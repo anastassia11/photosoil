@@ -101,7 +101,6 @@ export default function Soils({ soils, isAllSoils }) {
     }
 
     const SoilCard = ({ photo, name, id }) => {
-        console.log(name, photo.path)
         return <Link href={`${pathname}/${id}`}
             onClick={() => router.push(id)}
             className='relative aspect-[2/3] overflow-hidden transition-all

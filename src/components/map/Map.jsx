@@ -33,12 +33,10 @@ const Map = memo(function Map({ }) {
         }
     }
 
-
     useEffect(() => {
         if (didLogRef.current === false) {
             didLogRef.current = true
             window.Create2dMap('map')
-
         }
     }, [])
 

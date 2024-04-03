@@ -2,6 +2,7 @@
 
 import { getSoil } from '@/api/get_soil'
 import DynamicMap from '@/components/map/DynamicMap'
+import MapPointView from '@/components/map/MapPointView'
 import Zoom from '@/components/map/Zoom'
 import Gallery from '@/components/soils/Gallery'
 import { BASE_URL, SOIL_INFO } from '@/utils/constants'
@@ -37,11 +38,6 @@ export default function SoilPage({ params: { id } }) {
         fetchSoil()
     }, [])
 
-
-    useEffect(() => {
-        console.log(soil.photo)
-    }, [soil])
-
     return (
         <div className='flex flex-col'>
             <h1 className='text-2xl font-semibold mb-2'>
@@ -68,7 +64,7 @@ export default function SoilPage({ params: { id } }) {
             </div>
             <div className='flex flex-row mt-6 space-x-8'>
                 <div className='w-1/2'>
-                    <Gallery mainPhoto={soil.photo} objectPhoto={soil.objectPhoto} />
+                    {/* <Gallery mainPhoto={soil.photo} objectPhoto={soil.objectPhoto} /> */}
                 </div>
                 <div className='w-1/2'>
                     <h3 className='text-2xl font-semibold mb-2'>
@@ -132,10 +128,10 @@ export default function SoilPage({ params: { id } }) {
             </button>
             {mapVisible ? <div id='map-section' className='mt-4 border rounded-lg overflow-hidden'>
                 <div className='relative w-full aspect-[2/1]'>
-                    <DynamicMap />
-                    <div className='z-20 absolute top-[calc(50%-112px)] right-0'>
+                    <MapPointView latitude={soil.latitude} longtitude={soil.longtitude} />
+                    {/* <div className='z-20 absolute top-[calc(50%-112px)] right-0'>
                         <Zoom />
-                    </div>
+                    </div> */}
                 </div>
             </div> : ''}
             {soil.ecoSystems?.length ?

@@ -8,15 +8,14 @@ import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { fromLonLat } from 'ol/proj';
 import { OSM, Vector as VectorSource } from 'ol/source';
 
-
-
-
-window.CreatePointViewMap = function (mapDivId, latDec,lonDec) {
+window.CreatePointViewMap = function (mapDivId, latDec, lonDec) {
+    console.log(mapDivId, latDec, lonDec);
 
     var isCoordExist = true;
 
     //если координаты пустые
     if (latDec === "" || lonDec === "") {
+        console.log('координаты пустые')
         isCoordExist = false;
     }
 
@@ -24,6 +23,7 @@ window.CreatePointViewMap = function (mapDivId, latDec,lonDec) {
 
     //если координаты не действительны
     if (isNaN(startcoords[0]) || isNaN(startcoords[1])) {
+        console.log('координаты не действительны')
         isCoordExist = false;
         startcoords = fromLonLat([85.9075867, 53.1155423]);
     }
@@ -33,6 +33,7 @@ window.CreatePointViewMap = function (mapDivId, latDec,lonDec) {
         center: startcoords,
         zoom: 8.5
     });
+    console.log(view)
 
     //создаем новую карту
     const map = new Map({
@@ -42,17 +43,19 @@ window.CreatePointViewMap = function (mapDivId, latDec,lonDec) {
             })
         ],
         target: mapDivId,
-        view: view
+        view: view,
     });
 
     if (isCoordExist) {
         //Геометрия метки
         const selectedPointGeom = new Point(startcoords);
+        console.log(selectedPointGeom)
 
         //Создаем метку
         const selectedPoint = new Feature({
             geometry: selectedPointGeom,
         });
+        console.log(selectedPoint)
 
         //Стиль метки
         selectedPoint.setStyle(
@@ -60,7 +63,7 @@ window.CreatePointViewMap = function (mapDivId, latDec,lonDec) {
                 image: new Icon({
                     anchor: [0.5, 1],
                     scale: 0.15,
-                    src: '/img/ui/mapicons/map-marker.svg'
+                    src: '/map-marker.svg'
                 }),
             })
         );
@@ -71,7 +74,7 @@ window.CreatePointViewMap = function (mapDivId, latDec,lonDec) {
                 features: [selectedPoint]
             })
         });
-
+        console.log(vectorLayer);
         map.addLayer(vectorLayer);
     }
 }
