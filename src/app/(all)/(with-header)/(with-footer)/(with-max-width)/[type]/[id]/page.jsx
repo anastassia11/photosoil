@@ -1,12 +1,12 @@
 'use client'
 
 import { getSoil } from '@/api/get_soil'
-import DynamicMap from '@/components/map/DynamicMap'
 import Zoom from '@/components/map/Zoom'
 import Gallery from '@/components/soils/Gallery'
 import { BASE_URL, SOIL_INFO } from '@/utils/constants'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
+import Map from '@/components/map/Map';
 
 
 export default function SoilPage({ params: { id } }) {
@@ -132,7 +132,7 @@ export default function SoilPage({ params: { id } }) {
             </button>
             {mapVisible ? <div id='map-section' className='mt-4 border rounded-lg overflow-hidden'>
                 <div className='relative w-full aspect-[2/1]'>
-                    <DynamicMap />
+                    <Map />
                     <div className='z-20 absolute top-[calc(50%-112px)] right-0'>
                         <Zoom />
                     </div>

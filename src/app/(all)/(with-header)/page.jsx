@@ -1,9 +1,12 @@
 'use client'
 
-import DynamicMap from '@/components/map/DynamicMap';
+import { getEcosystems } from '@/api/get_ecosystems';
+import { getSoils } from '@/api/get_soils';
 import LayersPanel from '@/components/map/LayersPanel';
+import Map from '@/components/map/Map';
 import SideBar from '@/components/map/SideBar';
 import Zoom from '@/components/map/Zoom';
+import { useEffect, useState } from 'react';
 
 // export const metadata = {
 //   title: "Визуальная база данных почв и экосистем | PhotoSOIL",
@@ -16,7 +19,7 @@ export default function HomePage() {
 
   return (
     <div className="relative w-screen h-[calc(100vh-64px)]">
-      <DynamicMap />
+      <Map />
       <div className='z-20 absolute top-0 right-0 m-2'>
         <LayersPanel />
       </div>
