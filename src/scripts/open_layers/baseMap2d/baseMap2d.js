@@ -15,6 +15,7 @@ import proj4 from 'proj4';
 import randomColor from 'randomcolor';
 import $ from "jquery";
 import Control from 'ol/control/Control';
+import { BASE_SERVER_URL } from '@/utils/constants';
 
 
 
@@ -121,22 +122,17 @@ window.Create2dMap = function (mapDivId) {
     loadLayers();
     //Загружает слои
     function loadLayers() {
-        layers.set('Stations', getLayer('Stations', fromWgsToProj));
-        layers.set('MeteoStations', getLayer('MeteoStations', fromWgsToProj));
-        layers.set('Expeditions', getLayer('Expeditions', fromWgsToProj));
-        layers.set('Projects', getLayer('Projects', fromWgsToProj));
-        layers.set('Probes', getLayer('Probes', fromWgsToProj));
-        layers.set('Publications', getLayer('Publications', fromWgsToProj));
-        layers.set('GeoMaps', getLayer('GeoMaps', fromWgsToProj));
+        layers.set('SoilObjects', getLayer('SoilObject', fromWgsToProj));
+        layers.set('EcoSystem', getLayer('EcoSystem', fromWgsToProj));
+        layers.set('Publication', getLayer('Publication', fromWgsToProj));
         for (let lay of layers.values()) {
             map.addLayer(lay);
             lay.setZIndex(5);
         }
 
-        layers.get('Expeditions').setZIndex(1);
     }
     //Отслеживает изменения выбранных слоев
-    $(".layerCheker").change(function (e) {
+    $(".layerCheker").on("change", function (e) {
         //Получаем чекбокс по которому кликнули
         let prjKey = $(this).data("scrtype");
         //Получаем слой
@@ -505,83 +501,26 @@ function getLayer(layerName, fromWgsToProj) {
     let layerVectorSource = new VectorSource();
     let layerZIndex = 5;
 
-    let url = `/api/MapLayers/Get${layerName}`;
+    let url = `http://cloudcfd.ru:1515/api/${layerName}/GetAll`;
     $.getJSON(url, function (data) {
 
         let layerStyle = getIconStyleByLayerName(layerName);
 
-
-
-        if (layerName === 'Expeditions') {
-            layerZIndex = 10;
-            for (let i = 0; i < data.length; i++) {
-                if (!data[i].rout) continue;
-                let routStr = data[i].rout;
-                let repRoutStr = routStr.replace('\\', '');
-                data[i].rout = JSON.parse(repRoutStr);
-                let sortRoutCoords = data[i].rout.sort(function (x, y) {
-                    return x.poz - y.poz;
-                }).map(function (item) {
-                    return fromWgsToProj([item.lon, item.lat]);
-                });
-
-                let newroutLineFeature = new Feature(
-                    new LineString(sortRoutCoords)
-                );
-
-                let layerStyle = new Style({
-                    image: new Icon({
-                        anchor: [0.5, 1],
-                        scale: 0.05,
-                        src: '/img/ui/mapicons/ExpeditionMap.png'
-                    }),
-                });
-
-                let expStule = new Style({
-                    fill: new Fill({
-                        color: "#ff9900",
-                    }),
-                    stroke: new Stroke({
-                        color: "#ff9900",
-                        width: 2,
-                        lineDash: [5, 5]
-                    })
-                });
-
-                for (let j = 0; j < sortRoutCoords.length; j++) {
-                    let newPointFeature = new Feature({
-                        geometry: new Point(sortRoutCoords[j])
-                    });
-                    newPointFeature.set("p_Id", data[i].id);
-                    newPointFeature.set("p_type", data[i].type);
-                    newPointFeature.set("isGeoMapFeature", false);
-                    newPointFeature.setStyle(layerStyle);
-                    layerVectorSource.addFeature(newPointFeature);
-                }
-
-                newroutLineFeature.set("p_Id", data[i].id);
-                newroutLineFeature.set("p_type", data[i].type);
-                newroutLineFeature.set("isGeoMapFeature", false);
-                //устанавливаем стиль
-                newroutLineFeature.setStyle(expStule);
-                //layerVectorSource.setStyle(expStule);
-                layerVectorSource.addFeature(newroutLineFeature);
-            }
-        } else {
-            for (let i = 0; i < data.length; i++) {
+            for (let i = 0; i < data.response.length; i++) {
+                console.log(data.response[i].longtitude)
+                console.log(data.response[i].latitude)
                 //создаем новую точку
                 let newPointFeature = new Feature({
-                    geometry: new Point(fromWgsToProj([data[i].lon, data[i].lat]))
+                    geometry: new Point(fromWgsToProj([data.response[i].longtitude, data.response[i].latitude]))
                 });
-                newPointFeature.set("p_Id", data[i].id);
-                newPointFeature.set("p_type", data[i].type);
+                newPointFeature.set("p_Id", data.response[i].id);
+                newPointFeature.set("p_type", data.response[i].type);
                 newPointFeature.set("isGeoMapFeature", false);
                 //устанавливаем стиль
                 newPointFeature.setStyle(layerStyle);
 
                 layerVectorSource.addFeature(newPointFeature);
             }
-        }
 
     });
 
@@ -594,28 +533,18 @@ function getLayer(layerName, fromWgsToProj) {
 
 //Создает стиль иконки по типу слоя
 function getIconStyleByLayerName(layerName) {
-    if (layerName === "Stations") {
-        return createIconStyle('/img/ui/mapicons/StationMap.png');
+    if (layerName === "Publication") {
+
+        return createIconStyle('/mapicons/StationMap.png');
     }
-    if (layerName === "MeteoStations") {
-        return createIconStyle('/img/ui/mapicons/MeteoMao.png');
+    if (layerName === "EcoSystem") {
+        return createIconStyle('/mapicons/MeteoMao.png');
     }
-    if (layerName === "Publications") {
-        return createIconStyle('/img/ui/mapicons/PublicationMap.png');
+    if (layerName === "SoilObject") {
+        return createIconStyle('/mapicons/PublicationMap.png');
     }
-    if (layerName === "Expeditions") {
-        return createIconStyle('/img/ui/mapicons/ExpeditionMap.png');
-    }
-    if (layerName === "Projects") {
-        return createIconStyle('/img/ui/mapicons/ProjectMap.png');
-    }
-    if (layerName === "Probes") {
-        return createIconStyle('/img/ui/mapicons/ProbeMap.png', 0.07);
-    }
-    if (layerName === "GeoMaps") {
-        return createIconStyle('/img/ui/mapicons/GeoMap.png');
-    }
-    return createIconStyle('/img/ui/mapicons/map-marker.svg');
+
+    return createIconStyle('/public/mapicons/map-marker.svg');
 }
 
 //Создает стиль иконки по Url
