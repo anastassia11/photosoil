@@ -3,9 +3,9 @@ import React, { useState } from 'react'
 
 export default function SideBar() {
     const [sidebarOpen, setSideBarOpen] = useState(true);
-    const [soils, setSoils]=useState(true);
-    const [ecosystems, setEcosystems]=useState(true);
-    const [publications, setPublications]=useState(true);
+    const [soils, setSoils] = useState(true);
+    const [ecosystems, setEcosystems] = useState(true);
+    const [publications, setPublications] = useState(true);
 
     const handleViewSidebar = () => {
         setSideBarOpen(!sidebarOpen);
@@ -16,30 +16,30 @@ export default function SideBar() {
         shadow-lg bg-white duration-300 rounded-lg m-2`}>
 
             <div className='relative h-full'>
-            <div class="px-3 pt-1">
-        <div class="text-xl font-bold cursor-pointer pb-1">Слои карты</div>
-            <div x-show="show" x-transition>
-                <div class="form-control">
-                    <label class="cursor-pointer label">
-                        <span class="label-text">Почвенные объекты</span> 
-                        <input type="checkbox" checked={soils} onChange={e=>setSoils(!soils)} data-scrtype="SoilObjects" class="toggle layerCheker toggle-primary"/>
-                    </label>
-                </div>
-                <div class="form-control">
-                    <label class="cursor-pointer label">
-                        <span class="label-text">Метео станции</span> 
-                        <input type="checkbox" checked={ecosystems} onChange={e=>setEcosystems(!ecosystems)} data-scrtype="EcoSystem" class="toggle layerCheker  toggle-secondary"/>
-                    </label>
-                </div>
-                <div class="form-control">
-                    <label class="cursor-pointer label">
-                        <span class="label-text">Публикации</span> 
-                        <input type="checkbox" checked={publications} onChange={e=>setPublications(!publications)} data-scrtype="Publication" class="toggle layerCheker toggle-accent"/>
-                    </label>
-                </div>
+                <div class="px-3 pt-1">
+                    <div class="text-xl font-bold cursor-pointer pb-1">Слои карты</div>
+                    <div x-show="show" x-transition>
+                        <div class="form-control">
+                            <label class="cursor-pointer label">
+                                <span class="label-text">Почвенные объекты</span>
+                                <input type="checkbox" checked={soils} onChange={e => setSoils(!soils)} data-scrtype="SoilObjects" class="toggle layerCheker toggle-primary" />
+                            </label>
+                        </div>
+                        <div class="form-control">
+                            <label class="cursor-pointer label">
+                                <span class="label-text">Метео станции</span>
+                                <input type="checkbox" checked={ecosystems} onChange={e => setEcosystems(!ecosystems)} data-scrtype="EcoSystem" class="toggle layerCheker  toggle-secondary" />
+                            </label>
+                        </div>
+                        <div class="form-control">
+                            <label class="cursor-pointer label">
+                                <span class="label-text">Публикации</span>
+                                <input type="checkbox" checked={publications} onChange={e => setPublications(!publications)} data-scrtype="Publication" class="toggle layerCheker toggle-accent" />
+                            </label>
+                        </div>
 
-            </div>
-        </div>
+                    </div>
+                </div>
                 <button onClick={handleViewSidebar} className="absolute -right-8 top-0 bg-white w-6 h-10 rounded-md shadow-md">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
                         className={`${sidebarOpen ? 'rotate-90' : '-rotate-90'}`}>

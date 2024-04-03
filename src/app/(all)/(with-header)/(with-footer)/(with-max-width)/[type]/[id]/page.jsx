@@ -1,7 +1,6 @@
 'use client'
 
 import { getSoil } from '@/api/get_soil'
-import DynamicMap from '@/components/map/DynamicMap'
 import MapPointView from '@/components/map/MapPointView'
 import Zoom from '@/components/map/Zoom'
 import Gallery from '@/components/soils/Gallery'
