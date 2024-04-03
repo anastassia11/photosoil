@@ -6,10 +6,7 @@ const MapSelect = memo(function MapSelect({ }) {
     const didLogRef = useRef(false)
 
     useEffect(() => {
-        if (didLogRef.current === false) {
-            didLogRef.current = true
             window.CreatePointSelectMap('map', '#LatitudeDec', '#LongtitudeDec', '#LatitudeMinSec', '#LongtitudeMinSec', '#smbbtm');
-        }
     }, [])
 
     return (

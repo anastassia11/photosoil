@@ -27,7 +27,7 @@ window.CreatePointViewMap = function (mapDivId, latDec, lonDec) {
         isCoordExist = false;
         startcoords = fromLonLat([85.9075867, 53.1155423]);
     }
-
+    console.log(startcoords)
     //Создаем вид
     const view = new View({
         center: startcoords,

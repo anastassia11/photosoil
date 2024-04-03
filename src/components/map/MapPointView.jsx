@@ -10,7 +10,9 @@ const MapPointView = memo(function MapPointView({ latitude, longtitude }) {
     const didLogRef = useRef(false)
 
     useEffect(() => {
-        window.CreatePointViewMap('map-point-view', latitude, longtitude);
+        if(latitude!= undefined){
+            window.CreatePointViewMap('map-point-view', latitude, longtitude);
+        }
         // if (didLogRef.current === false) {
         //     didLogRef.current = true
         //     window.CreatePointViewMap('map-point-view', latDec, lonDec);

@@ -169,7 +169,7 @@ export default function Soils({ soils, isAllSoils }) {
                             onChange={(newData) => handleCategoryChange(newData)} />
 
                     </li> : ''}
-                    {classifications.map(item => <li key={item.id}>
+                    {classifications?.map(item => <li key={item.id}>
                         <Filter name={item.name} items={item.terms}
                             allSelectedItems={selectedTerms}
                             onChange={(newData) => handleTermsChange(newData)} />

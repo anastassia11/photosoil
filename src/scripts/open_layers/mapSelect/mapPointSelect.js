@@ -102,7 +102,7 @@ window.CreatePointSelectMap = function (mapDivId, latitudeDecSelector, longtitud
     const longtitudeDec = $(longtitudeDecSelector);
     const latitudeMinSec = $(latitudeMinSecSelector);
     const longtitudeMinSec = $(longtitudeMinSecSelector);
-
+    onInputCoordChenged();
     //Обработчик изменения координат через input
     function onInputCoordChenged() {
         //если координаты не определены
