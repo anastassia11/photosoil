@@ -12,17 +12,7 @@ export default function SideBar() {
         shadow-lg bg-white duration-300 rounded-lg m-2`}>
 
             <div className='relative h-full'>
-                {/* <label
-                    htmlFor="AcceptConditions"
-                    className="relative h-8 w-14 cursor-pointer rounded-full bg-gray-300 transition [-webkit-tap-highlight-color:_transparent] has-[:checked]:bg-green-500"
-                >
-                    <input type="checkbox" id="AcceptConditions" className="peer sr-only" />
 
-                    <span
-                        className="absolute inset-y-0 start-0 m-1 size-6 rounded-full bg-white transition-all peer-checked:start-6"
-                    ></span>
-                </label>
-                сампиртоьл */}
                 <button onClick={handleViewSidebar} className="absolute -right-8 top-0 bg-white w-6 h-10 rounded-md shadow-md">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
                         className={`${sidebarOpen ? 'rotate-90' : '-rotate-90'}`}>

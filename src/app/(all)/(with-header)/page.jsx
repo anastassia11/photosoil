@@ -12,6 +12,8 @@ import Zoom from '@/components/map/Zoom';
 
 export default function HomePage() {
 
+
+
   return (
     <div className="relative w-screen h-[calc(100vh-64px)]">
       <DynamicMap />
