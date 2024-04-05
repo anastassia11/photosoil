@@ -6,7 +6,7 @@ import View from 'ol/View';
 import { Icon, Style, Fill, Stroke } from 'ol/style';
 import { Tile as TileLayer, Vector as VectorLayer, VectorImage as VectorImageLayer, } from 'ol/layer';
 import { fromLonLat, toLonLat } from 'ol/proj';
-import { OSM, XYZ, BingMaps, Vector as VectorSource } from 'ol/source';
+import { OSM,Cluster, XYZ, BingMaps, Vector as VectorSource } from 'ol/source';
 import { GPX, GeoJSON, IGC, KML, TopoJSON } from 'ol/format';
 import { get as getProjection, getTransform } from 'ol/proj';
 import { register } from 'ol/proj/proj4';
@@ -16,10 +16,17 @@ import randomColor from 'randomcolor';
 import $ from "jquery";
 import Control from 'ol/control/Control';
 import { BASE_SERVER_URL } from '@/utils/constants';
+import {
+    Circle as CircleStyle,
+    Text,
+  } from 'ol/style.js';
+
 
 
 
 window.Create2dMap = function (mapDivId) {
+
+
     proj4.defs("EPSG:32647", "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs");
     proj4.defs("EPSG:32645", "+proj=utm +zone=45 +datum=WGS84 +units=m +no_defs");
     proj4.defs("EPSG:32644", "+proj=utm +zone=44 +datum=WGS84 +units=m +no_defs");
@@ -36,17 +43,120 @@ window.Create2dMap = function (mapDivId) {
         center: startcoords,
         zoom: 8.5
     });
+ 
+
+    window.selectLocationHandler = function (item) {
+        const newCord = fromLonLat([item.lon, item.lat]);
+
+        view.animate({ duration: 500 }, { center: newCord, extent: extent,zoom:view.getZoom + 10});
+    }
+    
+
+
+        
+    // document.getElementById('btnsearch').onclick = function () {
+    //     var searchstring = document.getElementById('search').value
+    //     const params = {
+    //         q:searchstring,
+    //         format: 'json',
+    //         addressdetails: 1,
+    //         polygon_geojson:0
+    //     }
+    //     const queryString = new URLSearchParams(params).toString();
+    //     const requestOptions ={
+    //         method:"GET",
+    //         redirect: "follow"
+    //     }
+    //     var result = fetch(`https://nominatim.openstreetmap.org/search?${queryString}`,requestOptions)
+    //         .then((response) => response.text())
+    //         .then((result)=> JSON.parse(result))
+    //         .then((result) =>{
+    //             const newCord = fromLonLat([result[0].lon, result[0].lat]);
+    //             console.log(result)
+
+    //             //view.fit(result[0], { duration: 500 });
+
+    //             view.animate({ duration: 500 }, { center: newCord});
+    //         })
+    //         .catch((err)=>console.log("err", err))
+    
+    //         console.log(result);
+    
+    // };
+
+
+
 
     //Базовый слой карты
     const baseLayer = new TileLayer();
 
+
+
+
+    const count = 20000;
+    const features = new Array(count);
+    const e = 4500000;
+    for (let i = 0; i < count; ++i) {
+      const coordinates = [2 * e * Math.random() - e, 2 * e * Math.random() - e];
+      features[i] = new Feature(new Point(coordinates));
+    }
+    
+    const source = new VectorSource({
+      features: features,
+    });
+
+    const clusterSource = new Cluster({
+        distance: parseInt(1000, 10),
+        minDistance: parseInt(5, 10),
+        source: source,
+      });
+
+      const styleCache = {};
+      const clusters = new VectorLayer({
+        source: clusterSource,
+        style: function (feature) {
+          const size = feature.get('features').length;
+          let style = styleCache[size];
+          if (!style) {
+            style = new Style({
+              image: new CircleStyle({
+                radius: 10,
+                stroke: new Stroke({
+                  color: '#fff',
+                }),
+                fill: new Fill({
+                  color: '#3399CC',
+                }),
+              }),
+              text: new Text({
+                text: size.toString(),
+                fill: new Fill({
+                  color: '#fff',
+                }),
+              }),
+            });
+            styleCache[size] = style;
+          }
+          return style;
+        },
+      });
+
+
+
     //создаем новую карту
     const map = new OLMap({
-        layers: [baseLayer],
+        layers: [baseLayer,clusters],
         target: mapDivId,
         view: view,
         controls: []
     });
+
+
+
+
+
+
+
 
     let zoomType;
     document.getElementById('customZoomOut').onclick = function () {
@@ -426,48 +536,16 @@ window.Create2dMap = function (mapDivId) {
 
     map.on('singleclick', function (event) {
 
-        $('#selectedlayerTableContainer').html('');
-
-
         if (map.hasFeatureAtPixel(event.pixel) === true) {
             let selectedFeatures = map.getFeaturesAtPixel(event.pixel);
+            console.log(selectedFeatures)
+            
+            document.getElementById("selectInput").value = "/api/" + selectedFeatures[0].get("p_type") + "/GetById?Id=" + selectedFeatures[0].get("p_Id");
 
-            for (let f of selectedFeatures) {
-                if (f.get("isGeoMapFeature") === false) {
-                    $('#mapinfobox').html(getMapInfoBoxStartData());
-                    $('#mapinfobox').fadeIn();
-
-                    $.get("/MapInfoBox/" + selectedFeatures[0].get("p_type") + "?id=" + selectedFeatures[0].get("p_Id"), function (data) {
-                        $('#mapinfobox').html(data);
-                    });
-
-                    if (f.get("p_type") === "GeoMaps") loadGeoMapLayers(f.get("p_Id"));
-
-                    selectedFeatureGeoMapLayer.getSource().removeFeature(selectedGeoMapFeature);
-                    selectedGeoMapFeature = null;
-                    return;
-                }
-            }
-
-            for (let feature of selectedFeatures) {
-                if (feature.get("isGeoMapFeature") === true) {
-                    if (feature !== selectedGeoMapFeature) {
-                        if (selectedGeoMapFeature) {
-                            selectedFeatureGeoMapLayer.getSource().removeFeature(selectedGeoMapFeature);
-                        }
-                        if (feature) {
-                            selectedFeatureGeoMapLayer.getSource().addFeature(feature);
-                        }
-                        selectedGeoMapFeature = feature;
-                    }
-                    printSelectedFeatureTable();
-                    return;
-                }
-            }
+            var event = new Event('change');
+            document.getElementById("selectInput").dispatchEvent(event);
         }
-        $('#mapinfobox').fadeOut();
 
-        selectedFeatureGeoMapLayer.getSource().removeFeature(selectedGeoMapFeature);
         selectedGeoMapFeature = null;
     });
 
@@ -501,10 +579,11 @@ function getLayer(layerName, fromWgsToProj) {
     let layerVectorSource = new VectorSource();
     let layerZIndex = 5;
 
-    let url = `http://cloudcfd.ru:1515/api/${layerName}/GetAll`;
+    let url = `${BASE_SERVER_URL}/api/${layerName}/GetAll`;
     $.getJSON(url, function (data) {
 
         let layerStyle = getIconStyleByLayerName(layerName);
+        console.log(data.response)
 
             for (let i = 0; i < data.response.length; i++) {
                 console.log(data.response[i].longtitude)
@@ -514,7 +593,7 @@ function getLayer(layerName, fromWgsToProj) {
                     geometry: new Point(fromWgsToProj([data.response[i].longtitude, data.response[i].latitude]))
                 });
                 newPointFeature.set("p_Id", data.response[i].id);
-                newPointFeature.set("p_type", data.response[i].type);
+                newPointFeature.set("p_type", layerName);
                 newPointFeature.set("isGeoMapFeature", false);
                 //устанавливаем стиль
                 newPointFeature.setStyle(layerStyle);
