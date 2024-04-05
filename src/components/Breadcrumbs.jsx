@@ -113,18 +113,14 @@ export default function Breadcrumbs({ homeElement }) {
 
     return (
         <ul className='flex items-center py-4 whitespace-nowrap' >
-            {homeElement && <>
-                <li className='hover:underline'><Link href={'/'}>{homeElement}</Link></li>
-                {pathNames.length > 0 && separator}
-            </>}
             {breadcrumbs.map(({ href, itemTitle, isRef }, index) =>
-                <div key={href}>
-                    <li className={`${breadcrumbs.length === index + 1 ? 'text-blue-600' : ''}
-                    ${isRef ? 'hover:underline' : ''}`}>
+                <li key={href} className='flex flex-row'>
+                    <div className={`${breadcrumbs.length === index + 1 ? 'text-blue-600' : ''}
+                    ${isRef ? 'hover:underdivne' : ''}`}>
                         {isRef ? <Link href={href}>{itemTitle}</Link> : itemTitle}
-                    </li>
+                    </div>
                     {breadcrumbs.length !== index + 1 && separator}
-                </div>)}
+                </li>)}
         </ul>
     )
 }

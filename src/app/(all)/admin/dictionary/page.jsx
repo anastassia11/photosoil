@@ -38,6 +38,7 @@ export default function DictionaryAdminPage() {
         }))
 
         const isConfirm = await dispatch(confirmationModal());
+        console.log('isConfirm', isConfirm)
         if (isConfirm.payload) {
             await fetchDeleteDisconary(id);
         }

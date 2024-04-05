@@ -170,6 +170,7 @@ export default function SoilForm({ item, mainSoilPhoto, otherSoilPhoto, onItemCh
         }))
 
         const isConfirm = await dispatch(confirmationModal());
+        console.log('isConfirm', isConfirm)
         if (isConfirm.payload) {
             await mainPhotoDelete(id);
         }

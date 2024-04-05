@@ -152,6 +152,7 @@ export default function CreatePage() {
         }))
 
         const isConfirm = await dispatch(confirmationModal());
+        console.log('isConfirm', isConfirm)
         if (isConfirm.payload) {
             if (Number.isInteger(photos[idx].id)) {
                 await fetchDeletePhoto(photos[idx].id, idx)
@@ -210,7 +211,7 @@ export default function CreatePage() {
                 <p className='max-w-full flex overflow-hidden rounded-b-lg px-4 py-2 text-sm font-medium z-10 absolute
                  bottom-0 max-h-[25%] backdrop-blur-md bg-black bg-opacity-40 text-white w-full
                  overflow-ellipsis'>
-                    {formData.find((item, index) => index == idx).name ?? 'Без имени'}
+                    {formData.find((item, index) => index == idx)?.name ?? 'Без имени'}
                 </p>
             </div>
         </div>

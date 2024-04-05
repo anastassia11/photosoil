@@ -40,6 +40,7 @@ export default function ObjectsPage() {
         }))
 
         const isConfirm = await dispatch(confirmationModal());
+        console.log('isConfirm', isConfirm)
         if (isConfirm.payload) {
             await fetchDeleteSoil(id);
         }
@@ -58,7 +59,7 @@ export default function ObjectsPage() {
                     Создать объекты
                 </Link>
             </div>
-            <ObjectsView _objects={soils} onDeleteClick={handleDeleteClick} pathname='objects' />
+            <ObjectsView _objects={soils} onDeleteClick={handleDeleteClick} pathname='objects' visibilityControl={true} />
         </div >
     );
 }
