@@ -255,7 +255,7 @@ export default function ObjectsView({ _objects, onDeleteClick, pathname, visibil
             <div className='relative flex flex-row justify-between min-h-[42px] '>
                 <div className='relative w-full'>
                     <div className={`absolute overflow-hidden w-fit inline-flex bg-white border divide-x rounded-lg duration-200
-                    ${!visibilityControl ? 'opacity-0' : (!selectedObjects.length ? 'opacity-0 invisible' : 'opacity-100')}`}
+                    ${!visibilityControl ? 'opacity-0' : (selectedObjects.length ? 'opacity-0 invisible' : 'opacity-100')}`}
                     >
                         <button className={`min-w-fit px-5 py-2 font-medium text-zinc-600 transition-colors duration-200
                         ${publishStatus === 'all' ? 'bg-zinc-100' : 'hover:bg-zinc-100 bg-none'}`}
@@ -318,7 +318,7 @@ export default function ObjectsView({ _objects, onDeleteClick, pathname, visibil
                                 pathname === 'authors' ? <AuthorTableHead /> :
                                     <TableHead />}
                             <tbody className="bg-white divide-y divide-zinc-200">
-                                {currentItems.map(object => {
+                                {filteredObjects.map(object => {
                                     return pathname === 'dictionary' ? DictionaryTableRow(object) :
                                         pathname === 'authors' ? AuthorTableRow(object) :
                                             TableRow(object)

@@ -1,9 +1,6 @@
 'use client'
 
 import { getSoil } from '@/api/get_soil'
-import MapPointView from '@/components/map/MapPointView'
-import Zoom from '@/components/map/Zoom'
-import Gallery from '@/components/soils/Gallery'
 import SoilObject from '@/components/soils/SoilObject'
 import { BASE_URL, SOIL_INFO } from '@/utils/constants'
 import Link from 'next/link'

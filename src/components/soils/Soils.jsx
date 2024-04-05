@@ -192,8 +192,8 @@ export default function Soils({ soils, isAllSoils, _filtersVisible, type }) {
                 </li>)}
             </ul>
 
-            {/* <Pagination itemsPerPage={itemsPerPage} items={filteredSoils}
-                updateCurrentItems={(newCurrentItems) => setCurrentItems(newCurrentItems)} /> */}
+            <Pagination itemsPerPage={itemsPerPage} items={filteredSoils}
+                updateCurrentItems={(newCurrentItems) => setCurrentItems(newCurrentItems)} />
 
         </div >
     )

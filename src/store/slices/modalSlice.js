@@ -8,6 +8,8 @@ export const confirmationModal = createAsyncThunk(
         return new Promise(resolve => {
             const unsubscribe = store.subscribe(() => {
                 const state = store.getState();
+                console.log(state)
+                console.log(state.modal)
                 if (state.modal.isConfirm) {
                     unsubscribe();
                     resolve(true);
