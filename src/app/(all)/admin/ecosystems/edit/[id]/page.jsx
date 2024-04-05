@@ -1,54 +1,48 @@
 'use client'
 
-import { getSoilPhoto } from '@/api/get_photo';
-import { getSoil } from '@/api/get_soil'
-import { getSoilForPut } from '@/api/get_soil_for_put';
-import { putPhoto } from '@/api/put_photo';
-import { putSoil } from '@/api/put_soil';
 import SoilForm from '@/components/admin-panel/SoilForm'
-import { closeAlert, openAlert } from '@/store/slices/alertSlice';
-import React, { useEffect, useState } from 'react'
-import { Oval } from 'react-loader-spinner';
+import { useEffect, useState } from 'react';
+import { Oval } from 'react-loader-spinner'
 import { useDispatch } from 'react-redux';
 
-export default function SoilEditPage({ params: { id } }) {
+export default function EcosystemEditPage({ params: { id } }) {
     const dispatch = useDispatch();
 
-    const [soil, setSoil] = useState({});
+    const [ecosystem, setEcosystem] = useState({});
     const [mainPhoto, setMainPhoto] = useState({});
     const [otherPhotos, setOtherPhotos] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        fetchSoil()
+        fetchEcosystem()
     }, [])
 
-    const fetchSoil = async () => {
-        const result = await getSoilForPut(id);
+    const fetchEcosystem = async () => {
+        const result = await getEcosystemForPut(id);
         if (result.success) {
-            setSoil(result.data);
+            setEcosystem(result.data);
             fetchOtherPhotos(result.data.objectPhoto);
-            fetchSoilPhoto(result.data.photoId);
+            fetchEcosystemPhoto(result.data.photoId);
         }
     }
 
     const fetchOtherPhotos = async (photos) => {
         const objectPhotos = await Promise.all(photos.map(async (id) => {
-            const result = await getSoilPhoto(id);
+            const result = await getEcosystemPhoto(id);
             return result.success ? result.data : null;
         }));
         setOtherPhotos(objectPhotos.filter(photo => photo !== null));
     }
 
-    const fetchSoilPhoto = async (id) => {
-        const result = await getSoilPhoto(id)
+    const fetchEcosystemPhoto = async (id) => {
+        const result = await getEcosystemPhoto(id)
         if (result.success) {
             setMainPhoto(result.data)
         }
     }
 
-    const editSoil = async (id, data) => {
-        const result = await putSoil(id, data);
+    const editEcosystem = async (id, data) => {
+        const result = await putEcosystem(id, data);
         if (result.success) {
 
         }
@@ -73,7 +67,7 @@ export default function SoilEditPage({ params: { id } }) {
         setIsLoading(true);
         try {
             await Promise.all([
-                editSoil(id, soil),
+                editEcosystem(id, ecosystem),
                 editPhoto(mainPhoto.id, { title: mainPhoto.title }),
                 ...otherPhotos.map(photo => editPhoto(photo.id, { title: photo.title }))
             ]);
@@ -91,13 +85,13 @@ export default function SoilEditPage({ params: { id } }) {
         <div className="flex flex-col w-full space-y-4 ">
             <div className='flex flex-row justify-between items-center'>
                 <h1 className='text-2xl font-semibold'>
-                    Редактирование почвенного объекта
+                    Редактирование экосистемы
                 </h1>
             </div>
-            <SoilForm type='edit' item={soil}
-                mainSoilPhoto={mainPhoto}
-                otherSoilPhoto={otherPhotos}
-                onItemChange={(soil) => setSoil(soil)}
+            <SoilForm type='edit' item={ecosystem}
+                mainEcosystemPhoto={mainPhoto}
+                otherEcosystemPhoto={otherPhotos}
+                onItemChange={(ecosystem) => setEcosystem(ecosystem)}
                 onMainPhotoChange={handleMainPhotoChange}
                 onOtherPhotosChange={handleOtherPhotosChange} />
             <button

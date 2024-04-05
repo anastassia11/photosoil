@@ -20,8 +20,8 @@ export default function Filter({ name, items, allSelectedItems, onChange }) {
 
     useEffect(() => {
         items && setFilteredItems(items.filter((item) => {
-            if (item.fio) {
-                return item.fio.toLowerCase().includes(filterName.toLowerCase())
+            if (item.name) {
+                return item.name.toLowerCase().includes(filterName.toLowerCase())
             } else {
                 return item.name.toLowerCase().includes(filterName.toLowerCase())
             }
@@ -90,13 +90,13 @@ export default function Filter({ name, items, allSelectedItems, onChange }) {
                                 />
                             </div>
                             <ul className="scroll space-y-1 border-t border-gray-200 p-4 py-2 max-h-[200px] overflow-auto">
-                                {filteredItems.map(({ fio, name, id }) => <li key={id}>
+                                {filteredItems.map(({ name, id }) => <li key={id}>
                                     <label htmlFor={`Item${id}`} className="flex flex-row cursor-pointer">
                                         <input type="checkbox" id={`Item${id}`}
                                             checked={selectedItems.includes(id)}
                                             onChange={(e) => handleItemSelect(e, id)}
                                             className="min-w-5 w-5 min-h-5 h-5 mr-1 rounded border-gray-300 " />
-                                        <span className="text-gray-700 ml-2 ">{fio || name}</span>
+                                        <span className="text-gray-700 ml-2 ">{name}</span>
                                     </label>
                                 </li>)}
                             </ul>
@@ -107,7 +107,7 @@ export default function Filter({ name, items, allSelectedItems, onChange }) {
                 {pathNames.includes('create') || pathNames.includes('edit') ? <ul className='mt-2 flex flex-row flex-wrap max-w-full '>
                     {selectedItems.map(id => items.map(item => item.id === id && <li key={item.id}
                         className='border border-zinc-400 rounded-full min-w-fit h-fit px-2 flex flex-row justify-center space-x-2 mr-2 mb-1'>
-                        <p>{item.fio || item.name}</p>
+                        <p>{item.name}</p>
                         <button className='text-black pt-[1px]'
                             onClick={(e) => handleItemSelect(e, id)}>
                             <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className='w-[10px] h-[10px]'>

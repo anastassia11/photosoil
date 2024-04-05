@@ -32,7 +32,7 @@ export default function SoilsPage({ params: { type } }) {
                         type === 'dynamics' ? 'Динамика почв' :
                             type === 'morphological' ? 'Почвенные морфологические элементы' : ''}
             </h1>
-            <Soils soils={items} isAllSoils={type === 'soils'} />
+            <Soils soils={items} isAllSoils={type === 'soils'} type='soils' />
         </div >
     )
 }
