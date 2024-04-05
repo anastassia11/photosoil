@@ -73,11 +73,11 @@ export default function Breadcrumbs({ homeElement }) {
             isRef: true
         },
         'create': {
-            title: 'Создание объектов',
+            title: 'Создание',
             isRef: true
         },
         'edit': {
-            title: 'Редактирование объекта',
+            title: 'Редактирование',
             isRef: true
         },
     };
@@ -118,13 +118,13 @@ export default function Breadcrumbs({ homeElement }) {
                 {pathNames.length > 0 && separator}
             </>}
             {breadcrumbs.map(({ href, itemTitle, isRef }, index) =>
-                <React.Fragment key={href}>
+                <div key={href}>
                     <li className={`${breadcrumbs.length === index + 1 ? 'text-blue-600' : ''}
                     ${isRef ? 'hover:underline' : ''}`}>
                         {isRef ? <Link href={href}>{itemTitle}</Link> : itemTitle}
                     </li>
                     {breadcrumbs.length !== index + 1 && separator}
-                </React.Fragment>)}
+                </div>)}
         </ul>
     )
 }

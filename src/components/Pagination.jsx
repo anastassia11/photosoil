@@ -10,7 +10,6 @@ export default function Pagination({ itemsPerPage, items, updateCurrentItems }) 
 
     useEffect(() => {
         const endOffset = itemOffset + Number(itemsPerPage);
-        console.log('updateCurrentItems')
         console.log(items.slice(itemOffset, endOffset))
         updateCurrentItems(items.slice(itemOffset, endOffset));
         setPageCount(Math.ceil(items.length / itemsPerPage));

@@ -67,7 +67,6 @@ export default function CreatePage() {
 
     const requestSendPhoto = async (file) => {
         const result = await sendPhoto(file);
-        console.log(result)
         if (result.success) {
             setPhotos(prev => [...prev, { ...result.data }]);
             setFormData(prev => [...prev, { photoId: result.data.id }]);
@@ -100,7 +99,6 @@ export default function CreatePage() {
 
     const editPhoto = async (id, data) => {
         const result = await putPhoto(id, data);
-        console.log(result)
         if (result.success) {
 
         }
@@ -149,7 +147,7 @@ export default function CreatePage() {
     const handleSoilDelete = async (e, idx) => {
         dispatch(openModal({
             title: 'Предупреждение',
-            message: 'Объект будет удален навсегда',
+            message: 'Объект будет удален',
             buttonText: 'Удалить'
         }))
 
