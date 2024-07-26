@@ -1,16 +1,20 @@
-import { getclassifications } from '@/api/get_classifications'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useEffect, useRef, useState } from 'react'
 import Filter from './Filter'
 import { useDispatch, useSelector } from 'react-redux'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { BASE_SERVER_URL } from '@/utils/constants'
-import { addCategory, addTerm, setCategories, setTerms } from '@/store/slices/dataSlice'
+import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { BASE_SERVER_URL, PAGINATION_OPTIONS } from '@/utils/constants'
+import { addCategory, addTerm, deleteCategory, deleteTerm } from '@/store/slices/dataSlice'
 import Pagination from '../Pagination'
+import { useTranslation } from 'react-i18next'
+import Dropdown from '../admin-panel/Dropdown'
+import { useConstants } from '@/hooks/useConstants'
 
-export default function Soils({ soils, isAllSoils, _filtersVisible, type }) {
+export default function Soils({ soils, isAllSoils, isFilters, isDrafts, type }) {
     const dispatch = useDispatch();
+    const { locale } = useParams();
+    const { t } = useTranslation();
 
     const didLogRef = useRef(true);
     const pathname = usePathname();
@@ -20,44 +24,32 @@ export default function Soils({ soils, isAllSoils, _filtersVisible, type }) {
     const { selectedTerms, selectedCategories, classifications } = useSelector(state => state.data);
 
     const [filterName, setFilterName] = useState('');
-    const [filtersVisible, setFiltersVisible] = useState(_filtersVisible ?? true);
+    const [filtersVisible, setFiltersVisible] = useState(true);
     const [filteredSoils, setFilteredSoils] = useState([]);
 
     const [currentItems, setCurrentItems] = useState([]);
-    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [itemsPerPage, setItemsPerPage] = useState(0);
 
     const [draftIsVisible, setDraftIsVisible] = useState(false);
+    const [token, setToken] = useState(null);
 
-    const CATEGORY_FILTER = {
-        id: 'category',
-        name: 'Категория',
-        terms: [
-            {
-                id: 0,
-                name: 'Динамика почв'
-            },
-            {
-                id: 1,
-                name: 'Почвенные профили'
-            },
-            {
-                id: 2,
-                name: 'Почвенные морфологические элементы'
-            }
-        ]
-    }
-
-    const OPTIONS = ['3', '10', '20', '30', '40', '50']
+    const { SOIL_ENUM } = useConstants();
+    const CATEGORY_ARRAY = Object.entries(SOIL_ENUM).map(([key, value]) => ({
+        id: Number(key),
+        name: value,
+    }));
+    const _isEng = locale === 'en';
 
     useEffect(() => {
         setFilteredSoils(prev => soils.filter(soil =>
-            soil.name.toLowerCase().includes(filterName.toLowerCase()) &&
-            (selectedCategories.length === 0 || selectedCategories.includes(soil.objectType)) &&
+            soil.translations?.find(transl => transl.isEnglish === _isEng)?.name.toLowerCase().includes(filterName.toLowerCase())
+            && (selectedCategories.length === 0 || selectedCategories.includes(soil.objectType)) &&
             (selectedTerms.length === 0 || selectedTerms.some(selectedTerm => soil.terms.some(term => term === selectedTerm)))
         ))
     }, [filterName, selectedCategories, selectedTerms, soils])
 
     useEffect(() => {
+        setToken(JSON.parse(localStorage.getItem('tokenData'))?.token);
         if (didLogRef.current) {
             didLogRef.current = false
             const categoriesParam = searchParams.get('categories');
@@ -89,32 +81,54 @@ export default function Soils({ soils, isAllSoils, _filtersVisible, type }) {
         router.replace(pathname + '?' + params.toString())
     };
 
-
-    const handleCategoryChange = (newData) => {
-        dispatch(setCategories(newData))
+    const handleAddCategory = (newItem) => {
+        dispatch(addCategory(newItem))
     }
 
-    const handleTermsChange = (newData) => {
-        dispatch(setTerms(newData))
+    const handleDeleteCategorie = (newItem) => {
+        dispatch(deleteCategory(newItem))
     }
+
+    const handleResetCategories = (deletedItems) => {
+        for (let item of deletedItems) {
+            dispatch(deleteCategory(item))
+        }
+    }
+
+    const handleAddTerm = (newItem) => {
+        dispatch(addTerm(newItem))
+    }
+
+    const handleDeleteTerm = (deletedItem) => {
+        dispatch(deleteTerm(deletedItem))
+    }
+
+    const handleResetTerms = (deletedItems) => {
+        for (let item of deletedItems) {
+            dispatch(deleteTerm(item))
+        }
+    }
+
+    const isSoils = type === 'soils' || type === 'profiles' ||
+        type === 'morphological' || type === 'dynamics'
 
     const SoilCard = ({ photo, name, id }) => {
-        return <Link href={`${pathname}/${id}`}
+        return <Link href={`/${type}/${id}`}
             className='relative aspect-[2/3] overflow-hidden transition-all
-    bg-white rounded-md border border-zinc-400 flex flex-col hover:border-blue-600 duration-300 cursor-pointer'>
-            <div className='h-[100%] w-full overflow-hidden '
+    rounded-md  hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] flex flex-col  duration-300 cursor-pointer'>
+            <div className='h-[100%] w-full overflow-hidden opacity-80'
                 style={{
                     backgroundImage: `url("${BASE_SERVER_URL}${photo.path}")`,
                     backgroundSize: '200%',
                     backgroundPosition: 'center',
-                    filter: 'blur(7px)',
+                    filter: 'blur(3px)',
                 }}>
 
             </div>
-            <div className='h-[80%] absolute top-0 w-full flex'>
+            <div className='h-[75%] absolute top-0 w-full flex'>
                 <Image src={`${BASE_SERVER_URL}${photo.path}`} width={500} height={500} alt='soil' className='m-auto w-full h-full object-contain self-start' />
             </div>
-            <p className='p-4 text-sm font-medium z-10 absolute bottom-0 h-1/5 backdrop-blur-md bg-black bg-opacity-40 text-white w-full'>
+            <p className='p-4 text-sm font-medium z-10 absolute bottom-0 h-[25%] backdrop-blur-md bg-black/40 text-white w-full'>
                 {name}
             </p>
         </Link>
@@ -130,71 +144,84 @@ export default function Soils({ soils, isAllSoils, _filtersVisible, type }) {
                     <input value={filterName}
                         onChange={(e) => setFilterName(e.target.value)}
                         type="text"
-                        placeholder={`${type === 'soils' ? 'Найти по коду или названию' :
-                            type === 'ecosystems' ? "Найти по названию" :
-                                'Найти по имени'}`}
+                        placeholder={`${isSoils ? t('search_code') :
+                            type === 'ecosystems' ? t('search_title') :
+                                t('search_name')}`}
                         className="w-full py-2 pl-12 pr-4 border rounded-md outline-none bg-white focus:border-blue-600"
                     />
                 </div>
             </div>
-            <div className={`mb-4 flex flex-row justify-between items-center ${filtersVisible ? 'mb-2' : 'mb-4'}`}>
-                {type === 'soils' ? <button className='text-blue-600 w-fit' onClick={() => setFiltersVisible(!filtersVisible)}>
-                    {filtersVisible ? 'Скрыть фильтры' : 'Показать фильтры'}
+            <div className={`flex flex-row ${isDrafts ? 'justify-between' : 'justify-end'}  items-center ${filtersVisible && isFilters ? 'mb-2' : 'mb-4'}`}>
+                {isSoils && isFilters ? <button className='text-blue-600 w-fit' onClick={() => setFiltersVisible(!filtersVisible)}>
+                    {filtersVisible ? t('hide_filters') : t('show_filters')}
                 </button> : ''}
-                <label htmlFor='draftIsVisible' className={`flex-row cursor-pointer items-center justify-center
-                    ${type === 'soils' ? 'hidden' : 'flex'}`}>
+                {token && <label htmlFor='draftIsVisible' className={`flex-row cursor-pointer items-center justify-center
+                    ${isFilters || !isDrafts ? 'hidden' : 'flex'}`}>
                     <input type="checkbox" id='draftIsVisible'
                         checked={draftIsVisible}
                         onChange={() => setDraftIsVisible(!draftIsVisible)}
-                        className="min-w-5 w-5 min-h-5 h-5 mr-1 rounded border-gray-300 " />
-                    <span>Показывать черновики</span>
-                </label>
-                <div className='self-end flex-row items-center justify-center'>
-                    <span>На странице</span>
-                    <select value={itemsPerPage}
-                        onChange={e => setItemsPerPage(e.target.value)}
-                        className="ml-2 p-0 px-2 h-8 focus:outline-[0] border rounded-md outline-none">
-                        {OPTIONS.map((item) => <option value={item} key={item}
-                            className=''>{item}</option>)}
-                    </select >
+                        className="min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
+                    <span>{t('grafts_visible')}</span>
+                </label>}
+
+                <div className='self-end flex-row items-center justify-center w-[190px]'>
+                    <Dropdown name={t('in_page')} value={itemsPerPage} items={PAGINATION_OPTIONS}
+                        onCategotyChange={setItemsPerPage} flexRow={true} dropdownKey='in_page' noBold={true} />
                 </div>
 
             </div>
             {
-                type === 'soils' && filtersVisible ? <ul className='filters-grid z-10 w-full mb-4'>
-                    {isAllSoils ? <li key={CATEGORY_FILTER.id}>
-                        <Filter name={CATEGORY_FILTER.name} items={CATEGORY_FILTER.terms}
+                isSoils && filtersVisible && isFilters ? <ul className='filters-grid z-10 w-full mb-4'>
+                    {isAllSoils ? <li key='category'>
+                        <Filter name={t('category')} items={CATEGORY_ARRAY}
                             allSelectedItems={selectedCategories}
-                            onChange={(newData) => handleCategoryChange(newData)} />
+                            addItem={handleAddCategory}
+                            deleteItem={handleDeleteCategorie}
+                            resetItems={handleResetCategories} />
 
                     </li> : ''}
-                    {classifications?.map(item => <li key={item.id}>
-                        <Filter name={item.name} items={item.terms}
-                            allSelectedItems={selectedTerms}
-                            onChange={(newData) => handleTermsChange(newData)} />
-                    </li>
+                    {classifications?.map(item => {
+                        const isEnglish = locale === 'en';
+                        const isTranslationModeValid = item.translationMode === 0 || (isEnglish ? item.translationMode === 1 : item.translationMode === 2);
+                        if (isTranslationModeValid) {
+                            return (
+                                <li key={item.id}>
+                                    <Filter isEng={locale === 'en'} itemId={item.id}
+                                        name={isEnglish ? item.nameEng : item.nameRu}
+                                        items={item.terms}
+                                        allSelectedItems={selectedTerms}
+                                        addItem={handleAddTerm}
+                                        deleteItem={handleDeleteTerm}
+                                        resetItems={handleResetTerms}
+                                    />
+                                </li>
+                            );
+                        }
+                    }
                     )}
                 </ul> : ''
             }
 
-            <label htmlFor='draftIsVisible' className={`mb-4 self-end  flex-row cursor-pointer
-            ${type === 'ecosystems' || type === 'authors' ? 'hidden' : 'flex'}`}>
+            {token && <label htmlFor='draftIsVisible' className={`mb-4 sm:self-end flex-row cursor-pointer
+            ${!isFilters || !isDrafts ? 'hidden' : 'flex'}`}>
                 <input type="checkbox" id='draftIsVisible'
                     checked={draftIsVisible}
                     onChange={() => setDraftIsVisible(!draftIsVisible)}
-                    className="min-w-5 w-5 min-h-5 h-5 mr-1 rounded border-gray-300 " />
-                <span>Показывать черновики</span>
-            </label>
+                    className="min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
+                <span>{t('grafts_visible')}</span>
+            </label>}
 
             <ul className='soils-grid mb-4'>
-                {filteredSoils.map(({ photo, name, id }) => <li key={id}>
-                    {SoilCard({ photo, name, id })}
-                </li>)}
+                {currentItems.map(({ id, photo, translations, dataRu, dataEng }) => <li key={id}>
+                    {SoilCard({
+                        name: translations?.find(({ isEnglish }) => isEnglish === (locale === 'en'))?.name ||
+                            (locale === 'en' ? dataEng.name : locale === 'ru' ? dataRu.name : ''), photo, id
+                    })}
+                </li>
+                )}
             </ul>
-
-            <Pagination itemsPerPage={itemsPerPage} items={filteredSoils}
+            <Pagination itemsPerPage={PAGINATION_OPTIONS[itemsPerPage]} items={filteredSoils}
                 updateCurrentItems={(newCurrentItems) => setCurrentItems(newCurrentItems)} />
-
         </div >
     )
 }

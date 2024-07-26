@@ -1,16 +1,20 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next';
 
-export default function DragAndDrop({ onLoadClick, isMultiple }) {
+export default function DragAndDrop({ onLoadClick, isMultiple, accept }) {
     const [drag, setDrag] = useState(false);
+    const { t } = useTranslation();
 
     const handleChange = (e) => {
         e.preventDefault();
-        console.log(e.target)
+        const type = accept === 'img' ? 'image/' : accept === 'pdf' ? 'application/pdf' : '';
         let files = [...e.target.files];
-        files.forEach(file => {
-            onLoadClick(file)
+        files.forEach((file, index) => {
+            if (file.type.startsWith(type)) {
+                onLoadClick(file, index)
+            }
         });
     }
 
@@ -26,9 +30,13 @@ export default function DragAndDrop({ onLoadClick, isMultiple }) {
 
     const handleDrop = (e) => {
         e.preventDefault();
+        const type = accept === 'img' ? 'image/' : accept === 'pdf' ? 'application/pdf' : '';
         let files = [...e.dataTransfer.files];
-        files.forEach(file => {
-            onLoadClick(file)
+
+        files.forEach((file, index) => {
+            if (file.type.startsWith(type)) {
+                onLoadClick(file, index)
+            }
         });
         setDrag(false);
     }
@@ -43,7 +51,7 @@ export default function DragAndDrop({ onLoadClick, isMultiple }) {
                     onDragOver={e => handleDragStart(e)}
                     onDrop={e => handleDrop(e)}>
                     <p className='text-white'>
-                        Отпустите файлы
+                        {t('release_files')}
                     </p>
                 </div>
                 : <label htmlFor='geometry_file'
@@ -54,9 +62,10 @@ export default function DragAndDrop({ onLoadClick, isMultiple }) {
                     onDragLeave={e => handleDragLeave(e)}
                     onDragOver={e => handleDragStart(e)}>
 
-                    <p className='text-center'><span className='font-semibold'>Нажмите для загрузки</span> или перетащите файлы</p>
+                    <p className='text-center'><span className='font-semibold'>{t('click_download')}</span> {t('drag_files')}</p>
 
                     <input type="file" multiple={isMultiple} id='geometry_file' className="w-0 h-0"
+                        accept={`${accept === 'img' ? "image/*" : accept === 'pdf' ? '.pdf' : ''}`}
                         onChange={handleChange} />
                 </label>}
         </div>

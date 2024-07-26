@@ -15,7 +15,7 @@ const generalSlice = createSlice({
 
     reducers: {
         setDropdown(state, action) {
-            state.dropdown = action.payload
+            state.dropdown = action.payload;
         },
     }
 

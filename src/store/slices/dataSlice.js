@@ -1,5 +1,6 @@
-import { getClassifications } from '@/api/get_classifications';
-import { getSoils } from '@/api/get_soils';
+import { getClassifications } from '@/api/classification/get_classifications';
+import { getSoils } from '@/api/soil/get_soils';
+import { getTags } from '@/api/tags/get_tags';
 import { BASE_SERVER_URL } from '@/utils/constants';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios';
@@ -14,10 +15,22 @@ export const getAllClassifications = createAsyncThunk(
     }
 );
 
+export const getAllTags = createAsyncThunk(
+    'data/getAllTags',
+    async function () {
+        const result = await getTags();
+        if (result.success) {
+            return result.data;
+        }
+    }
+);
+
 const dataSlice = createSlice({
     name: 'data',
     initialState: {
         classifications: [],
+        tags: [],
+        selectedTags: [],
         selectedAuthors: [],
         selectedTerms: [],
         selectedCategories: [],
@@ -28,9 +41,6 @@ const dataSlice = createSlice({
 
     reducers: {
         // Term reducers
-        setTerms(state, action) {
-            state.selectedTerms = action.payload
-        },
         addTerm(state, action) {
             const existingId = state.selectedTerms.find(id => id === action.payload);
             if (!existingId) {
@@ -45,9 +55,6 @@ const dataSlice = createSlice({
         },
 
         // Category reducers
-        setCategories(state, action) {
-            state.selectedCategories = action.payload
-        },
         addCategory(state, action) {
             const existingId = state.selectedCategories.find(id => id === action.payload);
             if (!existingId) {
@@ -59,6 +66,19 @@ const dataSlice = createSlice({
         },
         resetCategory(state) {
             state.selectedCategories = []
+        },
+        // Tags reducers
+        addTag(state, action) {
+            const existingId = state.selectedTags.find(id => id === action.payload);
+            if (!existingId) {
+                state.selectedTags.push(action.payload);
+            }
+        },
+        deleteTag(state, action) {
+            state.selectedTags = state.selectedTags.filter(item => item !== action.payload)
+        },
+        resetTags(state) {
+            state.selectedTags = []
         },
 
         // Author reducers
@@ -110,14 +130,25 @@ const dataSlice = createSlice({
                 state.classifications = action.payload;
             })
             .addCase(getAllClassifications.rejected, (state, action) => { })
+            .addCase(getAllTags.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(getAllTags.fulfilled, (state, action) => {
+                state.status = 'resolved';
+                state.tags = action.payload;
+            })
+            .addCase(getAllTags.rejected, (state, action) => {
+                state.status = 'error';
+            });
     },
 
 })
 export const {
-    addTerm, deleteTerm, resetTerm, setTerms,
-    addCategory, deleteCategory, resetCategory, setCategories,
+    addTerm, deleteTerm, resetTerm,
+    addCategory, deleteCategory, resetCategory,
     addAuthor, deleteAuthor, resetAuthor,
     addEcosystem, deleteEcosystem, resetEcosystem,
     addPublication, deletePublication, resetPublication,
+    addTag, deleteTag, resetTags,
 } = dataSlice.actions;
 export default dataSlice.reducer

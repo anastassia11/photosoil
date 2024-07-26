@@ -6,7 +6,7 @@ import View from 'ol/View';
 import { Icon, Style, Fill, Stroke } from 'ol/style';
 import { Tile as TileLayer, Vector as VectorLayer, VectorImage as VectorImageLayer, } from 'ol/layer';
 import { fromLonLat, toLonLat } from 'ol/proj';
-import { OSM,Cluster, XYZ, BingMaps, Vector as VectorSource } from 'ol/source';
+import { OSM, Cluster, XYZ, BingMaps, Vector as VectorSource } from 'ol/source';
 import { GPX, GeoJSON, IGC, KML, TopoJSON } from 'ol/format';
 import { get as getProjection, getTransform } from 'ol/proj';
 import { register } from 'ol/proj/proj4';
@@ -19,13 +19,12 @@ import { BASE_SERVER_URL } from '@/utils/constants';
 import {
     Circle as CircleStyle,
     Text,
-  } from 'ol/style.js';
+} from 'ol/style.js';
 
 
 
-
+console.log(window)
 window.Create2dMap = function (mapDivId) {
-
 
     proj4.defs("EPSG:32647", "+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs");
     proj4.defs("EPSG:32645", "+proj=utm +zone=45 +datum=WGS84 +units=m +no_defs");
@@ -43,17 +42,17 @@ window.Create2dMap = function (mapDivId) {
         center: startcoords,
         zoom: 8.5
     });
- 
+
 
     window.selectLocationHandler = function (item) {
         const newCord = fromLonLat([item.lon, item.lat]);
 
-        view.animate({ duration: 500 }, { center: newCord, extent: extent,zoom:view.getZoom + 10});
+        view.animate({ duration: 500 }, { center: newCord });
     }
-    
 
 
-        
+
+
     // document.getElementById('btnsearch').onclick = function () {
     //     var searchstring = document.getElementById('search').value
     //     const params = {
@@ -79,9 +78,9 @@ window.Create2dMap = function (mapDivId) {
     //             view.animate({ duration: 500 }, { center: newCord});
     //         })
     //         .catch((err)=>console.log("err", err))
-    
+
     //         console.log(result);
-    
+
     // };
 
 
@@ -97,63 +96,59 @@ window.Create2dMap = function (mapDivId) {
     const features = new Array(count);
     const e = 4500000;
     for (let i = 0; i < count; ++i) {
-      const coordinates = [2 * e * Math.random() - e, 2 * e * Math.random() - e];
-      features[i] = new Feature(new Point(coordinates));
+        const coordinates = [2 * e * Math.random() - e, 2 * e * Math.random() - e];
+        features[i] = new Feature(new Point(coordinates));
     }
-    
+
     const source = new VectorSource({
-      features: features,
+        features: features,
     });
 
     const clusterSource = new Cluster({
         distance: parseInt(1000, 10),
         minDistance: parseInt(5, 10),
         source: source,
-      });
+    });
 
-      const styleCache = {};
-      const clusters = new VectorLayer({
+    const styleCache = {};
+    const clusters = new VectorLayer({
         source: clusterSource,
         style: function (feature) {
-          const size = feature.get('features').length;
-          let style = styleCache[size];
-          if (!style) {
-            style = new Style({
-              image: new CircleStyle({
-                radius: 10,
-                stroke: new Stroke({
-                  color: '#fff',
-                }),
-                fill: new Fill({
-                  color: '#3399CC',
-                }),
-              }),
-              text: new Text({
-                text: size.toString(),
-                fill: new Fill({
-                  color: '#fff',
-                }),
-              }),
-            });
-            styleCache[size] = style;
-          }
-          return style;
+            const size = feature.get('features').length;
+            let style = styleCache[size];
+            if (!style) {
+                style = new Style({
+                    image: new CircleStyle({
+                        radius: 10,
+                        stroke: new Stroke({
+                            color: '#fff',
+                        }),
+                        fill: new Fill({
+                            color: '#3399CC',
+                        }),
+                    }),
+                    text: new Text({
+                        text: size.toString(),
+                        fill: new Fill({
+                            color: '#fff',
+                        }),
+                    }),
+                });
+                styleCache[size] = style;
+            }
+            return style;
         },
-      });
+    });
 
 
 
     //создаем новую карту
     const map = new OLMap({
-        layers: [baseLayer,clusters],
+        layers: [baseLayer, clusters],
         target: mapDivId,
         view: view,
         controls: []
     });
-
-
-
-
 
 
 
@@ -166,19 +161,35 @@ window.Create2dMap = function (mapDivId) {
         zoomType = "customZoomIn";
     };
 
-    $(document).on('click', ".customZoom", function (e) {
-        if (zoomType == "customZoomOut") {
-            let view = map.getView();
-            let zoom = view.getZoom();
-            view.animate({ zoom: zoom - 1 })
-        }
-        if (zoomType == "customZoomIn") {
-            let view = map.getView();
-            let zoom = view.getZoom();
-            view.animate({ zoom: zoom + 1 })
-        }
+
+    const customZoomElements = document.querySelectorAll('.customZoom');
+    customZoomElements.forEach(element => {
+        element.addEventListener('click', (e) => {
+            if (zoomType === "customZoomOut") {
+                let view = map.getView();
+                let zoom = view.getZoom();
+                view.animate({ zoom: zoom - 1 });
+            }
+            if (zoomType === "customZoomIn") {
+                let view = map.getView();
+                let zoom = view.getZoom();
+                view.animate({ zoom: zoom + 1 });
+            }
+        });
     });
 
+    // $(document).on('click', ".customZoom", function (e) {
+    //     if (zoomType == "customZoomOut") {
+    //         let view = map.getView();
+    //         let zoom = view.getZoom();
+    //         view.animate({ zoom: zoom - 1 })
+    //     }
+    //     if (zoomType == "customZoomIn") {
+    //         let view = map.getView();
+    //         let zoom = view.getZoom();
+    //         view.animate({ zoom: zoom + 1 })
+    //     }
+    // });
 
     //////////////**************************//////////////
     //////////////Преобразования координат/////////////
@@ -188,11 +199,29 @@ window.Create2dMap = function (mapDivId) {
     //Устанавливаем базовый слой
     baseLayer.setSource(getBaseLayerSourse("OSM"));
 
-    //Отслеживание события изменения базового слоя
+    // const baseLayerSelectorElements = document.querySelectorAll(
+    //     ".baseLayerSelector"
+    // );
+
+    // baseLayerSelectorElements.forEach(function (element) {
+    //     element.addEventListener("click", function (e) {
+    //         console.log(this.dataset.scrtype)
+    //         changeBaseLayer(this.dataset.scrtype);
+    //     });
+    // });
+
+    // function changeBaseLayer(sourceType) {
+    //     baseLayer.setSource(getBaseLayerSourse(sourceType));
+    //     document.querySelector(".baseLayerButtonText").textContent = this.textContent;
+    // }
+
+    // Отслеживание события изменения базового слоя
     $(document).on("click", ".baseLayerSelector", function (e) {
         baseLayer.setSource(getBaseLayerSourse($(this).data("scrtype")));
         $(".baseLayerButtonText").html($(this).html());
     });
+
+
 
     //Отслеживание события изменения проекции
     $(".projSelector").on("click", function (e) {
@@ -217,10 +246,6 @@ window.Create2dMap = function (mapDivId) {
         view = newview;
 
     });
-
-
-
-
 
     //Функция преобразования координат в WGS
     function updateCoordTransforms(newProjection) {
@@ -403,6 +428,7 @@ window.Create2dMap = function (mapDivId) {
         `);
     }
 
+
     //Отображает таблицу для выбранной сущности GeoMap
     function printSelectedFeatureTable() {
         $('#selectedlayerTableContainer').html('');
@@ -538,8 +564,7 @@ window.Create2dMap = function (mapDivId) {
 
         if (map.hasFeatureAtPixel(event.pixel) === true) {
             let selectedFeatures = map.getFeaturesAtPixel(event.pixel);
-            console.log(selectedFeatures)
-            
+
             document.getElementById("selectInput").value = "/api/" + selectedFeatures[0].get("p_type") + "/GetById?Id=" + selectedFeatures[0].get("p_Id");
 
             var event = new Event('change');
@@ -548,7 +573,6 @@ window.Create2dMap = function (mapDivId) {
 
         selectedGeoMapFeature = null;
     });
-
 }
 
 function getMapInfoBoxStartData() {
@@ -583,23 +607,19 @@ function getLayer(layerName, fromWgsToProj) {
     $.getJSON(url, function (data) {
 
         let layerStyle = getIconStyleByLayerName(layerName);
-        console.log(data.response)
+        for (let i = 0; i < data.response.length; i++) {
+            //создаем новую точку
+            let newPointFeature = new Feature({
+                geometry: new Point(fromWgsToProj([data.response[i].longtitude, data.response[i].latitude]))
+            });
+            newPointFeature.set("p_Id", data.response[i].id);
+            newPointFeature.set("p_type", layerName);
+            newPointFeature.set("isGeoMapFeature", false);
+            //устанавливаем стиль
+            newPointFeature.setStyle(layerStyle);
 
-            for (let i = 0; i < data.response.length; i++) {
-                console.log(data.response[i].longtitude)
-                console.log(data.response[i].latitude)
-                //создаем новую точку
-                let newPointFeature = new Feature({
-                    geometry: new Point(fromWgsToProj([data.response[i].longtitude, data.response[i].latitude]))
-                });
-                newPointFeature.set("p_Id", data.response[i].id);
-                newPointFeature.set("p_type", layerName);
-                newPointFeature.set("isGeoMapFeature", false);
-                //устанавливаем стиль
-                newPointFeature.setStyle(layerStyle);
-
-                layerVectorSource.addFeature(newPointFeature);
-            }
+            layerVectorSource.addFeature(newPointFeature);
+        }
 
     });
 

@@ -7,10 +7,9 @@ import { Icon, Style } from 'ol/style';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { fromLonLat } from 'ol/proj';
 import { OSM, Vector as VectorSource } from 'ol/source';
+import $ from "jquery";
 
 window.CreatePointViewMap = function (mapDivId, latDec, lonDec) {
-    console.log(mapDivId, latDec, lonDec);
-
     var isCoordExist = true;
 
     //если координаты пустые
@@ -33,7 +32,6 @@ window.CreatePointViewMap = function (mapDivId, latDec, lonDec) {
         center: startcoords,
         zoom: 8.5
     });
-    console.log(view)
 
     //создаем новую карту
     const map = new Map({
@@ -44,6 +42,28 @@ window.CreatePointViewMap = function (mapDivId, latDec, lonDec) {
         ],
         target: mapDivId,
         view: view,
+        controls: []
+    });
+
+    let zoomType;
+    document.getElementById('customZoomOut').onclick = function () {
+        zoomType = "customZoomOut";
+    };
+    document.getElementById('customZoomIn').onclick = function () {
+        zoomType = "customZoomIn";
+    };
+
+    $(document).on('click', ".customZoom", function (e) {
+        if (zoomType == "customZoomOut") {
+            let view = map.getView();
+            let zoom = view.getZoom();
+            view.animate({ zoom: zoom - 1 })
+        }
+        if (zoomType == "customZoomIn") {
+            let view = map.getView();
+            let zoom = view.getZoom();
+            view.animate({ zoom: zoom + 1 })
+        }
     });
 
     if (isCoordExist) {

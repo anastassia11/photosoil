@@ -1,12 +1,20 @@
+'use client'
+
+import Link from 'next/link'
 import React from 'react'
+import { useTranslation } from 'react-i18next';
 
 export default function Form() {
+    const { t } = useTranslation();
+
     return (
         <div className="space-y-6 sm:max-w-md m-auto mt-16">
             <div className="text-center">
                 <div className="mt-5 space-y-2">
-                    <h3 className="text-2xl font-semibold">Стать автором</h3>
-                    <p className="">Чтобы стать автором, заполните форму ниже</p>
+                    <h3 className="sm:text-2xl text-xl font-semibold">{t('join')}</h3>
+                    <p className="">{t('join_text')}<br />
+                        {t('account_exists')} <Link className='text-blue-600 hover:underline duration-300'
+                            href='/login'>{t('login')}</Link></p>
                 </div>
             </div>
             <div className="bg-white shadow p-4 py-6 sm:p-6 sm:rounded-lg">
@@ -16,7 +24,7 @@ export default function Form() {
                 >
                     <div>
                         <label className="font-medium">
-                            ФИО
+                            {t('full_name')}
                         </label>
                         <input
                             type="text"
@@ -26,7 +34,7 @@ export default function Form() {
                     </div>
                     <div>
                         <label className="font-medium">
-                            Организация
+                            {t('organization')}
                         </label>
                         <input
                             type="email"
@@ -36,7 +44,7 @@ export default function Form() {
                     </div>
                     <div>
                         <label className="font-medium">
-                            Должность
+                            {t('post')}
                         </label>
                         <input
                             type="password"
@@ -46,7 +54,7 @@ export default function Form() {
                     </div>
                     <div>
                         <label className="font-medium">
-                            Электронная почта
+                            {t('email')}
                         </label>
                         <input
                             type="password"
@@ -57,7 +65,7 @@ export default function Form() {
                     <button
                         className="w-full px-4 py-2 text-white font-medium bg-blue-600 hover:bg-blue-500 active:bg-blue-600 rounded-lg duration-150"
                     >
-                        Отправить
+                        {t('submit')}
                     </button>
                 </form>
             </div>

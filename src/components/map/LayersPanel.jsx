@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
 
-export default function LayersPanel() {
+export default function LayersPanel({ onLayerChange, currentLayer }) {
     const [drapdownState, setDrapdownState] = useState({ isActive: false, key: null });
-    const [selectedLayer, setSelectedLayer] = useState('BingRoud')
+    const [selectedLayer, setSelectedLayer] = useState(null);
+
     const layers = [
         { key: 'OSM', title: 'OpenStreetMap схема' },
         { key: 'BingRoud', title: 'Bing схема' },
@@ -12,6 +13,10 @@ export default function LayersPanel() {
         { key: 'ArcGis_World_Imagery', title: 'ArcGis World Imagery' },
         { key: 'ArcGis_World_Topo_Map', title: 'ArcGis World Topo Map' },
     ]
+
+    // useEffect(() => {
+    //     setSelectedLayer(currentLayer);
+    // }, [currentLayer])
 
     useEffect(() => {
         document.onclick = (e) => {
@@ -37,11 +42,14 @@ export default function LayersPanel() {
                                 {layers.map(({ key, title }) =>
                                     <li key={key} className={`baseLayerSelector flex flex-row justify-between duration-300 cursor-pointer hover:text-blue-600 h-9 hover:bg-zinc-100  
                                     items-center px-4
-                                    ${selectedLayer === key ? 'text-blue-600' : 'text-zinc-800'}`}
-                                        data-scrtype={key}
-                                        onClick={() => setSelectedLayer(key)}>
+                                    ${currentLayer === key ? 'text-blue-600' : 'text-zinc-800'}`}
+                                        // data-scrtype={key}
+                                        onClick={() => {
+                                            onLayerChange(key)
+                                            // setSelectedLayer(key)
+                                        }}>
                                         {title}
-                                        {selectedLayer === key ?
+                                        {currentLayer === key ?
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
                                                 className="w-5 h-5 text-blue-600"

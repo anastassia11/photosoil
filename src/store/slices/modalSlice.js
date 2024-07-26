@@ -1,27 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import store from '..';
-
-
-export const confirmationModal = createAsyncThunk(
-    'modal/confirmationModal',
-    async () => {
-        return new Promise(resolve => {
-            const unsubscribe = store.subscribe(() => {
-                const state = store.getState();
-                console.log(state)
-                console.log(state.modal)
-                if (state.modal.isConfirm) {
-                    unsubscribe();
-                    resolve(true);
-                }
-                if (state.modal.isDecline) {
-                    unsubscribe();
-                    resolve(false);
-                }
-            });
-        });
-    }
-)
+import { createSlice } from '@reduxjs/toolkit'
 
 const modalSlice = createSlice({
     name: 'modal',
@@ -29,7 +6,7 @@ const modalSlice = createSlice({
         isOpen: false,
         isConfirm: false,
         isDecline: false,
-        props: {
+        modalProps: {
             title: null,
             message: null,
             buttonText: null,
@@ -41,19 +18,17 @@ const modalSlice = createSlice({
             state.isOpen = true;
             state.isDecline = false;
             state.isConfirm = false;
-            state.props = action.payload
+            state.modalProps = action.payload
         },
         closeModal(state) {
             state.isOpen = false;
             state.isDecline = true;
-            state.isConfirm = false;
-            state.props = {}
+            state.modalProps = {}
         },
-        setConfirm(state, action) {
+        setConfirm(state) {
             state.isConfirm = true;
-            state.isDecline = false;
             state.isOpen = false;
-            state.props = {}
+            state.modalProps = {}
         },
     }
 

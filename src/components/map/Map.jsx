@@ -1,42 +1,32 @@
 'use client'
 
 import React, { memo, useEffect, useRef, useState } from 'react'
-import '@/scripts/open_layers/baseMap2d/baseMap2d.js'
+// import '@/scripts/open_layers/baseMap2d/baseMap2d.js'
 import LayersPanel from './LayersPanel'
 import Zoom from './Zoom'
 import SideBar from './SideBar'
-import { getSoils } from '@/api/get_soils'
-import { getEcosystems } from '@/api/get_ecosystems'
+import { getSoils } from '@/api/soil/get_soils'
+import { getEcosystems } from '@/api/ecosystem/get_ecosystems'
 
 const Map = memo(function Map({ }) {
     const didLogRef = useRef(false)
-    const [soils, setSoils] = useState([]);
-    // const [publications, setPublications] = useState([]);
-    const [ecosystems, setEcosystems] = useState([]);
 
     useEffect(() => {
-        fetchSoils()
-        fetchEcosystems()
-    }, [])
-
-    const fetchSoils = async () => {
-        const result = await getSoils()
-        if (result.success) {
-            setSoils(result.data)
+        const initializeMap = () => {
+            if (didLogRef.current === false) {
+                didLogRef.current = true
+                window.Create2dMap('map')
+            }
         }
-    }
 
-    const fetchEcosystems = async () => {
-        const result = await getEcosystems()
-        if (result.success) {
-            setEcosystems(result.data)
+        if (document.getElementById('map')) {
+            initializeMap()
+        } else {
+            document.addEventListener('DOMContentLoaded', initializeMap)
         }
-    }
 
-    useEffect(() => {
-        if (didLogRef.current === false) {
-            didLogRef.current = true
-            window.Create2dMap('map')
+        return () => {
+            document.removeEventListener('DOMContentLoaded', initializeMap)
         }
     }, [])
 

@@ -6,11 +6,10 @@ import '@/scripts/open_layers/mapSelect/mapPointView.js'
 const MapPointView = memo(function MapPointView({ latitude, longtitude }) {
     const latDec = latitude
     const lonDec = longtitude
-    console.log(latitude, longtitude)
     const didLogRef = useRef(false)
 
     useEffect(() => {
-        if(latitude!= undefined){
+        if (latitude != undefined) {
             window.CreatePointViewMap('map-point-view', latitude, longtitude);
         }
         // if (didLogRef.current === false) {

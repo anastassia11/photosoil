@@ -1,8 +1,8 @@
 'use client'
 
-import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import ReactPaginate from 'react-paginate';
+import '@/styles/pagination.css';
 
 export default function Pagination({ itemsPerPage, items, updateCurrentItems }) {
     const [pageCount, setPageCount] = useState(0);
@@ -10,7 +10,6 @@ export default function Pagination({ itemsPerPage, items, updateCurrentItems }) 
 
     useEffect(() => {
         const endOffset = itemOffset + Number(itemsPerPage);
-        console.log(items.slice(itemOffset, endOffset))
         updateCurrentItems(items.slice(itemOffset, endOffset));
         setPageCount(Math.ceil(items.length / itemsPerPage));
     }, [itemOffset, itemsPerPage, items]);

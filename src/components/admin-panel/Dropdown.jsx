@@ -4,29 +4,32 @@ import { setDropdown } from '@/store/slices/generalSlice'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-export default function Dropdown({ name, items, onCategotyChange }) {
+export default function Dropdown({ name, value, items, onCategotyChange, flexRow, dropdownKey, isTransparent, noBold }) {
     const dispatch = useDispatch()
     const dropdown = useSelector(state => state.general.dropdown)
-    const [selectedValue, setSelectedValue] = useState(null)
+    const [selectedValue, setSelectedValue] = useState()
+
+    useEffect(() => {
+        if (value !== null && value !== undefined) setSelectedValue({ name: items[value], id: value })
+    }, [value, items])
 
     const handleSelectClick = (name, id) => {
         setSelectedValue({ name, id })
         onCategotyChange(id)
         dispatch(setDropdown({ key: null, isActive: false }))
-
     }
 
     return (
-
-        <div className="w-full">
-            <label className="font-medium">
+        <div className={`w-full ${flexRow && 'flex flex-row items-center space-x-3 '}`}>
+            <label className={`${!noBold && 'font-medium'} min-w-fit`}>
                 {name}
             </label>
-            <div className="mt-1 relative">
-                <div className="category_dropdown bg-white flex cursor-pointer items-center justify-between gap-2 border p-2  transition rounded-md"
-                    onClick={() => dispatch(setDropdown({ key: 'category_dropdown', isActive: dropdown.key !== null && dropdown.key !== 'category_dropdown' ? true : !dropdown.isActive }))}>
+            <div className={`${flexRow ? 'w-full' : 'mt-1'} relative`}>
+                <div className={`h-[40px] ${dropdownKey} ${!isTransparent && 'bg-white border'} flex cursor-pointer 
+                    items-center justify-between gap-2 p-2 transition rounded-md`}
+                    onClick={() => dispatch(setDropdown({ key: dropdownKey, isActive: dropdown.key !== null && dropdown.key !== dropdownKey ? true : !dropdown.isActive }))}>
                     <span className="overflow-hidden whitespace-nowrap text-ellipsis">{selectedValue ? selectedValue.name : '- Выберите -'}</span>
-                    <span className={`transition ${dropdown.key == 'category_dropdown' && dropdown.isActive ? '-rotate-180' : ''} `}>
+                    <span className={`transition ${dropdown.key == dropdownKey && dropdown.isActive ? '-rotate-180' : ''} `}>
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -41,18 +44,18 @@ export default function Dropdown({ name, items, onCategotyChange }) {
                 </div>
 
                 <div className={`z-50 duration-200 transition-all 
-                    absolute w-[390px] rounded-md border border-gray-200 bg-white top-8
-                    ${dropdown.key == 'category_dropdown' && dropdown.isActive ? 'visible translate-y-4' : 'invisible opacity-0'}`}
+                    absolute w-full rounded-md border border-gray-200 bg-white top-[30px]
+                    ${dropdown.key == dropdownKey && dropdown.isActive ? 'visible translate-y-4' : 'invisible opacity-0'}`}
                     onClick={() => dispatch(setDropdown({ key: null, isActive: false }))}>
 
                     <ul className={`scroll space-y-1 py-2 max-h-[200px] overflow-auto
                  `}>
-                        {items.map(({ name, id }) => <li key={id}>
-                            <button className={`duration-300 space-x-2 flex-row justify-between w-full  cursor-pointer hover:text-blue-600 h-9 
-                            hover:bg-zinc-100 flex items-center px-4 ${id === selectedValue?.id ? 'text-blue-600' : ''}`}
-                                onClick={() => handleSelectClick(name, id)}>
-                                {name}
-                                {selectedValue?.id === id ?
+                        {items ? Object.entries(items).map(([key, value]) => <li key={`objectType-${key}`}>
+                            <button type='button' className={`duration-300 space-x-2 flex-row justify-between w-full  cursor-pointer hover:text-blue-600 min-h-9 h-fit
+                            hover:bg-zinc-100 flex px-4 items-center ${key === selectedValue?.id ? 'text-blue-600' : ''}`}
+                                onClick={() => handleSelectClick(value, key)}>
+                                <p className='text-left'>{value}</p>
+                                {selectedValue?.id === key ?
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         className="w-5 h-5 text-blue-600"
@@ -66,9 +69,8 @@ export default function Dropdown({ name, items, onCategotyChange }) {
                                         />
                                     </svg> : ''}
                             </button>
-                        </li>)}
+                        </li>) : ''}
                     </ul>
-
                 </div>
             </div>
         </div>
