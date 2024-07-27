@@ -15,8 +15,7 @@ export default function CreatePublicationPage() {
     const [createTwoLang, setCreateTwoLang] = useState(false);
     const { t } = useTranslation();
 
-    const fetchCreatePublication = async (data) => {
-        setIsLoading(true)
+    const fetchCreateNews = async (data) => {
         const result = await createPublication(data);
         if (result.success) {
             router.push(`/admin/publications`)
@@ -24,7 +23,19 @@ export default function CreatePublicationPage() {
         } else {
             dispatch(openAlert({ title: t('error'), message: t('error_publication'), type: 'error' }));
         }
-        setIsLoading(false);
+    }
+
+    const fetchCreatePublication = async ({ createTwoLang, isEng, publication }) => {
+        setIsLoading(true)
+        try {
+            const langPublication = { ...publication, translations: publication.translations.filter(({ isEnglish }) => isEnglish === isEng) };
+            await fetchCreateNews(createTwoLang ? publication : langPublication);
+        } catch (error) {
+            console.log(error)
+            dispatch(openAlert({ title: t('error'), message: t('error_publication'), type: 'error' }));
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     return (
