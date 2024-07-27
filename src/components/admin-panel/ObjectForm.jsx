@@ -134,13 +134,16 @@ export default function ObjectForm({ oldTwoLang, oldIsEng, pathname, type, item,
         const { value, name } = e.target;
         const updatedObject = (name === 'code' || name === 'latitude' || name === 'longtitude') ? { ...object, [name]: value }
             : { ...object, translations: object.translations.map(translation => translation.isEnglish === isEng ? { ...translation, [name]: value } : translation) }
-
         setObject(updatedObject);
         onItemChange(updatedObject);
     }
 
     const handleCoordChange = ({ latitude, longtitude }) => {
-        setObject(prev => ({ ...prev, latitude, longtitude }));
+        setObject(prev => {
+            const _prev = { ...prev, latitude, longtitude };
+            onItemChange(_prev);
+            return _prev;
+        });
     }
 
     const handleCategotyChange = (id) => {

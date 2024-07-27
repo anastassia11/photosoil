@@ -27,10 +27,9 @@ import Zoom from './Zoom';
 import LayersPanel from './LayersPanel';
 import { getSoils } from '@/api/soil/get_soils';
 import { getEcosystems } from '@/api/ecosystem/get_ecosystems';
-import { getpublication } from '@/api/publication/get_publication';
-import { getpublications } from '@/api/publication/get_publications';
 import SideBar from './SideBar';
 import { useSelector } from 'react-redux';
+import { getPublications } from '@/api/publication/get_publications';
 
 export default function NewMap() {
     const [baseLayer, setBaseLayer] = useState(null);
@@ -184,7 +183,7 @@ export default function NewMap() {
     const typeConfig = {
         soil: { fetch: getSoils, setState: setSoils },
         ecosystem: { fetch: getEcosystems },
-        publication: { fetch: getpublications }
+        publication: { fetch: getPublications }
     };
 
     const fetchData = async (type) => {
@@ -208,7 +207,7 @@ export default function NewMap() {
                 for (let i = 0; i < data.length; i++) {
                     //создаем новую точку
                     let newPointFeature = new Feature({
-                        geometry: new Point([data[i].longtitude, data[i].latitude])
+                        geometry: new Point(fromLonLat([data[i].longtitude, data[i].latitude]))
                     });
                     newPointFeature.set("p_Id", data[i].id);
                     newPointFeature.set("p_type", layerName);
