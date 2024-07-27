@@ -17,7 +17,7 @@ import FullScreen from './FullScreen';
 import Zoom from './Zoom';
 import { rem } from '@mantine/core';
 
-function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref) {
+function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange, isDisabled }, ref) {
     const didLogRef = useRef(false);
     const mapElement = useRef();
 
@@ -61,10 +61,10 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref
         } else {
             document.addEventListener('DOMContentLoaded', initializeMap);
         }
-        addListeners();
+        !isDisabled && addListeners();
         return () => {
             document.removeEventListener('DOMContentLoaded', initializeMap);
-            removeListeners();
+            !isDisabled && removeListeners();
         }
     }, [])
 
@@ -222,7 +222,7 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref
                 geometry: new Point(fromLonLat([coordinates[i].longtitude, coordinates[i].latitude]))
             });
             //устанавливаем стиль новой точки
-            newPointFeature.setStyle(basePointStyle);
+            newPointFeature.setStyle(isDisabled ? selectedPointStyle : basePointStyle);
             //добавляем её на слой
             pointVectorSource.addFeature(newPointFeature);
         }

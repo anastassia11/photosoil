@@ -1,19 +1,20 @@
 'use client'
 
 import { getPublication } from '@/api/publication/get_publication'
-import MapPointView from '@/components/map/MapPointView'
-import Zoom from '@/components/map/Zoom'
+import MapArraySelect from '@/components/map/MapArraySelect'
 import PdfGallery from '@/components/soils/PdfGallery'
 import Soils from '@/components/soils/Soils'
 import { BASE_SERVER_URL } from '@/utils/constants'
 import { useParams } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 export default function PublicationPage({ params: { id } }) {
     const [publication, setPublication] = useState({});
     const { t } = useTranslation();
     const { locale } = useParams();
+    const mapRef = useRef();
+
     let _isEng = locale === 'en';
 
     const currentTransl = publication?.translations?.find(({ isEnglish }) => isEnglish === _isEng);
@@ -71,16 +72,13 @@ export default function PublicationPage({ params: { id } }) {
                 </button>
             </div>
             <div className='flex flex-row space-x-8 mt-6'>
-                {publication.coordinates?.length ? <div className='w-1/2'>
-                    <div id='map-section' className='border rounded-lg overflow-hidden'>
-                        {/* <div className='relative w-full aspect-[2/1]'>
-                            <MapPointView latitude={64} longtitude={57} />
-                            <div className='z-30 absolute top-[calc(50%-50px)] right-0 m-2 '>
-                                <Zoom />
-                            </div>
-                        </div> */}
-                    </div>
-                </div> : ''}
+                {publication.coordinates ?
+                    <div id='map-section' className='border rounded-lg mt-2 min-h-[574px] w-1/2'>
+                        <MapArraySelect ref={mapRef}
+                            coordinates={JSON.parse(publication.coordinates)}
+                            isDisabled={true}
+                        />
+                    </div> : ''}
                 <div className='w-1/2 flex flex-col justify-between'>
                     <div className='flex flex-col space-y-2'>
                         {publication?.doi ? <div className='flex flex-row w-full space-x-4'>
