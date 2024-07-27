@@ -38,6 +38,9 @@ export default function NewMap() {
     const [selectedLayer, setSelectedLayer] = useState('');
 
     const [soils, setSoils] = useState([]);
+    const [ecosystems, setEcosystems] = useState([]);
+    const [publications, setPublications] = useState([]);
+
     const [defaultSoilStyle, setSoilStyle] = useState(null);
 
     const didLogRef = useRef(false);
@@ -182,8 +185,8 @@ export default function NewMap() {
 
     const typeConfig = {
         soil: { fetch: getSoils, setState: setSoils },
-        ecosystem: { fetch: getEcosystems },
-        publication: { fetch: getPublications }
+        ecosystem: { fetch: getEcosystems, setState: setEcosystems },
+        publication: { fetch: getPublications, setState: setPublications }
     };
 
     const fetchData = async (type) => {
@@ -204,20 +207,22 @@ export default function NewMap() {
         fetchData(layerName)
             .then(data => {
                 let layerStyle = getIconStyleByLayerName(layerName);
-                for (let i = 0; i < data.length; i++) {
-                    //создаем новую точку
-                    let newPointFeature = new Feature({
-                        geometry: new Point(fromLonLat([data[i].longtitude, data[i].latitude]))
-                    });
-                    newPointFeature.set("p_Id", data[i].id);
-                    newPointFeature.set("p_type", layerName);
-                    // newPointFeature.set("isGeoMapFeature", false);
+                data.forEach(item => {
+                    const coordinates = layerName === 'publication' && item.coordinates
+                        ? JSON.parse(item.coordinates)
+                        : [{ longtitude: item.longtitude, latitude: item.latitude }];
 
-                    //устанавливаем стиль
-                    newPointFeature.setStyle(layerStyle);
-                    layerVectorSource.addFeature(newPointFeature);
-                }
-
+                    // Создаем точки на основе координат
+                    coordinates.forEach(coord => {
+                        const newPointFeature = new Feature({
+                            geometry: new Point(fromLonLat([coord.longtitude, coord.latitude])),
+                        });
+                        newPointFeature.set("p_Id", item.id);
+                        newPointFeature.set("p_type", layerName);
+                        newPointFeature.setStyle(layerStyle);
+                        layerVectorSource.addFeature(newPointFeature);
+                    })
+                })
             });
         return new VectorLayer({
             source: layerVectorSource,
@@ -239,7 +244,7 @@ export default function NewMap() {
     //Создает стиль иконки по типу слоя
     const getIconStyleByLayerName = (layerName) => {
         if (layerName === "publication") {
-            return createIconStyle('/publ-marker.svg');
+            return createIconStyle('/publ-marker_v2.svg');
         }
         if (layerName === "ecosystem") {
             return createIconStyle('/ecosystem-marker.svg');
