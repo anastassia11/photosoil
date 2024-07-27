@@ -37,26 +37,16 @@ export default function NewMapSelect({ type, latitude, longtitude, onCoordinateC
         } else {
             document.addEventListener('DOMContentLoaded', initializeMap)
         }
-
+        addMapListeners();
         return () => {
-            document.removeEventListener('DOMContentLoaded', initializeMap)
+            document.removeEventListener('DOMContentLoaded', initializeMap);
+            removeMapListeners();
         }
     }, [])
 
     useEffect(() => {
         inputCoordChenged();
     }, [latitude, longtitude])
-
-    useEffect(() => {
-        mapRef.current?.addEventListener('click', (e) => {
-            const clickCoordinate = e.coordinate;
-            const newCord = toLonLat(clickCoordinate);
-            onCoordinateChange({ latitude: newCord[1], longtitude: newCord[0] });
-        });
-        return () => {
-            mapRef.current.removeEventListener('click', mapRef.current.clickHandler);
-        };
-    }, [])
 
     const init = () => {
         let startcoords = fromLonLat([85.9075867, 53.1155423]);
@@ -97,6 +87,20 @@ export default function NewMapSelect({ type, latitude, longtitude, onCoordinateC
             })
         });
         setVectorLayer(vectorLayer);
+    }
+
+    const addMapListeners = () => {
+        mapRef.current.addEventListener('click', handleMapClick)
+    }
+
+    const removeMapListeners = () => {
+        mapRef.current.removeEventListener('click', handleMapClick)
+    }
+
+    const handleMapClick = (e) => {
+        const clickCoordinate = e.coordinate;
+        const newCord = toLonLat(clickCoordinate);
+        onCoordinateChange({ latitude: newCord[1], longtitude: newCord[0] });
     }
 
     const inputCoordChenged = () => {
