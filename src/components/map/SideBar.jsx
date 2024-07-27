@@ -16,9 +16,9 @@ export default function SideBar({ onVisibleChange, onLocationHandler }) {
 
   const [sidebarOpen, setSideBarOpen] = useState(true);
   const [layersVisible, setLayersVisible] = useState({
-    SoilObjects: true,
-    EcoSystem: true,
-    Publication: true,
+    soil: true,
+    ecosystem: true,
+    publication: true,
   })
   const [location, setLocation] = useState([]);
 
@@ -138,8 +138,8 @@ export default function SideBar({ onVisibleChange, onLocationHandler }) {
           rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] 
           after:absolute after:top-0.5 after:start-[1px] after:bg-white after:border-gray-300 after:border 
           after:rounded-full after:h-[18px] after:w-[18px] after:transition-all 
-          ${type === 'SoilObjects' ? 'peer-checked:bg-[#3b82f6]'
-              : type === 'EcoSystem' ? 'peer-checked:bg-[#19aa1e]' : 'peer-checked:bg-[#8b5cf6]'}
+          ${type === 'soil' ? 'peer-checked:bg-[#3b82f6]'
+              : type === 'ecosystem' ? 'peer-checked:bg-[#19aa1e]' : 'peer-checked:bg-[#8b5cf6]'}
           `}></div>
         </label>
       </label>
@@ -221,9 +221,9 @@ export default function SideBar({ onVisibleChange, onLocationHandler }) {
               Слои карты
             </p>
             <div x-show="show" x-transition className="space-y-2.5 px-1">
-              {LayerSwitch({ title: t('soils'), type: 'SoilObjects' })}
-              {LayerSwitch({ title: t('ecosystems'), type: 'EcoSystem' })}
-              {LayerSwitch({ title: t('publications'), type: 'Publication' })}
+              {LayerSwitch({ title: t('soils'), type: 'soil' })}
+              {LayerSwitch({ title: t('ecosystems'), type: 'ecosystem' })}
+              {LayerSwitch({ title: t('publications'), type: 'publication' })}
             </div>
           </div>
 
