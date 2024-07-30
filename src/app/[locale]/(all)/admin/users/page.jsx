@@ -13,6 +13,7 @@ import { useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useConstants } from '@/hooks/useConstants';
 import modalThunkActions from '@/store/thunks/modalThunk';
+import Input from '@/components/admin-panel/ui-kit/Input';
 
 export default function AuthorsPage() {
     const dispatch = useDispatch();
@@ -110,22 +111,6 @@ export default function AuthorsPage() {
         dispatch(closeModal());
     }
 
-    const Input = ({ title, name }) => {
-        return <>
-            <label className="font-medium">
-                {title}
-            </label >
-            <input
-                required={name !== 'name'}
-                name={name}
-                value={userData[name] || ''}
-                onChange={handleInputChange}
-                type={name}
-                className="bg-white w-full mt-1 p-2 outline-none border focus:border-blue-600 shadow-sm rounded-md"
-            />
-        </>
-    }
-
     const RegisterForm = () => <form onSubmit={handleCreateAccount}
         className="bg-black/30 fixed top-0 left-0 z-50 overflow-y-auto w-screen h-screen">
         <div className="flex items-center h-full justify-center px-4 pt-4 pb-20 ml-[290px] text-center">
@@ -134,8 +119,14 @@ export default function AuthorsPage() {
                     {t('register')}
                 </h3>
                 <ul className='my-2 space-y-3'>
-                    {MODERATOR_INFO.map(item => <li key={item.name}>
-                        {Input({ ...item })}
+                    {MODERATOR_INFO.map(({ title, name, }) => <li key={name}>
+                        {Input({
+                            label: title,
+                            name: name,
+                            required: name !== 'name',
+                            value: userData[name] || '',
+                            onChange: handleInputChange,
+                        })}
                     </li>)}
                     <div>
                         <label className="font-medium">

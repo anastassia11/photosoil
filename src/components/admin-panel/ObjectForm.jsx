@@ -23,6 +23,10 @@ import { getBaseEcosystems } from '@/api/ecosystem/get_base_ecosystems';
 import { getBasePublications } from '@/api/publication/get_base_publications';
 import { getBaseSoils } from '@/api/soil/get_base_soils';
 import MapSelect from '../map/MapSelect';
+import Input from './ui-kit/Input';
+import MapInput from './ui-kit/MapInput';
+import Textarea from './ui-kit/Textarea';
+import PhotoCard from './ui-kit/PhotoCard';
 
 export default function ObjectForm({ oldTwoLang, oldIsEng, pathname, type, item, mainObjectPhoto, otherObjectPhoto, onItemChange, onMainPhotoChange, onOtherPhotosChange }) {
     const dispatch = useDispatch()
@@ -271,95 +275,6 @@ export default function ObjectForm({ oldTwoLang, oldIsEng, pathname, type, item,
         onMainPhotoChange(updatedMainPhoto);
     }
 
-    const Input = ({ name, label }) => {
-        return <div>
-            <label className="font-medium flex flex-row">
-                {`${label} ${(name !== 'code' && isEng) ? '(EN) ' : ''}`}<span className={`text-orange-500
-                    ${name === 'name' ? 'block' : 'hidden'}`}>*</span>
-            </label>
-            <input
-                value={name === 'code' ? object[name]
-                    : object.translations?.find(({ isEnglish }) => isEng === isEnglish)?.[name] || ''}
-                onChange={handleInputChange}
-                name={name}
-                type="text"
-                className="h-[40px] bg-white w-full mt-1 p-2 outline-none border focus:border-blue-600 shadow-sm rounded-md"
-            />
-        </div>
-    }
-
-    const MapInput = ({ name, label, id }) => {
-        return <input
-            value={object?.[name] || ''}
-            onChange={handleInputChange}
-            name={name}
-            type="text"
-            placeholder={label}
-            id={id}
-            className="h-[40px] bg-white w-full p-2 outline-none border focus:border-blue-600 shadow-sm rounded-md"
-        />
-    }
-
-    const Textarea = ({ name, label }) => {
-        return <div className=''>
-            <label className="font-medium">
-                {`${label} ${isEng ? '(EN)' : ''}`}
-            </label>
-            <textarea
-                value={object.translations?.find(({ isEnglish }) => isEng === isEnglish)?.[name] || ''}
-                name={name}
-                onChange={handleInputChange}
-                type="text"
-                className="h-full bg-white w-full mt-1 p-2 outline-none border focus:border-blue-600 shadow-sm rounded-md"
-            />
-        </div>
-    }
-
-    const PhotoCard = ({ id, titleEng, titleRu, path, fileName, onDelete, isMain, isLoading }) => {
-        return <div className='flex flex-row space-x-4 h-[150px] mt-1'>
-            <div className='bg-black/10 relative flex flex-col justify-center items-center min-w-[150px] aspect-[1/1] rounded-md overflow-hidden
-                            shadow-lg'>
-                {isLoading ? <Oval
-                    height={30}
-                    width={30}
-                    color="#FFFFFF"
-                    visible={true}
-                    ariaLabel='oval-loading'
-                    secondaryColor="#FFFFFF"
-                    strokeWidth={4}
-                    strokeWidthSecondary={4} />
-                    : <Image src={`${BASE_SERVER_URL}${path}`} height={150} width={150} alt={id}
-                        className='object-cover w-[150px] aspect-[1/1]' />}
-                {!isLoading && <p className='overflow-hidden whitespace-nowrap overflow-ellipsis py-1 px-2 text-sm font-medium z-10 absolute bottom-0 backdrop-blur-md bg-black bg-opacity-40 text-white w-full'>
-                    {fileName}
-                </p>}
-                {!isLoading && <button className='overflow-hidden p-[6px] text-sm font-medium z-10 absolute top-0 right-0 rounded-bl-md
-                                backdrop-blur-md bg-black bg-opacity-40 text-zinc-200 hover:text-white duration-300'
-                    onClick={() => onDelete(id)}>
-                    <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className='w-4 h-4'>
-                        <g id="Menu / Close_LG">
-                            <path id="Vector" d="M21 21L12 12M12 12L3 3M12 12L21.0001 3M12 12L3 21.0001" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                        </g>
-                    </svg>
-                </button>}
-            </div>
-
-            <div className='w-full flex flex-col justify-between'>
-                <textarea
-                    value={isEng ? (titleEng || '') : (titleRu || '')}
-                    onChange={e => {
-                        if (isMain) {
-                            handleMainPhotoChange(e)
-                        } else handleOtherPhotosChange(e, id)
-                    }}
-                    type="text"
-                    placeholder={`Текст к фото ${isEng ? '(EN)' : ''}`}
-                    className="bg-white w-full p-2 outline-none border focus:border-blue-600 shadow-sm rounded-md max-h-full"
-                />
-            </div>
-        </div>
-    }
-
     return (
         <form
             onSubmit={(e) => e.preventDefault()}
@@ -397,7 +312,15 @@ export default function ObjectForm({ oldTwoLang, oldIsEng, pathname, type, item,
                     </Tabs.Root>
 
                     <div className='flex flex-col w-full'>
-                        {Input({ name: 'name', label: t('title') })}
+                        {Input({
+                            label: <>
+                                {`${t('title')} ${isEng ? '(EN) ' : ''}`}<span className={`text-orange-500`}>*</span>
+                            </>,
+                            name: 'name',
+                            value: object.translations?.find(({ isEnglish }) => isEng === isEnglish)?.name || '',
+                            required: true,
+                            onChange: handleInputChange
+                        })}
                         {type === 'soil' && <div className='mt-3'>
                             <Dropdown name={t('objectType')} value={object?.objectType ?? null} items={SOIL_ENUM}
                                 onCategotyChange={handleCategotyChange} dropdownKey='category' />
@@ -407,8 +330,21 @@ export default function ObjectForm({ oldTwoLang, oldIsEng, pathname, type, item,
                             {INFO.map(({ name, title }) => {
                                 return <li key={name} className={`mt-3 ${name === 'objectType' && 'hidden'}`}>
                                     {
-                                        name === 'soilFeatures' || name === 'description' ? Textarea({ name, label: title }) :
-                                            Input({ name, label: title })
+                                        name === 'soilFeatures' || name === 'description'
+                                            ? Textarea({
+                                                name: name,
+                                                label: `${title} ${isEng ? '(EN)' : ''}`,
+                                                value: object.translations?.find(({ isEnglish }) => isEng === isEnglish)?.[name] || '',
+                                                onChange: handleInputChange,
+                                                required: false
+                                            })
+                                            : Input({
+                                                label: `${title} ${isEng ? '(EN) ' : ''}`,
+                                                name: name,
+                                                value: object.translations?.find(({ isEnglish }) => isEng === isEnglish)?.[name] || '',
+                                                required: false,
+                                                onChange: handleInputChange
+                                            })
                                     }
                                 </li>
                             })}
@@ -427,8 +363,18 @@ export default function ObjectForm({ oldTwoLang, oldIsEng, pathname, type, item,
                             {t('in_map')}
                         </label>
                         <div className='flex flex-row mt-1 mb-2 w-full space-x-3'>
-                            {MapInput({ name: 'latitude', label: 'Latitude', id: "LatitudeDec" })}
-                            {MapInput({ name: 'longtitude', label: 'Longtitude', id: "LongtitudeDec" })}
+                            {MapInput({
+                                name: 'latitude',
+                                label: 'Latitude',
+                                value: object?.latitude || '',
+                                onChange: handleInputChange,
+                            })}
+                            {MapInput({
+                                name: 'longtitude',
+                                label: 'Longtitude',
+                                value: object?.longtitude || '',
+                                onChange: handleInputChange,
+                            })}
                         </div>
 
                         <div id='map-section' className='border rounded-lg overflow-hidden mt-1 h-full'>
@@ -440,7 +386,11 @@ export default function ObjectForm({ oldTwoLang, oldIsEng, pathname, type, item,
                 <p className='font-medium mt-8'>{t('main_photo')}<span className='text-orange-500'>*</span></p>
                 {mainPhoto?.path ?
                     <div className='grid grid-cols-2 gap-4 mt-1'>
-                        {PhotoCard({ ...mainPhoto, isMain: true, onDelete: handleMainPhotoDelete })}
+                        {PhotoCard({
+                            ...mainPhoto, isEng: isEng,
+                            onDelete: handleMainPhotoDelete,
+                            onChange: handleMainPhotoChange,
+                        })}
                     </div>
                     : <div className='w-[50%] h-[150px] pr-2 mt-1'>
                         <DragAndDrop onLoadClick={handleMainPhotoSend} isMultiple={false} accept='img' />
@@ -455,7 +405,11 @@ export default function ObjectForm({ oldTwoLang, oldIsEng, pathname, type, item,
                     :
                     <ul className={` grid grid-cols-2 gap-4 `}>
                         {otherPhotos.map(photo => <li key={photo.id}>
-                            {PhotoCard({ ...photo, isMain: false, onDelete: handleOtherPhotoDelete })}
+                            {PhotoCard({
+                                ...photo, isEng: isEng,
+                                onDelete: handleOtherPhotoDelete,
+                                onChange: handleOtherPhotosChange,
+                            })}
                         </li>)}
                         <div className='h-[150px]'>
                             <DragAndDrop onLoadClick={handleOtherPhotoSend} isMultiple={true} accept='img' />
@@ -507,7 +461,16 @@ export default function ObjectForm({ oldTwoLang, oldIsEng, pathname, type, item,
                     />
                 </div>
 
-                <div className='mt-8 w-[50%] pr-2'>  {Input({ name: 'code', label: t('code') })}</div>
+                <div className='mt-8 w-[50%] pr-2'>  {
+                    Input({
+                        label: t('code'),
+                        name: 'code',
+                        value: object.code,
+                        required: false,
+                        onChange: handleInputChange
+                    })
+                }
+                </div>
             </div>
         </form >
     )

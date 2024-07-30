@@ -104,8 +104,10 @@ export default function PublicationPage({ params: { id } }) {
                     {publication.file ? <div className='flex flex-row space-x-6 mt-6'>
                         {/* <a data-fancybox data-type="pdf" href={publication.file?.path}>PDF file</a> */}
                         <PdfGallery path={publication.file?.path} />
+
                         <a className='flex flex-row text-blue-700 hover:underline duration-300 cursor-pointer'
-                            onClick={handleDownload}>
+                            onClick={handleDownload}
+                        >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"

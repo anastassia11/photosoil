@@ -1,19 +1,27 @@
 'use client'
 
+import { openAlert } from '@/store/slices/alertSlice';
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 
 export default function DragAndDrop({ onLoadClick, isMultiple, accept }) {
+    const dispatch = useDispatch();
     const [drag, setDrag] = useState(false);
     const { t } = useTranslation();
 
     const handleChange = (e) => {
         e.preventDefault();
-        const type = accept === 'img' ? 'image/' : accept === 'pdf' ? 'application/pdf' : '';
+        const type = accept === 'img' ? 'image/' : accept === 'pdf' ? 'application/pdf'
+            : ''
         let files = [...e.target.files];
         files.forEach((file, index) => {
             if (file.type.startsWith(type)) {
                 onLoadClick(file, index)
+            } else {
+                dispatch(openAlert({
+                    title: t('warning'), message: `${t('error_file')} (.${accept})}`, type: 'warning'
+                }))
             }
         });
     }
@@ -36,6 +44,8 @@ export default function DragAndDrop({ onLoadClick, isMultiple, accept }) {
         files.forEach((file, index) => {
             if (file.type.startsWith(type)) {
                 onLoadClick(file, index)
+            } else {
+                dispatch(openAlert({ title: t('warning'), message: `${t('error_file')} (.${accept})`, type: 'warning' }))
             }
         });
         setDrag(false);
@@ -65,7 +75,7 @@ export default function DragAndDrop({ onLoadClick, isMultiple, accept }) {
                     <p className='text-center'><span className='font-semibold'>{t('click_download')}</span> {t('drag_files')}</p>
 
                     <input type="file" multiple={isMultiple} id='geometry_file' className="w-0 h-0"
-                        accept={`${accept === 'img' ? "image/*" : accept === 'pdf' ? '.pdf' : ''}`}
+                        accept={`${accept === 'img' ? "image/*" : accept === 'pdf' ? '.pdf' : ''} `}
                         onChange={handleChange} />
                 </label>}
         </div>

@@ -261,5 +261,6 @@
   "connect_soils": "Connected soils objects",
   "connect_publ": "Connected publications",
 
-  "add_point": "Add point"
+  "add_point": "Add point",
+  "error_file": "Please upload a file in a supported format"
 }

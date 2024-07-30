@@ -9,6 +9,7 @@ import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 import { useConstants } from '@/hooks/useConstants';
 import Dropdown from './Dropdown';
+import Input from './ui-kit/Input';
 
 export default function AuthorForm({ _author, onFormSubmit, isLoading, btnText }) {
     const [author, setAuthor] = useState({});
@@ -77,22 +78,6 @@ export default function AuthorForm({ _author, onFormSubmit, isLoading, btnText }
 
     const handleRankChange = (newRank) => {
         setAuthor(prev => ({ ...prev, authorType: Number(newRank) }));
-    }
-
-    const Input = ({ title, name, lang }) => {
-        let data = lang === 'ru' ? 'dataRu' : 'dataEng'
-        return <>
-            <label className="font-medium">
-                {`${title} ${lang === 'eng' ? '(EN)' : ''}`}
-            </label >
-            <input
-                name={name}
-                value={author[data]?.[name] || ''}
-                onChange={e => handleInputChange(e, lang)}
-                type="text"
-                className="bg-white w-full mt-1 p-2 outline-none border focus:border-blue-600 shadow-sm rounded-md"
-            />
-        </>
     }
 
     const ArrayInput = ({ title, name }) => {
@@ -165,14 +150,24 @@ export default function AuthorForm({ _author, onFormSubmit, isLoading, btnText }
             <div className='flex xl:flex-row flex-col w-full mt-8'>
                 <ul className='space-y-3 xl:w-[50%] xl:pr-6 xl:border-r'>
                     <p className='text-blue-700 font-semibold'>Русская версия</p>
-                    {AUTHOR_INFO.map(item => <li key={item.name}>
-                        {!item.isArray && Input({ ...item, lang: 'ru' })}
+                    {AUTHOR_INFO.map(({ name, isArray, title }) => <li key={name}>
+                        {!isArray && Input({
+                            label: `${title}`,
+                            name: name,
+                            value: author.dataRu?.[name] || '',
+                            onChange: e => handleInputChange(e, 'ru')
+                        })}
                     </li>)}
                 </ul>
                 <ul className='space-y-3 xl:w-[50%] xl:pl-6'>
                     <p className='text-blue-700 font-semibold'>English version</p>
-                    {AUTHOR_INFO.map(item => <li key={item.name}>
-                        {!item.isArray && Input({ ...item, lang: 'eng' })}
+                    {AUTHOR_INFO.map(({ name, isArray, title }) => <li key={name}>
+                        {!isArray && Input({
+                            label: `${title} (EN)`,
+                            name: name,
+                            value: author.dataEng?.[name] || '',
+                            onChange: e => handleInputChange(e, 'eng')
+                        })}
                     </li>)}
                 </ul>
             </div>

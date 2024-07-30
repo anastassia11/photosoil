@@ -26,12 +26,12 @@ export const useConstants = () => {
     ];
 
     const PUBLICATION_INFO = [
-        { name: 'name', titleRu: t('title') },
-        { name: 'authors', titleRu: t('authors') },
-        { name: 'edition', titleRu: t('info_journal') },
-        { name: 'type', titleRu: t('publ_type') },
-        { name: 'doi', titleRu: 'DOI' },
-        { name: 'description', titleRu: t('annotation') },
+        { name: 'name', title: t('title') },
+        { name: 'authors', title: t('authors') },
+        { name: 'edition', title: t('info_journal') },
+        { name: 'type', title: t('publ_type') },
+        { name: 'doi', title: 'DOI' },
+        { name: 'description', title: t('annotation') },
     ];
 
     const MODERATOR_INFO = [
