@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import { Oval } from 'react-loader-spinner';
 import { useDispatch, useSelector } from 'react-redux'
+import { Tooltip } from 'react-tooltip';
 
 export default function Filter({ type, itemId, name, items, allSelectedItems, addItem, deleteItem, resetItems, isMapFilter, isEng }) {
     const dispatch = useDispatch();
@@ -174,12 +175,15 @@ export default function Filter({ type, itemId, name, items, allSelectedItems, ad
     </div>
 
     return (
-        <div className="flex gap-8 w-full">
         <div className="select-none flex gap-8 w-full">
             <div className="relative w-full">
                 <div className="filter_dropdown">
-                    <div className={`flex cursor-pointer items-center justify-between gap-2 ${!isMapFilter ? 'bg-white border h-[40px] p-2' : ''} transition rounded-md`}
-                        onClick={handleOpenClick}>
+                    <div className={`overflow-visible flex cursor-pointer items-center justify-between gap-2 ${!isMapFilter ? 'bg-white border h-[40px] p-2' : ''} transition rounded-md`}
+                        onClick={handleOpenClick}
+                        data-tooltip-id={`${_id}`}
+                        data-tooltip-content={`${name}`}
+                        data-tooltip-place={isMapFilter ? "right" : "top"}
+                        data-tooltip-variant="dark">
                         <span className={`text-base overflow-hidden whitespace-nowrap text-ellipsis duration-300
                         ${isMapFilter && filterOpen && 'font-medium text-blue-700'} ${!isMapFilter && 'font-medium'}`}>{name}</span>
                         <span className={`transition ${(dropdown.key == _id && dropdown.isActive) || filterOpen ? '-rotate-180' : ''} `}>
@@ -193,6 +197,7 @@ export default function Filter({ type, itemId, name, items, allSelectedItems, ad
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                             </svg>
                         </span>
+
                     </div>
 
                     <div className={`w-full duration-200 transition-all ${!isMapFilter ? 'top-[30px] absolute border z-50' : ''} 
@@ -262,7 +267,6 @@ export default function Filter({ type, itemId, name, items, allSelectedItems, ad
                         </button> : ''}
                     </div>
                 </div>
-
                 {pathNames.includes('create') || pathNames.includes('edit') ? <ul className='mt-2 flex flex-row flex-wrap w-fit max-w-full'>
                     {selectedItems.map(_id => items.map(({ name, id, dataRu, dataEng, nameEng, nameRu }) => {
                         if (id === _id) {
@@ -284,6 +288,17 @@ export default function Filter({ type, itemId, name, items, allSelectedItems, ad
                     }))}
                 </ul> : ''}
             </div>
+            {pathNames.includes('create') || pathNames.includes('edit') ? '' : <Tooltip id={`${_id}`}
+                style={{
+                    fontSize: "14px",
+                    height: "25px",
+                    padding: "1px 8px 1px 8px",
+                    whiteSpace: "nowrap",
+                    display: "flex",
+                    alignItems: "center",
+                    backgroundColor: "rgb(82 82 91)",
+                    zIndex: "100",
+                }} />}
             {formVisible.visible ? TagForm() : ''}
         </div >
     )
