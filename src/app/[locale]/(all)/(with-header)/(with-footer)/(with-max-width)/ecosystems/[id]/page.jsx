@@ -26,7 +26,7 @@ export default function EcosystemPage({ params: { id } }) {
     }
 
     return (
-        <SoilObject object={ecosystem}>
+        <SoilObject object={ecosystem} type='ecosystem'>
             <ul className='flex flex-col space-y-2 '>
                 {ecosystem?.translations?.find(({ isEnglish }) => isEnglish === _isEng)?.description ?
                     <li key='ecosystem-description'

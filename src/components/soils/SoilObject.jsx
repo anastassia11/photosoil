@@ -1,17 +1,14 @@
 'use client'
 
-import MapPointView from '../map/MapPointView'
 import { useEffect, useState } from 'react';
 import Soils from './Soils';
-import Gallery from './Gallery';
-import Zoom from '../map/Zoom';
-import FullScreen from '../map/FullScreen';
 import { useTranslation } from 'react-i18next';
 import NewGallery from './NewGallery';
 import { useParams } from 'next/navigation';
 import Publications from '../publication/Publications';
+import MapSelect from '../map/MapSelect';
 
-export default function SoilObject({ object, children }) {
+export default function SoilObject({ object, children, type }) {
     const [mapVisible, setMapVisible] = useState(true);
     const { t } = useTranslation();
     const { locale } = useParams();
@@ -59,8 +56,6 @@ export default function SoilObject({ object, children }) {
             </div>
             <div className='flex md:flex-row flex-col mt-6 '>
                 <div className='w-full md:min-w-[50%] md:max-w-[50%] lg:max-w-[550px] lg:min-w-[550px]'>
-                    {/* md:min-w-[50%] md:max-w-[50%] lg:max-w-[550px] lg:min-w-[550px] */}
-                    {/* <Gallery mainPhoto={object.photo} objectPhoto={object.objectPhoto} /> */}
                     <NewGallery mainPhoto={object.photo} objectPhoto={object.objectPhoto} />
                 </div>
                 <div className='md:ml-8 mt-12 md:mt-0'>
@@ -70,22 +65,17 @@ export default function SoilObject({ object, children }) {
                     {children}
                 </div>
             </div>
-            {object.latitude && <>
+            {object.latitude && <div id='map-section'>
                 <button className='text-blue-600 w-fit mt-6' onClick={() => setMapVisible(!mapVisible)}>
                     {mapVisible ? t('hide_map') : t('show_map')}
                 </button>
-                {mapVisible ? <div id='map-section' className='mt-4 border rounded-lg overflow-hidden'>
+                {mapVisible ? <div className='mt-4 border rounded-lg overflow-hidden'>
                     <div className='relative w-full aspect-[2/1]'>
-                        <MapPointView latitude={object.latitude} longtitude={object.longtitude} />
-                        <div className='z-20 absolute top-0 right-0 m-2'>
-                            <FullScreen />
-                        </div>
-                        <div className='z-30 absolute top-[calc(50%-50px)] right-0 m-2 '>
-                            <Zoom />
-                        </div>
+                        <MapSelect type={type}
+                            latitude={object?.latitude} longtitude={object?.longtitude} />
                     </div>
                 </div> : ''}
-            </>}
+            </div>}
 
             {object.soilObjects?.length ?
                 <div id='soilObjects-section'>
