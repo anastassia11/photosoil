@@ -4,20 +4,12 @@ import { useState, useEffect, useRef } from 'react';
 import 'ol/ol.css';
 import Feature from 'ol/Feature';
 import OLMap from 'ol/Map';
-import { LineString, Point } from 'ol/geom';
+import { Point } from 'ol/geom';
 import View from 'ol/View';
 import { Icon, Style, Fill, Stroke } from 'ol/style';
-import { Tile as TileLayer, Vector as VectorLayer, VectorImage as VectorImageLayer, } from 'ol/layer';
+import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { fromLonLat, toLonLat } from 'ol/proj';
 import { OSM, Cluster, XYZ, BingMaps, Vector as VectorSource } from 'ol/source';
-import { GPX, GeoJSON, IGC, KML, TopoJSON } from 'ol/format';
-import { get as getProjection, getTransform } from 'ol/proj';
-import { register } from 'ol/proj/proj4';
-import { ZoomSlider } from 'ol/control.js';
-import proj4 from 'proj4';
-import randomColor from 'randomcolor';
-import Control from 'ol/control/Control';
-import { BASE_SERVER_URL } from '@/utils/constants';
 import {
     Circle as CircleStyle,
     Text,
@@ -30,16 +22,20 @@ import { getEcosystems } from '@/api/ecosystem/get_ecosystems';
 import SideBar from './SideBar';
 import { useSelector } from 'react-redux';
 import { getPublications } from '@/api/publication/get_publications';
+import ObjectsPopup from './ObjectsPopup';
 
-export default function NewMap() {
+export default function MainMap() {
     const [baseLayer, setBaseLayer] = useState(null);
     const [layers, setLayers] = useState(null);
     const { selectedTerms, selectedCategories } = useSelector(state => state.data);
     const [selectedLayer, setSelectedLayer] = useState('');
 
+    const [objects, setObjects] = useState([]);
+
     const [soils, setSoils] = useState([]);
     const [ecosystems, setEcosystems] = useState([]);
     const [publications, setPublications] = useState([]);
+    const [popupVisible, setPopupVisible] = useState(false);
 
     const [defaultSoilStyle, setSoilStyle] = useState(null);
 
@@ -62,11 +58,15 @@ export default function NewMap() {
         } else {
             document.addEventListener('DOMContentLoaded', initializeMap)
         }
-
         return () => {
-            document.removeEventListener('DOMContentLoaded', initializeMap)
+            document.removeEventListener('DOMContentLoaded', initializeMap);
         }
     }, [])
+
+    useEffect(() => {
+        addListeners();
+        return () => removeListeners();
+    }, [soils, ecosystems, publications])
 
     useEffect(() => {
         const filteredIds = soils.filter(soil =>
@@ -207,26 +207,34 @@ export default function NewMap() {
         fetchData(layerName)
             .then(data => {
                 let layerStyle = getIconStyleByLayerName(layerName);
-                data.forEach(item => {
+                data?.forEach(item => {
                     const coordinates = layerName === 'publication' && item.coordinates
                         ? JSON.parse(item.coordinates)
                         : [{ longtitude: item.longtitude, latitude: item.latitude }];
-
+                    console.log(layerName, coordinates)
                     // Создаем точки на основе координат
                     coordinates.forEach(coord => {
-                        const newPointFeature = new Feature({
-                            geometry: new Point(fromLonLat([coord.longtitude, coord.latitude])),
-                        });
-                        newPointFeature.set("p_Id", item.id);
-                        newPointFeature.set("p_type", layerName);
-                        newPointFeature.setStyle(layerStyle);
-                        layerVectorSource.addFeature(newPointFeature);
+                        if (coord.longtitude && coord.latitude) {
+                            const newPointFeature = new Feature({
+                                geometry: new Point(fromLonLat([coord.longtitude, coord.latitude])),
+                            });
+                            newPointFeature.set("p_Id", item.id);
+                            newPointFeature.set("p_type", layerName);
+                            newPointFeature.setStyle(layerStyle);
+                            layerVectorSource.addFeature(newPointFeature);
+                        }
                     })
                 })
             });
-        return new VectorLayer({
-            source: layerVectorSource,
+        const clusterSource = new Cluster({
+            distance: 35, // Расстояние для кластеризации в пикселях
+            source: layerVectorSource // Исходный источник
         });
+        const clusterLayer = new VectorLayer({
+            source: clusterSource,
+            style: clusterStyle
+        });
+        return clusterLayer;
     }
 
     const loadLayers = () => {
@@ -239,6 +247,31 @@ export default function NewMap() {
             lay.setZIndex(5);
         }
         setLayers(layers);
+    }
+
+    const clusterStyle = (feature) => {
+        const size = feature.get('features').length;
+        if (size > 1) {
+            // Стиль для кластеров
+            return new Style({
+                image: new CircleStyle({
+                    radius: 20,
+                    fill: new Fill({ color: '#fa9405' }),
+                    stroke: new Stroke({ color: '#fff4e5', width: 5 }),
+                }),
+                text: new Text({
+                    text: size.toString(),
+                    fill: new Fill({ color: '#ffffff' }),
+                    font: 'bold 16px sans-serif',
+                    offsetX: 0,
+                    offsetY: 2,
+                    textAlign: 'center',
+                }),
+            });
+        } else {
+            const singleFeature = feature.get('features')[0];
+            return singleFeature.getStyle();
+        }
     }
 
     //Создает стиль иконки по типу слоя
@@ -266,6 +299,51 @@ export default function NewMap() {
         });
     }
 
+    const hangleMapClick = (e) => {
+        const features = mapRef.current.getFeaturesAtPixel(e.pixel);
+        const _objects = [];
+        if (features.length > 0) {
+            const feature = features[0];
+            const points = feature.get('features');
+
+
+            setPopupVisible(true);
+
+            points.forEach(point => {
+                const type = point.get("p_type");
+                const _id = point.get("p_Id");
+
+                switch (type) {
+                    case 'soil': {
+                        _objects.push({ ...soils.find(({ id }) => id == _id), _type: 'soil' });
+                        break;
+                    }
+                    case 'ecosystem': {
+                        _objects.push({ ...ecosystems.find(({ id }) => id == _id), _type: 'ecosystem' });
+                        break;
+                    }
+                    case 'publication': {
+                        !_objects.some(obj => obj.id === _id) && _objects.push({ ...publications.find(({ id }) => id == _id), _type: 'publication' });
+                        break;
+                    }
+                }
+            })
+        };
+        if (_objects.length) {
+            setObjects(_objects);
+        }
+    }
+
+
+    const addListeners = () => {
+        mapRef.current.addEventListener('singleclick', hangleMapClick)
+    }
+
+    const removeListeners = () => {
+        mapRef.current.removeEventListener('singleclick', hangleMapClick)
+    }
+
+
     const handleLayerChange = ({ name, checked }) => {
         let currentLayer = layers.get(name);
         if (currentLayer) {
@@ -274,8 +352,20 @@ export default function NewMap() {
     }
 
     const selectLocationHandler = (item) => {
-        const newCord = fromLonLat([item.lon, item.lat]);
-        mapRef.current.getView().animate({ duration: 500 }, { center: newCord });
+        let up = fromLonLat([item.boundingbox[3], item.boundingbox[1]]);
+        let down = fromLonLat([item.boundingbox[2], item.boundingbox[0]]);
+
+        let combined = down.concat(up);
+        mapRef.current.getView().fit(combined, {
+            duration: 500, // Анимация в 500 миллисекунд
+            maxZoom: 15, // Максимальный уровень масштабирования
+            padding: [20, 20, 20, 20] // Отступы: [верх, право, низ, лево]
+        });
+    }
+
+    const handlePopupClose = () => {
+        setPopupVisible(false);
+        setObjects([]);
     }
 
     return (
@@ -286,7 +376,9 @@ export default function NewMap() {
             <div className='z-30 absolute top-[calc(50%-100px)] right-0 m-2 '>
                 <Zoom onClick={handleZoomClick} />
             </div>
-            <SideBar onVisibleChange={handleLayerChange} onLocationHandler={selectLocationHandler} />
+            <SideBar popupVisible={popupVisible}
+                onVisibleChange={handleLayerChange} onLocationHandler={selectLocationHandler} />
+            <ObjectsPopup visible={popupVisible} objects={objects} onCloseClick={handlePopupClose} />
         </div>
     )
 }

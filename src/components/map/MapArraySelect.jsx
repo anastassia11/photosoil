@@ -10,14 +10,12 @@ import { Draw, Modify, Snap } from 'ol/interaction';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { fromLonLat, toLonLat } from 'ol/proj';
 import { OSM, Vector as VectorSource } from 'ol/source';
-import { toStringHDMS, degreesToStringHDMS } from 'ol/coordinate';
 
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import FullScreen from './FullScreen';
 import Zoom from './Zoom';
-import { rem } from '@mantine/core';
 
-function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange, isDisabled }, ref) {
+function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref) {
     const didLogRef = useRef(false);
     const mapElement = useRef();
 
@@ -61,10 +59,10 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange, isDis
         } else {
             document.addEventListener('DOMContentLoaded', initializeMap);
         }
-        !isDisabled && addListeners();
+        onInputChange && addListeners();
         return () => {
             document.removeEventListener('DOMContentLoaded', initializeMap);
-            !isDisabled && removeListeners();
+            onInputChange && removeListeners();
         }
     }, [])
 
@@ -222,7 +220,7 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange, isDis
                 geometry: new Point(fromLonLat([coordinates[i].longtitude, coordinates[i].latitude]))
             });
             //устанавливаем стиль новой точки
-            newPointFeature.setStyle(isDisabled ? selectedPointStyle : basePointStyle);
+            newPointFeature.setStyle(!onInputChange ? selectedPointStyle : basePointStyle);
             //добавляем её на слой
             pointVectorSource.addFeature(newPointFeature);
         }
@@ -236,9 +234,11 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange, isDis
             );
             routLineVectorSource.addFeature(routLineFeature);
             mapRef.current.getView().fit(routLineVectorSource.getFeatures()[0].getGeometry(),
-                { padding: [30, 30, 30, 30] });
+                {
+                    padding: [30, 30, 30, 30],
+                    maxZoom: 6.5
+                });
         }
-
     }
 
     const handleZoomClick = (zoomType) => {

@@ -2,7 +2,6 @@
 
 import { useDispatch, useSelector } from 'react-redux';
 import * as Tabs from "@radix-ui/react-tabs";
-import Zoom from '../map/Zoom'
 import Filter from '../soils/Filter'
 import { useEffect, useState } from 'react';
 import { BASE_SERVER_URL } from '@/utils/constants';
@@ -11,10 +10,8 @@ import { sendPhoto } from '@/api/photo/send_photo';
 import { getAuthors } from '@/api/author/get_authors';
 import { getEcosystems } from '@/api/ecosystem/get_ecosystems';
 import Dropdown from './Dropdown';
-// import DynamicMapSelect from '../map/DynamicMapSelect';
 import DragAndDrop from './ui-kit/DragAndDrop';
 import { deletePhotoById } from '@/api/photo/delete_photo';
-import FullScreen from '../map/FullScreen';
 import uuid from 'react-uuid';
 import { closeModal, openModal } from '@/store/slices/modalSlice';
 import { getPublications } from '@/api/publication/get_publications';
@@ -25,7 +22,7 @@ import modalThunkActions from '@/store/thunks/modalThunk';
 import { getBaseEcosystems } from '@/api/ecosystem/get_base_ecosystems';
 import { getBasePublications } from '@/api/publication/get_base_publications';
 import { getBaseSoils } from '@/api/soil/get_base_soils';
-import NewMapSelect from '../map/NewMapSelect';
+import MapSelect from '../map/MapSelect';
 
 export default function ObjectForm({ oldTwoLang, oldIsEng, pathname, type, item, mainObjectPhoto, otherObjectPhoto, onItemChange, onMainPhotoChange, onOtherPhotosChange }) {
     const dispatch = useDispatch()
@@ -435,16 +432,7 @@ export default function ObjectForm({ oldTwoLang, oldIsEng, pathname, type, item,
                         </div>
 
                         <div id='map-section' className='border rounded-lg overflow-hidden mt-1 h-full'>
-                            {/* <div className='relative w-full h-full '>
-                                <DynamicMapSelect />
-                                <div className='z-20 absolute top-0 right-0 m-2'>
-                                    <FullScreen />
-                                </div>
-                                <div className='z-20 absolute top-[calc(50%-50px)] right-0 m-2 '>
-                                    <Zoom />
-                                </div>
-                            </div> */}
-                            <NewMapSelect type={type} latitude={object?.latitude} longtitude={object?.longtitude}
+                            <MapSelect type={type} latitude={object?.latitude} longtitude={object?.longtitude}
                                 onCoordinateChange={handleCoordChange} />
                         </div>
                     </div>

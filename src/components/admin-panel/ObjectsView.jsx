@@ -107,7 +107,6 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
 
     const TableRow = ({ name, dataEng, dataRu, soilObject, ecoSystem, publication, news,
         lastUpdated, isVisible, id, soilId, ecoSystemId, publicationId, newsId, type, isEnglish, title }) => {
-        console.log(type)
         return <tr key={`tableRow_${id}`}
             onClick={() => handleObjectSelect(!selectedObjects.includes(id), id, type?.name)}
             className={`cursor-pointer ${(!type ? selectedObjects.includes(id) : selectedObjects.find(obj => obj.id === id && obj.type === type.name)) ? 'bg-yellow-100/50' : ''}`}>
