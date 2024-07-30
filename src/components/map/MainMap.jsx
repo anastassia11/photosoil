@@ -26,18 +26,21 @@ import ObjectsPopup from './ObjectsPopup';
 
 export default function MainMap() {
     const [baseLayer, setBaseLayer] = useState(null);
-    const [layers, setLayers] = useState(null);
+
+    const [clusterLayer, setClusterLayer] = useState(null);
+    const [features, setFeatures] = useState([]);
+
+
     const { selectedTerms, selectedCategories } = useSelector(state => state.data);
     const [selectedLayer, setSelectedLayer] = useState('');
 
-    const [objects, setObjects] = useState([]);
+    const [selectedObjects, setSelectedObjects] = useState([]);
 
+    const [objects, setObjects] = useState([]);
     const [soils, setSoils] = useState([]);
     const [ecosystems, setEcosystems] = useState([]);
     const [publications, setPublications] = useState([]);
     const [popupVisible, setPopupVisible] = useState(false);
-
-    const [defaultSoilStyle, setSoilStyle] = useState(null);
 
     const didLogRef = useRef(false);
     const mapElement = useRef();
@@ -73,22 +76,19 @@ export default function MainMap() {
             (selectedCategories.length === 0 || selectedCategories.includes(soil.objectType)) &&
             (selectedTerms.length === 0 || selectedTerms.some(selectedTerm => soil.terms.some(term => term === selectedTerm)))
         ).map(({ id }) => id);
-        filterSoilsById(filteredIds);
+        clusterLayer && filterSoilsById(filteredIds);
     }, [selectedTerms, selectedCategories, soils])
 
     const filterSoilsById = (filteredIds) => {
-        const soilObjectLayer = layers?.get('soil');
-        if (!soilObjectLayer) return;
+        const layerSource = clusterLayer.getSource().getSource(); // Получаем источник кластера
 
-        const source = soilObjectLayer.getSource();
-        const hiddenStyle = new Style(null);
-        source.getFeatures().forEach(feature => {
+        features.forEach(feature => {
             if (feature.get('p_type') === 'soil') {
                 const featureId = feature.get('p_Id');
                 if (filteredIds.includes(featureId)) {
-                    feature.setStyle(defaultSoilStyle);
+                    !layerSource.hasFeature(feature) && layerSource.addFeature(feature);
                 } else {
-                    feature.setStyle(hiddenStyle);
+                    layerSource.removeFeature(feature);
                 }
             }
         });
@@ -114,7 +114,6 @@ export default function MainMap() {
             controls: []
         });
         setBaseLayer(baseLayer);
-        setSoilStyle(createIconStyle('/soil-marker.svg'));
     }
 
     const getBaseLayerSourse = (layerValue) => {
@@ -183,35 +182,53 @@ export default function MainMap() {
         baseLayer.setSource(getBaseLayerSourse(layer))
     }
 
-    const typeConfig = {
-        soil: { fetch: getSoils, setState: setSoils },
-        ecosystem: { fetch: getEcosystems, setState: setEcosystems },
-        publication: { fetch: getPublications, setState: setPublications }
-    };
-
-    const fetchData = async (type) => {
-        if (!typeConfig[type]) return {};
-
-        const { fetch, setState } = typeConfig[type];
-        const result = await fetch();
-
-        if (result.success && setState) {
-            setState(result.data);
+    const typeConfig = [
+        {
+            type: 'soil',
+            fetch: getSoils,
+            setState: setSoils
+        },
+        {
+            type: 'ecosystem',
+            fetch: getEcosystems,
+            setState: setEcosystems
+        },
+        {
+            type: 'publication',
+            fetch: getPublications,
+            setState: setPublications
         }
-        return result.data;
+    ];
+
+    const fetchData = async () => {
+        const fetchPromises = typeConfig.map(async ({ type, fetch, setState }) => {
+            const result = await fetch();
+            if (result.success && setState) {
+                setState(result.data);
+            }
+            const dataWithType = result.data.map(item => ({
+                ...item,
+                _type: type
+            }));
+            return dataWithType;
+        });
+
+        const results = await Promise.all(fetchPromises);
+        const combinedResults = results.flat(); // Объединяем все массивы в один
+        setObjects(combinedResults);
+        return combinedResults;
     };
 
-    const getLayer = (layerName) => {
+    const getLayer = () => {
         let layerVectorSource = new VectorSource();
 
-        fetchData(layerName)
+        fetchData()
             .then(data => {
-                let layerStyle = getIconStyleByLayerName(layerName);
+                const newFeatures = [];
                 data?.forEach(item => {
-                    const coordinates = layerName === 'publication' && item.coordinates
+                    const coordinates = item._type === 'publication' && item.coordinates
                         ? JSON.parse(item.coordinates)
                         : [{ longtitude: item.longtitude, latitude: item.latitude }];
-                    console.log(layerName, coordinates)
                     // Создаем точки на основе координат
                     coordinates.forEach(coord => {
                         if (coord.longtitude && coord.latitude) {
@@ -219,34 +236,30 @@ export default function MainMap() {
                                 geometry: new Point(fromLonLat([coord.longtitude, coord.latitude])),
                             });
                             newPointFeature.set("p_Id", item.id);
-                            newPointFeature.set("p_type", layerName);
-                            newPointFeature.setStyle(layerStyle);
+                            newPointFeature.set("p_type", item._type);
+                            newPointFeature.setStyle(getIconStyleByLayerName(item._type));
                             layerVectorSource.addFeature(newPointFeature);
+                            newFeatures.push(newPointFeature);
                         }
                     })
-                })
+                });
+                setFeatures(prevFeatures => [...prevFeatures, ...newFeatures]);
             });
         const clusterSource = new Cluster({
             distance: 35, // Расстояние для кластеризации в пикселях
             source: layerVectorSource // Исходный источник
         });
-        const clusterLayer = new VectorLayer({
+        const _clusterLayer = new VectorLayer({
             source: clusterSource,
-            style: clusterStyle
+            style: clusterStyle,
         });
-        return clusterLayer;
+        _clusterLayer.setZIndex(5);
+        setClusterLayer(_clusterLayer);
+        return _clusterLayer;
     }
 
     const loadLayers = () => {
-        let layers = new Map();
-        layers.set('soil', getLayer('soil'));
-        layers.set('ecosystem', getLayer('ecosystem'));
-        layers.set('publication', getLayer('publication'));
-        for (let lay of layers.values()) {
-            mapRef.current.addLayer(lay);
-            lay.setZIndex(5);
-        }
-        setLayers(layers);
+        mapRef.current.addLayer(getLayer());
     }
 
     const clusterStyle = (feature) => {
@@ -306,31 +319,24 @@ export default function MainMap() {
             const feature = features[0];
             const points = feature.get('features');
 
-
             setPopupVisible(true);
 
             points.forEach(point => {
                 const type = point.get("p_type");
                 const _id = point.get("p_Id");
-
-                switch (type) {
-                    case 'soil': {
-                        _objects.push({ ...soils.find(({ id }) => id == _id), _type: 'soil' });
-                        break;
+                _objects.push({
+                    ...objects.find(({ id, _type }) => {
+                        if (_type === 'publication') {
+                            return !_objects.some(obj => obj.id === _id) && ((id == _id) && (type == _type));
+                        }
+                        return (id == _id) && (type == _type)
                     }
-                    case 'ecosystem': {
-                        _objects.push({ ...ecosystems.find(({ id }) => id == _id), _type: 'ecosystem' });
-                        break;
-                    }
-                    case 'publication': {
-                        !_objects.some(obj => obj.id === _id) && _objects.push({ ...publications.find(({ id }) => id == _id), _type: 'publication' });
-                        break;
-                    }
-                }
+                    )
+                });
             })
         };
         if (_objects.length) {
-            setObjects(_objects);
+            setSelectedObjects(_objects);
         }
     }
 
@@ -343,13 +349,19 @@ export default function MainMap() {
         mapRef.current.removeEventListener('singleclick', hangleMapClick)
     }
 
-
     const handleLayerChange = ({ name, checked }) => {
-        let currentLayer = layers.get(name);
-        if (currentLayer) {
-            currentLayer.setVisible(checked);
-        }
-    }
+        const layerSource = clusterLayer.getSource().getSource(); // Получаем источник кластера
+
+        features.forEach(feature => {
+            if (feature.get('p_type') === name) {
+                if (checked) {
+                    !layerSource.hasFeature(feature) && layerSource.addFeature(feature); // Добавляем Feature обратно в источник, если checked
+                } else {
+                    layerSource.removeFeature(feature); // Удаляем Feature из источника, если unchecked
+                }
+            }
+        });
+    };
 
     const selectLocationHandler = (item) => {
         let up = fromLonLat([item.boundingbox[3], item.boundingbox[1]]);
@@ -357,15 +369,15 @@ export default function MainMap() {
 
         let combined = down.concat(up);
         mapRef.current.getView().fit(combined, {
-            duration: 500, // Анимация в 500 миллисекунд
-            maxZoom: 15, // Максимальный уровень масштабирования
-            padding: [20, 20, 20, 20] // Отступы: [верх, право, низ, лево]
+            duration: 500,
+            maxZoom: 15,
+            padding: [20, 20, 20, 20]
         });
     }
 
     const handlePopupClose = () => {
         setPopupVisible(false);
-        setObjects([]);
+        setSelectedObjects([]);
     }
 
     return (
@@ -378,7 +390,7 @@ export default function MainMap() {
             </div>
             <SideBar popupVisible={popupVisible}
                 onVisibleChange={handleLayerChange} onLocationHandler={selectLocationHandler} />
-            <ObjectsPopup visible={popupVisible} objects={objects} onCloseClick={handlePopupClose} />
+            <ObjectsPopup visible={popupVisible} objects={selectedObjects} onCloseClick={handlePopupClose} />
         </div>
     )
 }
