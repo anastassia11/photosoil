@@ -167,8 +167,8 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
 
   return (
     <div id='map-sidebar'
-      className={`${sidebarOpen ? "left-0" : "-left-[408px]"
-        } z-20 absolute top-0 w-[400px] max-w-[400px] max-h-[calc(100%-16px)] 
+      className={`${sidebarOpen ? "left-0 z-30" : "-left-[408px] z-20"
+        } absolute top-0 w-[400px] max-w-[400px] max-h-[calc(100%-16px)] 
         shadow-lg bg-white duration-300 rounded-lg m-2 flex flex-row pb-4`}>
       <div className="relative flex-1 flex flex-col max-w-full">
         <button

@@ -175,6 +175,7 @@ export default function Filter({ type, itemId, name, items, allSelectedItems, ad
 
     return (
         <div className="flex gap-8 w-full">
+        <div className="select-none flex gap-8 w-full">
             <div className="relative w-full">
                 <div className="filter_dropdown">
                     <div className={`flex cursor-pointer items-center justify-between gap-2 ${!isMapFilter ? 'bg-white border h-[40px] p-2' : ''} transition rounded-md`}
@@ -284,6 +285,6 @@ export default function Filter({ type, itemId, name, items, allSelectedItems, ad
                 </ul> : ''}
             </div>
             {formVisible.visible ? TagForm() : ''}
-        </div>
+        </div >
     )
 }

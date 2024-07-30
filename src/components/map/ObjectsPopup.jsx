@@ -37,8 +37,8 @@ export default function ObjectsPopup({ visible, objects, onCloseClick }) {
     const ObjectCard = (object) => {
         const currentTransl = object.translations?.find(({ isEnglish }) => isEnglish === (locale === 'en')) || {};
         return <Link href={`${object._type}s/${object.id}`}
-            className='flex flex-row hover:bg-zinc-100 duration-300 px-4 py-3'>
-            {object._type === 'publication' ? <div className='flex flex-col ml-2 max-w-full'>
+            className={`flex flex-row hover:bg-zinc-100 duration-300 px-4 ${object._type === 'publication' ? 'py-2' : 'py-3'}`}>
+            {object._type === 'publication' ? <div className='flex flex-col ml-1 max-w-full'>
                 <p className='text-blue-700'>
                     {PUBLICATION_ENUM[object.type] || ''}
                 </p>
@@ -48,9 +48,6 @@ export default function ObjectsPopup({ visible, objects, onCloseClick }) {
                 <p className="text-gray-600 text-nowrap text-ellipsis max-w-full overflow-hidden mt-1">
                     {currentTransl.authors}
                 </p>
-                {/* <p className="text-gray-600 flex items-center font-medium">
-                    {currentTransl.edition}
-                </p> */}
             </div> : <> {object?.photo?.path
                 ? <Image src={`${BASE_SERVER_URL}${object.photo?.path}`}
                     className="aspect-[3/4] object-cover object-top border border-blue-600 shadow-md rounded-xl w-[40%]"
@@ -70,19 +67,17 @@ export default function ObjectsPopup({ visible, objects, onCloseClick }) {
         </Link>
     }
 
-    useEffect(() => { console.log(isVisible['soils']) }, [isVisible])
-
     const Dropdown = (type) => {
         return <div className='flex flex-col'>
             <label onClick={() => setIsVisible(prev => ({ ...prev, [type]: !prev[type] }))}
-                className="px-3 text-gray-500 flex flex-row items-center cursor-pointer text-xl font-medium">
+                className="select-none px-3 py-1 text-gray-500 flex flex-row items-center cursor-pointer text-xl font-medium">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={`mr-1 size-6 duration-150 ${isVisible[type] ? 'rotate-180' : ''}`}>
                     <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
                 </svg>
                 {t(type)}
             </label>
 
-            {<ul className={`flex flex-col duration-200 transition-all ${isVisible[type] ? 'visible translate-y-3' : 'invisible opacity-0'}`}>
+            {<ul className={`flex flex-col duration-300 transition-all overflow-hidden ${isVisible[type] ? 'max-h-fit opacity-100 visible translate-y-0' : '-translate-y-2 max-h-0 invisible opacity-0'}`}>
                 {type === 'soils' ? soils.map(obj => <li key={obj.id}>
                     {ObjectCard(obj)}
                 </li>)
@@ -97,8 +92,8 @@ export default function ObjectsPopup({ visible, objects, onCloseClick }) {
     }
 
     return (
-        <div className={`${visible ? "-left-[2px]" : "-left-[440px]"} 
-        z-30 absolute top-0 w-[400px] max-w-[400px] 
+        <div className={`${visible ? "-left-[2px] z-30" : "-left-[440px] z-20"} 
+       absolute top-0 w-[400px] max-w-[400px] 
      max-h-[calc(100%-16px)] 
         shadow-lg bg-white duration-300 rounded-lg m-2 flex flex-row`}>
             <div className={`relative flex-1 flex flex-col max-w-full`}>
@@ -111,7 +106,7 @@ export default function ObjectsPopup({ visible, objects, onCloseClick }) {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                     </svg>
                 </button>
-                {objects.length ? <div className='flex flex-col py-4 space-y-1 max-h-full overflow-y-auto scroll'>
+                {objects.length ? <div className='flex flex-col py-4 space-y-2 max-h-full overflow-y-auto scroll'>
                     {soils.length ? Dropdown('soils') : ''}
                     {ecosystems.length ? Dropdown('ecosystems') : ''}
                     {publications.length ? Dropdown('publications') : ''}
