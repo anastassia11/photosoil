@@ -1,6 +1,6 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
-import { BASE_SERVER_URL } from "@/utils/constants";
 import Filter from '../soils/Filter';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +8,7 @@ import { useConstants } from '@/hooks/useConstants';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { addCategory, addTerm, deleteCategory, deleteTerm } from '@/store/slices/dataSlice';
 
-export default function SideBar({ onVisibleChange, onLocationHandler }) {
+export default function SideBar({ popupVisible, onVisibleChange, onLocationHandler }) {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -21,6 +21,7 @@ export default function SideBar({ onVisibleChange, onLocationHandler }) {
     publication: true,
   })
   const [location, setLocation] = useState([]);
+  const [debounceTimeout, setDebounceTimeout] = useState(null);
 
   const [searchTitle, setSearchTitle] = useState('');
   const { selectedTerms, selectedCategories, classifications } = useSelector(state => state.data);
@@ -35,6 +36,10 @@ export default function SideBar({ onVisibleChange, onLocationHandler }) {
   useEffect(() => {
     updateFiltersInHistory();
   }, [selectedCategories, selectedTerms])
+
+  useEffect(() => {
+    setSideBarOpen(!popupVisible)
+  }, [popupVisible])
 
   const updateFiltersInHistory = () => {
     const params = new URLSearchParams(searchParams.toString())
@@ -60,6 +65,22 @@ export default function SideBar({ onVisibleChange, onLocationHandler }) {
   const handleSearch = async (e) => {
     const { value } = e.target;
     setSearchTitle(value);
+
+    // Если есть активный таймер, сбрасываем его
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+    }
+
+    // Устанавливаем новый таймер
+    const newTimeout = setTimeout(() => {
+      fetchLocations(value);
+      clearTimeout(debounceTimeout);
+    }, 300); // 300 мс задержка
+
+    setDebounceTimeout(newTimeout);
+  };
+
+  const fetchLocations = async (value) => {
     const params = {
       q: value,
       format: "json",
@@ -67,24 +88,22 @@ export default function SideBar({ onVisibleChange, onLocationHandler }) {
       polygon_geojson: 0,
     };
     const queryString = new URLSearchParams(params).toString();
-    const requestOptions = {
-      method: "GET",
-      redirect: "follow",
-    };
-    !value.length && setLocation([]);
+    if (!value.length) {
+      setLocation([]);
+      return;
+    }
 
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?${queryString}`,
-        requestOptions
+        `https://nominatim.openstreetmap.org/search?${queryString}`
       );
       const result = await response.json();
 
       if (result.length > 0) {
-        setLocation(result.slice(0, 5))
+        setLocation(result.slice(0, 5));
       }
     } catch (err) {
-      console.log(err)
+      console.log(err);
     }
   };
 
@@ -147,7 +166,7 @@ export default function SideBar({ onVisibleChange, onLocationHandler }) {
   }
 
   return (
-    <div
+    <div id='map-sidebar'
       className={`${sidebarOpen ? "left-0" : "-left-[408px]"
         } z-20 absolute top-0 w-[400px] max-w-[400px] max-h-[calc(100%-16px)] 
         shadow-lg bg-white duration-300 rounded-lg m-2 flex flex-row pb-4`}>
