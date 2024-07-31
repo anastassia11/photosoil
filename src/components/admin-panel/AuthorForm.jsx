@@ -10,8 +10,13 @@ import { useTranslation } from 'react-i18next';
 import { useConstants } from '@/hooks/useConstants';
 import Dropdown from './Dropdown';
 import Input from './ui-kit/Input';
+import { openAlert } from '@/store/slices/alertSlice';
+import { useDispatch } from 'react-redux';
+import { closeModal, openModal } from '@/store/slices/modalSlice';
+import modalThunkActions from '@/store/thunks/modalThunk';
 
 export default function AuthorForm({ _author, onFormSubmit, isLoading, btnText }) {
+    const dispatch = useDispatch();
     const [author, setAuthor] = useState({});
     const [photo, setPhoto] = useState({});
     const [role, setRole] = useState(null);
@@ -31,7 +36,11 @@ export default function AuthorForm({ _author, onFormSubmit, isLoading, btnText }
 
     const handleCreateAuthor = async (e) => {
         e.preventDefault();
-        onFormSubmit(author);
+        if (author.dataEng?.name?.length && author.dataRu?.name?.length && author.photoId) {
+            onFormSubmit(author);
+        } else {
+            dispatch(openAlert({ title: t('warning'), message: t('form_required'), type: 'warning' }))
+        }
     }
 
     const handleInputChange = (e, lang) => {
@@ -58,11 +67,23 @@ export default function AuthorForm({ _author, onFormSubmit, isLoading, btnText }
         }))
     }
 
-    const handlePhotoDelete = () => {
-        const _author = { ...author };
-        delete _author.PhotoId;
-        setAuthor(_author);
-        setPhoto({});
+    const handlePhotoDelete = async () => {
+        dispatch(openModal({
+            title: t('warning'),
+            message: t('delete_photo'),
+            buttonText: t('delete')
+        }))
+
+        const isConfirm = await dispatch(modalThunkActions.open());
+        if (isConfirm.payload) {
+            const updatedAuthor = JSON.parse(JSON.stringify(author));
+            delete updatedAuthor.photoId;
+            delete updatedAuthor.photo;
+
+            setAuthor(updatedAuthor);
+            setPhoto({});
+        }
+        dispatch(closeModal());
     }
 
     const fetchSendPhoto = async (file) => {
@@ -120,9 +141,12 @@ export default function AuthorForm({ _author, onFormSubmit, isLoading, btnText }
             className="flex flex-col items-start">
             <div className='flex flex-row w-full 3xl:w-[50%]'>
                 <div className='mt-4'>
-                    <div className='max-h-[370px] min-h-[370px] aspect-[3/4] overflow-hidden'>
+                    <div className=''>
+                        <p className="font-medium mb-1">
+                            Фото<span className='text-orange-500'>*</span>
+                        </p>
                         {photo?.path ? <div className='relative max-h-full rounded-md overflow-hidden'>
-                            <button className='overflow-hidden p-[6px] text-sm font-medium z-10 absolute top-0 right-0 rounded-bl-md
+                            <button type='button' className='overflow-hidden p-[6px] text-sm font-medium z-10 absolute top-0 right-0 rounded-bl-md
                                 backdrop-blur-md bg-black bg-opacity-40 text-zinc-200 hover:text-white duration-300'
                                 onClick={handlePhotoDelete}>
                                 <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className='w-4 h-4'>
@@ -132,14 +156,17 @@ export default function AuthorForm({ _author, onFormSubmit, isLoading, btnText }
                                 </svg>
                             </button>
                             <Image src={`${BASE_SERVER_URL}${photo.path}`} height={370} width={370} alt='author photo'
-                                className='object-cover rounded-md max-h-full' />
+                                className='object-cover rounded-md max-h-[370px] min-h-[370px] aspect-[3/4] overflow-hidden' />
                         </div> :
-                            <DragAndDrop onLoadClick={fetchSendPhoto} isMultiple={false} accept='img' />}
+                            <div className='max-h-[370px] min-h-[370px] aspect-[3/4] overflow-hidden'>
+                                <DragAndDrop onLoadClick={fetchSendPhoto} isMultiple={false} accept='img' />
+                            </div>
+                        }
                     </div>
                 </div>
                 <ul className='pl-6 w-full space-y-4'>
                     {role === 'Admin' && <li key='rang' className='w-[285px] mt-4'>
-                        <Dropdown name={t('rank')} value={author.authorType} items={RANK_ENUM} onCategotyChange={handleRankChange} dropdownKey='rang' />
+                        <Dropdown name={t('rank')} value={author.authorType || 3} items={RANK_ENUM} onCategotyChange={handleRankChange} dropdownKey='rang' />
                     </li>}
                     {AUTHOR_INFO.map(item => <li key={item.name}>
                         {item.isArray && ArrayInput({ ...item })}
@@ -152,7 +179,8 @@ export default function AuthorForm({ _author, onFormSubmit, isLoading, btnText }
                     <p className='text-blue-700 font-semibold'>Русская версия</p>
                     {AUTHOR_INFO.map(({ name, isArray, title }) => <li key={name}>
                         {!isArray && Input({
-                            label: `${title}`,
+                            required: name === 'name',
+                            label: title,
                             name: name,
                             value: author.dataRu?.[name] || '',
                             onChange: e => handleInputChange(e, 'ru')
@@ -163,7 +191,9 @@ export default function AuthorForm({ _author, onFormSubmit, isLoading, btnText }
                     <p className='text-blue-700 font-semibold'>English version</p>
                     {AUTHOR_INFO.map(({ name, isArray, title }) => <li key={name}>
                         {!isArray && Input({
-                            label: `${title} (EN)`,
+                            required: name === 'name',
+                            label: title,
+                            isEng: true,
                             name: name,
                             value: author.dataEng?.[name] || '',
                             onChange: e => handleInputChange(e, 'eng')
