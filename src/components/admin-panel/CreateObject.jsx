@@ -43,8 +43,11 @@ export default function CreateObject({ title, onCreate, type }) {
     const handleChange = (e) => {
         e.preventDefault();
         let files = [...e.target.files];
-        files.forEach((file) => {
-            requestSendPhoto(file)
+        files.forEach((file, index) => {
+            setPhotos(prev => [...prev, { createTwoLang: false, currentLang: 'ru', isLoading: true }]);
+            setFormData(prevData => [...prevData, { translations: [{ isEnglish: true }, { isEnglish: false }] }]);
+            setOtherPhotos(prev => [...prev, []]);
+            requestSendPhoto(file, index);
         });
         setCurrentForm(0)
     }
