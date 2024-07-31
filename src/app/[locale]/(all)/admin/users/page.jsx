@@ -119,7 +119,7 @@ export default function AuthorsPage() {
                     {t('register')}
                 </h3>
                 <ul className='my-2 space-y-3'>
-                    {MODERATOR_INFO.map(({ title, name, }) => <li key={name}>
+                    {MODERATOR_INFO.map(({ title, name }) => <li key={name}>
                         {Input({
                             label: title,
                             name: name,
@@ -130,7 +130,7 @@ export default function AuthorsPage() {
                     </li>)}
                     <div>
                         <label className="font-medium">
-                            {t('password')}
+                            {t('password')}<span className='text-orange-500'>*</span>
                         </label >
                         <div className="relative">
                             <button type='button' className="text-gray-400 absolute right-3 inset-y-0 my-auto active:text-gray-600"

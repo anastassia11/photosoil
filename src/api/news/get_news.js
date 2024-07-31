@@ -13,7 +13,6 @@ export async function getNewsById(Id) {
             }
         )
         if (!response.data.error) {
-            console.log(response)
             return { success: true, data: response.data.response }
         }
     } catch (error) {

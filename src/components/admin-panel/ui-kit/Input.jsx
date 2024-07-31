@@ -1,12 +1,14 @@
 import React from 'react'
 
-export default function Input({ label, name, value, required, onChange }) {
+export default function Input({ label, name, value, required, onChange, isEng }) {
+
     return (
-        <div>
-            <label className="font-medium flex flex-row">
-                {label}
-            </label>
+        <div className='w-full'>
+            {label ? <label className="font-medium flex flex-row">
+                {label}{isEng ? ' (EN) ' : ''}<span className='text-orange-500'>{required ? '*' : ''}</span>
+            </label> : ''}
             <input
+                autocomplete="off"
                 required={required}
                 value={value}
                 onChange={onChange}

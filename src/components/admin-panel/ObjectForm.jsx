@@ -313,9 +313,8 @@ export default function ObjectForm({ oldTwoLang, oldIsEng, pathname, type, item,
 
                     <div className='flex flex-col w-full'>
                         {Input({
-                            label: <>
-                                {`${t('title')} ${isEng ? '(EN) ' : ''}`}<span className={`text-orange-500`}>*</span>
-                            </>,
+                            label: t('title'),
+                            isEng: isEng,
                             name: 'name',
                             value: object.translations?.find(({ isEnglish }) => isEng === isEnglish)?.name || '',
                             required: true,
@@ -339,7 +338,8 @@ export default function ObjectForm({ oldTwoLang, oldIsEng, pathname, type, item,
                                                 required: false
                                             })
                                             : Input({
-                                                label: `${title} ${isEng ? '(EN) ' : ''}`,
+                                                label: title,
+                                                isEng: isEng,
                                                 name: name,
                                                 value: object.translations?.find(({ isEnglish }) => isEng === isEnglish)?.[name] || '',
                                                 required: false,
