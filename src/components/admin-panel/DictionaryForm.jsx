@@ -3,9 +3,11 @@ import { Oval } from 'react-loader-spinner';
 import Dropdown from './Dropdown';
 import { useConstants } from '@/hooks/useConstants';
 import { useTranslation } from 'react-i18next';
+import Input from './ui-kit/Input';
 
 export default function DictionaryForm({ _dictionary, onFormSubmit, isLoading, isEdit, btnTitle }) {
     const { t } = useTranslation();
+
     const [dictionary, setDictionary] = useState({
         nameRu: '',
         nameEng: '',
@@ -75,30 +77,26 @@ export default function DictionaryForm({ _dictionary, onFormSubmit, isLoading, i
                     ${dictionary.translationMode == 0 ? 'xl:w-[50%] xl:pr-6 xl:border-r' : 'w-full'}`}>
                     <p className='text-blue-700 font-semibold'>Русская версия</p>
                     <div className='w-full'>
-                        <label className="font-medium">
-                            {t('classification')}
-                        </label>
-                        <input
-                            value={dictionary.nameRu}
-                            name='nameRu'
-                            onChange={handleNameChange}
-                            type="text"
-                            className="bg-white w-full mt-1 p-2 outline-none border focus:border-blue-600 shadow-sm rounded-md"
-                        />
+                        {Input({
+                            label: t('classification'),
+                            name: 'nameRu',
+                            value: dictionary.nameRu,
+                            onChange: handleNameChange,
+                            required: dictionary.translationMode == 0 || dictionary.translationMode == 2
+                        })}
                     </div>
                     {dictionary.terms.length ? <div className='flex flex-col w-full'>
                         <p className="font-medium">
                             {t('terms')}
                         </p>
-                        <ul>
-                            {dictionary.terms?.map((term, index) => <li className='flex flex-row' key={`term-${term.id || index}`}>
-                                <input
-                                    value={term.nameRu}
-                                    onChange={(e) => handleTermsChange(e, term.id || index)}
-                                    type="text"
-                                    name='nameRu'
-                                    className="bg-white w-full mt-1 p-2 outline-none border focus:border-blue-600 shadow-sm rounded-md"
-                                />
+                        <ul className='w-full'>
+                            {dictionary.terms?.map((term, index) => <li className='flex flex-row min-w-full' key={`term-${term.id || index}`}>
+                                {Input({
+                                    name: 'nameRu',
+                                    value: term.nameRu,
+                                    onChange: (e) => handleTermsChange(e, term.id || index),
+                                    required: dictionary.translationMode == 0 || dictionary.translationMode == 2
+                                })}
                                 <button type='button'
                                     className='p-2'
                                     onClick={() => handleDeleteTerm(term.id || index)}>
@@ -118,16 +116,14 @@ export default function DictionaryForm({ _dictionary, onFormSubmit, isLoading, i
                     ${dictionary.translationMode == 0 ? 'xl:w-[50%] xl:pl-6' : 'w-full'}`}>
                     <p className='text-blue-700 font-semibold'>English version</p>
                     <div className='w-full'>
-                        <label className="font-medium">
-                            {`${t('classification')} (EN)`}
-                        </label>
-                        <input
-                            value={dictionary.nameEng}
-                            name='nameEng'
-                            onChange={handleNameChange}
-                            type="text"
-                            className="bg-white w-full mt-1 p-2 outline-none border focus:border-blue-600 shadow-sm rounded-md"
-                        />
+                        {Input({
+                            label: t('classification'),
+                            name: 'nameEng',
+                            isEng: true,
+                            value: dictionary.nameEng,
+                            onChange: handleNameChange,
+                            required: dictionary.translationMode == 0 || dictionary.translationMode == 1
+                        })}
                     </div>
                     {dictionary.terms.length ? <div className='flex flex-col w-full'>
                         <p className="font-medium">
@@ -135,13 +131,12 @@ export default function DictionaryForm({ _dictionary, onFormSubmit, isLoading, i
                         </p>
                         <ul>
                             {dictionary.terms?.map((term, index) => <li className='flex flex-row' key={`term-${term.id || index}`}>
-                                <input
-                                    value={term.nameEng}
-                                    onChange={(e) => handleTermsChange(e, term.id || index)}
-                                    type="text"
-                                    name='nameEng'
-                                    className="bg-white w-full mt-1 p-2 outline-none border focus:border-blue-600 shadow-sm rounded-md"
-                                />
+                                {Input({
+                                    name: 'nameEng',
+                                    value: term.nameEng,
+                                    onChange: (e) => handleTermsChange(e, term.id || index),
+                                    required: dictionary.translationMode == 0 || dictionary.translationMode == 1
+                                })}
                                 <button type='button'
                                     className='p-2'
                                     onClick={() => handleDeleteTerm(term.id || index)}>
