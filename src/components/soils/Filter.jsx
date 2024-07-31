@@ -1,18 +1,17 @@
 import { createTag } from '@/api/tags/create_tag';
 import { deleteTag } from '@/api/tags/delete_tag';
 import { putTag } from '@/api/tags/put_tag';
-import { getAllTags } from '@/store/slices/dataSlice';
 import { setDropdown } from '@/store/slices/generalSlice'
 import { openModal } from '@/store/slices/modalSlice';
 import modalThunkActions from '@/store/thunks/modalThunk';
-import { useParams, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import { Oval } from 'react-loader-spinner';
 import { useDispatch, useSelector } from 'react-redux'
 import { Tooltip } from 'react-tooltip';
 
-export default function Filter({ type, itemId, name, items, allSelectedItems, addItem, deleteItem, resetItems, isMapFilter, isEng }) {
+export default function Filter({ type, itemId, name, items, setTags, allSelectedItems, addItem, deleteItem, resetItems, isMapFilter, isEng }) {
     const dispatch = useDispatch();
     const [filterOpen, setFilterOpen] = useState(false)
     const paths = usePathname();
@@ -78,9 +77,10 @@ export default function Filter({ type, itemId, name, items, allSelectedItems, ad
             await createTag(tagData)
             : await putTag({ id: tagData.id, data: { nameRu: tagData.nameRu, nameEng: tagData.nameEng } });
         if (result.success) {
+            formVisible.type === 'create' ? setTags(prev => [...prev, result.data])
+                : setTags(prev => prev.map(item => item.id === tagData.id ? result.data : item));
             setFormVisible(prev => ({ visible: false, type: '' }));
             setTagData({});
-            dispatch(getAllTags());
         }
         setIsLoading(false);
     }
@@ -95,7 +95,7 @@ export default function Filter({ type, itemId, name, items, allSelectedItems, ad
     const fetchDeleteTag = async (id) => {
         const result = await deleteTag(id);
         if (result.success) {
-            dispatch(getAllTags());
+            setTags(prev => prev.filter(item => item.id !== id));
         } else {
             console.log(result)
         }
@@ -152,7 +152,7 @@ export default function Filter({ type, itemId, name, items, allSelectedItems, ad
                         <button type='button' onClick={handleCloseForm} className="w-full px-4 py-2 font-medium tracking-wide text-gray-700 capitalize transition-colors duration-300 transform border border-gray-200 rounded-md sm:w-1/2 sm:mx-2 focus:outline-none">
                             {t('cancel')}
                         </button>
-                        <button onClick={createNewTag}
+                        <button onClick={createNewTag} type='button'
                             disabled={isLoading}
                             className="flex items-center justify-center w-full px-4 py-2 mt-3 font-medium tracking-wide text-white capitalize transition-colors duration-300 transform 
                                     bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600 sm:mt-0 sm:w-1/2 sm:mx-2">

@@ -10,6 +10,7 @@ import Pagination from '../Pagination'
 import { useTranslation } from 'react-i18next'
 import Dropdown from '../admin-panel/Dropdown'
 import { useConstants } from '@/hooks/useConstants'
+import { getClassifications } from '@/api/classification/get_classifications'
 
 export default function Soils({ soils, isAllSoils, isFilters, isDrafts, type }) {
     const dispatch = useDispatch();
@@ -21,7 +22,9 @@ export default function Soils({ soils, isAllSoils, isFilters, isDrafts, type }) 
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    const { selectedTerms, selectedCategories, classifications } = useSelector(state => state.data);
+    const { selectedTerms, selectedCategories } = useSelector(state => state.data);
+
+    const [classifications, setClassifications] = useState([]);
 
     const [filterName, setFilterName] = useState('');
     const [filtersVisible, setFiltersVisible] = useState(true);
@@ -50,6 +53,7 @@ export default function Soils({ soils, isAllSoils, isFilters, isDrafts, type }) 
 
     useEffect(() => {
         setToken(JSON.parse(localStorage.getItem('tokenData'))?.token);
+        fetchClassifications();
         if (didLogRef.current) {
             didLogRef.current = false
             const categoriesParam = searchParams.get('categories');
@@ -63,6 +67,13 @@ export default function Soils({ soils, isAllSoils, isFilters, isDrafts, type }) 
     useEffect(() => {
         updateFiltersInHistory();
     }, [selectedCategories, selectedTerms])
+
+    const fetchClassifications = async () => {
+        const result = await getClassifications();
+        if (result.success) {
+            setClassifications(result.data);
+        }
+    }
 
     const updateFiltersInHistory = () => {
         const params = new URLSearchParams(searchParams.toString())

@@ -2,11 +2,8 @@
 
 import { getSoils } from '@/api/soil/get_soils';
 import Soils from '@/components/soils/Soils';
-import { BASE_URL } from '@/utils/constants';
-import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
 
 export default function SoilsPage({ params: { type } }) {
     const [soils, setSoils] = useState([])
@@ -17,12 +14,6 @@ export default function SoilsPage({ params: { type } }) {
     }, [])
 
     const fetchSoils = async () => {
-        // const { data } = await fetch('/api/soilObject')
-
-        // console.log(data)
-        // setSoils(data)
-
-
         const result = await getSoils()
         if (result.success) {
             setSoils(result.data)

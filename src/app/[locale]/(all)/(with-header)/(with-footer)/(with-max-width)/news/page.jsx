@@ -1,10 +1,11 @@
 'use client'
 
 import { getAllNews } from '@/api/news/get_allNews';
+import { getTags } from '@/api/tags/get_tags';
 import Pagination from '@/components/Pagination';
 import Dropdown from '@/components/admin-panel/Dropdown';
 import Filter from '@/components/soils/Filter';
-import { addTag, deleteTag, getAllTags, resetTags } from '@/store/slices/dataSlice';
+import { addTag, deleteTag, resetTags } from '@/store/slices/dataSlice';
 import { PAGINATION_OPTIONS } from '@/utils/constants';
 import Link from 'next/link';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -19,19 +20,20 @@ export default function NewsPage() {
     const [filterName, setFilterName] = useState('');
     const [filteredNews, setFilteredNews] = useState([]);
     const [currentItems, setCurrentItems] = useState([]);
+    const [tags, setTags] = useState([]);
     const [itemsPerPage, setItemsPerPage] = useState(0);
     const searchParams = useSearchParams();
     const router = useRouter();
 
     const { t } = useTranslation();
     const { locale } = useParams();
-    const { tags, selectedTags } = useSelector(state => state.data);
+    const { selectedTags } = useSelector(state => state.data);
 
     const _isEng = locale === 'en';
 
     useEffect(() => {
+        fetchTags();
         fetchNews();
-        dispatch(getAllTags())
     }, [])
 
     useEffect(() => {
@@ -72,6 +74,13 @@ export default function NewsPage() {
         const result = await getAllNews();
         if (result.success) {
             setNews(result.data)
+        }
+    }
+
+    const fetchTags = async () => {
+        const result = await getTags();
+        if (result.success) {
+            setTags(result.data);
         }
     }
 

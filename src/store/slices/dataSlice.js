@@ -5,31 +5,9 @@ import { BASE_SERVER_URL } from '@/utils/constants';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios';
 
-export const getAllClassifications = createAsyncThunk(
-    'data/getAllClassifications',
-    async function () {
-        const result = await getClassifications();
-        if (result.success) {
-            return result.data;
-        }
-    }
-);
-
-export const getAllTags = createAsyncThunk(
-    'data/getAllTags',
-    async function () {
-        const result = await getTags();
-        if (result.success) {
-            return result.data;
-        }
-    }
-);
-
 const dataSlice = createSlice({
     name: 'data',
     initialState: {
-        classifications: [],
-        tags: [],
         selectedTags: [],
         selectedAuthors: [],
         selectedTerms: [],
@@ -120,29 +98,8 @@ const dataSlice = createSlice({
             state.selectedPublications = []
         },
     },
-    extraReducers: builder => {
-        builder
-            .addCase(getAllClassifications.pending, (state) => {
-                state.status = 'loading'
-            })
-            .addCase(getAllClassifications.fulfilled, (state, action) => {
-                state.status = 'resolved';
-                state.classifications = action.payload;
-            })
-            .addCase(getAllClassifications.rejected, (state, action) => { })
-            .addCase(getAllTags.pending, (state) => {
-                state.status = 'loading';
-            })
-            .addCase(getAllTags.fulfilled, (state, action) => {
-                state.status = 'resolved';
-                state.tags = action.payload;
-            })
-            .addCase(getAllTags.rejected, (state, action) => {
-                state.status = 'error';
-            });
-    },
-
 })
+
 export const {
     addTerm, deleteTerm, resetTerm,
     addCategory, deleteCategory, resetCategory,

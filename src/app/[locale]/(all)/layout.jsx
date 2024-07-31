@@ -3,7 +3,6 @@
 import { useDispatch } from 'react-redux';
 import { useEffect } from 'react';
 import { setDropdown } from '@/store/slices/generalSlice';
-import { getAllClassifications } from '@/store/slices/dataSlice';
 
 export default function AllLayout({ children }) {
   const dispatch = useDispatch();
@@ -15,8 +14,6 @@ export default function AllLayout({ children }) {
   };
 
   useEffect(() => {
-    dispatch(getAllClassifications());
-
     document.addEventListener('click', handleClickOutside);
     return () => {
       document.removeEventListener('click', handleClickOutside);

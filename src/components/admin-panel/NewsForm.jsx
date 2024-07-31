@@ -15,7 +15,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { deletePhotoById } from '@/api/photo/delete_photo';
 import Filter from '../soils/Filter';
 import { getTags } from '@/api/tags/get_tags';
-import { getAllTags } from '@/store/slices/dataSlice';
 import Textarea from './ui-kit/Textarea';
 import PhotoCard from './ui-kit/PhotoCard';
 import FileCard from './ui-kit/FileCard';
@@ -25,7 +24,8 @@ export default function NewsForm({ _news, pathname, onNewsSubmit, isLoading, btn
     const [news, setNews] = useState({});
     const [newsPhotos, setNewsPhotos] = useState([]);
     const [files, setFiles] = useState([]);
-    const tags = useSelector(state => state.data.tags);
+    const [tags, setTags] = useState([]);
+
     const [isEng, setIsEng] = useState(false);
     const [createTwoLang, setCreateTwoLang] = useState(false);
     const { t } = useTranslation();
@@ -47,8 +47,15 @@ export default function NewsForm({ _news, pathname, onNewsSubmit, isLoading, btn
     }, [_news])
 
     useEffect(() => {
-        dispatch(getAllTags());
+        fetchTags();
     }, [])
+
+    const fetchTags = async () => {
+        const result = await getTags();
+        if (result.success) {
+            setTags(result.data);
+        }
+    }
 
     const handleInputChange = (e) => {
         const { value, name } = e.target;
@@ -316,7 +323,8 @@ export default function NewsForm({ _news, pathname, onNewsSubmit, isLoading, btn
                 </div>
 
                 <div className='mt-8 flex flex-col w-1/2'>
-                    <Filter name={t('tags')} items={tags} isEng={isEng}
+                    <Filter name={t('tags')} items={tags} setTags={setTags}
+                        isEng={isEng}
                         allSelectedItems={news?.tags}
                         addItem={newItem => handleAddTag(newItem)}
                         deleteItem={deletedItem => handleDeleteTag(deletedItem)}
@@ -328,7 +336,7 @@ export default function NewsForm({ _news, pathname, onNewsSubmit, isLoading, btn
             <button
                 onClick={handleFormSubmit}
                 disabled={isLoading}
-                className="min-w-[232px] mt-8 min-h-[40px] flex items-center justify-center self-end w-fit px-8 py-2 font-medium text-center text-white transition-colors duration-300 
+                className="min-w-[232px] mt-16 min-h-[40px] flex items-center justify-center self-end w-fit px-8 py-2 font-medium text-center text-white transition-colors duration-300 
                 transform bg-blue-600 disabled:bg-blue-600/70 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600 align-bottom">
                 {isLoading ?
                     <Oval
