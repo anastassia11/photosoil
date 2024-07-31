@@ -20,6 +20,7 @@ import Input from './ui-kit/Input';
 import MapInput from './ui-kit/MapInput';
 import Textarea from './ui-kit/Textarea';
 import FileCard from './ui-kit/FileCard';
+import { openAlert } from '@/store/slices/alertSlice';
 
 export default function PublicationForm({ _publication, pathname, onPublicationSubmit, isLoading, btnText, oldTwoLang, oldIsEng }) {
     const [publication, setPublication] = useState({});
@@ -158,7 +159,12 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
     }
 
     const handleSubmit = () => {
-        onPublicationSubmit({ createTwoLang, isEng, publication });
+        if (createTwoLang ? (publication.translations?.every(({ name }) => name?.length))
+            : publication.translations?.find(({ isEnglish }) => isEng === isEnglish).name) {
+            onPublicationSubmit({ createTwoLang, isEng, publication });
+        } else {
+            dispatch(openAlert({ title: t('warning'), message: t('form_required'), type: 'warning' }))
+        }
     }
 
     return (
@@ -209,12 +215,8 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
                                             onCategotyChange={handleTypeChange} dropdownKey='category' /> :
                                             Input({
                                                 name: name,
-                                                label: <>
-                                                    {`${title} ${(name !== 'doi' && isEng) ? '(EN)' : ''}`}
-                                                    <span className={`text-orange-500 ${name === 'name' ? 'block' : 'hidden'}`}>
-                                                        *
-                                                    </span>
-                                                </>,
+                                                label: title,
+                                                isEng: name !== 'doi' && isEng,
                                                 value: name === 'doi' ? publication.doi : publication.translations?.find(({ isEnglish }) => isEng === isEnglish)?.[name] || '',
                                                 onChange: handleInputChange,
                                                 required: name === 'name'
