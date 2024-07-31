@@ -170,7 +170,7 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
     return (
         <form
             onSubmit={(e) => e.preventDefault()}
-            className="flex flex-col w-full h-fit">
+            className="flex flex-col w-full h-fit pb-16">
             <div className='flex flex-col w-full h-full'>
                 <div className='grid grid-cols-2 gap-4 w-full'>
                     <Tabs.Root defaultValue={false} className="col-span-2" value={isEng}

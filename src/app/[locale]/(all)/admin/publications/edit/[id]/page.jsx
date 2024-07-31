@@ -54,7 +54,7 @@ export default function EditPublicationPage({ params: { id } }) {
     }
 
     return (
-        <div className="flex flex-col w-full flex-1">
+        <div className="flex flex-col w-full flex-1 pb-24">
             <h1 className='sm:text-2xl text-xl font-semibold mb-4'>
                 {t('edit_publication')}
             </h1>

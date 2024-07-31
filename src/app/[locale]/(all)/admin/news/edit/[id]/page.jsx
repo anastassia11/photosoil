@@ -73,7 +73,7 @@ export default function EditNewsPage({ params: { id } }) {
     }
 
     return (
-        <div className="flex flex-col w-full flex-1">
+        <div className="flex flex-col w-full flex-1 pb-44">
             <h1 className='sm:text-2xl text-xl font-semibold mb-4'>
                 {t('edit_news')}
             </h1>
