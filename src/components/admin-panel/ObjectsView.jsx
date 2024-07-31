@@ -39,25 +39,30 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
     }, [_objects]);
 
     useEffect(() => {
-        setFilteredObjects(prev => objects.sort((a, b) => {
-            const dateA = new Date(a.lastUpdated);
-            const dateB = new Date(b.lastUpdated);
-            return dateB - dateA;
-        }).filter(object =>
-            (object?.name?.toLowerCase().includes(filterName.toLowerCase()) ||
-                object?.email?.toLowerCase().includes(filterName.toLowerCase()) ||
-                object?.title?.toLowerCase().includes(filterName.toLowerCase()) ||
-                object?.dataEng?.name?.toLowerCase().includes(filterName.toLowerCase()) || object?.dataRu?.name?.toLowerCase().includes(filterName.toLowerCase())) &&
-            ((publishStatus === 'publish' && object.isVisible) ||
-                (publishStatus === 'not_publish' && (!object.isVisible && object.isVisible !== undefined)) ||
-                (publishStatus === 'all' && true)) &&
-            (((currentLang === 'eng' && object.isEnglish) ||
-                (currentLang === 'ru' && !object.isEnglish && object.isEnglish !== undefined) ||
-                (currentLang === 'any' && true)) ||
-                ((currentLang === 'eng' && object.translationMode !== undefined && (object.translationMode == 1 || object.translationMode == 0)) ||
-                    (currentLang === 'ru' && object.translationMode !== undefined && (object.translationMode == 2 || object.translationMode == 0)) ||
-                    (currentLang === 'any' && true)))
-        ))
+        setFilteredObjects(prev => objects
+            .sort((a, b) => {
+                const dateA = new Date(a.lastUpdated);
+                const dateB = new Date(b.lastUpdated);
+                return dateB - dateA;
+            })
+            .filter(object =>
+                (object?.name?.toLowerCase().includes(filterName.toLowerCase()) ||
+                    object?.email?.toLowerCase().includes(filterName.toLowerCase()) ||
+                    object?.title?.toLowerCase().includes(filterName.toLowerCase()) ||
+                    object?.dataEng?.name?.toLowerCase().includes(filterName.toLowerCase()) ||
+                    object?.dataRu?.name?.toLowerCase().includes(filterName.toLowerCase()) ||
+                    object?.nameRu?.toLowerCase().includes(filterName.toLowerCase()) ||
+                    object?.nameEng?.toLowerCase().includes(filterName.toLowerCase())) &&
+                ((publishStatus === 'publish' && object.isVisible) ||
+                    (publishStatus === 'not_publish' && (!object.isVisible && object.isVisible !== undefined)) ||
+                    (publishStatus === 'all' && true)) &&
+                (((currentLang === 'eng' && object.isEnglish) ||
+                    (currentLang === 'ru' && !object.isEnglish && object.isEnglish !== undefined) ||
+                    (currentLang === 'any' && true)) ||
+                    ((currentLang === 'eng' && object.translationMode !== undefined && (object.translationMode == 1 || object.translationMode == 0)) ||
+                        (currentLang === 'ru' && object.translationMode !== undefined && (object.translationMode == 2 || object.translationMode == 0)) ||
+                        (currentLang === 'any' && true)))
+            ))
     }, [objects, filterName, publishStatus, currentLang]);
 
     const handleObjectSelect = (checked, id, type) => {
