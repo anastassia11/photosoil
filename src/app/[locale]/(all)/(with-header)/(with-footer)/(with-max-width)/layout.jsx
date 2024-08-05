@@ -1,6 +1,4 @@
-
 import Breadcrumbs from '@/components/Breadcrumbs'
-import React from 'react'
 
 export default function MaxWidthLayout({ children }) {
     return (

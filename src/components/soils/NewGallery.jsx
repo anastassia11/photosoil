@@ -10,6 +10,7 @@ import '@fancyapps/ui/dist/carousel/carousel.thumbs.css';
 import { BASE_SERVER_URL } from '@/utils/constants';
 import { useParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
+import Image from 'next/image';
 
 export default function NewGallery({ mainPhoto, objectPhoto }) {
     const [fancyboxIsActive, setFancyboxIsActive] = useState(false);
@@ -75,15 +76,10 @@ export default function NewGallery({ mainPhoto, objectPhoto }) {
                       </div>`}
                         >
                             <div className="absolute inset-0 z-[-1] overflow-hidden">
-                                <img className="w-full h-full object-cover blur-[7px] scale-150 opacity-70"
-                                    alt=""
-                                    src={`${BASE_SERVER_URL}${path}`}
-                                />
+                                <Image priority src={`${BASE_SERVER_URL}${path}`} width={500} height={500} alt='soil'
+                                    className="w-full h-full object-cover blur-[7px] scale-150 opacity-70" />
                             </div>
-                            <img className='h-full w-full object-contain'
-                                alt=""
-                                data-lazy-src={`${BASE_SERVER_URL}${path}`}
-                            />
+                            <Image priority src={`${BASE_SERVER_URL}${path}`} width={500} height={500} alt='soil' />
                             {/* <figcaption className='p-4 z-10 absolute bottom-0 h-[100px] backdrop-blur-md bg-black bg-opacity-40 text-white w-full
                             flex flex-col justify-center'>
                                 <p class="text-base font-medium">{lastUpdated}</p>

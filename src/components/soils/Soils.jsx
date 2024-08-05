@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Filter from './Filter'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
@@ -11,8 +11,10 @@ import { useTranslation } from 'react-i18next'
 import Dropdown from '../admin-panel/Dropdown'
 import { useConstants } from '@/hooks/useConstants'
 import { getClassifications } from '@/api/classification/get_classifications'
+import SoilsLoader from '../content-loaders/SoilsLoader'
+import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper'
 
-export default function Soils({ soils, isAllSoils, isFilters, isDrafts, type }) {
+export default function Soils({ getItems, isAllSoils, isFilters, type }) {
     const dispatch = useDispatch();
     const { locale } = useParams();
     const { t } = useTranslation();
@@ -25,6 +27,7 @@ export default function Soils({ soils, isAllSoils, isFilters, isDrafts, type }) 
     const { selectedTerms, selectedCategories } = useSelector(state => state.data);
 
     const [classifications, setClassifications] = useState([]);
+    const [soils, setSoils] = useState([]);
 
     const [filterName, setFilterName] = useState('');
     const [filtersVisible, setFiltersVisible] = useState(true);
@@ -32,6 +35,11 @@ export default function Soils({ soils, isAllSoils, isFilters, isDrafts, type }) 
 
     const [currentItems, setCurrentItems] = useState([]);
     const [itemsPerPage, setItemsPerPage] = useState(0);
+
+    const [isLoading, setIsLoading] = useState({
+        items: true,
+        classifications: true,
+    });
 
     const [draftIsVisible, setDraftIsVisible] = useState(false);
     const [token, setToken] = useState(null);
@@ -43,17 +51,13 @@ export default function Soils({ soils, isAllSoils, isFilters, isDrafts, type }) 
     }));
     const _isEng = locale === 'en';
 
-    useEffect(() => {
-        setFilteredSoils(prev => soils.filter(soil =>
-            soil.translations?.find(transl => transl.isEnglish === _isEng)?.name.toLowerCase().includes(filterName.toLowerCase())
-            && (selectedCategories.length === 0 || selectedCategories.includes(soil.objectType)) &&
-            (selectedTerms.length === 0 || selectedTerms.some(selectedTerm => soil.terms.some(term => term === selectedTerm)))
-        ))
-    }, [filterName, selectedCategories, selectedTerms, soils])
+    const isSoils = type === 'soils' || type === 'profiles' ||
+        type === 'morphological' || type === 'dynamics'
 
     useEffect(() => {
         setToken(JSON.parse(localStorage.getItem('tokenData'))?.token);
         fetchClassifications();
+        fetchItems();
         if (didLogRef.current) {
             didLogRef.current = false
             const categoriesParam = searchParams.get('categories');
@@ -65,6 +69,15 @@ export default function Soils({ soils, isAllSoils, isFilters, isDrafts, type }) 
     }, [])
 
     useEffect(() => {
+        console.log(soils)
+        soils?.length && setFilteredSoils(prev => soils.filter(soil =>
+            soil.translations?.find(transl => transl.isEnglish === _isEng)?.name.toLowerCase().includes(filterName.toLowerCase())
+            && (selectedCategories.length === 0 || selectedCategories.includes(soil.objectType)) &&
+            (selectedTerms.length === 0 || selectedTerms.some(selectedTerm => soil.terms.some(term => term === selectedTerm)))
+        ))
+    }, [filterName, selectedCategories, selectedTerms, soils])
+
+    useEffect(() => {
         updateFiltersInHistory();
     }, [selectedCategories, selectedTerms])
 
@@ -73,6 +86,20 @@ export default function Soils({ soils, isAllSoils, isFilters, isDrafts, type }) 
         if (result.success) {
             setClassifications(result.data);
         }
+        setIsLoading(prev => ({ ...prev, classifications: false }))
+    }
+
+    const fetchItems = async () => {
+        const result = await getItems();
+        if (result.success) {
+            const data = result.data;
+            const items =
+                type === 'profiles' ? data.filter(soil => soil.objectType === 1) :
+                    type === 'dynamics' ? data.filter(soil => soil.objectType === 0) :
+                        type === 'morphological' ? data.filter(soil => soil.objectType === 2) : data;
+            setSoils(items);
+        }
+        setIsLoading(prev => ({ ...prev, items: false }))
     }
 
     const updateFiltersInHistory = () => {
@@ -120,24 +147,16 @@ export default function Soils({ soils, isAllSoils, isFilters, isDrafts, type }) 
         }
     }
 
-    const isSoils = type === 'soils' || type === 'profiles' ||
-        type === 'morphological' || type === 'dynamics'
-
     const SoilCard = ({ photo, name, id }) => {
         return <Link href={`/${type}/${id}`}
             className='relative aspect-[2/3] overflow-hidden transition-all
     rounded-md  hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] flex flex-col  duration-300 cursor-pointer'>
-            <div className='h-[100%] w-full overflow-hidden opacity-80'
-                style={{
-                    backgroundImage: `url("${BASE_SERVER_URL}${photo.path}")`,
-                    backgroundSize: '200%',
-                    backgroundPosition: 'center',
-                    filter: 'blur(3px)',
-                }}>
-
+            <div className='h-[100%] w-full overflow-hidden opacity-80'>
+                <Image priority src={`${BASE_SERVER_URL}${photo.path}`} width={500} height={500} alt='soil' className='blur-sm w-full h-full object-cover scale-150' />
             </div>
+
             <div className='h-[75%] absolute top-0 w-full flex'>
-                <Image src={`${BASE_SERVER_URL}${photo.path}`} width={500} height={500} alt='soil' className='m-auto w-full h-full object-contain self-start' />
+                <Image priority src={`${BASE_SERVER_URL}${photo.path}`} width={500} height={500} alt='soil' className='m-auto w-full h-full object-contain self-start' />
             </div>
             <p className='p-4 text-sm font-medium z-10 absolute bottom-0 h-[25%] backdrop-blur-md bg-black/40 text-white w-full'>
                 {name}
@@ -162,18 +181,21 @@ export default function Soils({ soils, isAllSoils, isFilters, isDrafts, type }) 
                     />
                 </div>
             </div>
-            <div className={`flex flex-row ${isDrafts ? 'justify-between' : 'justify-end'}  items-center ${filtersVisible && isFilters ? 'mb-2' : 'mb-4'}`}>
+            <div className={`flex flex-row justify-between items-center mb-4`}>
                 {isSoils && isFilters ? <button className='text-blue-600 w-fit' onClick={() => setFiltersVisible(!filtersVisible)}>
                     {filtersVisible ? t('hide_filters') : t('show_filters')}
                 </button> : ''}
-                {token && <label htmlFor='draftIsVisible' className={`flex-row cursor-pointer items-center justify-center
-                    ${isFilters || !isDrafts ? 'hidden' : 'flex'}`}>
-                    <input type="checkbox" id='draftIsVisible'
-                        checked={draftIsVisible}
-                        onChange={() => setDraftIsVisible(!draftIsVisible)}
-                        className="min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
-                    <span>{t('grafts_visible')}</span>
-                </label>}
+
+                <MotionWrapper>
+                    <label htmlFor='draftIsVisible' className={`flex-row cursor-pointer items-center justify-center
+                    ${isFilters || !token ? 'invisible' : 'flex'}`}>
+                        <input type="checkbox" id='draftIsVisible'
+                            checked={draftIsVisible}
+                            onChange={() => setDraftIsVisible(!draftIsVisible)}
+                            className="min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
+                        <span>{t('grafts_visible')}</span>
+                    </label>
+                </MotionWrapper>
 
                 <div className='self-end flex-row items-center justify-center w-[190px]'>
                     <Dropdown name={t('in_page')} value={itemsPerPage} items={PAGINATION_OPTIONS}
@@ -183,53 +205,71 @@ export default function Soils({ soils, isAllSoils, isFilters, isDrafts, type }) 
             </div>
             {
                 isSoils && filtersVisible && isFilters ? <ul className='filters-grid z-10 w-full mb-4'>
-                    {isAllSoils ? <li key='category'>
-                        <Filter name={t('category')} items={CATEGORY_ARRAY}
-                            allSelectedItems={selectedCategories}
-                            addItem={handleAddCategory}
-                            deleteItem={handleDeleteCategorie}
-                            resetItems={handleResetCategories} />
-
-                    </li> : ''}
-                    {classifications?.map(item => {
-                        const isEnglish = locale === 'en';
-                        const isTranslationModeValid = item.translationMode === 0 || (isEnglish ? item.translationMode === 1 : item.translationMode === 2);
-                        if (isTranslationModeValid) {
-                            return (
-                                <li key={item.id}>
-                                    <Filter isEng={locale === 'en'} itemId={item.id}
-                                        name={isEnglish ? item.nameEng : item.nameRu}
-                                        items={item.terms}
-                                        allSelectedItems={selectedTerms}
-                                        addItem={handleAddTerm}
-                                        deleteItem={handleDeleteTerm}
-                                        resetItems={handleResetTerms}
-                                    />
-                                </li>
-                            );
+                    <>
+                        {isLoading?.classifications ? Array(8).fill('').map((item, idx) => <li key={idx}>
+                            <SoilsLoader className='w-full h-[40px]' />
+                        </li>)
+                            : <>
+                                {isAllSoils ? <li key='category'>
+                                    <MotionWrapper>
+                                        <Filter name={t('category')} items={CATEGORY_ARRAY}
+                                            allSelectedItems={selectedCategories}
+                                            addItem={handleAddCategory}
+                                            deleteItem={handleDeleteCategorie}
+                                            resetItems={handleResetCategories} />
+                                    </MotionWrapper>
+                                </li> : ''}
+                                {classifications?.map(item => {
+                                    const isEnglish = locale === 'en';
+                                    const isTranslationModeValid = item.translationMode === 0 || (isEnglish ? item.translationMode === 1 : item.translationMode === 2);
+                                    if (isTranslationModeValid) {
+                                        return (
+                                            <li key={item.id}>
+                                                <MotionWrapper>
+                                                    <Filter isEng={locale === 'en'} itemId={item.id}
+                                                        name={isEnglish ? item.nameEng : item.nameRu}
+                                                        items={item.terms}
+                                                        allSelectedItems={selectedTerms}
+                                                        addItem={handleAddTerm}
+                                                        deleteItem={handleDeleteTerm}
+                                                        resetItems={handleResetTerms}
+                                                    />
+                                                </MotionWrapper>
+                                            </li>
+                                        );
+                                    }
+                                })}
+                            </>
                         }
-                    }
-                    )}
+                    </>
                 </ul> : ''
             }
 
-            {token && <label htmlFor='draftIsVisible' className={`mb-4 sm:self-end flex-row cursor-pointer
-            ${!isFilters || !isDrafts ? 'hidden' : 'flex'}`}>
-                <input type="checkbox" id='draftIsVisible'
-                    checked={draftIsVisible}
-                    onChange={() => setDraftIsVisible(!draftIsVisible)}
-                    className="min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
-                <span>{t('grafts_visible')}</span>
-            </label>}
+            <MotionWrapper>
+                <label htmlFor='draftIsVisible' className={`mb-4 sm:self-end flex-row cursor-pointer
+            ${!isFilters || !token ? 'hidden' : 'flex'}`}>
+                    <input type="checkbox" id='draftIsVisible'
+                        checked={draftIsVisible}
+                        onChange={() => setDraftIsVisible(!draftIsVisible)}
+                        className="min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
+                    <span>{t('grafts_visible')}</span>
+                </label>
+            </MotionWrapper>
 
             <ul className='soils-grid mb-4'>
-                {currentItems.map(({ id, photo, translations, dataRu, dataEng }) => <li key={id}>
-                    {SoilCard({
-                        name: translations?.find(({ isEnglish }) => isEnglish === (locale === 'en'))?.name ||
-                            (locale === 'en' ? dataEng.name : locale === 'ru' ? dataRu.name : ''), photo, id
-                    })}
-                </li>
-                )}
+                {isLoading?.items ? Array(8).fill('').map((item, idx) => <li key={idx}>
+                    <SoilsLoader className='aspect-[2/3]' />
+                </li>)
+                    : <>
+                        {currentItems.map(({ id, photo, translations, dataRu, dataEng }) => <li key={id}>
+                            <MotionWrapper>
+                                {SoilCard({
+                                    name: translations?.find(({ isEnglish }) => isEnglish === (locale === 'en'))?.name ||
+                                        (locale === 'en' ? dataEng.name : locale === 'ru' ? dataRu.name : ''), photo, id
+                                })}
+                            </MotionWrapper>
+                        </li>)}
+                    </>}
             </ul>
             <Pagination itemsPerPage={PAGINATION_OPTIONS[itemsPerPage]} items={filteredSoils}
                 updateCurrentItems={(newCurrentItems) => setCurrentItems(newCurrentItems)} />

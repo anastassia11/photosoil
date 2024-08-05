@@ -8,6 +8,8 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import LanguageChanger from './LanguageChanger';
 import { usePathname, useRouter } from 'next/navigation';
+import { motion } from "framer-motion"
+import { BarLoader } from 'react-spinners';
 
 export default function Header() {
     const dispatch = useDispatch();
@@ -18,6 +20,7 @@ export default function Header() {
     const { t } = useTranslation();
     const [menuOpen, setMenuOpen] = useState(false);
     const [token, setToken] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     const soilsNavs = [
         { key: 'soils', title: t('search_all') },
@@ -38,6 +41,7 @@ export default function Header() {
 
     useEffect(() => {
         localStorage.getItem('tokenData') && setToken(JSON.parse(localStorage.getItem('tokenData'))?.token);
+        setIsLoading(false);
     }, []);
 
     useEffect(() => {
@@ -60,7 +64,7 @@ export default function Header() {
     }, [handleScroll]);
 
     return (
-        <header className={`${visible ? 'fixed top-0 ' : 'fixed -top-20'} transition-all duration-200 ease-in-out z-50 px-4 sm:px-8 w-full border-b shadow-sm h-16 bg-white flex flex-row items-center justify-between`}>
+        <header className={`${visible ? 'fixed top-0 ' : 'fixed -top-20'} transition-all duration-200 ease-in-out z-40 px-4 sm:px-8 w-full border-b shadow-sm h-16 bg-white flex flex-row items-center justify-between`}>
             <div className='flex-1 '>
                 <Link href={`/`} className='flex flex-row items-center w-fit'>
                     <Image src={'/logo.png'} width={300} height={300} alt='logo' className='sm:w-9 w-8' />
@@ -108,18 +112,25 @@ export default function Header() {
                 </li>)}
             </ul>
 
-            {<div className='flex-1 justify-end space-x-4 h-full flex flex-row items-center w-fit'>
-                {!token ? <Link href={`/join`} className="hidden sm:flex max-h-[40px] px-4 py-2 font-medium text-center text-white transition-colors duration-300 
+            {!isLoading ?
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className='flex-1 justify-end space-x-4 h-full flex flex-row items-center w-fit'>
+
+                    {!token ? <Link href={`/join`} className="hidden sm:flex max-h-[40px] px-4 py-2 font-medium text-center text-white transition-colors duration-300 
                 transform bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600">
-                    {t('join')}
-                </Link> : <Link href={`/admin`} className="min-w-fit hidden sm:flex max-h-[40px] px-4 py-2 font-medium text-center text-blue-600 transition-colors duration-300 
+                        {t('join')}
+                    </Link> : <Link href={`/admin`} className="min-w-fit hidden sm:flex max-h-[40px] px-4 py-2 font-medium text-center text-blue-600 transition-colors duration-300 
                 transform ">
-                    {t('dashboard')}
-                </Link>}
-                <div className='w-[80px] h-full flex items-center'>
-                    <LanguageChanger />
-                </div>
-            </div>}
+                        {t('dashboard')}
+                    </Link>}
+                    <div className='w-[80px] h-full flex items-center'>
+                        <LanguageChanger />
+                    </div>
+                </motion.div>
+                : <div className='flex-1 justify-end space-x-4 h-full flex flex-row items-center w-fit'></div>}
 
 
             <div className="block 2xl:hidden ml-2">

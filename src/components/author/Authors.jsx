@@ -7,13 +7,18 @@ import Pagination from '../Pagination'
 import { useTranslation } from 'react-i18next'
 import Dropdown from '../admin-panel/Dropdown'
 import { useConstants } from '@/hooks/useConstants'
+import { getAuthors } from '@/api/author/get_authors'
+import SoilsLoader from '../content-loaders/SoilsLoader'
+import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper'
 
-export default function Authors({ authors }) {
+export default function Authors() {
     const { locale } = useParams();
     const { t } = useTranslation();
 
+    const [authors, setAuthors] = useState([]);
     const [filterName, setFilterName] = useState('');
     const [filteredAuthors, setFilteredAuthors] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     const [currentItems, setCurrentItems] = useState([]);
     const [itemsPerPage, setItemsPerPage] = useState(0);
@@ -26,6 +31,18 @@ export default function Authors({ authors }) {
             locale === 'en' ? author.dataEng?.name.toLowerCase().includes(filterName.toLowerCase())
                 : author.dataRu?.name.toLowerCase().includes(filterName.toLowerCase())).sort((a, b) => a.rank - b.rank))
     }, [filterName, authors])
+
+    useEffect(() => {
+        fetchAuthors();
+    }, [])
+
+    const fetchAuthors = async () => {
+        const result = await getAuthors();
+        if (result.success) {
+            setAuthors(result.data)
+        }
+        setIsLoading(false);
+    }
 
     const AuthorCard = ({ photo, dataEng, dataRu, authorType, id }) => {
         return <Link href={`authors/${id}`}
@@ -76,10 +93,14 @@ export default function Authors({ authors }) {
             </div>
 
             <ul className='soils-grid mb-4'>
-                {currentItems.map(author => <li key={author.id}>
-                    {AuthorCard({ ...author })}
-                </li>
-                )}
+                {isLoading ? Array(8).fill('').map((item, idx) => <li key={idx}>
+                    <SoilsLoader className='w-full h-full aspect-[2/3]' />
+                </li>) :
+                    currentItems.map(author => <li key={author.id}>
+                        <MotionWrapper>
+                            {AuthorCard({ ...author })}
+                        </MotionWrapper>
+                    </li>)}
             </ul>
             <Pagination itemsPerPage={PAGINATION_OPTIONS[itemsPerPage]} items={filteredAuthors}
                 updateCurrentItems={(newCurrentItems) => setCurrentItems(newCurrentItems)} />

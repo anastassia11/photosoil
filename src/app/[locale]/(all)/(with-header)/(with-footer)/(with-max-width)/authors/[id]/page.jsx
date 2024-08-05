@@ -113,7 +113,7 @@ export default function AuthorPage({ params: { id } }) {
                 <h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-2'>
                     {t('author_soils')}
                 </h3>
-                <Soils soils={author.soilObjects} type='soils' isFilters={false} isDrafts={true} />
+                <Soils soils={author.soilObjects} type='soils' isFilters={false} />
             </div> : ''}
 
             {author.ecoSystems?.length ?
@@ -121,7 +121,7 @@ export default function AuthorPage({ params: { id } }) {
                     <h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-2'>
                         {t('author_ecosystems')}
                     </h3>
-                    <Soils soils={author.ecoSystems} type='ecosystems' isFilters={false} isDrafts={true} />
+                    <Soils soils={author.ecoSystems} type='ecosystems' isFilters={false} />
                 </div> : ''}
         </div >
     )

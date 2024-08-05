@@ -129,14 +129,14 @@ export default function PublicationPage({ params: { id } }) {
                 <h3 className='sm:text-2xl text-xl font-semibold mt-8'>
                     {t('connect_soils')}
                 </h3>
-                {/* <Soils soils={publication?.soilObjects} isFilters={false} isDrafts={true} type='soils' /> */}
+                <Soils soils={publication?.soilObjects} isFilters={false} type='soils' />
             </div> : ''}
 
             {publication.ecosystems?.length ? <div id='ecosystems-section'>
                 <h3 className='sm:text-2xl text-xl font-semibold mt-8'>
                     {t('connect_ecosystems')}
                 </h3>
-                {/* <Soils soils={publication?.ecosystems} isFilters={false} isDrafts={true} type='ecosystems' /> */}
+                <Soils soils={publication?.ecosystems} isFilters={false} type='ecosystems' />
             </div> : ''}
         </div>
     )

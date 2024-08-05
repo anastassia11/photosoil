@@ -1,9 +1,8 @@
 'use client'
 
-import { closeModal, confirmAction, setConfirm } from '@/store/slices/modalSlice';
-import { useEffect } from 'react';
+import { closeModal, setConfirm } from '@/store/slices/modalSlice';
 import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 export default function Modal({ isOpen, title, message, buttonText }) {
     const dispatch = useDispatch();

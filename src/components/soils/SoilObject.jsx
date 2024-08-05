@@ -58,7 +58,7 @@ export default function SoilObject({ object, children, type }) {
                 <div className='w-full md:min-w-[50%] md:max-w-[50%] lg:max-w-[550px] lg:min-w-[550px]'>
                     <NewGallery mainPhoto={object.photo} objectPhoto={object.objectPhoto} />
                 </div>
-                <div className='md:ml-8 mt-12 md:mt-0'>
+                <div className='md:ml-8 mt-12 md:mt-0 w-full'>
                     <h3 className='sm:text-2xl text-xl font-semibold mb-2'>
                         {t('info_obj')}
                     </h3>
@@ -82,14 +82,14 @@ export default function SoilObject({ object, children, type }) {
                     <h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-4'>
                         {t('connect_soils')}
                     </h3>
-                    <Soils soils={object.soilObjects} isFilters={false} isDrafts={true} type='soils' />
+                    <Soils soils={object.soilObjects} isFilters={false} type='soils' />
                 </div> : ''}
             {object.ecoSystems?.length ?
                 <div id='ecosystems-section'>
                     <h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-4'>
                         {t('connect_ecosystems')}
                     </h3>
-                    <Soils soils={object.ecoSystems} isFilters={false} isDrafts={true} type='ecosystems' />
+                    <Soils soils={object.ecoSystems} isFilters={false} type='ecosystems' />
                 </div> : ''}
             {object.publications?.length ? <div id='publications-section'>
                 <h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-4'>

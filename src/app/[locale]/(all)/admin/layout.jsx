@@ -1,13 +1,16 @@
 'use client'
+
 import { useEffect, useRef, useState } from 'react'
 import Breadcrumbs from '@/components/Breadcrumbs'
 import Sidebar from '@/components/admin-panel/Sidebar';
 import Header from '@/components/admin-panel/Header';
-import Modal from '@/components/admin-panel/Modal';
 import { useDispatch, useSelector } from 'react-redux';
-import Alert from '@/components/admin-panel/Alert';
 import { useRouter } from 'next/navigation';
 import { closeAlert } from '@/store/slices/alertSlice';
+import dynamic from 'next/dynamic';
+
+const Alert = dynamic(() => import('@/components/admin-panel/Alert'), { ssr: false });
+const Modal = dynamic(() => import('@/components/admin-panel/Modal'), { ssr: false });
 
 export default function AdminLayout({ children }) {
     const { isOpen, modalProps } = useSelector(state => state.modal);
@@ -49,7 +52,7 @@ export default function AdminLayout({ children }) {
                         <Header />
                         <Breadcrumbs />
                         {children}
-                        <Modal isOpen={isOpen}  {...modalProps} />
+                        {isOpen && <Modal isOpen={isOpen}  {...modalProps} />}
                     </div>
                 </> : <></>
             ) : ''}

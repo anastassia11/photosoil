@@ -4,6 +4,8 @@ import { getAllNews } from '@/api/news/get_allNews';
 import { getTags } from '@/api/tags/get_tags';
 import Pagination from '@/components/Pagination';
 import Dropdown from '@/components/admin-panel/Dropdown';
+import MotionWrapper from '@/components/admin-panel/ui-kit/MotionWrapper';
+import SoilsLoader from '@/components/content-loaders/SoilsLoader';
 import Filter from '@/components/soils/Filter';
 import { addTag, deleteTag, resetTags } from '@/store/slices/dataSlice';
 import { PAGINATION_OPTIONS } from '@/utils/constants';
@@ -22,6 +24,11 @@ export default function NewsPage() {
     const [currentItems, setCurrentItems] = useState([]);
     const [tags, setTags] = useState([]);
     const [itemsPerPage, setItemsPerPage] = useState(0);
+    const [isLoading, setIsLoading] = useState({
+        items: true,
+        tags: true
+    });
+
     const searchParams = useSearchParams();
     const router = useRouter();
 
@@ -75,6 +82,7 @@ export default function NewsPage() {
         if (result.success) {
             setNews(result.data)
         }
+        setIsLoading(prev => ({ ...prev, items: false }))
     }
 
     const fetchTags = async () => {
@@ -82,6 +90,7 @@ export default function NewsPage() {
         if (result.success) {
             setTags(result.data);
         }
+        setIsLoading(prev => ({ ...prev, tags: false }))
     }
 
     const NewsCard = ({ id, tags, translations }) => {
@@ -128,20 +137,27 @@ export default function NewsPage() {
                     onCategotyChange={setItemsPerPage} flexRow={true} dropdownKey='in_page' />
             </div>
             <div className='mb-6 filters-grid'>
-                <Filter isEng={_isEng} itemId='tags'
-                    name={t('tags')}
-                    items={tags}
-                    allSelectedItems={selectedTags}
-                    addItem={handleAddTag}
-                    deleteItem={handleDeleteTag}
-                    resetItems={handleResetTags}
-                />
+                {isLoading.tags ? <SoilsLoader className='w-full h-[40px]' /> :
+                    <MotionWrapper>
+                        <Filter isEng={_isEng} itemId='tags'
+                            name={t('tags')}
+                            items={tags}
+                            allSelectedItems={selectedTags}
+                            addItem={handleAddTag}
+                            deleteItem={handleDeleteTag}
+                            resetItems={handleResetTags}
+                        />
+                    </MotionWrapper>
+                }
             </div>
 
-
             <ul className='soils-grid mb-4'>
-                {currentItems.map((item, idx) => <li key={`news_${idx}`} className='w-full h-full'>
-                    <NewsCard {...item} />
+                {isLoading.items ? Array(8).fill('').map((item, idx) => <li key={idx}>
+                    <SoilsLoader className='w-full h-full aspect-[2/1.5]' />
+                </li>) : currentItems.map((item, idx) => <li key={`news_${idx}`} className='w-full h-full'>
+                    <MotionWrapper>
+                        <NewsCard {...item} />
+                    </MotionWrapper>
                 </li>)}
             </ul>
 

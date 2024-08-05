@@ -20,7 +20,7 @@ export default function Dropdown({ name, value, items, onCategotyChange, flexRow
     }
 
     return (
-        <div className={`w-full ${flexRow && 'flex flex-row items-center space-x-3 '}`}>
+        <div className={`${flexRow && 'flex flex-row items-center space-x-3 '}`}>
             <label className={`${!noBold && 'font-medium'} min-w-fit`}>
                 {name}
             </label>
@@ -28,7 +28,7 @@ export default function Dropdown({ name, value, items, onCategotyChange, flexRow
                 <div className={`h-[40px] ${dropdownKey} ${!isTransparent && 'bg-white border'} flex cursor-pointer 
                     items-center justify-between gap-2 p-2 transition rounded-md`}
                     onClick={() => dispatch(setDropdown({ key: dropdownKey, isActive: dropdown.key !== null && dropdown.key !== dropdownKey ? true : !dropdown.isActive }))}>
-                    <span className="overflow-hidden whitespace-nowrap text-ellipsis">{selectedValue ? selectedValue.name : '- Выберите -'}</span>
+                    <span className="overflow-hidden whitespace-nowrap text-ellipsis">{selectedValue ? selectedValue.name : ''}</span>
                     <span className={`transition ${dropdown.key == dropdownKey && dropdown.isActive ? '-rotate-180' : ''} `}>
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -74,6 +74,5 @@ export default function Dropdown({ name, value, items, onCategotyChange, flexRow
                 </div>
             </div>
         </div>
-
     )
 }
