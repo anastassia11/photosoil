@@ -15,7 +15,7 @@ import { useEffect, useRef, useState } from 'react';
 import FullScreen from './FullScreen';
 import Zoom from './Zoom';
 
-export default function MapSelect({ type, latitude, longtitude, onCoordinateChange }) {
+export default function MapSelect({ id, type, latitude, longtitude, onCoordinateChange }) {
     const didLogRef = useRef(false);
     const mapElement = useRef();
     const [isCoordExist, setIsCoordExist] = useState(false);
@@ -37,12 +37,18 @@ export default function MapSelect({ type, latitude, longtitude, onCoordinateChan
         } else {
             document.addEventListener('DOMContentLoaded', initializeMap)
         }
+
         onCoordinateChange && addMapListeners();
         return () => {
             document.removeEventListener('DOMContentLoaded', initializeMap);
             onCoordinateChange && removeMapListeners();
         }
-    }, [])
+    }, [onCoordinateChange])
+
+    useEffect(() => {
+        setIsCoordExist(false);
+        mapRef.current.removeLayer(vectorLayer);
+    }, [id])
 
     useEffect(() => {
         vectorLayer && inputCoordChenged();
@@ -104,7 +110,6 @@ export default function MapSelect({ type, latitude, longtitude, onCoordinateChan
     }
 
     const inputCoordChenged = () => {
-
         //если координаты не определены
         if (latitude === "" || longtitude === "") {
             setIsCoordExist(false);
@@ -118,7 +123,6 @@ export default function MapSelect({ type, latitude, longtitude, onCoordinateChan
             mapRef.current.removeLayer(vectorLayer);
             return;
         }
-
         //Проверяем есть ли метка на карте
         if (!isCoordExist) {
             //Добавляем метку на карту

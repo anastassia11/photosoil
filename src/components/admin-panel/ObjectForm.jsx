@@ -3,7 +3,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import * as Tabs from "@radix-ui/react-tabs";
 import Filter from '../soils/Filter'
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { BASE_SERVER_URL } from '@/utils/constants';
 import Image from 'next/image';
 import { sendPhoto } from '@/api/photo/send_photo';
@@ -28,7 +28,7 @@ import MapInput from './ui-kit/MapInput';
 import Textarea from './ui-kit/Textarea';
 import PhotoCard from './ui-kit/PhotoCard';
 
-export default function ObjectForm({ oldTwoLang, oldIsEng, pathname, type, item, mainObjectPhoto, otherObjectPhoto, onItemChange, onMainPhotoChange, onOtherPhotosChange }) {
+export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, mainObjectPhoto, otherObjectPhoto, onItemChange, onMainPhotoChange, onOtherPhotosChange }) {
     const dispatch = useDispatch()
     const classifications = useSelector(state => state.data.classifications);
     const { t } = useTranslation();
@@ -139,13 +139,13 @@ export default function ObjectForm({ oldTwoLang, oldIsEng, pathname, type, item,
         onItemChange(updatedObject);
     }
 
-    const handleCoordChange = ({ latitude, longtitude }) => {
+    const handleCoordChange = useCallback(({ latitude, longtitude }) => {
         setObject(prev => {
             const _prev = { ...prev, latitude, longtitude };
             onItemChange(_prev);
             return _prev;
         });
-    }
+    }, [object])
 
     const handleCategotyChange = (id) => {
         const updatedObject = { ...object, objectType: Number(id) };
@@ -378,7 +378,7 @@ export default function ObjectForm({ oldTwoLang, oldIsEng, pathname, type, item,
                         </div>
 
                         <div id='map-section' className='border rounded-lg overflow-hidden mt-1 w-full h-full'>
-                            <MapSelect type={type} latitude={object?.latitude} longtitude={object?.longtitude}
+                            <MapSelect id={id} type={type} latitude={object?.latitude} longtitude={object?.longtitude}
                                 onCoordinateChange={handleCoordChange} />
                         </div>
                     </div>

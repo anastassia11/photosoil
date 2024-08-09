@@ -322,6 +322,7 @@ export default function CreateObject({ title, onCreate, type }) {
                         <div ref={formRef} className='flex-1 xl:order-1 order-2 xl:pr-6 xl:border-r'>
                             {currentForm !== null ?
                                 <ObjectForm type={type}
+                                    id={currentForm}
                                     item={formData.find((item, idx) => idx == currentForm)}
                                     mainObjectPhoto={photos.find((item, idx) => idx == currentForm)}
                                     otherObjectPhoto={otherPhotos.find((item, idx) => idx == currentForm)}
