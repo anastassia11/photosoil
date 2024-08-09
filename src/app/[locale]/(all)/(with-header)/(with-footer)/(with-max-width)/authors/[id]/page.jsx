@@ -86,7 +86,7 @@ export default function AuthorPage({ params: { id } }) {
                             className='flex flex-col w-full'>
                             {(authorLang?.[name] || author[name]) ? <>
                                 <span className=' text-zinc-500 font-semibold'>
-                                    {title}
+                                    {isArray ? (author[name].length ? title : '') : title}
                                 </span>
                                 {isArray ?
                                     <ul className='flex flex-col'>
@@ -113,7 +113,7 @@ export default function AuthorPage({ params: { id } }) {
                 <h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-2'>
                     {t('author_soils')}
                 </h3>
-                <Soils soils={author.soilObjects} type='soils' isFilters={false} />
+                <Soils _soils={author.soilObjects} type='soils' isFilters={false} />
             </div> : ''}
 
             {author.ecoSystems?.length ?
@@ -121,7 +121,7 @@ export default function AuthorPage({ params: { id } }) {
                     <h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-2'>
                         {t('author_ecosystems')}
                     </h3>
-                    <Soils soils={author.ecoSystems} type='ecosystems' isFilters={false} />
+                    <Soils _soils={author.ecoSystems} type='ecosystems' isFilters={false} />
                 </div> : ''}
         </div >
     )

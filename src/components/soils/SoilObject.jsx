@@ -82,14 +82,14 @@ export default function SoilObject({ object, children, type }) {
                     <h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-4'>
                         {t('connect_soils')}
                     </h3>
-                    <Soils soils={object.soilObjects} isFilters={false} type='soils' />
+                    <Soils _soils={object.soilObjects} isFilters={false} type='soils' />
                 </div> : ''}
             {object.ecoSystems?.length ?
                 <div id='ecosystems-section'>
                     <h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-4'>
                         {t('connect_ecosystems')}
                     </h3>
-                    <Soils soils={object.ecoSystems} isFilters={false} type='ecosystems' />
+                    <Soils _soils={object.ecoSystems} isFilters={false} type='ecosystems' />
                 </div> : ''}
             {object.publications?.length ? <div id='publications-section'>
                 <h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-4'>

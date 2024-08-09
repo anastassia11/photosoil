@@ -48,14 +48,14 @@ export default function AdminLayout({ children }) {
     }, [alertIsOpen, dispatch]);
 
     return (
-        <div className='w-screen max-h-screen flex flex-row'>
+        <div className='flex flex-row min-h-screen'>
             {isChecked ? (
                 isAuth ? <>
-                    <div className={`lg:block lg:static fixed z-50 duration-300 ${menuOpen ? 'block left-0' : 'lg:opacity-100 opacity-0 lg:left-0 -left-[290px]'}`}>
+                    <div className={`lg:block fixed z-50 duration-300 ${menuOpen ? 'block left-0' : 'lg:opacity-100 opacity-0 lg:left-0 -left-[290px]'}`}>
                         <Sidebar />
                     </div>
 
-                    <div className='flex flex-col sm:pt-4 pt-1 sm:px-8 px-4 w-full overflow-y-auto overflow-x-hidden'>
+                    <div className='min-h-full flex flex-col sm:py-4 py-1 sm:px-8 px-4 lg:ml-[290px] w-full overflow-y-auto overflow-x-hidden'>
                         <Alert isOpen={alertIsOpen} {...alertProps} />
                         <div className='flex flex-row w-full justify-end items-center'>
                             <Header />

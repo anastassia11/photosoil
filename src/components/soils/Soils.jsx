@@ -14,7 +14,7 @@ import { getClassifications } from '@/api/classification/get_classifications'
 import SoilsLoader from '../content-loaders/SoilsLoader'
 import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper'
 
-export default function Soils({ getItems, isAllSoils, isFilters, type }) {
+export default function Soils({ _soils, getItems, isAllSoils, isFilters, type }) {
     const dispatch = useDispatch();
     const { locale } = useParams();
     const { t } = useTranslation();
@@ -58,7 +58,11 @@ export default function Soils({ getItems, isAllSoils, isFilters, type }) {
         setFiltersVisible(window.innerWidth > 640);
         setToken(JSON.parse(localStorage.getItem('tokenData'))?.token);
         fetchClassifications();
-        fetchItems();
+        if (_soils) {
+            setSoils(_soils);
+            setIsLoading(prev => ({ ...prev, items: false }));
+        } else fetchItems();
+
         if (didLogRef.current) {
             didLogRef.current = false
             const categoriesParam = searchParams.get('categories');
@@ -156,12 +160,14 @@ export default function Soils({ getItems, isAllSoils, isFilters, type }) {
                 <Image priority src={`${BASE_SERVER_URL}${photo.path}`} width={500} height={500} alt='soil' className='blur-sm w-full h-full object-cover scale-150' />
             </div>
 
-            <div className='h-[75%] absolute top-0 w-full flex'>
+            <div className='h-[77%] absolute top-0 w-full flex'>
                 <Image priority src={`${BASE_SERVER_URL}${photo.path}`} width={500} height={500} alt='soil' className='m-auto w-full h-full object-contain self-start' />
             </div>
-            <p className='p-4 text-sm font-medium z-10 absolute bottom-0 h-[25%] backdrop-blur-md bg-black/40 text-white w-full'>
-                {name}
-            </p>
+            <div className='overflow-hidden rounded-b-md flex items-start p-4 text-sm font-medium z-10 absolute bottom-0 h-[24%] backdrop-blur-md bg-black/40 text-white w-full'>
+                <p className='max-h-full overflow-hidden line-clamp-5'>
+                    {name}
+                </p>
+            </div>
         </Link>
     }
 

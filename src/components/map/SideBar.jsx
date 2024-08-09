@@ -14,7 +14,7 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
   const router = useRouter();
   const pathname = usePathname();
 
-  const [sidebarOpen, setSideBarOpen] = useState(true);
+  const [sidebarOpen, setSideBarOpen] = useState(false);
   const [layersVisible, setLayersVisible] = useState({
     soil: true,
     ecosystem: true,
@@ -34,11 +34,15 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
   }));
 
   useEffect(() => {
+    setSideBarOpen(window.innerWidth > 640)
+  }, [])
+
+  useEffect(() => {
     updateFiltersInHistory();
   }, [selectedCategories, selectedTerms])
 
   useEffect(() => {
-    setSideBarOpen(!popupVisible)
+    window.innerWidth > 640 && setSideBarOpen(!popupVisible)
   }, [popupVisible])
 
   const updateFiltersInHistory = () => {
@@ -167,7 +171,7 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
 
   return (
     <div id='map-sidebar'
-      className={`${sidebarOpen ? "left-0 z-30" : "sm:-left-[408px] z-20 -left-[calc(100%-92px)]"
+      className={`${sidebarOpen ? "left-0 z-30" : "sm:-left-[408px] sm:z-20 z-30 -left-[calc(100%-94px)]"
         } absolute top-0 sm:w-[400px] w-[calc(100%-100px)] sm:max-w-[400px] max-h-[calc(100%-16px)] 
         shadow-lg bg-white duration-300 rounded-lg m-2 flex flex-row pb-4`}>
       <div className="relative flex-1 flex flex-col max-w-full">

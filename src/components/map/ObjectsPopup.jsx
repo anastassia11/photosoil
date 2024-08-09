@@ -92,8 +92,8 @@ export default function ObjectsPopup({ visible, objects, onCloseClick }) {
     }
 
     return (
-        <div className={`${visible ? "-left-[2px] z-30" : "-left-[440px] z-20"} 
-       absolute top-0 w-[400px] max-w-[400px] 
+        <div className={`${visible ? "-left-[2px] z-30" : "sm:-left-[440px] z-20 -left-[calc(100%-94px)]"} 
+       absolute top-0 sm:w-[400px] w-[calc(100%-100px)] sm:max-w-[400px] 
      max-h-[calc(100%-16px)] 
         shadow-lg bg-white duration-300 rounded-lg m-2 flex flex-row`}>
             <div className={`relative flex-1 flex flex-col max-w-full`}>

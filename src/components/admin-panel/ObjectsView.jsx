@@ -137,7 +137,7 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
                         <p className="px-3 py-1 text-sm rounded-full text-zinc-500 bg-zinc-100">{t('no_publish')}</p>}
                 </div>}
             </td>
-            <td className="xl:flex px-4 py-3 text-sm whitespace-nowrap hidden flex-row justify-end">
+            <td className="xl:flex hidden px-4 py-3 text-sm whitespace-nowrap flex-row justify-end">
                 <div className="relative inline-block">
                     <button onClick={(e) => {
                         e.stopPropagation();
@@ -201,7 +201,7 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
             </div>
         </td>
 
-        <td className="px-4 py-3 text-sm whitespace-nowrap flex flex-row justify-end">
+        <td className="px-4 py-3 text-sm whitespace-nowrap xl:flex hidden flex-row justify-end">
             <div className="relative inline-block">
                 <button onClick={() => dispatch(setDropdown({ key: id, isActive: dropdown.key !== null && dropdown.key !== id ? true : !dropdown.isActive }))} className="dropdown px-1 py-1 text-gray-500 transition-colors duration-200 rounded-lg hover:bg-gray-100">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
@@ -245,7 +245,7 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
             </div>}
         </td>
 
-        <td className="px-4 py-3 text-sm whitespace-nowrap flex flex-row justify-end">
+        <td className="px-4 py-3 text-sm whitespace-nowrap xl:flex hidden flex-row justify-end">
             <div className="relative">
                 <button onClick={(e) => {
                     e.stopPropagation();
@@ -300,7 +300,7 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
         </td>
 
 
-        <td className="px-4 py-3 text-sm whitespace-nowrap flex flex-row justify-end">
+        <td className="px-4 py-3 text-sm whitespace-nowrap xl:flex hidden flex-row justify-end">
             <div className="relative inline-block">
                 <button onClick={(e) => {
                     e.stopPropagation();
@@ -380,7 +380,7 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
                         <span>{t('title')}</span>
                     </div>
                 </th>
-                <th scope="col" className="relative py-3.5 px-4">
+                <th scope="col" className="xl:block hidden relative py-3.5 px-4">
                     <span className="sr-only">Edit</span>
                 </th>
             </tr>
@@ -400,7 +400,7 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
                     </div>
                 </th>
                 <th scope="col" className="px-4 py-3.5 text-sm font-normal text-left text-zinc-500">{t('rank')}</th>
-                <th scope="col" className="relative py-3.5 px-4">
+                <th scope="col" className="xl:block hidden relative py-3.5 px-4">
                     <span className="sr-only">Edit</span>
                 </th>
             </tr>
@@ -421,7 +421,7 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
                 </th>
                 <th scope="col" className="px-4 py-3.5 text-sm font-normal text-left text-zinc-500">{t('fio')}</th>
                 <th scope="col" className="px-4 py-3.5 text-sm font-normal text-left text-zinc-500">{t('role')}</th>
-                <th scope="col" className="relative py-3.5 px-4">
+                <th scope="col" className="xl:block hidden relative py-3.5 px-4">
                     <span className="sr-only">Edit</span>
                 </th>
             </tr>

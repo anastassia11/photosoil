@@ -10,7 +10,7 @@ export default function AboutPage() {
     const { t } = useTranslation();
 
     return (
-        <div className='flex flex-col space-y-24 items-center w-full'>
+        <div className='flex flex-col sm:space-y-24 space-y-12 items-center w-full'>
             <div className='h-[600px] bg-zinc-400 w-full overflow-hidden flex items-center justify-center'>
                 <div className='flex flex-col space-y-4 max-w-screen-xl mx-8 m-auto w-full h-full justify-center relative'>
                     <h2 className='text-center lg:text-left z-10 sm:text-5xl text-4xl font-bold text-white'>
@@ -28,7 +28,7 @@ export default function AboutPage() {
                 </div>
             </div>
 
-            <div className='max-w-screen-xl m-auto flex flex-col space-y-24 sm:mx-8 mx-4'>
+            <div className='max-w-screen-xl m-auto flex flex-col sm:space-y-24 space-y-12 sm:mx-8 mx-4'>
                 <div className=''>
                     <h2 className='sm:text-2xl text-xl font-semibold text-center'>Для чего нужна база даннных PhotoSOIL</h2>
                     <p className='text-base mt-6'>
