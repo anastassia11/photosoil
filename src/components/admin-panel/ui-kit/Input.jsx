@@ -8,7 +8,7 @@ export default function Input({ label, name, value, required, onChange, isEng })
                 {label}{isEng ? ' (EN) ' : ''}<span className='text-orange-500'>{required ? '*' : ''}</span>
             </label> : ''}
             <input
-                autocomplete="off"
+                autoComplete="off"
                 required={required}
                 value={value}
                 onChange={onChange}

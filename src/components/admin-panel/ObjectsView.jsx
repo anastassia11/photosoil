@@ -128,8 +128,7 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
             </td>
 
             {objectType === 'userPage' ? <td className="px-4 py-3 text-sm text-zinc-500 whitespace-nowrap">{type?.title}</td>
-                // soilObject?.user?.email || ecoSystem?.user?.email || publication?.user?.email || news.user?.email
-                : <td className="px-4 py-3 text-sm text-zinc-500 whitespace-nowrap">{[type?.name]?.user?.email}</td>}
+                : <td className="px-4 py-3 text-sm text-zinc-500 whitespace-nowrap">{soilObject?.user?.email || ecoSystem?.user?.email || publication?.user?.email || news?.user?.email}</td>}
             <td className="px-4 py-3 text-sm text-zinc-500 whitespace-nowrap">{lastUpdated}</td>
             <td className="px-4 py-3 text-sm whitespace-nowrap">
                 {isVisible !== undefined && <div className="flex items-center gap-x-2">
