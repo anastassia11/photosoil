@@ -1,7 +1,7 @@
 'use client'
 
 import { useDispatch } from 'react-redux';
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { setDropdown } from '@/store/slices/generalSlice';
 
 export default function AllLayout({ children }) {
@@ -21,6 +21,8 @@ export default function AllLayout({ children }) {
   }, [dispatch])
 
   return (
-    <>{children}</>
+    <>
+      {children}
+    </>
   );
 }

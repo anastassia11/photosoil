@@ -113,7 +113,7 @@ export default function AuthorsPage() {
 
     const RegisterForm = () => <form onSubmit={handleCreateAccount}
         className="bg-black/30 fixed top-0 left-0 z-50 overflow-y-auto w-screen h-screen">
-        <div className="flex items-center h-full justify-center px-4 pt-4 pb-20 ml-[290px] text-center">
+        <div className="flex items-center h-full justify-center px-4 pt-4 pb-20 lg:ml-[290px] text-center">
             <div className="relative inline-block px-4 pt-5 pb-4 overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-md sm:p-6 sm:align-middle">
                 <h3 className="text-center text-lg font-medium leading-6 text-gray-800 capitalize" id="modal-title">
                     {t('register')}
@@ -193,7 +193,7 @@ export default function AuthorsPage() {
                     {t('users')}
                 </h1>
                 {formVisible ? RegisterForm() : ''}
-                <button className="w-fit px-8 py-2 font-medium text-center text-white transition-colors duration-300 
+                <button className="w-fit sm:px-8 px-2 py-2 font-medium text-center text-white transition-colors duration-300 
                 transform bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600"
                     onClick={() => setFormVisible(true)}>
                     {t('create_account')}

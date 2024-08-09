@@ -35,8 +35,8 @@ export default function Publications() {
 
     useEffect(() => {
         setFilteredPublications(prev => publications.filter(publication =>
-        (locale === 'en' ? publication.translations?.find(transl => transl.isEnglish)?.name.toLowerCase().includes(filterName.toLowerCase())
-            : publication.translations?.find(transl => !transl.isEnglish)?.name.toLowerCase().includes(filterName.toLowerCase()))
+            (draftIsVisible ? true : publication.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible) &&
+            (publication.translations?.find(transl => transl.isEnglish === _isEng)?.name.toLowerCase().includes(filterName.toLowerCase()))
         ))
     }, [filterName, publications])
 
@@ -65,23 +65,33 @@ export default function Publications() {
                     />
                 </div>
             </div>
-            <div className={`flex flex-row ${token ? 'justify-between' : 'justify-end'} items-center`}>
+            <div className={`flex flex-row justify-end items-center`}>
 
-                <MotionWrapper>
+                {/* <MotionWrapper>
                     <label htmlFor='draftIsVisible' className={`flex-row cursor-pointer items-center justify-center
                     flex ${!token ? 'hidden' : 'flex'}`}>
                         <input type="checkbox" id='draftIsVisible'
                             checked={draftIsVisible}
                             onChange={() => setDraftIsVisible(!draftIsVisible)}
                             className="min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
-                        <span>{t('grafts_visible')}</span>
+                        <span className='select-none'>{t('grafts_visible')}</span>
                     </label>
-                </MotionWrapper>
+                </MotionWrapper> */}
                 <div className='self-end flex-row items-center justify-center w-[190px]'>
                     <Dropdown name={t('in_page')} value={itemsPerPage} items={PAGINATION_OPTIONS}
                         onCategotyChange={setItemsPerPage} flexRow={true} dropdownKey='in_page' />
                 </div>
             </div>
+            <MotionWrapper>
+                <label htmlFor='draftIsVisible' className={`my-4 flex-row cursor-pointer 
+                    flex ${!token ? 'hidden' : 'flex'}`}>
+                    <input type="checkbox" id='draftIsVisible'
+                        checked={draftIsVisible}
+                        onChange={() => setDraftIsVisible(!draftIsVisible)}
+                        className="min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
+                    <span className='select-none'>{t('grafts_visible')}</span>
+                </label>
+            </MotionWrapper>
             <section className="">
                 <div className="mx-auto ">
                     <ul className="">
@@ -89,9 +99,9 @@ export default function Publications() {
                             className={`mt-4 border-b flex flex-row`}>
                             <SoilsLoader className='w-full h-[140px] mb-4 ' />
                         </li>) :
-                            currentItems.map((item, idx) => (
-                                <li key={idx} className={`mt-4 ${idx + 1 === currentItems.length ? '' : 'border-b'} flex flex-row`}>
-                                    <MotionWrapper>
+                            publications.length && filteredPublications.length ? currentItems.map((item, idx) => (
+                                <li key={idx} className={`mt-4 ${idx + 1 === currentItems.length ? '' : 'border-b'} flex flex-row min-w-full`}>
+                                    <MotionWrapper className='min-w-full'>
                                         <Link href={`${BASE_URL}/publications/${item.id}`}
                                             className='justify-between items-start flex flex-row flex-1 mb-4 px-4 py-5 cursor-pointer hover:bg-white
                                         rounded-md hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] transition-all duration-300'>
@@ -112,7 +122,11 @@ export default function Publications() {
                                         </Link>
                                     </MotionWrapper>
                                 </li>
-                            ))
+                            )) : <MotionWrapper className='col-span-full'>
+                                <p className='text-gray-500 mt-6 col-span-full'>
+                                    {t('no_objects')}
+                                </p>
+                            </MotionWrapper>
                         }
                     </ul>
                 </div>

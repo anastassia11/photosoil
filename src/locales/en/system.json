@@ -138,7 +138,7 @@
   "rem_published_objects": "Objects will be removed from publication",
   "delete_object": "Object will be deleted",
   "delete_objects": "Objects will be deleted",
-  "create_account": "Create new account",
+  "create_account": "Create account",
 
   "any": "Any",
   "ru": "Russian",
@@ -260,7 +260,7 @@
   "connect_ecosystems": "Connected ecosystems",
   "connect_soils": "Connected soils objects",
   "connect_publ": "Connected publications",
-
+  "photo": "Photo",
   "add_point": "Add point",
   "error_file": "Please upload a file in a supported format"
 }

@@ -15,7 +15,6 @@ export default function Header() {
     const [role, setRole] = useState(null);
     const { t } = useTranslation();
 
-
     useEffect(() => {
         localStorage.getItem('email') && setEmail(localStorage.getItem('email'));
         localStorage.getItem('tokenData') && setRole(JSON.parse(localStorage.getItem('tokenData'))?.role);
@@ -28,26 +27,37 @@ export default function Header() {
     }
 
     return (
-        <div className="relative w-fit self-end flex flex-row">
-            <div className='user relative group w-fit self-end flex flex-row items-center space-x-4
+        <div className="relative w-fit self-end flex flex-row justify-center items-center">
+            <div className='user relative w-fit self-end flex flex-row items-center space-x-4
                 px-4 py-1 cursor-pointer'
                 onClick={() => dispatch(setDropdown({ key: 'user', isActive: dropdown.key !== null && dropdown.key !== 'user' ? true : !dropdown.isActive }))}>
                 <span className='uppercase bg-blue-600 w-10 h-10 rounded-2xl text-white font-light text-2xl flex items-center justify-center'>
                     {email?.[0]}
                 </span>
                 <div className='flex flex-col justify-center items-start'>
-                    <p className='font-semibold group-hover:text-blue-700 duration-300'>
+                    <p className={`font-semibold ${dropdown.key == 'user' && dropdown.isActive ? 'text-blue-700' : ''} duration-300`}>
                         {email}
                     </p>
                     <p className='text-sm text-zinc-500'>
                         {role === 'Admin' ? t('admin') : t('moderator')}
                     </p>
                 </div>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 
+                {/* <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 
                         text-zinc-500">
                     <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
-                </svg>
-
+                </svg> */}
+                <span className={`transition ${dropdown.key == 'user' && dropdown.isActive ? '-rotate-180' : ''} `}>
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth="1.5"
+                        stroke="currentColor"
+                        className="h-4 w-4"
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                    </svg>
+                </span>
                 <div onClick={() => dispatch(setDropdown({ key: null, isActive: false }))} className={`absolute right-0 
                         z-20 w-48 py-2 mt-2 origin-top-right shadow-md  duration-200 transition-all 
                      rounded-md border border-gray-200 bg-white top-8

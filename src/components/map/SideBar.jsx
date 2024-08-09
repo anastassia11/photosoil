@@ -167,8 +167,8 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
 
   return (
     <div id='map-sidebar'
-      className={`${sidebarOpen ? "left-0 z-30" : "-left-[408px] z-20"
-        } absolute top-0 w-[400px] max-w-[400px] max-h-[calc(100%-16px)] 
+      className={`${sidebarOpen ? "left-0 z-30" : "sm:-left-[408px] z-20 -left-[calc(100%-92px)]"
+        } absolute top-0 sm:w-[400px] w-[calc(100%-100px)] sm:max-w-[400px] max-h-[calc(100%-16px)] 
         shadow-lg bg-white duration-300 rounded-lg m-2 flex flex-row pb-4`}>
       <div className="relative flex-1 flex flex-col max-w-full">
         <button
@@ -186,7 +186,7 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
         </button>
 
 
-        <div className='px-4 pt-3'>
+        <div className='sm:px-4 pt-3 px-2'>
           <div className="relative">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -222,7 +222,7 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
         rounded-md shadow-md">
           <ul className="dropdown-menu space-y-1 mt-4">
             {location.map((item) => (
-              <li key={item.id} className="cursor-pointer duration-300 hover:bg-zinc-100 px-4 py-2" onClick={() => onLocationHandler(item)}>
+              <li key={item.id} className="cursor-pointer duration-300 hover:bg-zinc-100 sm:px-4 px-2 py-2" onClick={() => onLocationHandler(item)}>
                 <div className="flex items-start pl-2">
                   <img className="w-6 h-6 mt-[2px]" src='/search-marker.svg' alt="Logo" />
                   <p className='pl-2'>
@@ -234,7 +234,7 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
           </ul>
         </div> : ''}
 
-        <div className='flex-1 h-full overflow-y-auto scroll px-5 flex flex-col space-y-3 w-full pb-3'>
+        <div className='flex-1 h-full overflow-y-auto scroll sm:px-5 px-3 flex flex-col space-y-3 w-full pb-3'>
           <div className=''>
             <p className='font-medium text-xl mt-3 mb-1.5'>
               Слои карты

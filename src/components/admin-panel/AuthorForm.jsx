@@ -138,12 +138,12 @@ export default function AuthorForm({ _author, onFormSubmit, isLoading, btnText }
     return (
         <form
             onSubmit={handleCreateAuthor}
-            className="flex flex-col items-start">
-            <div className='flex flex-row w-full 3xl:w-[50%]'>
+            className="flex flex-col items-start pb-16">
+            <div className='flex sm:flex-row flex-col w-full 3xl:w-[50%]'>
                 <div className='mt-4'>
                     <div className=''>
                         <p className="font-medium mb-1">
-                            Фото<span className='text-orange-500'>*</span>
+                            {t('photo')}<span className='text-orange-500'>*</span>
                         </p>
                         {photo?.path ? <div className='relative max-h-full rounded-md overflow-hidden'>
                             <button type='button' className='overflow-hidden p-[6px] text-sm font-medium z-10 absolute top-0 right-0 rounded-bl-md
@@ -164,9 +164,9 @@ export default function AuthorForm({ _author, onFormSubmit, isLoading, btnText }
                         }
                     </div>
                 </div>
-                <ul className='pl-6 w-full space-y-4'>
+                <ul className='sm:pl-6 w-full space-y-4'>
                     {role === 'Admin' && <li key='rang' className='w-[285px] mt-4'>
-                        <Dropdown name={t('rank')} value={author.authorType || 3} items={RANK_ENUM} onCategotyChange={handleRankChange} dropdownKey='rang' />
+                        <Dropdown name={t('rank')} value={(author.authorType !== undefined) ? author.authorType : 3} items={RANK_ENUM} onCategotyChange={handleRankChange} dropdownKey='rang' />
                     </li>}
                     {AUTHOR_INFO.map(item => <li key={item.name}>
                         {item.isArray && ArrayInput({ ...item })}
@@ -187,7 +187,7 @@ export default function AuthorForm({ _author, onFormSubmit, isLoading, btnText }
                         })}
                     </li>)}
                 </ul>
-                <ul className='space-y-3 xl:w-[50%] xl:pl-6'>
+                <ul className='space-y-3 xl:w-[50%] xl:pl-6 xl:mt-0 mt-6'>
                     <p className='text-blue-700 font-semibold'>English version</p>
                     {AUTHOR_INFO.map(({ name, isArray, title }) => <li key={name}>
                         {!isArray && Input({

@@ -26,9 +26,9 @@ export default function AccountPage({ params: { id } }) {
     const { t } = useTranslation();
 
     const FILTERS = [
-        { title: t('soils'), name: 'soilObject' },
-        { title: t('ecosystems'), name: 'ecoSystem' },
-        { title: t('publications'), name: 'publication' },
+        { title: t('soils'), name: 'objects' },
+        { title: t('ecosystems'), name: 'ecosystems' },
+        { title: t('publications'), name: 'publications' },
         { title: t('news'), name: 'news' },
     ];
 
@@ -44,35 +44,27 @@ export default function AccountPage({ params: { id } }) {
         const result = await getAccount(id);
         if (result.success) {
             let userData = result.data;
-            // [...userData.soilObjects.map(({ translations }) => translations.map(translation => ({ ...translation, type: FILTERS.find(({ name }) => name === 'objects') })))]
-            // let _userObjects = [...userData.soilObjects.map(soil => ({ ...soil, type: FILTERS.find(({ name }) => name === 'objects') })),
-            // ...userData.ecoSystems.map(ecosystem => ({ ...ecosystem, type: FILTERS.find(({ name }) => name === 'ecosystems') })),
-            // ...userData.publications.map(publication => ({ ...publication, type: FILTERS.find(({ name }) => name === 'publications') })),
-            // ...userData.authors.map(author => ({ ...author, type: FILTERS.find(({ name }) => name === 'authors') }))]
-
             let _userObjects = [...userData.soilObjects.flatMap(({ translations }) =>
                 translations.map(translation => ({
                     ...translation,
-                    type: FILTERS.find(({ name }) => name === 'soilObject')
+                    type: FILTERS.find(({ name }) => name === 'objects')
                 }))),
             ...userData.ecoSystems.flatMap(({ translations }) =>
                 translations.map(translation => ({
                     ...translation,
-                    type: FILTERS.find(({ name }) => name === 'ecoSystem')
+                    type: FILTERS.find(({ name }) => name === 'ecosystems')
                 }))),
             ...userData.publications.flatMap(({ translations }) =>
                 translations.map(translation => ({
                     ...translation,
-                    type: FILTERS.find(({ name }) => name === 'publication')
+                    type: FILTERS.find(({ name }) => name === 'publications')
                 }))),
             ...userData.news.flatMap(({ translations }) =>
                 translations.map(translation => ({
                     ...translation,
                     type: FILTERS.find(({ name }) => name === 'news')
                 }))),
-                // ...userData.authors.map(author => ({ ...author, type: FILTERS.find(({ name }) => name === 'authors') }))
             ]
-
             setUser(userData);
             setUserObjects(_userObjects);
             setSelectedFilters(FILTERS.map(({ name }) => name))
@@ -102,9 +94,6 @@ export default function AccountPage({ params: { id } }) {
             case 'publications':
                 result = await deletePublicationById(id);
                 break;
-            // case 'authors':
-            //     result = await deleteAuthor(id);
-            //     break;
         }
         if (result?.success) {
             setUserObjects(prevObjects => prevObjects.filter(object => (object.type.name !== type) || (object.id !== id)))
@@ -174,12 +163,12 @@ export default function AccountPage({ params: { id } }) {
 
             <ul className='flex flex-row flex-wrap'>
                 {FILTERS.map(({ title, name }) => <li key={name}>
-                    <label htmlFor={`Item${name}`} className="flex flex-row cursor-pointer mr-12 mb-4">
+                    <label htmlFor={`Item${name}`} className="flex flex-row cursor-pointer mr-12 mb-4 select-none">
                         <input type="checkbox" id={`Item${name}`}
                             name={name}
                             checked={selectedFilters.includes(name)}
                             onChange={handleFilterSelect}
-                            className="min-w-5 w-5 min-h-5 h-5 mr-1 rounded border-gray-300 " />
+                            className="cursor-pointer min-w-5 w-5 min-h-5 h-5 mr-1 rounded border-gray-300 " />
                         <span className="text-gray-700">{title}</span>
                     </label>
                 </li>)}

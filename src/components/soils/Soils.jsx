@@ -55,6 +55,7 @@ export default function Soils({ getItems, isAllSoils, isFilters, type }) {
         type === 'morphological' || type === 'dynamics'
 
     useEffect(() => {
+        setFiltersVisible(window.innerWidth > 640);
         setToken(JSON.parse(localStorage.getItem('tokenData'))?.token);
         fetchClassifications();
         fetchItems();
@@ -69,13 +70,13 @@ export default function Soils({ getItems, isAllSoils, isFilters, type }) {
     }, [])
 
     useEffect(() => {
-        console.log(soils)
         soils?.length && setFilteredSoils(prev => soils.filter(soil =>
+            (draftIsVisible ? true : soil.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible) &&
             soil.translations?.find(transl => transl.isEnglish === _isEng)?.name.toLowerCase().includes(filterName.toLowerCase())
             && (selectedCategories.length === 0 || selectedCategories.includes(soil.objectType)) &&
             (selectedTerms.length === 0 || selectedTerms.some(selectedTerm => soil.terms.some(term => term === selectedTerm)))
         ))
-    }, [filterName, selectedCategories, selectedTerms, soils])
+    }, [filterName, selectedCategories, selectedTerms, soils, draftIsVisible])
 
     useEffect(() => {
         updateFiltersInHistory();
@@ -181,21 +182,21 @@ export default function Soils({ getItems, isAllSoils, isFilters, type }) {
                     />
                 </div>
             </div>
-            <div className={`flex flex-row justify-between items-center mb-4`}>
+            <div className={`flex flex-row w-full items-center ${isSoils && isFilters ? 'justify-between' : 'justify-end'}`}>
                 {isSoils && isFilters ? <button className='text-blue-600 w-fit' onClick={() => setFiltersVisible(!filtersVisible)}>
                     {filtersVisible ? t('hide_filters') : t('show_filters')}
                 </button> : ''}
 
-                <MotionWrapper>
-                    <label htmlFor='draftIsVisible' className={`flex-row cursor-pointer items-center justify-center
-                    ${isFilters || !token ? 'invisible' : 'flex'}`}>
+                {/* <MotionWrapper>
+                    <label htmlFor='draftIsVisible' className={`flex-row cursor-pointer items-center justify-center max-w-fit
+                    ${isFilters || !token ? 'hidden' : 'flex'}`}>
                         <input type="checkbox" id='draftIsVisible'
                             checked={draftIsVisible}
                             onChange={() => setDraftIsVisible(!draftIsVisible)}
                             className="min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
-                        <span>{t('grafts_visible')}</span>
+                        <span className='select-none'>{t('grafts_visible')}</span>
                     </label>
-                </MotionWrapper>
+                </MotionWrapper> */}
 
                 <div className='self-end flex-row items-center justify-center w-[190px]'>
                     <Dropdown name={t('in_page')} value={itemsPerPage} items={PAGINATION_OPTIONS}
@@ -204,7 +205,7 @@ export default function Soils({ getItems, isAllSoils, isFilters, type }) {
 
             </div>
             {
-                isSoils && filtersVisible && isFilters ? <ul className='filters-grid z-10 w-full mb-4'>
+                isSoils && filtersVisible && isFilters ? <ul className='filters-grid z-10 w-full mt-4'>
                     <>
                         {isLoading?.classifications ? Array(8).fill('').map((item, idx) => <li key={idx}>
                             <SoilsLoader className='w-full h-[40px]' />
@@ -246,29 +247,33 @@ export default function Soils({ getItems, isAllSoils, isFilters, type }) {
             }
 
             <MotionWrapper>
-                <label htmlFor='draftIsVisible' className={`mb-4 sm:self-end flex-row cursor-pointer
-            ${!isFilters || !token ? 'hidden' : 'flex'}`}>
+                <label htmlFor='draftIsVisible' className={`my-4 sm:self-end flex-row cursor-pointer max-w-fit
+            ${!token ? 'hidden' : 'flex'}`}>
                     <input type="checkbox" id='draftIsVisible'
                         checked={draftIsVisible}
                         onChange={() => setDraftIsVisible(!draftIsVisible)}
                         className="min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
-                    <span>{t('grafts_visible')}</span>
+                    <span className='select-none'>{t('grafts_visible')}</span>
                 </label>
             </MotionWrapper>
 
-            <ul className='soils-grid mb-4'>
+            <ul className='soils-grid my-4'>
                 {isLoading?.items ? Array(8).fill('').map((item, idx) => <li key={idx}>
                     <SoilsLoader className='aspect-[2/3]' />
                 </li>)
                     : <>
-                        {currentItems.map(({ id, photo, translations, dataRu, dataEng }) => <li key={id}>
+                        {soils.length && filteredSoils.length ? currentItems.map(({ id, photo, translations, dataRu, dataEng }) => <li key={id}>
                             <MotionWrapper>
                                 {SoilCard({
                                     name: translations?.find(({ isEnglish }) => isEnglish === (locale === 'en'))?.name ||
                                         (locale === 'en' ? dataEng.name : locale === 'ru' ? dataRu.name : ''), photo, id
                                 })}
                             </MotionWrapper>
-                        </li>)}
+                        </li>) : <MotionWrapper className='col-span-full'>
+                            <p className='text-gray-500 mt-6 col-span-full'>
+                                {t('no_objects')}
+                            </p>
+                        </MotionWrapper>}
                     </>}
             </ul>
             <Pagination itemsPerPage={PAGINATION_OPTIONS[itemsPerPage]} items={filteredSoils}

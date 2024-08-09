@@ -27,7 +27,7 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="space-y-6 sm:max-w-md m-auto mt-24">
+        <div className="sm:space-y-6 sm:max-w-md m-auto sm:mt-24 w-full">
             <div className="text-center">
                 <div className="mt-5 space-y-2">
                     <h3 className="sm:text-2xl text-xl font-semibold">Авторизация</h3>
@@ -35,7 +35,7 @@ export default function LoginPage() {
                         className='text-blue-600 hover:underline duration-300'>Стать автором</Link></p>
                 </div>
             </div>
-            <div className="bg-white shadow p-4 py-6 sm:p-6 sm:rounded-lg">
+            <div className="sm:bg-white sm:shadow p-4 py-6 sm:p-6 sm:rounded-lg">
                 <form
                     onSubmit={handleFormSubmit}
                     className="space-y-5">
@@ -48,7 +48,7 @@ export default function LoginPage() {
                             value={userData.email}
                             onChange={e => setUserData(prev => ({ ...prev, email: e.target.value }))}
                             required
-                            className="w-full mt-2 px-3 py-2 bg-transparent outline-none border focus:border-blue-600 shadow-sm rounded-lg"
+                            className="sm:bg-none bg-white w-full mt-2 px-3 py-2 bg-transparent outline-none border focus:border-blue-600 shadow-sm rounded-lg"
                         />
                     </div>
                     <div>
@@ -76,7 +76,7 @@ export default function LoginPage() {
                                 value={userData.password}
                                 onChange={e => setUserData(prev => ({ ...prev, password: e.target.value }))}
                                 type={isPasswordHidden ? "password" : "text"}
-                                className="bg-white w-full mt-1 p-2 outline-none border focus:border-blue-600 shadow-sm rounded-md"
+                                className="sm:bg-none bg-white w-full mt-1 p-2 outline-none border focus:border-blue-600 shadow-sm rounded-md"
                             />
                         </div>
                     </div>

@@ -153,7 +153,8 @@ export default function CreateObject({ title, onCreate, type }) {
                 router.push(`/admin/${type === 'soil' ? 'objects' : 'ecosystems'}`);
                 dispatch(openAlert({ title: t('success'), message: t('created_objects'), type: 'success' }));
             } else {
-                dispatch(openAlert({ title: t('warning'), message: t('form_required'), type: 'warning' }))
+                _creationResults[0].status === 400 && dispatch(openAlert({ title: t('warning'), message: t('form_required'), type: 'warning' }));
+                _creationResults[0].status === 500 && dispatch(openAlert({ title: t('error'), message: t('error_objects'), type: 'error' }));
                 _creationResults.forEach((result, index) => {
                     if (result.success) {
                         setFormData(prevData => prevData.filter((data, idx) => index !== idx));
@@ -231,7 +232,10 @@ export default function CreateObject({ title, onCreate, type }) {
             <div className='flex flex-col items-center w-full h-full overflow-hidden'>
                 <button className='overflow-hidden p-[6px] text-sm font-medium z-10 absolute top-0 right-0 rounded-bl-md
                                 backdrop-blur-md bg-black bg-opacity-40 text-zinc-200 hover:text-white duration-300'
-                    onClick={(e) => handleSoilDelete(e, idx)} >
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        handleSoilDelete(e, idx)
+                    }} >
                     <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className='w-4 h-4'>
                         <g id="Menu / Close_LG">
                             <path id="Vector" d="M21 21L12 12M12 12L3 3M12 12L21.0001 3M12 12L3 21.0001" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
@@ -272,14 +276,14 @@ export default function CreateObject({ title, onCreate, type }) {
     }
 
     return (
-        <div className="flex flex-col w-full flex-1 pb-16">
+        <div className="flex flex-col w-full h-full">
             <h1 className='sm:text-2xl text-xl font-semibold mb-4'>
                 {title}
             </h1>
-            <div className='relative flex-1'>
+            <div className='relative h-full pb-16'>
                 {!photos.length ? <>
                     {drag
-                        ? <div className={`h-full absolute bg-black/45 top-0 w-full rounded-lg border-dashed border-[1.5px]
+                        ? <div className={`h-[calc(100%-64px)] absolute bg-black/45 top-0 w-full rounded-lg border-dashed border-[1.5px]
                 border-black/80 items-center justify-center flex z-30`}
                             onDragStart={e => handleDragStart(e)}
                             onDragLeave={e => handleDragLeave(e)}
@@ -289,15 +293,15 @@ export default function CreateObject({ title, onCreate, type }) {
                                 Отпустите файлы
                             </p>
                         </div> : ''}
-                    <div className='w-full'
+                    <div className='w-full h-full'
                         onDragStart={e => !drag && handleDragStart(e)}
                         onDragLeave={e => !drag && handleDragLeave(e)}
                         onDragOver={e => !drag && handleDragStart(e)}>
-                        <div className='flex flex-col w-full items-center my-[200px]'>
-                            <p className='w-[70%] text-center sm:text-2xl text-xl'>
+                        <div className='flex flex-col w-full items-center pt-12 xl:pt-24'>
+                            <p className='md:w-[70%] w-full text-center sm:text-2xl text-xl'>
                                 {t('to_create')} {type === 'soil' ? t('soils') : type === 'ecosystem' ? t('ecosystems') : ''}, {t('upload_main')}</p>
                             <label htmlFor='photo_file'
-                                className='cursor-pointer mt-4 mb-2 w-fit px-8 py-2 font-medium text-center text-white transition-colors duration-300 
+                                className='flex items-center justify-center cursor-pointer mt-4 mb-2 sm:px-8 px-4 w-[190px] sm:w-fit py-2 font-medium text-center text-white transition-colors duration-300 
                 transform bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600
                 sm:text-2xl text-xl'>
                                 <input type="file" multiple id='photo_file' className="w-0 h-0" accept="image/*"
@@ -307,15 +311,15 @@ export default function CreateObject({ title, onCreate, type }) {
                             <p>
                                 {t('drag_files')}
                             </p>
-                            <button className='mt-[100px] text-blue-700 hover:underline duration-300'
+                            <button className='mt-[50px] text-blue-700 hover:underline duration-300'
                                 onClick={handleFormClick}>
                                 {t('go_form')}
                             </button>
                         </div>
                     </div>
                 </> :
-                    <div className='flex flex-row h-full space-x-12'>
-                        <div ref={formRef} className='flex-1 h-fit '>
+                    <div className='flex xl:flex-row flex-col'>
+                        <div ref={formRef} className='flex-1 xl:order-1 order-2 xl:pr-6 xl:border-r'>
                             {currentForm !== null ?
                                 <ObjectForm type={type}
                                     item={formData.find((item, idx) => idx == currentForm)}
@@ -327,22 +331,21 @@ export default function CreateObject({ title, onCreate, type }) {
                                 /> : ""}
                         </div>
 
-                        <div className={`flex flex-col w-[280px] space-y-2`}>
+                        <div className={`mb-6 xl:mb-0 flex flex-col w-full xl:w-[250px] space-y-2 xl:order-2 order-1 xl:pl-6 xl:sticky xl:top-0 
+                            xl:max-h-[calc(100vh-100px)] h-[250px] xl:h-fit`}>
                             <p className="font-medium">
                                 {`${type === 'soil' ? t('soils') : type === 'ecosystem' ? t('ecosystems') : ''}`}
                             </p>
                             {photos.length &&
-                                <ul style={{
-                                    height: `${rightBlockHeight}px`
-                                }}
-                                    className={`w-full flex flex-col space-y-2 pr-2 rounded-lg overflow-y-auto scroll items-center`}
+                                <ul className={`h-full w-full flex xl:flex-col flex-row justify-start 
+                                    xl:space-y-2 xl:pr-2 pb-2 xl:pb-0 rounded-lg overflow-y-auto overflow-x-auto xl:overflow-x-hidden scroll items-center`}
                                     onDragStart={e => !drag && handleDragStart(e)}
                                     onDragLeave={e => !drag && handleDragLeave(e)}
                                     onDragOver={e => !drag && handleDragStart(e)} >
-                                    {photos.map((photo, idx) => <li key={photo.id} className='w-full p-[3px] flex flex-col items-center'>
+                                    {photos.map((photo, idx) => <li key={photo.id} className='xl:w-full h-full aspect-square p-[3px] flex flex-col items-center justify-center'>
                                         {PhotoCard({ ...photo, idx })}
                                     </li>)}
-                                    <div className='w-[95%] p-[3px] min-h-[242px] '>
+                                    <div className='xl:min-w-[95%] xl:h-auto h-[95%] p-[3px] flex w-[150px] aspect-square max-w-[150px] xl:w-auto ml-2 xl:ml-0'>
                                         <DragAndDrop onLoadClick={handleSendPhoto} accept='img' />
                                     </div>
                                 </ul>
@@ -350,7 +353,7 @@ export default function CreateObject({ title, onCreate, type }) {
                             <button
                                 onClick={handleCreateClick}
                                 disabled={isLoading}
-                                className="min-h-[40px] flex items-center justify-center self-end w-full px-8 py-2 font-medium text-center text-white transition-colors duration-300 
+                                className="flex min-h-[40px] items-center justify-center self-end w-full px-8 py-2 font-medium text-center text-white transition-colors duration-300 
                 transform bg-blue-600 disabled:bg-blue-600/70 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600 align-bottom">
                                 {isLoading ?
                                     <Oval
@@ -365,6 +368,7 @@ export default function CreateObject({ title, onCreate, type }) {
                                     : t('create_objects')}
                             </button>
                         </div>
+
                     </div>}
             </div >
         </div >

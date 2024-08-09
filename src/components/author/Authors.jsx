@@ -96,11 +96,15 @@ export default function Authors() {
                 {isLoading ? Array(8).fill('').map((item, idx) => <li key={idx}>
                     <SoilsLoader className='w-full h-full aspect-[2/3]' />
                 </li>) :
-                    currentItems.map(author => <li key={author.id}>
+                    authors.length && filteredAuthors.length ? currentItems.map(author => <li key={author.id}>
                         <MotionWrapper>
                             {AuthorCard({ ...author })}
                         </MotionWrapper>
-                    </li>)}
+                    </li>) : <MotionWrapper className='col-span-full'>
+                        <p className='text-gray-500 mt-6 col-span-full'>
+                            {t('no_objects')}
+                        </p>
+                    </MotionWrapper>}
             </ul>
             <Pagination itemsPerPage={PAGINATION_OPTIONS[itemsPerPage]} items={filteredAuthors}
                 updateCurrentItems={(newCurrentItems) => setCurrentItems(newCurrentItems)} />

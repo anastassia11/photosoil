@@ -23,6 +23,8 @@ export default function NewsPage() {
     const [filteredNews, setFilteredNews] = useState([]);
     const [currentItems, setCurrentItems] = useState([]);
     const [tags, setTags] = useState([]);
+    const [token, setToken] = useState(false);
+    const [draftIsVisible, setDraftIsVisible] = useState(false);
     const [itemsPerPage, setItemsPerPage] = useState(0);
     const [isLoading, setIsLoading] = useState({
         items: true,
@@ -39,12 +41,14 @@ export default function NewsPage() {
     const _isEng = locale === 'en';
 
     useEffect(() => {
+        localStorage.getItem('tokenData') && setToken(JSON.parse(localStorage.getItem('tokenData'))?.token);
         fetchTags();
         fetchNews();
     }, [])
 
     useEffect(() => {
         setFilteredNews(prev => news.filter(item =>
+            (draftIsVisible ? true : item.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible) &&
             item.translations?.find(transl => transl.isEnglish === _isEng)?.title.toLowerCase().includes(filterName.toLowerCase()) &&
             (selectedTags.length === 0 || selectedTags.some(selectedTag => item.tags.some(({ id }) => id === selectedTag)))
         ))
@@ -132,11 +136,36 @@ export default function NewsPage() {
                 />
             </div>
 
-            <div className='self-end flex-row items-center justify-center mb-4 w-[190px]'>
-                <Dropdown name={t('in_page')} value={itemsPerPage} items={PAGINATION_OPTIONS}
-                    onCategotyChange={setItemsPerPage} flexRow={true} dropdownKey='in_page' />
+
+
+            <div className={`flex flex-row justify-end items-center`}>
+
+                {/* <MotionWrapper>
+                    <label htmlFor='draftIsVisible' className={`flex-row cursor-pointer items-center justify-center
+                    flex ${!token ? 'hidden' : 'flex'}`}>
+                        <input type="checkbox" id='draftIsVisible'
+                            checked={draftIsVisible}
+                            onChange={() => setDraftIsVisible(!draftIsVisible)}
+                            className="min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
+                        <span className='select-none'>{t('grafts_visible')}</span>
+                    </label>
+                </MotionWrapper> */}
+                <div className='self-end flex-row items-center justify-center w-[190px]'>
+                    <Dropdown name={t('in_page')} value={itemsPerPage} items={PAGINATION_OPTIONS}
+                        onCategotyChange={setItemsPerPage} flexRow={true} dropdownKey='in_page' />
+                </div>
             </div>
-            <div className='mb-6 filters-grid'>
+            <MotionWrapper>
+                <label htmlFor='draftIsVisible' className={`flex-row cursor-pointer my-4
+                    flex ${!token ? 'hidden' : 'flex'}`}>
+                    <input type="checkbox" id='draftIsVisible'
+                        checked={draftIsVisible}
+                        onChange={() => setDraftIsVisible(!draftIsVisible)}
+                        className="min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
+                    <span className='select-none'>{t('grafts_visible')}</span>
+                </label>
+            </MotionWrapper>
+            <div className='mt-4 mb-6 filters-grid'>
                 {isLoading.tags ? <SoilsLoader className='w-full h-[40px]' /> :
                     <MotionWrapper>
                         <Filter isEng={_isEng} itemId='tags'
@@ -154,11 +183,16 @@ export default function NewsPage() {
             <ul className='soils-grid mb-4'>
                 {isLoading.items ? Array(8).fill('').map((item, idx) => <li key={idx}>
                     <SoilsLoader className='w-full h-full aspect-[2/1.5]' />
-                </li>) : currentItems.map((item, idx) => <li key={`news_${idx}`} className='w-full h-full'>
-                    <MotionWrapper>
-                        <NewsCard {...item} />
-                    </MotionWrapper>
-                </li>)}
+                </li>) : (
+                    news.length && filteredNews.length ? currentItems.map((item, idx) => <li key={`news_${idx}`} className='w-full h-full'>
+                        <MotionWrapper>
+                            <NewsCard {...item} />
+                        </MotionWrapper>
+                    </li>) : <MotionWrapper className='col-span-full'>
+                        <p className='text-gray-500 mt-6 col-span-full'>
+                            {t('no_objects')}
+                        </p>
+                    </MotionWrapper>)}
             </ul>
 
             <Pagination itemsPerPage={PAGINATION_OPTIONS[itemsPerPage]} items={filteredNews}

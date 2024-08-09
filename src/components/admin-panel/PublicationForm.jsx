@@ -171,12 +171,12 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
         <form
             onSubmit={(e) => e.preventDefault()}
             className="flex flex-col w-full h-fit pb-16">
-            <div className='flex flex-col w-full h-full'>
-                <div className='grid grid-cols-2 gap-4 w-full'>
-                    <Tabs.Root defaultValue={false} className="col-span-2" value={isEng}
+            <div className='flex flex-col w-full h-full pb-16'>
+                <div className='grid md:grid-cols-2 grid-cols-1 gap-4 w-full'>
+                    <Tabs.Root defaultValue={false} className="md:col-span-2" value={isEng}
                         onValueChange={handleLangChange}>
-                        <Tabs.List className="w-full border-b flex items-center gap-x-4 overflow-x-auto justify-between">
-                            <div className='flex items-center gap-x-4 overflow-x-auto'>
+                        <Tabs.List className="w-full border-b flex md:items-center gap-x-4 overflow-x-auto justify-between md:flex-row flex-col">
+                            <div className='flex items-center gap-x-4 overflow-x-auto md:order-1 order-2'>
                                 <Tabs.Trigger disabled={!createTwoLang && isEng}
                                     className="disabled:text-gray-400 group outline-none border-b-2 border-[#f6f7f9] data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
                                     value={false}>
@@ -192,7 +192,7 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
                                     </div>
                                 </Tabs.Trigger>
                             </div>
-                            {(!oldTwoLang || pathname !== 'edit') && <label htmlFor='createTwoLang' className={`pb-2.5 flex flex-row cursor-pointer items-center`}>
+                            {(!oldTwoLang || pathname !== 'edit') && <label htmlFor='createTwoLang' className={`md:order-2 order-1 pb-4  md:pb-2.5 flex flex-row cursor-pointer items-center`}>
                                 <input type="checkbox" id='createTwoLang'
                                     checked={createTwoLang}
                                     onChange={handleTwoLangChange}
@@ -221,39 +221,11 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
                                                 onChange: handleInputChange,
                                                 required: name === 'name'
                                             })}
-
                                 </li>
                             })}
-
                         </ul>
-                        <p className='font-medium mt-3 w-full'>{t('file')}</p>
-                        {file.name || file.fileName ? FileCard({
-                            ...file,
-                            onDelete: handleFileDelete,
-                        }) : <div className='h-[150px] pr-2 mt-1'>
-                            <DragAndDrop onLoadClick={handleFileLoad} isMultiple={false} accept='pdf' />
-                        </div>}
-
-                        <p className='font-medium mt-5'>{t('connection')}</p>
-                        <div className='mt-1 flex flex-col space-y-4'>
-                            <Filter name={t('soils')} items={soils}
-                                type='soil'
-                                allSelectedItems={publication?.soilObjects} isEng={isEng}
-                                addItem={newItem => handleAddTerm('soilObjects', newItem)}
-                                deleteItem={deletedItem => handleDeleteTerm('soilObjects', deletedItem)}
-                                resetItems={deletedItems => handleResetTerms('soilObjects', deletedItems)}
-                            />
-                            <Filter name={t('ecosystems')} items={ecosystems}
-                                type='ecosystem'
-                                allSelectedItems={publication?.ecoSystems} isEng={isEng}
-                                addItem={newItem => handleAddTerm('ecoSystems', newItem)}
-                                deleteItem={deletedItem => handleDeleteTerm('ecoSystems', deletedItem)}
-                                resetItems={deletedItems => handleResetTerms('ecoSystems', deletedItems)}
-                            />
-                        </div>
-
                     </div>
-                    <div className='flex flex-col w-full'>
+                    <div className='flex flex-col w-full xl:h-[528px] md:h-[500px] h-[400px]'>
                         <label className="font-medium">
                             {t('in_map')}
                         </label>
@@ -278,13 +250,39 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
                             </button>
                         </div>
 
-                        <div id='map-section' className='border rounded-lg overflow-hidden mt-2 min-h-[574px]'>
+                        <div id='map-section' className='border rounded-lg overflow-hidden mt-2 w-full h-full'>
                             <MapArraySelect ref={mapRef}
                                 coordinates={coordinates} onInputChange={handleCoordChange}
                                 onCoordinatesChange={handleCoordArrayChange}
                             />
                         </div>
                     </div>
+                </div>
+
+                <p className='font-medium mt-3 w-full'>{t('file')}</p>
+                {file.name || file.fileName ? FileCard({
+                    ...file,
+                    onDelete: handleFileDelete,
+                }) : <div className='md:w-[50%] w-full h-[150px] pr-2 mt-1'>
+                    <DragAndDrop onLoadClick={handleFileLoad} isMultiple={false} accept='pdf' />
+                </div>}
+
+                <p className='font-medium mt-5'>{t('connection')}</p>
+                <div className='md:w-[50%] w-full mt-1 flex flex-col space-y-4'>
+                    <Filter name={t('soils')} items={soils}
+                        type='soil'
+                        allSelectedItems={publication?.soilObjects} isEng={isEng}
+                        addItem={newItem => handleAddTerm('soilObjects', newItem)}
+                        deleteItem={deletedItem => handleDeleteTerm('soilObjects', deletedItem)}
+                        resetItems={deletedItems => handleResetTerms('soilObjects', deletedItems)}
+                    />
+                    <Filter name={t('ecosystems')} items={ecosystems}
+                        type='ecosystem'
+                        allSelectedItems={publication?.ecoSystems} isEng={isEng}
+                        addItem={newItem => handleAddTerm('ecoSystems', newItem)}
+                        deleteItem={deletedItem => handleDeleteTerm('ecoSystems', deletedItem)}
+                        resetItems={deletedItems => handleResetTerms('ecoSystems', deletedItems)}
+                    />
                 </div>
             </div>
             <button

@@ -210,13 +210,12 @@ export default function NewsForm({ _news, pathname, onNewsSubmit, isLoading, btn
     return (
         <form
             onSubmit={(e) => e.preventDefault()}
-            className="flex flex-col w-full h-fit">
+            className="flex flex-col w-full h-fit pb-16">
             <div className='flex flex-col w-full h-full'>
-
-                <Tabs.Root defaultValue={false} className="col-span-2" value={isEng}
+                <Tabs.Root defaultValue={false} className="md:col-span-2" value={isEng}
                     onValueChange={handleLangChange}>
-                    <Tabs.List className="w-full border-b flex items-center gap-x-4 overflow-x-auto justify-between">
-                        <div className='flex items-center gap-x-4 overflow-x-auto'>
+                    <Tabs.List className="w-full border-b flex md:items-center gap-x-4 overflow-x-auto justify-between md:flex-row flex-col">
+                        <div className='flex items-center gap-x-4 overflow-x-auto md:order-1 order-2'>
                             <Tabs.Trigger disabled={!createTwoLang && isEng}
                                 className="disabled:text-gray-400 group outline-none border-b-2 border-[#f6f7f9] data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
                                 value={false}>
@@ -232,7 +231,7 @@ export default function NewsForm({ _news, pathname, onNewsSubmit, isLoading, btn
                                 </div>
                             </Tabs.Trigger>
                         </div>
-                        {(!oldTwoLang || pathname !== 'edit') && <label htmlFor='createTwoLang' className={`pb-2.5 flex flex-row cursor-pointer items-center`}>
+                        {(!oldTwoLang || pathname !== 'edit') && <label htmlFor='createTwoLang' className={`md:order-2 order-1 pb-4  md:pb-2.5 flex flex-row cursor-pointer items-center`}>
                             <input type="checkbox" id='createTwoLang'
                                 checked={createTwoLang}
                                 onChange={handleTwoLangChange}
@@ -241,25 +240,16 @@ export default function NewsForm({ _news, pathname, onNewsSubmit, isLoading, btn
                         </label>}
                     </Tabs.List>
                 </Tabs.Root>
-
-                <div className='flex flex-row space-x-4 mt-4'>
-                    <div className='flex flex-col w-full'>
-                        {Textarea({
-                            name: 'title',
-                            label: <>
-                                {`${t('heading')} ${isEng ? '(EN)' : ''}`}<span className='text-orange-600'>*</span>
-                            </>,
-                            value: news.translations?.find(({ isEnglish }) => isEng === isEnglish)?.title || '',
-                            onChange: handleInputChange,
-                            required: true
-                        })}
-                    </div>
-
-                    {/* <div className='flex flex-col w-full mb-1.5 min-h-[150px] max-h-[250px]'>
-                        <p className='font-medium mb-1'>Обложка</p>
-                        {cover?.path ? PhotoCard({ ...cover, onDelete: handleCoverDelete })
-                            : <DragAndDrop onLoadClick={handleCoverSend} isMultiple={false} accept='img' />}
-                    </div> */}
+                <div className='flex flex-col w-full mt-4'>
+                    {Textarea({
+                        name: 'title',
+                        label: <>
+                            {`${t('heading')} ${isEng ? '(EN)' : ''}`}<span className='text-orange-600'>*</span>
+                        </>,
+                        value: news.translations?.find(({ isEnglish }) => isEng === isEnglish)?.title || '',
+                        onChange: handleInputChange,
+                        required: true
+                    })}
                 </div>
                 <div className='flex flex-col w-full mt-4'>
                     {Textarea({
@@ -285,11 +275,11 @@ export default function NewsForm({ _news, pathname, onNewsSubmit, isLoading, btn
                         {`${t('gallery')}`}
                     </label>
                     {!newsPhotos?.length ?
-                        <div className='w-1/2 h-[150px] pr-2 mt-1'>
+                        <div className='w-full md:w-1/2 h-[150px] pr-2 mt-1'>
                             <DragAndDrop onLoadClick={handleNewsPhotoSend} isMultiple={true} accept='img' />
                         </div>
                         :
-                        <ul className={` grid grid-cols-2 gap-4 `}>
+                        <ul className={`grid md:grid-cols-2 grid-cols-1 gap-4 `}>
                             {newsPhotos.map(photo => <li key={photo.id}>
                                 {PhotoCard({
                                     ...photo, isEng: isEng,
@@ -308,11 +298,11 @@ export default function NewsForm({ _news, pathname, onNewsSubmit, isLoading, btn
                         {`${t('files')}`}
                     </label>
                     {!files?.length ?
-                        <div className='w-1/2 h-[150px] pr-2 mt-1'>
+                        <div className='w-full md:w-1/2 h-[150px] pr-2 mt-1'>
                             <DragAndDrop onLoadClick={handleFilesSend} isMultiple={true} accept='pdf' />
                         </div>
                         :
-                        <ul className={`mt-1 flex flex-col w-1/2`}>
+                        <ul className={`mt-1 flex flex-col w-full md:w-1/2`}>
                             {files.map(file => <li key={file.id}>
                                 {FileCard({ ...file, onDelete: () => handleFileDelete(file.id) })}
                             </li>)}
@@ -322,7 +312,7 @@ export default function NewsForm({ _news, pathname, onNewsSubmit, isLoading, btn
                         </ul>}
                 </div>
 
-                <div className='mt-8 flex flex-col w-1/2'>
+                <div className='mt-8 flex flex-col w-full md:w-1/2'>
                     <Filter name={t('tags')} items={tags} setTags={setTags}
                         isEng={isEng}
                         allSelectedItems={news?.tags}

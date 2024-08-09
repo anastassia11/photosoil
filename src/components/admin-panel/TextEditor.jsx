@@ -156,7 +156,7 @@ export default function TextEditor({ content, setContent }) {
         e.stopPropagation();
         editor.chain().focus();
       }}>
-      <div className="flex flex-row space-x-4 border-b pb-2 mb-2">
+      <div className="flex flex-row flex-wrap space-x-4 border-b pb-2 mb-2">
 
         <BubbleMenu
           className={`${dropdown.key === 'linkModal' ? 'invisible opacity-0' : 'visible'} flex duration-300 rounded-md border border-gray-200 bg-white p-2 flex-row z-40 space-x-2 items-center`}

@@ -5,6 +5,7 @@ export default async function tokenVerification({ isRequired }) {
     const loginUrl = '/login'
     let tokenData = localStorage.getItem('tokenData') ? JSON.parse(localStorage.getItem('tokenData')) : null
     const refreshToken = async (token) => {
+        // console.log('refreshToken')
         const formData = new FormData();
         formData.append('refreshToken', token)
         try {
@@ -28,7 +29,8 @@ export default async function tokenVerification({ isRequired }) {
         }
     }
     if (tokenData) {
-        if (tokenData.time + tokenData.deadTime * 1000 < Date.now()) {
+        // if (tokenData.time + tokenData.deadTime * 1000 < Date.now()) {
+        if (true) {
             try {
                 const response = await refreshToken(tokenData.refreshToken)
                 if (response.status === 200) {

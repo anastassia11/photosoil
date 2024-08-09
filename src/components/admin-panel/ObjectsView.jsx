@@ -112,18 +112,18 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
 
     const TableRow = ({ name, dataEng, dataRu, soilObject, ecoSystem, publication, news,
         lastUpdated, isVisible, id, soilId, ecoSystemId, publicationId, newsId, type, isEnglish, title }) => {
-        return <tr key={`tableRow_${id}`}
-            onClick={() => handleObjectSelect(!selectedObjects.includes(id), id, type?.name)}
-            className={`cursor-pointer ${(!type ? selectedObjects.includes(id) : selectedObjects.find(obj => obj.id === id && obj.type === type.name)) ? 'bg-yellow-100/50' : ''}`}>
-            <td className="px-4 py-3 text-sm font-medium text-zinc-700 whitespace-nowrap ">
-                <div className="flex flex-row items-center gap-x-3">
+        return <tr key={`tableRow_${type?.name}_${id}`}
+            onClick={() => handleObjectSelect(!(selectedObjects.includes(id) || selectedObjects.find(obj => obj.id === id && obj.type === type.name)), id, type?.name)}
+            className={`overflow-hidden cursor-pointer ${(!type ? selectedObjects.includes(id) : selectedObjects.find(obj => obj.id === id && obj.type === type.name)) ? 'bg-yellow-100/50' : ''}`}>
+            <td className="px-4 py-3 text-sm font-medium text-zinc-700 whitespace-nowrap overflow-hidden">
+                <div className="max-w-full md:w-fit w-[300px] flex flex-row items-center gap-x-3 overflow-hidden">
                     <input type="checkbox"
                         checked={!!(selectedObjects.includes(id) || selectedObjects.find(obj => obj.id === id && obj.type === type.name))}
                         onChange={(e) => handleObjectSelect(e.target.checked, id, type?.name)}
                         className="cursor-pointer text-blue-500 border-zinc-300 rounded min-w-4 min-h-4" />
                     <Link onClick={e => e.stopPropagation()}
                         href={{ pathname: `/admin/${objectType === 'userPage' ? type?.name : objectType}/edit/${soilId || ecoSystemId || publicationId || newsId || id}`, query: { lang: isEnglish ? 'eng' : 'ru' } }}
-                        className="font-medium text-blue-600 hover:underline whitespace-normal ">{name || dataRu?.name || title}</Link>
+                        className="font-medium text-blue-600 hover:underline whitespace-normal line-clamp-2">{name || dataRu?.name || title}</Link>
                 </div>
             </td>
 
@@ -137,7 +137,7 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
                         <p className="px-3 py-1 text-sm rounded-full text-zinc-500 bg-zinc-100">{t('no_publish')}</p>}
                 </div>}
             </td>
-            <td className="px-4 py-3 text-sm whitespace-nowrap flex flex-row justify-end">
+            <td className="xl:flex px-4 py-3 text-sm whitespace-nowrap hidden flex-row justify-end">
                 <div className="relative inline-block">
                     <button onClick={(e) => {
                         e.stopPropagation();
@@ -157,7 +157,7 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
                         e.stopPropagation();
                         dispatch(setDropdown({ key: null, isActive: false }))
                     }}
-                        className={`absolute right-0 z-20 w-48 py-2 mt-2 origin-top-right bg-white rounded-md shadow-md border
+                        className={`absolute right-0 z-50 w-48 py-2 mt-2 origin-top-right bg-white rounded-md shadow-md border
                     duration-200 transition-all border-gray-200  top-3
                     ${dropdown.key == `${objectType === 'userPage' ? `${type?.name}_${id}` : id}` && dropdown.isActive ? 'visible translate-y-4' : 'invisible opacity-0'}`}>
                         {isVisible !== undefined && <button className="w-full duration-300 cursor-pointer hover:text-blue-600 h-9 hover:bg-zinc-100 flex items-center px-4"
@@ -183,7 +183,7 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
 
 
     const DictionaryTableRow = ({ nameRu, nameEng, id }) => <tr className={`${selectedObjects.includes(id) ? 'bg-yellow-100/50' : ''}`}>
-        <td key={`tableRow_${id}`}
+        <td key={`tableRow_dictionary_${id}`}
             onClick={() => handleObjectSelect(!selectedObjects.includes(id), id)}
             className="cursor-pointer px-4 py-3 text-sm font-medium text-zinc-700 whitespace-nowrap ">
             <div className="flex flex-row items-center gap-x-3">
@@ -224,7 +224,7 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
     const AuthorTableRow = ({ dataRu, dataEng, authorType, id }) => <tr
         className={`cursor-pointer ${selectedObjects.includes(id) ? 'bg-yellow-100/50' : ''}`}
         onClick={() => handleObjectSelect(!selectedObjects.includes(id), id)}>
-        <td key={`tableRow_${id}`}
+        <td key={`tableRow_author_${id}`}
             className="px-4 py-3 text-sm font-medium text-zinc-700 whitespace-nowrap">
             <div className="flex flex-row items-center gap-x-3">
                 <input type="checkbox"
@@ -280,14 +280,14 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
     const ModeratorTableRow = ({ name, email, id, role }) => <tr className={`cursor-pointer 
     ${selectedObjects.includes(id) ? 'bg-yellow-100/50' : ''}`}
         onClick={() => handleObjectSelect(!selectedObjects.includes(id), id)}>
-        <td key={`tableRow_${id}`}
+        <td key={`tableRow_moderator_${id}`}
             className="px-4 py-3 text-sm font-medium text-zinc-700 whitespace-nowrap ">
             <div className="flex flex-row items-center gap-x-3">
                 <input type="checkbox"
                     checked={selectedObjects.includes(id)}
                     onChange={(e) => handleObjectSelect(e.target.checked, id)}
                     className="cursor-pointer text-blue-500 border-zinc-300 rounded min-w-4 min-h-4" />
-                <Link href={`/admin/${objectType}/${id}`}
+                <Link onClick={e => e.stopPropagation()} href={`/admin/${objectType}/${id}`}
                     className="font-medium text-blue-600 hover:underline whitespace-normal">{email}</Link>
             </div>
         </td>
@@ -361,7 +361,7 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
                 </th>}
                 <th scope="col" className="px-4 py-3.5 text-sm font-normal text-left text-zinc-500">{t('updated')}</th>
                 <th scope="col" className="px-4 py-3.5 text-sm font-normal text-left text-zinc-500">{t('status')}</th>
-                <th scope="col" className="relative py-3.5 px-4">
+                <th scope="col" className="xl:block hidden relative py-3.5 px-4">
                     <span className="sr-only">Edit</span>
                 </th>
             </tr>
@@ -443,59 +443,60 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
                 />
             </div>
             <div className={`relative flex flex-col lg:flex-row justify-between ${(visibilityControl || languageChanger) ? 'min-h-[42px]' : 'h-0'}`}>
-                <div className={`relative min-w-[447px] ${visibilityControl && 'min-w-[447px] min-h-[40px]'} flex-1`}>
-                    <div className={`absolute overflow-hidden w-fit inline-flex bg-white border divide-x rounded-lg duration-200
+                <div className={`relative ${visibilityControl && 'min-w-[447px] min-h-[40px]'} flex-1 sm:text-base text-sm`}>
+                    <div className={`absolute overflow-hidden w-fit h-full inline-flex bg-white border divide-x rounded-md duration-200
                     ${!visibilityControl ? 'opacity-0 hidden' : (selectedObjects.length ? 'opacity-0 invisible' : 'opacity-100')}`}>
-                        <button className={`min-w-fit px-5 py-2 font-medium text-zinc-600 transition-colors duration-200
+                        <button className={`min-w-fit px-2 sm:px-5 py-2 font-medium text-zinc-600 transition-colors duration-200
                         ${publishStatus === 'all' ? 'bg-zinc-100' : 'hover:bg-zinc-100 bg-none'}`}
                             onClick={() => setPublichStatus('all')}>
                             {t('all')}
                         </button>
 
-                        <button className={`min-w-fit px-5 py-2 font-medium text-zinc-600 transition-colors duration-200 hover:bg-zinc-100
+                        <button className={`min-w-fit px-2 sm:px-5 py-2 font-medium text-zinc-600 transition-colors duration-200 hover:bg-zinc-100
                         ${publishStatus === 'publish' ? 'bg-zinc-100' : 'hover:bg-zinc-100 bg-none'}`}
                             onClick={() => setPublichStatus('publish')}>
                             {t('published')}
                         </button>
 
-                        <button className={`min-w-fit px-5 py-2 font-medium text-zinc-600 transition-colors duration-200 hover:bg-zinc-100
+                        <button className={`min-w-fit px-2 sm:px-5 py-2 font-medium text-zinc-600 transition-colors duration-200 hover:bg-zinc-100
                          ${publishStatus === 'not_publish' ? 'bg-zinc-100' : 'hover:bg-zinc-100 bg-none'}`}
                             onClick={() => setPublichStatus('not_publish')}>
                             {t('no_published')}
                         </button>
                     </div>
-                    <div className={`${visibilityControl ? (!_isEng ? 'min-w-[588px]' : 'min-w-[433px]') : '-top-[50px]'} shadow-md z-30 absolute overflow-hidden inline-flex bg-white border divide-x rounded-lg duration-200
+                    <div className={`${visibilityControl ? (!_isEng ? 'sm:min-w-[588px]' : 'sm:min-w-[433px]') : '-top-[50px]'} shadow-md z-30 absolute overflow-hidden inline-flex bg-white border divide-x rounded-lg duration-200
                     ${selectedObjects.length ? 'opacity-100' : 'invisible opacity-0'}`}>
-                        <div className="min-w-fit px-5 py-2 font-medium text-blue-700 transition-colors duration-200 ">
+                        <div className="min-w-fit sm:px-5 py-2 sm:block hidden font-medium text-blue-700 transition-colors duration-200 ">
                             {selectedObjects.length} {t('select')}:
                         </div>
                         {visibilityControl ? <>
-                            <button className="min-w-fit px-5 py-2 font-medium text-zinc-600 transition-colors duration-200 hover:bg-zinc-100"
+                            <button className="min-w-fit px-2 sm:px-5 py-2 font-medium text-zinc-600 transition-colors duration-200 hover:bg-zinc-100"
                                 onClick={() => handleSelectedVisibleChange(true)}>
                                 {t('publish_go')}
                             </button>
 
-                            <button className="min-w-fit px-5 py-2 font-medium text-zinc-600 transition-colors duration-200 hover:bg-zinc-100"
+                            <button className="min-w-fit px-2 sm:px-5 py-2 font-medium text-zinc-600 transition-colors duration-200 hover:bg-zinc-100"
                                 onClick={() => handleSelectedVisibleChange(false)}>
                                 {t('no_publish_go')}
                             </button>
                         </> : ''}
-                        <button className="min-w-fit px-5 py-2 font-medium text-red-500 transition-colors duration-200 hover:bg-zinc-100"
+                        <button className="min-w-fit px-2 sm:px-5 py-2 font-medium text-red-500 transition-colors duration-200 hover:bg-zinc-100"
                             onClick={handleSelectedDelete}>
                             {t('delete')}
                         </button>
                     </div>
                 </div>
-                {languageChanger ? <div className={`${languageChanger ? 'mt-4' : 'mt-0'} w-[232px] lg:mt-0 ml-4 h-fit`}>
+                {languageChanger ? <div className={`${languageChanger ? 'sm:mt-4' : 'mt-0'} sm:text-base text-sm mt-2 ml-2 sm:mt-0 sm:w-[232px] w-[328px] lg:mt-0 sm:ml-4 h-fit
+                     `}>
                     <Dropdown name={t('language')} value={currentLang} items={LANGUAGES} flexRow={true}
                         onCategotyChange={handleLangChange} dropdownKey='language' />
                 </div> : ''}
             </div>
 
-            <div className="-mx-4 -my-2 sm:-mx-6 lg:-mx-8">
-                <div className="inline-block min-w-full align-middle md:px-6 lg:px-8">
+            <div className="w-full max-h-full overflow-x-auto xl:overflow-x-visible overflow-y-hidden xl:overflow-y-visible">
+                <div className="inline-block min-w-full">
                     <div className="border border-zinc-200">
-                        <table className="min-w-full divide-y divide-zinc-200">
+                        <table className="w-full max-w-full divide-y divide-zinc-200">
                             {objectType === 'dictionary' ? <DictionaryTableHead /> :
                                 objectType === 'authors' ? <AuthorTableHead /> :
                                     objectType === 'users' ? <ModeratorTableHead /> :
@@ -522,8 +523,8 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
                     </div>
                 </div>
             </div>
-            <div className='flex flex-row self-end space-x-6'>
-                <div className='flex flex-row justify-center items-center w-[200px]'>
+            <div className='flex sm:flex-row flex-col self-end sm:space-x-6'>
+                <div className='flex flex-row sm:justify-center justify-end mb-2 mr-1 sm:mr-0 sm:mb-0 items-center w-[200px]'>
                     <Dropdown name={t('in_page')} value={itemsPerPage} items={PAGINATION_OPTIONS}
                         onCategotyChange={setItemsPerPage} flexRow={true} dropdownKey='in_page' />
                 </div>

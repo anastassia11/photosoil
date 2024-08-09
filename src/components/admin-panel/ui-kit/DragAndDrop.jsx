@@ -52,10 +52,10 @@ export default function DragAndDrop({ onLoadClick, isMultiple, accept }) {
     }
 
     return (
-        <div className='h-full'>
+        <div className='min-h-full min-w-full flex flex-1'>
             {drag
                 ? <div className="flex flex-col justify-center items-center rounded border-black/80 bg-black/45
-                        border-dashed border-[1.5px] duration-300 min-h-full text-center"
+                        border-dashed border-[1.5px] duration-300 flex-1 text-center"
                     onDragStart={e => handleDragStart(e)}
                     onDragLeave={e => handleDragLeave(e)}
                     onDragOver={e => handleDragStart(e)}
@@ -66,8 +66,8 @@ export default function DragAndDrop({ onLoadClick, isMultiple, accept }) {
                 </div>
                 : <label htmlFor='geometry_file'
                     className="px-4 flex flex-col justify-center items-center space-y-2 
-                     hover:border-zinc-600 h-full rounded border-dashed border-[1px] 
-                    border-zinc-400 duration-300 cursor-pointer"
+                     hover:border-zinc-600 flex-1 rounded border-dashed border-[1px] 
+                    border-zinc-400 duration-300 cursor-pointer w-full"
                     onDragStart={e => handleDragStart(e)}
                     onDragLeave={e => handleDragLeave(e)}
                     onDragOver={e => handleDragStart(e)}>

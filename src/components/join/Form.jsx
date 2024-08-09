@@ -8,7 +8,7 @@ export default function Form() {
     const { t } = useTranslation();
 
     return (
-        <div className="space-y-6 sm:max-w-md m-auto mt-16">
+        <div className="sm:space-y-6 sm:max-w-md m-auto sm:mt-16">
             <div className="text-center">
                 <div className="mt-5 space-y-2">
                     <h3 className="sm:text-2xl text-xl font-semibold">{t('join')}</h3>
@@ -17,7 +17,7 @@ export default function Form() {
                             href='/login'>{t('login')}</Link></p>
                 </div>
             </div>
-            <div className="bg-white shadow p-4 py-6 sm:p-6 sm:rounded-lg">
+            <div className="sm:bg-white sm:shadow p-4 py-6 sm:p-6 sm:rounded-lg">
                 <form
                     onSubmit={(e) => e.preventDefault()}
                     className="space-y-5"
@@ -29,7 +29,7 @@ export default function Form() {
                         <input
                             type="text"
                             required
-                            className="w-full mt-2 px-3 py-2 bg-transparent outline-none border focus:border-blue-600 shadow-sm rounded-lg"
+                            className="sm:bg-none bg-white w-full mt-2 px-3 py-2 bg-transparent outline-none border focus:border-blue-600 shadow-sm rounded-lg"
                         />
                     </div>
                     <div>
@@ -39,7 +39,7 @@ export default function Form() {
                         <input
                             type="email"
                             required
-                            className="w-full mt-2 px-3 py-2 bg-transparent outline-none border focus:border-blue-600 shadow-sm rounded-lg"
+                            className="sm:bg-none bg-white w-full mt-2 px-3 py-2 bg-transparent outline-none border focus:border-blue-600 shadow-sm rounded-lg"
                         />
                     </div>
                     <div>
@@ -49,7 +49,7 @@ export default function Form() {
                         <input
                             type="password"
                             required
-                            className="w-full mt-2 px-3 py-2 bg-transparent outline-none border focus:border-blue-600 shadow-sm rounded-lg"
+                            className="sm:bg-none bg-white w-full mt-2 px-3 py-2 bg-transparent outline-none border focus:border-blue-600 shadow-sm rounded-lg"
                         />
                     </div>
                     <div>
@@ -59,7 +59,7 @@ export default function Form() {
                         <input
                             type="password"
                             required
-                            className="w-full mt-2 px-3 py-2 bg-transparent outline-none border focus:border-blue-600 shadow-sm rounded-lg"
+                            className="sm:bg-none bg-white w-full mt-2 px-3 py-2 bg-transparent outline-none border focus:border-blue-600 shadow-sm rounded-lg"
                         />
                     </div>
                     <button

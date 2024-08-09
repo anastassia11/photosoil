@@ -151,7 +151,7 @@ export default function AdminPage() {
                     </dl>
                 </div>
             </section>
-            <section className='mt-12 max-w-[2000px] mx-auto w-full'>
+            {news.length ? <section className='mt-12 max-w-[2000px] mx-auto w-full'>
                 <h3 className="sm:text-3xl text-2xl font-semibold mb-8 text-center">Последние новости</h3>
 
                 <ul className='w-full news-grid mb-4'>
@@ -159,7 +159,7 @@ export default function AdminPage() {
                         <NewsCard {...item} />
                     </li>)}
                 </ul>
-            </section>
+            </section> : ''}
             {/* <section className='mt-12  mx-auto w-full max-w-[2000px]'>
                 <h3 className="sm:text-3xl text-2xl font-semibold mb-8 text-center">Эксперты платформы</h3>
 

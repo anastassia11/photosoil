@@ -66,7 +66,7 @@ export default function DictionaryForm({ _dictionary, onFormSubmit, isLoading, i
     return (
         <form
             onSubmit={e => handleFormSubmit(e)}
-            className="flex flex-col h-fit items-start">
+            className="flex flex-col h-fit items-start pb-16">
             <div className='xl:w-[50%] w-full'>
                 <Dropdown name='Язык' value={dictionary.translationMode} items={TRANSLATION_ENUM}
                     onCategotyChange={handleModeChange} dropdownKey='language' />
@@ -112,7 +112,7 @@ export default function DictionaryForm({ _dictionary, onFormSubmit, isLoading, i
                     </div> : ''}
                 </ul> : ''}
 
-                {dictionary.translationMode == 0 || dictionary.translationMode == 1 ? <ul className={`space-y-3 
+                {dictionary.translationMode == 0 || dictionary.translationMode == 1 ? <ul className={`space-y-3 xl:mt-0 mt-6
                     ${dictionary.translationMode == 0 ? 'xl:w-[50%] xl:pl-6' : 'w-full'}`}>
                     <p className='text-blue-700 font-semibold'>English version</p>
                     <div className='w-full'>

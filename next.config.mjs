@@ -1,7 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: {
-        domains: ['cloudcfd.ru'],
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'cloudcfd.ru',
+                port: '',
+                pathname: '/**',
+            },
+            {
+                protocol: 'http',
+                hostname: 'cloudcfd.ru',
+                port: '1515',
+                pathname: '/**',
+            },
+        ],
     },
 };
 

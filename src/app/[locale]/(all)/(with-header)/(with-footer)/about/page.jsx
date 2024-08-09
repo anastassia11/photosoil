@@ -28,7 +28,7 @@ export default function AboutPage() {
                 </div>
             </div>
 
-            <div className='max-w-screen-xl m-auto flex flex-col space-y-24 mx-8'>
+            <div className='max-w-screen-xl m-auto flex flex-col space-y-24 sm:mx-8 mx-4'>
                 <div className=''>
                     <h2 className='sm:text-2xl text-xl font-semibold text-center'>Для чего нужна база даннных PhotoSOIL</h2>
                     <p className='text-base mt-6'>

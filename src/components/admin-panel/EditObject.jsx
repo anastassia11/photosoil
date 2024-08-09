@@ -123,7 +123,7 @@ export default function EditObject({ id, type, title }) {
     }
 
     return (
-        <div className="flex flex-col w-full space-y-4 ">
+        <div className="flex flex-col w-full space-y-4 pb-[100px]">
             <div className='flex flex-row items-center justify-between'>
                 <h1 className='sm:text-2xl text-xl font-semibold'>
                     {title}

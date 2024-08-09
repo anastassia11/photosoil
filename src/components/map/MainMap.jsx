@@ -382,10 +382,10 @@ export default function MainMap() {
 
     return (
         <div ref={mapElement} className="w-full h-full z-10">
-            <div className='z-20 absolute top-0 right-0 m-2'>
+            <div className='z-40 absolute top-0 right-0 m-2'>
                 <LayersPanel onLayerChange={handleBaseLayerChange} currentLayer={selectedLayer} />
             </div>
-            <div className='z-30 absolute top-[calc(50%-100px)] right-0 m-2 '>
+            <div className='z-20 absolute top-[calc(50%-100px)] right-0 m-2 '>
                 <Zoom onClick={handleZoomClick} />
             </div>
             <SideBar popupVisible={popupVisible}

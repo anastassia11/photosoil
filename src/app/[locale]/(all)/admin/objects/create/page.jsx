@@ -12,7 +12,7 @@ export default function CreateSoilPage() {
         const result = await createSoil(data)
         if (result.success) {
             return { success: true }
-        } else return { success: false }
+        } else return { success: false, status: result.status }
     }
 
     return (

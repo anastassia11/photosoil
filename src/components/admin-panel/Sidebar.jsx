@@ -82,15 +82,16 @@ export default function Sidebar() {
         </Link>
 
     return (
-        <aside className="flex flex-col min-w-[290px] h-screen px-6 overflow-y-auto bg-white border-r rtl:border-r-0 rtl:border-l">
-            <Link href='/' className='border-b flex flex-row items-center h-[70px]'>
-                <Image src={'/logo.png'} width={300} height={300} alt='logo' className='w-9' />
-                <p className='text-zinc-600 ml-2 text-3xl font-semibold'>Photo<span className='pl-[2px] text-[#226eaf] font-bold'>SOIL</span></p>
+        <aside className="flex flex-col sm:min-w-[290px] min-w-[270px] h-screen sm:px-6 px-4 overflow-y-auto bg-white 
+        border-r border-l rtl:border-r-0 rtl:border-l">
+            <Link href='/' className='border-b flex flex-row items-center sm:h-[70px] h-[60px]'>
+                <Image src={'/logo.png'} width={300} height={300} alt='logo' className='sm:w-9 w-6' />
+                <p className='text-zinc-600 ml-2 sm:text-3xl text-xl font-semibold'>Photo<span className='pl-[2px] text-[#226eaf] font-bold'>SOIL</span></p>
             </Link>
 
-            <div className="flex flex-col justify-between flex-1 mt-6">
-                <nav className="-mx-3 space-y-6 ">
-                    <div className="space-y-3 ">
+            <div className="flex flex-col justify-between flex-1 sm:mt-6 mt-4">
+                <nav className="-mx-3 sm:space-y-6 space-y-4">
+                    <div className="sm:space-y-3 space-y-2">
                         <label className="w-full px-3 text-sm text-gray-500 uppercase">{t('content')}</label>
                         {content.map(item => LinkItem(item))}
                     </div>

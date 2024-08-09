@@ -278,34 +278,34 @@ export default function ObjectForm({ oldTwoLang, oldIsEng, pathname, type, item,
     return (
         <form
             onSubmit={(e) => e.preventDefault()}
-            className="flex flex-col w-full h-fit">
+            className={`flex flex-col w-full h-fit max-h-full ${pathname !== 'edit' ? 'pb-[200px]' : 'pb-16'}`}>
             <div className='flex flex-col w-full h-full'>
-                <div className='grid grid-cols-2 gap-4 w-full'>
-
-                    <Tabs.Root defaultValue={false} className="col-span-2" value={isEng}
+                <div className='grid md:grid-cols-2 grid-cols-1 gap-4 w-full'>
+                    <Tabs.Root defaultValue={false} className="md:col-span-2" value={isEng}
                         onValueChange={handleLangChange}>
-                        <Tabs.List className="w-full border-b flex items-center gap-x-4 overflow-x-auto justify-between">
-                            <div className='flex items-center gap-x-4 overflow-x-auto'>
+                        <Tabs.List className="w-full border-b flex md:items-center gap-x-4 overflow-x-auto justify-between md:flex-row flex-col">
+                            <div className='flex items-center gap-x-4 overflow-x-auto md:order-1 order-2'>
                                 <Tabs.Trigger disabled={!createTwoLang && isEng}
                                     className="disabled:text-gray-400 group outline-none border-b-2 border-[#f6f7f9] data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
                                     value={false}>
-                                    <div className="pb-2.5 px-2 group-disabled:text-current duration-150 group-hover:text-blue-600 font-medium">
+                                    <div className="pb-2.5 sm:px-2 group-disabled:text-current duration-150 group-hover:text-blue-600 font-medium">
                                         Русскоязычная версия
                                     </div>
                                 </Tabs.Trigger>
                                 <Tabs.Trigger disabled={!createTwoLang}
                                     className="disabled:text-gray-400 group outline-none border-b-2 border-[#f6f7f9] data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
                                     value={true}>
-                                    <div className="pb-2.5 px-2 group-disabled:text-current duration-150 group-hover:text-blue-600 font-medium">
+                                    <div className="pb-2.5 sm:px-2 group-disabled:text-current duration-150 group-hover:text-blue-600 font-medium">
                                         English version
                                     </div>
                                 </Tabs.Trigger>
                             </div>
-                            {(!oldTwoLang || pathname !== 'edit') && <label htmlFor='createTwoLang' className={`pb-2.5 flex flex-row cursor-pointer items-center`}>
+                            {(!oldTwoLang || pathname !== 'edit') && <label htmlFor='createTwoLang'
+                                className={`select-none md:order-2 order-1 pb-4  md:pb-2.5 flex flex-row cursor-pointer items-center`}>
                                 <input type="checkbox" id='createTwoLang'
                                     checked={createTwoLang}
                                     onChange={handleTwoLangChange}
-                                    className="min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
+                                    className="cursor-pointer min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
                                 <span>{pathname === 'edit' ? `${oldIsEng ? t('add_ru') : t('add_en')}` : t('create_two_lang')}</span>
                             </label>}
                         </Tabs.List>
@@ -358,7 +358,7 @@ export default function ObjectForm({ oldTwoLang, oldIsEng, pathname, type, item,
                             </li>
                         </ul>
                     </div>
-                    <div className='flex flex-col w-full h-[566px] max-h-[566px]'>
+                    <div className='flex flex-col w-full xl:h-[528px] md:h-[500px] h-[400px]'>
                         <label className="font-medium">
                             {t('in_map')}
                         </label>
@@ -377,7 +377,7 @@ export default function ObjectForm({ oldTwoLang, oldIsEng, pathname, type, item,
                             })}
                         </div>
 
-                        <div id='map-section' className='border rounded-lg overflow-hidden mt-1 h-full'>
+                        <div id='map-section' className='border rounded-lg overflow-hidden mt-1 w-full h-full'>
                             <MapSelect type={type} latitude={object?.latitude} longtitude={object?.longtitude}
                                 onCoordinateChange={handleCoordChange} />
                         </div>
@@ -385,25 +385,25 @@ export default function ObjectForm({ oldTwoLang, oldIsEng, pathname, type, item,
                 </div>
                 <p className='font-medium mt-8'>{t('main_photo')}<span className='text-orange-500'>*</span></p>
                 {mainPhoto?.path ?
-                    <div className='grid grid-cols-2 gap-4 mt-1'>
+                    <div className='grid md:grid-cols-2 grid-cols-1 gap-4 mt-1'>
                         {PhotoCard({
                             ...mainPhoto, isEng: isEng,
                             onDelete: handleMainPhotoDelete,
                             onChange: handleMainPhotoChange,
                         })}
                     </div>
-                    : <div className='w-[50%] h-[150px] pr-2 mt-1'>
+                    : <div className='md:w-[50%] w-full h-[150px] pr-2 mt-1'>
                         <DragAndDrop onLoadClick={handleMainPhotoSend} isMultiple={false} accept='img' />
                     </div>}
 
 
                 <p className='font-medium mt-8'>{t('other_photos')}</p>
                 {!otherPhotos?.length ?
-                    <div className='w-[50%] h-[150px] pr-2 mt-1'>
+                    <div className='md:w-[50%] w-full h-[150px] pr-2 mt-1'>
                         <DragAndDrop onLoadClick={handleOtherPhotoSend} isMultiple={true} accept='img' />
                     </div>
                     :
-                    <ul className={` grid grid-cols-2 gap-4 `}>
+                    <ul className={`grid md:grid-cols-2 grid-cols-1 gap-4 `}>
                         {otherPhotos.map(photo => <li key={photo.id}>
                             {PhotoCard({
                                 ...photo, isEng: isEng,
@@ -419,7 +419,7 @@ export default function ObjectForm({ oldTwoLang, oldIsEng, pathname, type, item,
 
                 {type === 'soil' && <>
                     <p className='font-medium mt-8'>{t('classifications')}</p>
-                    <ul className='grid grid-cols-2 gap-4 w-full mt-1'>
+                    <ul className='grid md:grid-cols-2 grid-cols-1 gap-4 w-full mt-1'>
                         {classifications?.map(item => {
                             const isVisible = item.translationMode == 0 || (isEng ? (item.translationMode == 1) : (item.translationMode == 2))
                             if (isVisible) return <li key={`classification-${item.id}`}>
@@ -435,7 +435,7 @@ export default function ObjectForm({ oldTwoLang, oldIsEng, pathname, type, item,
                 </>}
 
                 <p className='font-medium mt-8'>{t('connection')}</p>
-                <div className='grid grid-cols-2 gap-4 w-full mt-1'>
+                <div className='grid md:grid-cols-2 grid-cols-1 gap-4 w-full mt-1'>
                     {type !== 'ecosystem' && <Filter name={t('ecosystems')} items={ecosystems}
                         type='ecosystem'
                         allSelectedItems={object?.ecoSystems} isEng={isEng}
@@ -461,7 +461,7 @@ export default function ObjectForm({ oldTwoLang, oldIsEng, pathname, type, item,
                     />
                 </div>
 
-                <div className='mt-8 w-[50%] pr-2'>  {
+                <div className='mt-8 md:w-[50%] w-full md:pr-2 pr-0'>  {
                     Input({
                         label: t('code'),
                         name: 'code',

@@ -51,7 +51,7 @@ export default function Header() {
     const handleScroll = useCallback(() => {
         const currentScrollPos = window.scrollY;
         setVisible(
-            (prevScrollPos > currentScrollPos)
+            (currentScrollPos > 0 ? (prevScrollPos > currentScrollPos) : true)
         );
         setPrevScrollPos(currentScrollPos);
     }, [prevScrollPos, setVisible, setPrevScrollPos]);
@@ -64,7 +64,8 @@ export default function Header() {
     }, [handleScroll]);
 
     return (
-        <header className={`${visible ? 'fixed top-0 ' : 'fixed -top-20'} transition-all duration-200 ease-in-out z-40 px-4 sm:px-8 w-full border-b shadow-sm h-16 bg-white flex flex-row items-center justify-between`}>
+        <header className={`${visible ? 'fixed top-0 ' : 'fixed -top-20'} z-50 transition-all duration-200 
+            ease-in-out px-4 sm:px-8 w-full border-b shadow-sm h-16 lg:bg-white bg-white/90 flex flex-row items-center justify-between`}>
             <div className='flex-1 '>
                 <Link href={`/`} className='flex flex-row items-center w-fit'>
                     <Image src={'/logo.png'} width={300} height={300} alt='logo' className='sm:w-9 w-8' />
@@ -150,8 +151,17 @@ export default function Header() {
                 </button>
             </div>
             <div className={`bg-white 2xl:block px-3 sm:w-[60%] w-full self-end h-[calc(100vh-64px)] fixed top-[64px] flex 
-            flex-col justify-between p-4
-                duration-300 ${menuOpen ? 'block right-0' : 'opacity-0 -right-[60%]'}`}>
+            flex-col p-4
+                duration-300 ${menuOpen ? 'block right-0' : 'opacity-0 -right-[100%]'}`}>
+                <li className='mb-4 h-fit flex-col space-y-2 justify-end flex sm:hidden w-full px-2'>
+                    {!token ? <Link href={`/join`} className="max-h-[40px] px-4 py-2 font-medium text-center text-white transition-colors duration-300 
+                transform bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600">
+                        {t('join')}
+                    </Link> : <Link href={`/admin`} className="min-w-fit max-h-[40px] px-2 py-2 font-medium text-left text-blue-600 transition-colors duration-300 
+                transform ">
+                        {t('dashboard')}
+                    </Link>}
+                </li>
                 <ul className='flex flex-col space-y-2'>
                     {navigation.map(({ key, title, isDropdown, navs }) => <li key={key}>
                         {isDropdown ?
@@ -194,7 +204,7 @@ export default function Header() {
                     </li>)}
                 </ul>
 
-                <li className='h-fit flex-col space-y-2 justify-end flex sm:hidden w-full px-2'>
+                {/* <li className='h-fit flex-col space-y-2 justify-end flex sm:hidden w-full px-2'>
                     {!token ? <Link href={`/join`} className="max-h-[40px] px-4 py-2 font-medium text-center text-white transition-colors duration-300 
                 transform bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600">
                         {t('join')}
@@ -202,7 +212,7 @@ export default function Header() {
                 transform ">
                         {t('dashboard')}
                     </Link>}
-                </li>
+                </li> */}
             </div>
         </header>
     )

@@ -5,9 +5,10 @@ import Breadcrumbs from '@/components/Breadcrumbs'
 import Sidebar from '@/components/admin-panel/Sidebar';
 import Header from '@/components/admin-panel/Header';
 import { useDispatch, useSelector } from 'react-redux';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { closeAlert } from '@/store/slices/alertSlice';
 import dynamic from 'next/dynamic';
+import MotionWrapper from '@/components/admin-panel/ui-kit/MotionWrapper';
 
 const Alert = dynamic(() => import('@/components/admin-panel/Alert'), { ssr: false });
 const Modal = dynamic(() => import('@/components/admin-panel/Modal'), { ssr: false });
@@ -18,8 +19,10 @@ export default function AdminLayout({ children }) {
     const token = useRef(null);
     const dispatch = useDispatch();
     const router = useRouter();
+    const pathname = usePathname();
     const [isAuth, setIsAuth] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false);
 
     useEffect(() => {
         token.current = localStorage.getItem('tokenData') ? JSON.parse(localStorage.getItem('tokenData')).token : null
@@ -31,7 +34,8 @@ export default function AdminLayout({ children }) {
             setIsAuth(true);
             setIsChecked(true);
         }
-    }, [router])
+        setMenuOpen(false);
+    }, [pathname])
 
     useEffect(() => {
         let timer;
@@ -44,12 +48,35 @@ export default function AdminLayout({ children }) {
     }, [alertIsOpen, dispatch]);
 
     return (
-        <div className='w-screen h-screen flex flex-row'>
+        <div className='w-screen max-h-screen flex flex-row'>
             {isChecked ? (
-                isAuth ? <><Sidebar />
-                    <div className='flex flex-col pt-4 px-8 w-full overflow-y-auto pb-16'>
+                isAuth ? <>
+                    <div className={`lg:block lg:static fixed z-50 duration-300 ${menuOpen ? 'block left-0' : 'lg:opacity-100 opacity-0 lg:left-0 -left-[290px]'}`}>
+                        <Sidebar />
+                    </div>
+
+                    <div className='flex flex-col sm:pt-4 pt-1 sm:px-8 px-4 w-full overflow-y-auto overflow-x-hidden'>
                         <Alert isOpen={alertIsOpen} {...alertProps} />
-                        <Header />
+                        <div className='flex flex-row w-full justify-end items-center'>
+                            <Header />
+                            <div className="block lg:hidden ml-2">
+                                <button className="m-2 mr-0 transition text-gray-600"
+                                    onClick={() => setMenuOpen(!menuOpen)} >
+                                    {
+                                        menuOpen ? (
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        ) : (
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                                            </svg>
+                                        )
+                                    }
+                                </button>
+                            </div>
+                        </div>
+
                         <Breadcrumbs />
                         {children}
                         {isOpen && <Modal isOpen={isOpen}  {...modalProps} />}
