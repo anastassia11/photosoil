@@ -23,8 +23,9 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
   const [location, setLocation] = useState([]);
   const [debounceTimeout, setDebounceTimeout] = useState(null);
 
+  const [classifications, setClassifications] = useState([]);
   const [searchTitle, setSearchTitle] = useState('');
-  const { selectedTerms, selectedCategories, classifications } = useSelector(state => state.data);
+  const { selectedTerms, selectedCategories } = useSelector(state => state.data);
   const { locale } = useParams();
   const { t } = useTranslation();
   const { SOIL_ENUM } = useConstants();
@@ -34,7 +35,8 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
   }));
 
   useEffect(() => {
-    setSideBarOpen(window.innerWidth > 640)
+    setSideBarOpen(window.innerWidth > 640);
+    fetchClassifications();
   }, [])
 
   useEffect(() => {
@@ -44,6 +46,14 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
   useEffect(() => {
     window.innerWidth > 640 && setSideBarOpen(!popupVisible)
   }, [popupVisible])
+
+
+  const fetchClassifications = async () => {
+    const result = await getClassifications();
+    if (result.success) {
+      setClassifications(result.data);
+    }
+  }
 
   const updateFiltersInHistory = () => {
     const params = new URLSearchParams(searchParams.toString())

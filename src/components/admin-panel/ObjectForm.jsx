@@ -27,12 +27,13 @@ import Input from './ui-kit/Input';
 import MapInput from './ui-kit/MapInput';
 import Textarea from './ui-kit/Textarea';
 import PhotoCard from './ui-kit/PhotoCard';
+import { getClassifications } from '@/api/classification/get_classifications';
 
 export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, mainObjectPhoto, otherObjectPhoto, onItemChange, onMainPhotoChange, onOtherPhotosChange }) {
     const dispatch = useDispatch()
-    const classifications = useSelector(state => state.data.classifications);
     const { t } = useTranslation();
 
+    const [classifications, setClassifications] = useState([]);
     const [object, setObject] = useState({});
     const [createTwoLang, setCreateTwoLang] = useState(false);
     const [isEng, setIsEng] = useState(false);
@@ -50,6 +51,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
         fetchAuthors();
         fetchPublications()
         if (type === 'soil') {
+            fetchClassifications();
             fetchEcosystems();
         } else if (type === 'ecosystem') {
             fetchSoils();
@@ -76,6 +78,13 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
             setOtherPhotos(otherObjectPhoto)
         }
     }, [otherObjectPhoto])
+
+    const fetchClassifications = async () => {
+        const result = await getClassifications();
+        if (result.success) {
+            setClassifications(result.data);
+        }
+    }
 
     const fetchAuthors = async () => {
         const result = await getAuthors();
@@ -423,7 +432,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                         {classifications?.map(item => {
                             const isVisible = item.translationMode == 0 || (isEng ? (item.translationMode == 1) : (item.translationMode == 2))
                             if (isVisible) return <li key={`classification-${item.id}`}>
-                                <Filter name={isEng ? item.nameEng : item.nameRu} items={item.terms} isEng={isEng}
+                                <Filter itemId={`classif-${item.id}`} name={isEng ? item.nameEng : item.nameRu} items={item.terms} isEng={isEng}
                                     allSelectedItems={object?.soilTerms}
                                     addItem={newItem => handleAddTerm('soilTerms', newItem)}
                                     deleteItem={deletedItem => handleDeleteTerm('soilTerms', deletedItem)}

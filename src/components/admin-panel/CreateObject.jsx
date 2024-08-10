@@ -220,7 +220,7 @@ export default function CreateObject({ title, onCreate, type }) {
     const handleFormClick = () => {
         const id = uuid();
         setCurrentForm(0);
-        setPhotos([{ id }]);
+        setPhotos([{ id, isLoading: false }]);
         setOtherPhotos([[]]);
         setFormData([{ photoId: id, translations: [{ isEnglish: true }, { isEnglish: false }] }]);
     }
