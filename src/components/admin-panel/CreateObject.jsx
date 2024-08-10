@@ -10,7 +10,7 @@ import { closeModal, openModal } from '@/store/slices/modalSlice';
 import modalThunkActions from '@/store/thunks/modalThunk';
 import { BASE_SERVER_URL } from '@/utils/constants';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import { Oval } from 'react-loader-spinner';
@@ -21,24 +21,14 @@ export default function CreateObject({ title, onCreate, type }) {
     const dispatch = useDispatch();
     const router = useRouter();
     const [drag, setDrag] = useState(false);
-
     const [photos, setPhotos] = useState([]);
     const [otherPhotos, setOtherPhotos] = useState([]);
-
     const [currentForm, setCurrentForm] = useState(null);
-
     const [formData, setFormData] = useState([]);
-    const [rightBlockHeight, setRightBlockHeight] = useState();
     const [isLoading, setIsLoading] = useState(false);
     const formRef = useRef(null);
+    const { locale } = useParams();
     const { t } = useTranslation();
-    const [creationResults, setCreationResults] = useState([]);
-
-    useEffect(() => {
-        if (formRef.current) {
-            setRightBlockHeight(formRef.current.clientHeight)
-        }
-    }, [photos.length, formData]);
 
     const handleChange = (e) => {
         e.preventDefault();
@@ -148,7 +138,6 @@ export default function CreateObject({ title, onCreate, type }) {
                     return await onCreate(createTwoLang ? data : newData);
                 }),
             ]);
-            setCreationResults(_creationResults);
             if (_creationResults.every(result => result.success === true)) {
                 router.push(`/admin/${type === 'soil' ? 'objects' : 'ecosystems'}`);
                 dispatch(openAlert({ title: t('success'), message: t('created_objects'), type: 'success' }));
@@ -226,6 +215,11 @@ export default function CreateObject({ title, onCreate, type }) {
     }
 
     const PhotoCard = ({ id, path, idx, isLoading }) => {
+        const translations = formData[idx].translations;
+        const name = locale === 'en'
+            ? (translations.find(({ isEnglish }) => isEnglish)?.name || translations.find(({ isEnglish }) => !isEnglish)?.name)
+            : (translations.find(({ isEnglish }) => !isEnglish)?.name || translations.find(({ isEnglish }) => isEnglish)?.name);
+
         return <div className={`aspect-[1/1] relative bg-white rounded-lg border flex flex-row
         duration-300 cursor-pointer hover:shadow-md ${currentForm === idx ? ' ring ring-blue-700 ring-opacity-30 w-full' : 'w-[95%]'}  overflow-hidden`}
             onClick={() => setCurrentForm(idx)}>
@@ -266,11 +260,12 @@ export default function CreateObject({ title, onCreate, type }) {
                             </svg>
                         </div>
                 )}
-                <p className='max-w-full flex overflow-hidden rounded-b-lg px-4 py-2 text-sm font-medium z-10 absolute
-                 bottom-0 max-h-[25%] backdrop-blur-md bg-black bg-opacity-40 text-white w-full
-                 overflow-ellipsis'>
-                    {formData.find((item, index) => index == idx)?.name ?? t('no_name')}
-                </p>
+                <div className='w-full flex rounded-b-lg text-sm font-medium z-10 absolute
+                 bottom-0 max-h-[25%] backdrop-blur-md bg-black bg-opacity-40 text-white px-4 py-2'>
+                    <p className='whitespace-nowrap text-ellipsis overflow-hidden'>
+                        {name || t('no_name')}
+                    </p>
+                </div>
             </div>
         </div>
     }
