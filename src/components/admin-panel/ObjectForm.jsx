@@ -393,7 +393,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                     </div>
                 </div>
                 <p className='font-medium mt-8'>{t('main_photo')}<span className='text-orange-500'>*</span></p>
-                {mainPhoto?.path ?
+                {mainPhoto.isLoading || mainPhoto.path ?
                     <div className='grid md:grid-cols-2 grid-cols-1 gap-4 mt-1'>
                         {PhotoCard({
                             ...mainPhoto, isEng: isEng,
