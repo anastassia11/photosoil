@@ -94,7 +94,7 @@ export default function Header() {
                                 </span>
                             </button>
                         </> :
-                        <Link href={`/${key}`} className='duration-300 cursor-pointer hover:text-blue-600'>
+                        <Link href={`/${key}`} prefetch={true} className='duration-300 cursor-pointer hover:text-blue-600'>
                             {title}
                         </Link>
                     }

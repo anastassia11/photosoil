@@ -2,7 +2,6 @@
 
 import { getEcosystem } from '@/api/ecosystem/get_ecosystem';
 import SoilObject from '@/components/soils/SoilObject';
-import { BASE_URL } from '@/utils/constants';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -47,7 +46,7 @@ export default function EcosystemPage({ params: { id } }) {
                     <ul className={`lg:w-[60%] w-full flex flex-row`}>
                         {ecosystem.authors?.map(({ id, name }, index) =>
                             <li key={`author-${index}`} className='mr-2'>
-                                <Link href={`${BASE_URL}/authors/${id}`}
+                                <Link href={`/authors/${id}`}
                                     className='text-blue-600 hover:underline'>
                                     {name}
                                 </Link>

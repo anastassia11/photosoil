@@ -35,7 +35,8 @@ export default async function tokenVerification({ isRequired }) {
                 if (response.status === 200) {
                     return { success: true }
                 } else {
-                    window.location.replace(loginUrl);
+                    localStorage.removeItem('tokenData');
+                    isRequired && window.location.replace(loginUrl);
                     throw new Error('Error');
                 }
             } catch (error) {

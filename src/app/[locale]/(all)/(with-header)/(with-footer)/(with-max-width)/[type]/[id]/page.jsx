@@ -3,7 +3,6 @@
 import { getSoil } from '@/api/soil/get_soil'
 import SoilObject from '@/components/soils/SoilObject'
 import { useConstants } from '@/hooks/useConstants'
-import { BASE_URL } from '@/utils/constants'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
@@ -56,7 +55,7 @@ export default function SoilPage({ params: { id } }) {
                     <ul className={`lg:w-[60%] w-full flex flex-row flex-wrap items-start justify-start h-fit`}>
                         {soil.authors?.map(({ id, dataEng, dataRu }, index) =>
                             <li key={`author-${index}`} className='mr-2 min-w-fit h-fit'>
-                                <Link href={`${BASE_URL}/authors/${id}`}
+                                <Link href={`/authors/${id}`}
                                     className='text-blue-600 hover:underline'>
                                     {_isEng ? dataEng?.name : dataRu?.name}
                                 </Link>
@@ -75,7 +74,7 @@ export default function SoilPage({ params: { id } }) {
                         <ul className={`lg:w-[60%] w-full flex flex-row flex-wrap items-start justify-start h-fit`}>
                             {terms.map(({ id, nameRu, nameEng }, index) =>
                                 <li key={`term-${id}`} className='mr-2 min-w-fit h-fit'>
-                                    <Link href={`${BASE_URL}/soils?terms=${id}`}
+                                    <Link href={`/soils?terms=${id}`}
                                         className='text-blue-600 hover:underline'>
                                         {_isEng ? nameEng : nameRu}{terms.length > 1 && index + 1 < terms.length && ','}
                                     </Link>
