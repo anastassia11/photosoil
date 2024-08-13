@@ -29,7 +29,10 @@ export default function Authors() {
     useEffect(() => {
         setFilteredAuthors(prev => authors.filter(author =>
             locale === 'en' ? author.dataEng?.name.toLowerCase().includes(filterName.toLowerCase())
-                : author.dataRu?.name.toLowerCase().includes(filterName.toLowerCase())).sort((a, b) => a.rank - b.rank))
+                : author.dataRu?.name.toLowerCase().includes(filterName.toLowerCase())).sort((a, b) => a.rank - b.rank)
+            .sort((a, b) => {
+                return a.authorType - b.authorType;
+            }))
     }, [filterName, authors])
 
     useEffect(() => {
