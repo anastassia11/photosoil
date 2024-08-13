@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useConstants } from '@/hooks/useConstants';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { addCategory, addTerm, deleteCategory, deleteTerm } from '@/store/slices/dataSlice';
+import { getClassifications } from '@/api/classification/get_classifications';
 
 export default function SideBar({ popupVisible, onVisibleChange, onLocationHandler }) {
   const dispatch = useDispatch();
@@ -182,7 +183,7 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
   return (
     <div id='map-sidebar'
       className={`${sidebarOpen ? "left-0 z-30" : "sm:-left-[408px] sm:z-20 z-30 -left-[calc(100%-94px)]"
-        } absolute top-0 sm:w-[400px] w-[calc(100%-100px)] sm:max-w-[400px] max-h-[calc(100%-16px)] 
+        } absolute top-0 sm:w-[400px] w-[calc(100%-100px)] sm:max-w-[400px] max-h-[calc(100%-100px)] 
         shadow-lg bg-white duration-300 rounded-lg m-2 flex flex-row pb-4`}>
       <div className="relative flex-1 flex flex-col max-w-full">
         <button
@@ -218,8 +219,8 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
               value={searchTitle}
               onChange={handleSearch}
               type="text"
-              placeholder="Поиск по названию региона"
-              className="w-full py-2 px-12 border rounded-lg outline-none bg-white focus:border-blue-600" />
+              placeholder={t('search_byRegion')}
+              className="w-full sm:py-2 py-2 px-12 border rounded-lg outline-none bg-white focus:border-blue-600" />
 
             <button className='absolute right-3 top-0 bottom-0 w-6 h-6 my-auto text-zinc-400 hover:text-zinc-600 duration-300'
               onClick={() => setSearchTitle('')}>
@@ -248,12 +249,12 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
           </ul>
         </div> : ''}
 
-        <div className='flex-1 h-full overflow-y-auto scroll sm:px-5 px-3 flex flex-col space-y-3 w-full pb-3'>
+        <div className='flex-1 h-full overflow-y-auto scroll sm:px-5 px-3 flex flex-col sm:space-y-3 space-y-2 w-full pb-3'>
           <div className=''>
-            <p className='font-medium text-xl mt-3 mb-1.5'>
-              Слои карты
+            <p className='font-medium sm:text-xl text-lg sm:mt-3 mt-2 sm:mb-1.5 '>
+              {t('map_layers')}
             </p>
-            <div x-show="show" x-transition className="space-y-2.5 px-1">
+            <div x-show="show" x-transition className="sm:space-y-2.5 space-y-1 px-1">
               {LayerSwitch({ title: t('soils'), type: 'soil' })}
               {LayerSwitch({ title: t('ecosystems'), type: 'ecosystem' })}
               {LayerSwitch({ title: t('publications'), type: 'publication' })}
@@ -261,12 +262,12 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
           </div>
 
           <div>
-            <p className='font-medium text-xl mb-1.5'>
-              Фильтры
+            <p className='font-medium sm:text-xl text-lg sm:mb-1.5 '>
+              {t('filters')}
             </p>
 
             {
-              <ul className='flex flex-col z-10 max-h-full space-y-2.5 px-1'>
+              <ul className='flex flex-col z-10 max-h-full sm:space-y-2.5 space-y-1 px-1'>
                 <li key={'category'}>
                   <Filter name={t('category')} itemId='category' items={CATEGORY_ARRAY}
                     allSelectedItems={selectedCategories}

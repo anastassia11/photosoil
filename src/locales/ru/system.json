@@ -263,5 +263,29 @@
   "connect_publ": "Связанные публикации",
 
   "add_point": "Добавить точку",
-  "error_file": "Загрузите файл в поддерживаемом формате"
+  "error_file": "Загрузите файл в поддерживаемом формате",
+  "map_layers": "Слои карты",
+  "filters": "Фильтры",
+  "search_byRegion": "Поиск по региону",
+
+  "OSM": "OpenStreetMap схема",
+  "BingRoud": "Bing схема",
+  "BingSat": "Bing спутник",
+  "BingHibrid": "Bing гибрид",
+  "ArcGis_World_Imagery": "ArcGis World Imagery",
+  "ArcGis_World_Topo_Map": "ArcGis World Topo Map",
+
+  "authorization": "Авторизация",
+  "no_account": "Еще нет аккаунта?",
+  "_login": "Логин",
+
+  "text_toPhoto": "Текст к фото",
+
+  "admin_h1": "Основная статистика платформы",
+  "admin_p": "Платформа PhotoSoil предоставляет уникальные возможности для анализа и управления данными о почвенных объектах и экосистемах",
+  "soils_rod": "Почвенных объектов",
+  "ecosystems_rod": "Экосистем",
+  "publ_rod": "Публикаций",
+  "aythors_rod": "Авторов",
+  "last_news": "Последние новости"
 }

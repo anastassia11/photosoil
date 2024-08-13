@@ -1,9 +1,12 @@
+'use client'
 import { BASE_SERVER_URL } from '@/utils/constants'
 import Image from 'next/image'
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { Oval } from 'react-loader-spinner'
 
 export default function PhotoCard({ id, path, titleEng, titleRu, fileName, onDelete, onChange, isLoading, isEng }) {
+    const { t } = useTranslation();
     return <div className='flex flex-row space-x-4 h-[150px] mt-1'>
         <div className='bg-black/10 relative flex flex-col justify-center items-center min-w-[150px] aspect-[1/1] rounded-md overflow-hidden
                             shadow-lg'>
@@ -39,7 +42,7 @@ export default function PhotoCard({ id, path, titleEng, titleRu, fileName, onDel
                     onChange(e, id)
                 }}
                 type="text"
-                placeholder={`Текст к фото ${isEng ? '(EN)' : ''}`}
+                placeholder={`${t('text_toPhoto')} ${isEng ? '(EN)' : ''}`}
                 className="bg-white w-full p-2 outline-none border focus:border-blue-600 shadow-sm rounded-md max-h-full"
             />
         </div>

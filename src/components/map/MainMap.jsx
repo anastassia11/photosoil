@@ -23,13 +23,14 @@ import SideBar from './SideBar';
 import { useSelector } from 'react-redux';
 import { getPublications } from '@/api/publication/get_publications';
 import ObjectsPopup from './ObjectsPopup';
+import { useParams } from 'next/navigation';
 
 export default function MainMap() {
     const [baseLayer, setBaseLayer] = useState(null);
 
     const [clusterLayer, setClusterLayer] = useState(null);
     const [features, setFeatures] = useState([]);
-
+    const { locale } = useParams();
 
     const { selectedTerms, selectedCategories } = useSelector(state => state.data);
     const [selectedLayer, setSelectedLayer] = useState('');
@@ -125,21 +126,21 @@ export default function MainMap() {
             return new BingMaps({
                 key: 'Ap9BYST6-nbFhg-aHFXmWRfqd0Tsq5a7aEPxHs_b7E5tBAb4cFTvj7td6SorYRdu',
                 imagerySet: 'RoadOnDemand',
-                culture: 'ru'
+                culture: locale
             });
         }
         if (layerValue === "BingSat") {
             return new BingMaps({
                 key: 'Ap9BYST6-nbFhg-aHFXmWRfqd0Tsq5a7aEPxHs_b7E5tBAb4cFTvj7td6SorYRdu',
                 imagerySet: 'Aerial',
-                culture: 'ru'
+                culture: locale
             });
         }
         if (layerValue === "BingHibrid") {
             return new BingMaps({
                 key: 'Ap9BYST6-nbFhg-aHFXmWRfqd0Tsq5a7aEPxHs_b7E5tBAb4cFTvj7td6SorYRdu',
                 imagerySet: 'AerialWithLabelsOnDemand',
-                culture: 'ru'
+                culture: locale
             });
         }
         if (layerValue === "ArcGis_World_Topo_Map") {

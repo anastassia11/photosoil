@@ -1,22 +1,19 @@
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next';
 
 export default function LayersPanel({ onLayerChange, currentLayer }) {
     const [drapdownState, setDrapdownState] = useState({ isActive: false, key: null });
-    const [selectedLayer, setSelectedLayer] = useState(null);
+    const { t } = useTranslation();
 
     const layers = [
-        { key: 'OSM', title: 'OpenStreetMap схема' },
-        { key: 'BingRoud', title: 'Bing схема' },
-        { key: 'BingSat', title: 'Bing спутник' },
-        { key: 'BingHibrid', title: 'Bing гибрид' },
-        { key: 'ArcGis_World_Imagery', title: 'ArcGis World Imagery' },
-        { key: 'ArcGis_World_Topo_Map', title: 'ArcGis World Topo Map' },
+        { key: 'OSM', title: t('OSM') },
+        { key: 'BingRoud', title: t('BingRoud') },
+        { key: 'BingSat', title: t('BingSat') },
+        { key: 'BingHibrid', title: t('BingHibrid') },
+        { key: 'ArcGis_World_Imagery', title: t('ArcGis_World_Imagery') },
+        { key: 'ArcGis_World_Topo_Map', title: t('ArcGis_World_Topo_Map') },
     ]
-
-    // useEffect(() => {
-    //     setSelectedLayer(currentLayer);
-    // }, [currentLayer])
 
     useEffect(() => {
         document.onclick = (e) => {
@@ -43,10 +40,8 @@ export default function LayersPanel({ onLayerChange, currentLayer }) {
                                     <li key={key} className={`baseLayerSelector flex flex-row justify-between duration-300 cursor-pointer hover:text-blue-600 h-9 hover:bg-zinc-100  
                                     items-center px-4
                                     ${currentLayer === key ? 'text-blue-600' : 'text-zinc-800'}`}
-                                        // data-scrtype={key}
                                         onClick={() => {
                                             onLayerChange(key)
-                                            // setSelectedLayer(key)
                                         }}>
                                         {title}
                                         {currentLayer === key ?

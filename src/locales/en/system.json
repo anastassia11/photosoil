@@ -262,5 +262,28 @@
   "connect_publ": "Connected publications",
   "photo": "Photo",
   "add_point": "Add point",
-  "error_file": "Please upload a file in a supported format"
+  "error_file": "Please upload a file in a supported format",
+  "map_layers": "Map layers",
+  "filters": "Filters",
+  "search_byRegion": "Search by region",
+
+  "OSM": "OpenStreetMap scheme",
+  "BingRoud": "Bing scheme",
+  "BingSat": "Bing satellite",
+  "BingHibrid": "Bing hybrid",
+  "ArcGis_World_Imagery": "ArcGis World Imagery",
+  "ArcGis_World_Topo_Map": "ArcGis World Topo Map",
+
+  "authorization": "Authorization",
+  "no_account": "No account yet?",
+  "_login": "Login",
+  "text_toPhoto": "Text to the photo",
+
+  "admin_h1": "Basic platform statistics",
+  "admin_p": "PhotoSoil platform provides unique opportunities for analyzing and managing data on soil objects and ecosystems",
+  "soils_rod": "Soils",
+  "ecosystems_rod": "Ecosystems",
+  "publ_rod": "Publications",
+  "aythors_rod": "Authors",
+  "last_news": "Latest news"
 }
