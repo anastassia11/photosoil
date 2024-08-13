@@ -32,7 +32,7 @@ const defaults = {
         display: {
             left: ['close', 'zoomIn', 'zoomOut', 'download'],
             middle: [],
-            right: ['download', 'close',],
+            right: ['zoomIn', 'zoomOut', 'download', 'close',],
         },
     },
 
