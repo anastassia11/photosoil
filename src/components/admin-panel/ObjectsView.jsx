@@ -9,6 +9,7 @@ import Dropdown from './Dropdown';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'next/navigation';
 import { PAGINATION_OPTIONS } from '@/utils/constants';
+import moment from 'moment';
 
 export default function ObjectsView({ _objects, onDeleteClick, objectType, visibilityControl, languageChanger, onVisibleChange, onRoleChange }) {
     const dispatch = useDispatch();
@@ -40,11 +41,6 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
 
     useEffect(() => {
         setFilteredObjects(prev => objects
-            .sort((a, b) => {
-                const dateA = new Date(a.lastUpdated);
-                const dateB = new Date(b.lastUpdated);
-                return dateB - dateA;
-            })
             .filter(object =>
                 (object?.name?.toLowerCase().includes(filterName.toLowerCase()) ||
                     object?.email?.toLowerCase().includes(filterName.toLowerCase()) ||
@@ -62,7 +58,12 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
                     ((currentLang === 'eng' && object.translationMode !== undefined && (object.translationMode == 1 || object.translationMode == 0)) ||
                         (currentLang === 'ru' && object.translationMode !== undefined && (object.translationMode == 2 || object.translationMode == 0)) ||
                         (currentLang === 'any' && true)))
-            ))
+            )
+            .sort((a, b) => {
+                const dateA = new Date(a.lastUpdated);
+                const dateB = new Date(b.lastUpdated);
+                return dateB.getTime() - dateA.getTime();
+            }))
     }, [objects, filterName, publishStatus, currentLang]);
 
     const handleObjectSelect = (checked, id, type) => {
@@ -123,13 +124,13 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
                         className="cursor-pointer text-blue-500 border-zinc-300 rounded min-w-4 min-h-4" />
                     <Link onClick={e => e.stopPropagation()}
                         href={{ pathname: `/admin/${objectType === 'userPage' ? type?.name : objectType}/edit/${soilId || ecoSystemId || publicationId || newsId || id}`, query: { lang: isEnglish ? 'eng' : 'ru' } }}
-                        className="font-medium text-blue-600 hover:underline whitespace-normal line-clamp-2">{name || dataRu?.name || title}</Link>
+                        className="font-medium text-blue-600 hover:underline whitespace-normal line-clamp-2">{name || (_isEng ? dataEng?.name : dataRu?.name) || title}</Link>
                 </div>
             </td>
 
             {objectType === 'userPage' ? <td className="px-4 py-3 text-sm text-zinc-500 whitespace-nowrap">{type?.title}</td>
                 : <td className="px-4 py-3 text-sm text-zinc-500 whitespace-nowrap">{soilObject?.user?.email || ecoSystem?.user?.email || publication?.user?.email || news?.user?.email}</td>}
-            <td className="px-4 py-3 text-sm text-zinc-500 whitespace-nowrap">{lastUpdated}</td>
+            <td className="px-4 py-3 text-sm text-zinc-500 whitespace-nowrap">{moment(lastUpdated).format('DD.MM.YYYY HH:mm')}</td>
             <td className="px-4 py-3 text-sm whitespace-nowrap">
                 {isVisible !== undefined && <div className="flex items-center gap-x-2">
                     {isVisible ? <p className="px-3 py-1 text-sm text-emerald-500 rounded-full bg-emerald-100/60">{t('publish')}</p> :
@@ -181,7 +182,7 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
     }
 
 
-    const DictionaryTableRow = ({ nameRu, nameEng, id }) => <tr className={`${selectedObjects.includes(id) ? 'bg-yellow-100/50' : ''}`}>
+    const DictionaryTableRow = ({ nameRu, nameEng, id, translationMode }) => <tr className={`${selectedObjects.includes(id) ? 'bg-yellow-100/50' : ''}`}>
         <td key={`tableRow_dictionary_${id}`}
             onClick={() => handleObjectSelect(!selectedObjects.includes(id), id)}
             className="cursor-pointer px-4 py-3 text-sm font-medium text-zinc-700 whitespace-nowrap ">
@@ -193,10 +194,16 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
                 <Link href={`/admin/${objectType}/edit/${id}`}
                     onClick={e => e.stopPropagation()}
                     className="font-medium text-blue-600 hover:underline whitespace-normal ">{
-                        currentLang === 'any' ? (_isEng ? `${nameEng} ${nameRu ? `(${nameRu})` : ''}`
-                            : `${nameRu} ${nameEng ? `(${nameEng})` : ''}`)
-                            : currentLang === 'ru' ? nameRu
-                                : currentLang === 'eng' ? nameEng : ''}</Link>
+                        currentLang === 'any' ? (
+                            translationMode === 0 ? (_isEng ? `${nameEng} (${nameRu})`
+                                : `${nameRu} (${nameEng})`)
+                                : translationMode === 1 ? nameEng
+                                    : translationMode === 2 ? nameRu : ''
+                        )
+                            : (currentLang === 'ru' ? nameRu
+                                : currentLang === 'eng' ? nameEng : '')
+                    }
+                </Link>
             </div>
         </td>
 

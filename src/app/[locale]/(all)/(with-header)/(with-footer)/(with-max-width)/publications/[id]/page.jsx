@@ -5,6 +5,7 @@ import MapArraySelect from '@/components/map/MapArraySelect'
 import PdfGallery from '@/components/soils/PdfGallery'
 import Soils from '@/components/soils/Soils'
 import { BASE_SERVER_URL } from '@/utils/constants'
+import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -14,12 +15,14 @@ export default function PublicationPage({ params: { id } }) {
     const { t } = useTranslation();
     const { locale } = useParams();
     const mapRef = useRef();
+    const [tokenData, setTokenData] = useState({});
 
     let _isEng = locale === 'en';
 
     const currentTransl = publication?.translations?.find(({ isEnglish }) => isEnglish === _isEng);
 
     useEffect(() => {
+        localStorage.getItem('tokenData') && setTokenData(JSON.parse(localStorage.getItem('tokenData')));
         fetchPublication();
     }, [])
 
@@ -50,9 +53,24 @@ export default function PublicationPage({ params: { id } }) {
 
     return (
         <div className='flex flex-col'>
-            <h1 className='sm:text-2xl text-xl font-semibold mb-2'>
-                {currentTransl?.name}
-            </h1>
+            <div className='flex flex-col sm:flex-row mb-2 justify-between sm:items-center'>
+                <h1 className='sm:text-2xl text-xl font-semibold'>
+                    {currentTransl?.name}
+                </h1>
+                {tokenData.role === 'Admin' || (tokenData.name === publication.user?.name) ? <Link target="_blank"
+                    className='text-blue-700 cursor-pointer flex flex-row items-center hover:underline duration-300'
+                    href={{
+                        pathname: `/admin/publications/edit/${publication.id}`,
+                        query: { lang: _isEng ? 'eng' : 'ru' }
+                    }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 mr-1">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                    </svg>
+                    <p className='pt-[3px]'>
+                        {t('edit_go')}
+                    </p>
+                </Link> : ''}
+            </div>
             <div className='space-y-1'>
                 {currentTransl?.authors ? <p className='text-gray-600'>{currentTransl.authors}</p> : ''}
                 {currentTransl?.edition ? <p className='text-gray-600 font-medium'>{currentTransl.edition}</p> : ''}

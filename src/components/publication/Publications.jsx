@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import Pagination from '../Pagination';
 import Link from 'next/link';
 import Dropdown from '../admin-panel/Dropdown';
-import { BASE_URL, PAGINATION_OPTIONS } from '@/utils/constants';
+import { PAGINATION_OPTIONS } from '@/utils/constants';
 import { useConstants } from '@/hooks/useConstants';
 import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper';
 import { getPublications } from '@/api/publication/get_publications';
@@ -36,9 +36,13 @@ export default function Publications() {
     useEffect(() => {
         setFilteredPublications(prev => publications.filter(publication =>
             (draftIsVisible ? true : publication.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible) &&
-            (publication.translations?.find(transl => transl.isEnglish === _isEng)?.name.toLowerCase().includes(filterName.toLowerCase()))
-        ))
-    }, [filterName, publications])
+            (publication.translations?.find(transl => transl.isEnglish === _isEng)?.name.toLowerCase().includes(filterName.toLowerCase())))
+            .sort((a, b) => {
+                const dateA = new Date(a.createdDate);
+                const dateB = new Date(b.createdDate);
+                return dateB.getTime() - dateA.getTime();
+            }))
+    }, [filterName, publications, draftIsVisible])
 
 
     const fetchPublications = async () => {
@@ -102,7 +106,7 @@ export default function Publications() {
                             publications.length && filteredPublications.length ? currentItems.map((item, idx) => (
                                 <li key={idx} className={`mt-4 ${idx + 1 === currentItems.length ? '' : 'border-b'} flex flex-row min-w-full`}>
                                     <MotionWrapper className='min-w-full'>
-                                        <Link href={`${BASE_URL}/publications/${item.id}`}
+                                        <Link href={`/publications/${item.id}`}
                                             className='justify-between items-start flex flex-row flex-1 mb-4 px-4 py-5 cursor-pointer hover:bg-white
                                         rounded-md hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] transition-all duration-300'>
                                             <div className='space-y-3'>

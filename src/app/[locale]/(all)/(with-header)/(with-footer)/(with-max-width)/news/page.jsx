@@ -9,6 +9,7 @@ import SoilsLoader from '@/components/content-loaders/SoilsLoader';
 import Filter from '@/components/soils/Filter';
 import { addTag, deleteTag, resetTags } from '@/store/slices/dataSlice';
 import { PAGINATION_OPTIONS } from '@/utils/constants';
+import moment from 'moment';
 import Link from 'next/link';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -51,8 +52,12 @@ export default function NewsPage() {
             (draftIsVisible ? true : item.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible) &&
             item.translations?.find(transl => transl.isEnglish === _isEng)?.title.toLowerCase().includes(filterName.toLowerCase()) &&
             (selectedTags.length === 0 || selectedTags.some(selectedTag => item.tags.some(({ id }) => id === selectedTag)))
-        ))
-    }, [filterName, news, selectedTags])
+        ).sort((a, b) => {
+            const dateA = new Date(a.createdDate);
+            const dateB = new Date(b.createdDate);
+            return dateB.getTime() - dateA.getTime();
+        }))
+    }, [filterName, news, selectedTags, draftIsVisible])
 
     useEffect(() => {
         updateFiltersInHistory();
@@ -84,6 +89,7 @@ export default function NewsPage() {
     const fetchNews = async () => {
         const result = await getAllNews();
         if (result.success) {
+            console.log(result.data)
             setNews(result.data)
         }
         setIsLoading(prev => ({ ...prev, items: false }))
@@ -103,7 +109,7 @@ export default function NewsPage() {
             className="px-8 py-4 bg-white rounded-md hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] transition-all duration-300
              w-full h-full flex flex-col justify-between">
             <div className='flex flex-col'>
-                <span className="text-sm font-light text-gray-600">{currentTransl?.lastUpdated || ''}</span>
+                <span className="text-sm font-light text-gray-600">{moment(currentTransl?.lastUpdated).format('DD.MM.YYYY HH:mm') || ''}</span>
 
                 <div className="mt-2">
                     <h3 className="text-xl font-medium text-gray-700 hover:text-gray-600">{currentTransl?.title || ''}</h3>
