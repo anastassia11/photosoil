@@ -7,13 +7,14 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import '@/styles/editor.css';
 import NewGallery from '@/components/soils/NewGallery';
-import { BASE_URL } from '@/utils/constants';
 import Link from 'next/link';
+import moment from 'moment';
 
 export default function NewsItemPage({ params: { id } }) {
     const [news, setNews] = useState({});
     const { t } = useTranslation();
     const { locale } = useParams();
+    const [tokenData, setTokenData] = useState({});
     const parser = new DOMParser();
 
     let _isEng = locale === 'en';
@@ -21,6 +22,7 @@ export default function NewsItemPage({ params: { id } }) {
     const currentTransl = news?.translations?.find(({ isEnglish }) => isEnglish === _isEng);
 
     useEffect(() => {
+        localStorage.getItem('tokenData') && setTokenData(JSON.parse(localStorage.getItem('tokenData')));
         document.documentElement.style.setProperty('--product-view-height', '600px');
         fetchNews();
     }, [])
@@ -28,6 +30,7 @@ export default function NewsItemPage({ params: { id } }) {
     const fetchNews = async () => {
         const result = await getNewsById(id)
         if (result.success) {
+            console.log(result.data)
             setNews(result.data)
         }
     }
@@ -72,11 +75,11 @@ export default function NewsItemPage({ params: { id } }) {
                 </button>
             </div>
             <div className='flex flex-row justify-between mt-4'>
-                <p className='text-gray-500 font-medium'>{currentTransl?.lastUpdated}</p>
+                <p className='text-gray-500 font-medium'>{moment(currentTransl?.lastUpdated).format('DD.MM.YYYY HH:mm') || ''}</p>
                 <ul className="flex items-center flex-row">
                     {news?.tags?.map(({ id, nameRu, nameEng }, index) =>
                         <li key={`tag-${id}`} className='mr-2 min-w-fit h-fit'>
-                            <Link href={`${BASE_URL}/news?tags=${id}`}
+                            <Link href={`/news?tags=${id}`}
                                 className='text-blue-600 hover:underline'>
                                 {_isEng ? (nameEng || '') : (nameRu || '')}{news?.tags?.length > 1 && index + 1 < news?.tags?.length && ','}
                             </Link>
@@ -84,7 +87,7 @@ export default function NewsItemPage({ params: { id } }) {
                 </ul>
             </div>
             <div className='tiptap mt-8'
-                dangerouslySetInnerHTML={{ __html: parser.parseFromString(currentTransl?.content, 'text/html').body.innerHTML }}>
+                dangerouslySetInnerHTML={{ __html: parser.parseFromString(currentTransl?.content || '', 'text/html').body.innerHTML }}>
             </div>
             <div id='gallery-section' className='mt-8 self-center'>
                 <NewGallery objectPhoto={news?.objectPhoto} />

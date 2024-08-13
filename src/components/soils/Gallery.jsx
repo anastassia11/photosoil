@@ -11,6 +11,7 @@ import 'lightgallery/css/lg-thumbnail.css';
 import { BASE_SERVER_URL } from '@/utils/constants';
 import { useParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
+import moment from 'moment';
 
 const Gallery = memo(function Gallery({ mainPhoto, objectPhoto }) {
     const containerRef = useRef(null);
@@ -32,7 +33,7 @@ const Gallery = memo(function Gallery({ mainPhoto, objectPhoto }) {
                     src: `${BASE_SERVER_URL}${mainPhoto.path}`,
                     thumb: `${BASE_SERVER_URL}${mainPhoto.path}`,
                     subHtml: `<div class="lightGallery-captions">
-                          <h4>${mainPhoto.lastUpdated}</h4>
+                            <h4>${moment(mainPhoto.lastUpdated).format('DD.MM.YYYY HH:mm')}</h4>
                           <p>${locale === 'en' ? (mainPhoto.titleEng || '') : locale === 'ru' ? (mainPhoto.titleRu || '') : ''}</p>
                       </div>`,
                 },
@@ -41,7 +42,7 @@ const Gallery = memo(function Gallery({ mainPhoto, objectPhoto }) {
                         src: `${BASE_SERVER_URL}${path}`,
                         thumb: `${BASE_SERVER_URL}${path}`,
                         subHtml: `<div class="lightGallery-captions">
-                          <h4>${lastUpdated}</h4>
+                          <h4>${moment(lastUpdated).format('DD.MM.YYYY HH:mm')}</h4>
                           <p>${locale === 'en' ? (titleEng || '') : locale === 'ru' ? (titleRu || '') : ''}</p>
                       </div>`,
                     }

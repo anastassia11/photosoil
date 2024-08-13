@@ -11,6 +11,7 @@ import { BASE_SERVER_URL } from '@/utils/constants';
 import { useParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import Image from 'next/image';
+import moment from 'moment';
 
 export default function NewGallery({ mainPhoto, objectPhoto }) {
     const [fancyboxIsActive, setFancyboxIsActive] = useState(false);
@@ -71,7 +72,7 @@ export default function NewGallery({ mainPhoto, objectPhoto }) {
                             data-fancybox="gallery"
                             data-src={`${BASE_SERVER_URL}${path}`}
                             data-caption={`<div className='flex flex-col h-full'>
-                          <p class="text-base font-medium mb-3">${lastUpdated}</p>
+                          <p class="text-base font-medium mb-3">${moment(lastUpdated).format('DD.MM.YYYY HH:mm')}</p>
                                 <p className='text-sm'>${locale === 'en' ? (titleEng || '') : locale === 'ru' ? (titleRu || '') : ''}</p>
                       </div>`}
                         >
