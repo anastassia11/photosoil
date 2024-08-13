@@ -53,24 +53,24 @@ export default function SoilObject({ object, children, type }) {
 
             <div className='flex flex-row w-full border-b-2'>
                 <button className={`y-2 w-fit font-semibold border-b-2 translate-y-[2px]
-                hover:border-blue-600 text-blue-600 mr-10 py-2
+                hover:border-blue-600 text-blue-600 sm:mr-10 mr-4 py-2 text-sm sm:text-base 
                 ${!object.soilObjects?.length && 'hidden'}`}
                     onClick={() => handleScrollToSection('soilObjects-section')}>
                     {t('connect_soils')} ({object.soilObjects?.length})
                 </button>
                 <button className={`y-2 w-fit font-semibold border-b-2 translate-y-[2px]
-                hover:border-blue-600 text-blue-600 mr-10 py-2
+                hover:border-blue-600 text-blue-600 sm:mr-10 mr-4 py-2 text-sm sm:text-base
                 ${!object.ecoSystems?.length && 'hidden'}`}
                     onClick={() => handleScrollToSection('ecosystems-section')}>
                     {t('connect_ecosystems')} ({object.ecoSystems?.length})
                 </button>
                 <button className={`y-2 w-fit font-semibold border-b-2 translate-y-[2px]
-                hover:border-blue-600 text-blue-600 mr-10 py-2
+                hover:border-blue-600 text-blue-600 sm:mr-10 mr-4 py-2 text-sm sm:text-base
                 ${!object.publications?.length && 'hidden'}`}
                     onClick={() => handleScrollToSection('publications-section')}>
                     {t('connect_publ')} ({object.publications?.length})
                 </button>
-                <button className={`y-2 text-blue-600 w-fit font-semibold border-b-2 translate-y-[2px]
+                <button className={`y-2 text-blue-600 w-fit font-semibold text-sm sm:text-base border-b-2 translate-y-[2px]
                 hover:border-blue-600 py-2
                 ${!object.latitude && 'hidden'}`}
                     onClick={() => handleScrollToSection('map-section')}>

@@ -36,7 +36,7 @@ export default function AuthorPage({ params: { id } }) {
     }
 
     function isEmail(email) {
-        var regex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+        let regex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
         return regex.test(email);
     }
 

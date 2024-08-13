@@ -76,37 +76,46 @@ export default function Sidebar() {
     ]
 
     const LinkItem = ({ url, title, svg }) =>
-        <Link key={`sidebar_${url}`} href={`/admin/${url}`} className="flex items-center px-3 py-2 transition-colors duration-300 transform rounded-lg hover:bg-gray-100 hover:text-gray-700">
+        <Link href={`/admin/${url}`} className="cursor-pointer flex items-center px-3 py-2 transition-colors duration-300 
+            transform rounded-lg hover:bg-gray-100 hover:text-gray-700">
             {svg && <div className='text-zinc-500'>{svg}</div>}
             <span className="mx-2 font-medium">{title}</span>
         </Link>
 
+
     return (
         <aside className="flex flex-col sm:min-w-[290px] min-w-[270px] h-screen sm:px-6 px-4 overflow-y-auto bg-white 
         border-r border-l rtl:border-r-0 rtl:border-l">
-            <Link href='/' className='border-b flex flex-row items-center sm:h-[70px] h-[60px]'>
+            <Link href='/' className='hover:cursor-pointer border-b flex flex-row items-center sm:h-[70px] h-[60px]'>
                 <Image src={'/logo.png'} width={300} height={300} alt='logo' className='sm:w-9 w-6' />
                 <p className='text-zinc-600 ml-2 sm:text-3xl text-xl font-semibold'>Photo<span className='pl-[2px] text-[#226eaf] font-bold'>SOIL</span></p>
             </Link>
 
             <div className="flex flex-col justify-between flex-1 sm:mt-6 mt-4">
                 <nav className="-mx-3 sm:space-y-6 space-y-4">
-                    <div className="sm:space-y-3 space-y-2">
+                    <ul className="sm:space-y-3 space-y-2">
                         <label className="w-full px-3 text-sm text-gray-500 uppercase">{t('content')}</label>
-                        {content.map(item => LinkItem(item))}
-                    </div>
+                        {content.map(item =>
+                            <li key={`sidebar_${item.url}`}>
+                                <LinkItem {...item} />
+                            </li>)}
+                    </ul>
 
                     {role === 'Admin' &&
                         <>
-                            <div className="space-y-3 ">
+                            <ul className="space-y-3 ">
                                 <label className="w-full px-3 text-sm text-gray-500 uppercase">{t('taxonomy')}</label>
-                                {taxonomy.map(item => LinkItem(item))}
-                            </div>
+                                {taxonomy.map(item => <li key={`sidebar_${item.url}`}>
+                                    <LinkItem {...item} />
+                                </li>)}
+                            </ul>
 
-                            <div className="space-y-3 ">
+                            <ul className="space-y-3 ">
                                 <label className="w-full px-3 text-sm text-gray-500 uppercase">{t('account_management')}</label>
-                                {users.map(item => LinkItem(item))}
-                            </div>
+                                {users.map(item => <li key={`sidebar_${item.url}`}>
+                                    <LinkItem {...item} />
+                                </li>)}
+                            </ul>
                         </>
                     }
                 </nav>

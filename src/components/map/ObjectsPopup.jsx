@@ -70,7 +70,7 @@ export default function ObjectsPopup({ visible, objects, onCloseClick }) {
     const Dropdown = (type) => {
         return <div className='flex flex-col'>
             <label onClick={() => setIsVisible(prev => ({ ...prev, [type]: !prev[type] }))}
-                className="select-none px-3 py-1 text-gray-500 flex flex-row items-center cursor-pointer text-xl font-medium">
+                className="select-none px-3 py-1 text-gray-500 flex flex-row items-center cursor-pointer sm:text-xl text-lg font-medium">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={`mr-1 size-6 duration-150 ${isVisible[type] ? 'rotate-180' : ''}`}>
                     <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
                 </svg>
@@ -106,7 +106,7 @@ export default function ObjectsPopup({ visible, objects, onCloseClick }) {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                     </svg>
                 </button>
-                {objects.length ? <div className='flex flex-col py-4 space-y-2 max-h-full overflow-y-auto scroll'>
+                {objects.length ? <div className='flex flex-col sm:py-4 py-2 space-y-2 max-h-full overflow-y-auto scroll'>
                     {soils.length ? Dropdown('soils') : ''}
                     {ecosystems.length ? Dropdown('ecosystems') : ''}
                     {publications.length ? Dropdown('publications') : ''}

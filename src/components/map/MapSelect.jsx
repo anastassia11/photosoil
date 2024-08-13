@@ -193,7 +193,7 @@ export default function MapSelect({ id, type, latitude, longtitude, onCoordinate
 
     return (
         <div ref={mapElement} className="w-full h-full z-10 relative">
-            <div className='z-20 absolute top-0 right-0 m-2'>
+            <div className='z-20 absolute top-0 right-0 m-2 sm:block hidden'>
                 <FullScreen onClick={handleFullClick} />
             </div>
             <div className='z-20 absolute top-[calc(50%-50px)] right-0 m-2 '>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useDispatch } from 'react-redux';
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { setDropdown } from '@/store/slices/generalSlice';
 
 export default function AllLayout({ children }) {

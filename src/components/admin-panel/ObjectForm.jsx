@@ -395,11 +395,8 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                 <p className='font-medium mt-8'>{t('main_photo')}<span className='text-orange-500'>*</span></p>
                 {mainPhoto.isLoading || mainPhoto.path ?
                     <div className='grid md:grid-cols-2 grid-cols-1 gap-4 mt-1'>
-                        {PhotoCard({
-                            ...mainPhoto, isEng: isEng,
-                            onDelete: handleMainPhotoDelete,
-                            onChange: handleMainPhotoChange,
-                        })}
+                        <PhotoCard {...mainPhoto} isEng={isEng} onDelete={handleMainPhotoDelete}
+                            onChange={handleMainPhotoChange} />
                     </div>
                     : <div className='md:w-[50%] w-full h-[150px] pr-2 mt-1'>
                         <DragAndDrop onLoadClick={handleMainPhotoSend} isMultiple={false} accept='img' />
@@ -414,11 +411,8 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                     :
                     <ul className={`grid md:grid-cols-2 grid-cols-1 gap-4 `}>
                         {otherPhotos.map(photo => <li key={photo.id}>
-                            {PhotoCard({
-                                ...photo, isEng: isEng,
-                                onDelete: handleOtherPhotoDelete,
-                                onChange: handleOtherPhotosChange,
-                            })}
+                            <PhotoCard {...photo} isEng={isEng} onDelete={handleOtherPhotoDelete}
+                                onChange={handleOtherPhotosChange} />
                         </li>)}
                         <div className='h-[150px]'>
                             <DragAndDrop onLoadClick={handleOtherPhotoSend} isMultiple={true} accept='img' />

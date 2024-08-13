@@ -281,11 +281,8 @@ export default function NewsForm({ _news, pathname, onNewsSubmit, isLoading, btn
                         :
                         <ul className={`grid md:grid-cols-2 grid-cols-1 gap-4 `}>
                             {newsPhotos.map(photo => <li key={photo.id}>
-                                {PhotoCard({
-                                    ...photo, isEng: isEng,
-                                    onDelete: handleNewsPhotoDelete,
-                                    onChange: handleNewsPhotosChange,
-                                })}
+                                <PhotoCard {...photo} isEng={isEng} onDelete={handleNewsPhotoDelete}
+                                    onChange={handleNewsPhotosChange} />
                             </li>)}
                             <div className='h-[150px]'>
                                 <DragAndDrop onLoadClick={handleNewsPhotoSend} isMultiple={true} accept='img' />
