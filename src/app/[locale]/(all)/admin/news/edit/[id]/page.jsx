@@ -5,10 +5,10 @@ import { getNewsById } from '@/api/news/get_news';
 import { putNews } from '@/api/news/put_news';
 import { putPhoto } from '@/api/photo/put_photo';
 import NewsForm from '@/components/admin-panel/NewsForm'
+import { useTranslation } from '@/i18n/client';
 import { openAlert } from '@/store/slices/alertSlice';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 
 export default function EditNewsPage({ params: { id } }) {
@@ -18,7 +18,8 @@ export default function EditNewsPage({ params: { id } }) {
     const [isLoading, setIsLoading] = useState(false);
     const [news, setNews] = useState();
     const [oldTwoLang, setOldTwoLang] = useState(false);
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     useEffect(() => {
         fetchNews();

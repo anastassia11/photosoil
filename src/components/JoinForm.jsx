@@ -1,11 +1,12 @@
 'use client'
 
+import { useTranslation } from '@/i18n/client';
 import Link from 'next/link'
-import React from 'react'
-import { useTranslation } from 'react-i18next';
+import { useParams } from 'next/navigation';
 
 export default function JoinForm() {
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     return (
         <div className="sm:space-y-6 sm:max-w-md m-auto sm:mt-16">

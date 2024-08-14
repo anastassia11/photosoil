@@ -1,19 +1,21 @@
+'use client'
+
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { BASE_SERVER_URL, PAGINATION_OPTIONS } from '@/utils/constants'
 import Pagination from './Pagination'
-import { useTranslation } from 'react-i18next'
 import Dropdown from './admin-panel/ui-kit/Dropdown'
 import { useConstants } from '@/hooks/useConstants'
 import { getAuthors } from '@/api/author/get_authors'
 import Loader from './Loader'
 import MotionWrapper from './admin-panel/ui-kit/MotionWrapper'
+import { useTranslation } from '@/i18n/client'
 
 export default function Authors() {
     const { locale } = useParams();
-    const { t } = useTranslation();
+    const { t } = useTranslation(locale);
 
     const [authors, setAuthors] = useState([]);
     const [filterName, setFilterName] = useState('');
@@ -22,8 +24,6 @@ export default function Authors() {
 
     const [currentItems, setCurrentItems] = useState([]);
     const [itemsPerPage, setItemsPerPage] = useState(0);
-    const { RANK_ENUM } = useConstants();
-
     const _isEng = locale === 'en';
 
     useEffect(() => {
@@ -66,7 +66,6 @@ export default function Authors() {
                     {_isEng ? (dataEng.name || '') : (dataRu.name || '')}
                 </p>
                 <p className='text-blue-700 '>
-                    {/* {RANK_ENUM?.[authorType]} */}
                     {_isEng ? (dataEng.organization || '') : (dataRu.organization || '')}
                 </p>
             </div>

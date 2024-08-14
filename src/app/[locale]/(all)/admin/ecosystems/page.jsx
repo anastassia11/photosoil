@@ -8,13 +8,15 @@ import ObjectsView from '@/components/admin-panel/ObjectsView';
 import { deleteEcosystemById } from '@/api/ecosystem/delete_ecosystem';
 import { putEcosystemVisible } from '@/api/ecosystem/put_ecosystemVisible';
 import { getEcosystemsForAdmin } from '@/api/ecosystem/get_ecosystems_forAdmin';
-import { useTranslation } from 'react-i18next';
 import modalThunkActions from '@/store/thunks/modalThunk';
+import { useParams } from 'next/navigation';
+import { useTranslation } from '@/i18n/client';
 
 export default function EcosystemsAdminPage() {
     const dispatch = useDispatch();
     const [ecosystems, setEcosystems] = useState([]);
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     useEffect(() => {
         fetchEcosystems()

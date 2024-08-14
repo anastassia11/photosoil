@@ -1,15 +1,15 @@
 'use client'
 
+import { useTranslation } from '@/i18n/client';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next';
 
 export default function Sidebar() {
     const [role, setRole] = useState(null);
-    const { t } = useTranslation();
-
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     useEffect(() => {
         localStorage.getItem('tokenData') && setRole(JSON.parse(localStorage.getItem('tokenData')).role)

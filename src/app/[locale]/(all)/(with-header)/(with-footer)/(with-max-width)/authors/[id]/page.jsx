@@ -18,6 +18,6 @@ export async function generateMetadata({ params: { id, locale } }) {
     };
 }
 
-export default function AuthorPage({ params: { id, locale } }) {
-    return <AuthorPageComponent id={id} locale={locale} />
+export default function AuthorPage({ params: { id } }) {
+    return <AuthorPageComponent id={id} />
 }

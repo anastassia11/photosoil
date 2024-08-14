@@ -1,11 +1,10 @@
 'use client'
 
 import { auth } from '@/api/account/login';
-import { t } from 'i18next';
+import { useTranslation } from '@/i18n/client';
 import Link from 'next/link'
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Oval } from 'react-loader-spinner';
 
 export default function LoginPageComponent() {
@@ -13,7 +12,8 @@ export default function LoginPageComponent() {
     const [userData, setUserData] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();

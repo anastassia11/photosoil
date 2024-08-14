@@ -13,8 +13,8 @@ import moment from 'moment';
 import Link from 'next/link';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from '@/i18n/client';
 
 export default function NewsPageComponent() {
     const pathname = usePathname();
@@ -34,9 +34,9 @@ export default function NewsPageComponent() {
 
     const searchParams = useSearchParams();
     const router = useRouter();
-
-    const { t } = useTranslation();
     const { locale } = useParams();
+    const { t } = useTranslation(locale);
+
     const { selectedTags } = useSelector(state => state.data);
 
     const _isEng = locale === 'en';

@@ -2,22 +2,19 @@
 
 import { createClassification } from '@/api/classification/create_classification';
 import DictionaryForm from '@/components/admin-panel/DictionaryForm';
+import { useTranslation } from '@/i18n/client';
 import { openAlert } from '@/store/slices/alertSlice';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next';
 import { Oval } from 'react-loader-spinner';
 import { useDispatch } from 'react-redux';
 
 export default function DictionatyCreatePage() {
     const dispatch = useDispatch();
     const router = useRouter();
-    const [dictionary, setDictionary] = useState({
-        name: '',
-        terms: [],
-    });
     const [isLoading, setIsLoading] = useState(false);
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     const createDictionary = async (data) => {
         setIsLoading(true);

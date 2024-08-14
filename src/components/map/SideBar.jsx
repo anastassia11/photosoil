@@ -1,13 +1,13 @@
-"use client";
+"use client"
 
 import React, { useEffect, useState } from "react";
 import Filter from '../soils/Filter';
 import { useDispatch, useSelector } from 'react-redux';
-import { useTranslation } from 'react-i18next';
 import { useConstants } from '@/hooks/useConstants';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { addCategory, addTerm, deleteCategory, deleteTerm } from '@/store/slices/dataSlice';
 import { getClassifications } from '@/api/classification/get_classifications';
+import { useTranslation } from '@/i18n/client';
 
 export default function SideBar({ popupVisible, onVisibleChange, onLocationHandler }) {
   const dispatch = useDispatch();
@@ -28,7 +28,7 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
   const [searchTitle, setSearchTitle] = useState('');
   const { selectedTerms, selectedCategories } = useSelector(state => state.data);
   const { locale } = useParams();
-  const { t } = useTranslation();
+  const { t } = useTranslation(locale);
   const { SOIL_ENUM } = useConstants();
   const CATEGORY_ARRAY = Object.entries(SOIL_ENUM).map(([key, value]) => ({
     id: Number(key),

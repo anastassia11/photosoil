@@ -8,10 +8,12 @@ import 'lightgallery/css/lightgallery.css';
 import 'lightgallery/css/lg-zoom.css';
 import 'lightgallery/css/lg-video.css';
 import { BASE_SERVER_URL } from '@/utils/constants';
-import { useTranslation } from 'react-i18next';
+import { useParams } from 'next/navigation';
+import { useTranslation } from '@/i18n/client';
 
 export default function PdfGallery({ path, title }) {
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     return (
         <div className="">

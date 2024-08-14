@@ -9,13 +9,15 @@ import DictionaryForm from '@/components/admin-panel/DictionaryForm';
 import { openAlert } from '@/store/slices/alertSlice';
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useTranslation } from 'react-i18next';
+import { useParams } from 'next/navigation';
+import { useTranslation } from '@/i18n/client';
 
 export default function DictionaryEditPage({ params: { id } }) {
     const dispatch = useDispatch();
     const [dictionary, setDictionary] = useState({});
     const [isLoading, setIsLoading] = useState(false);
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     useEffect(() => {
         fetchDictionary();

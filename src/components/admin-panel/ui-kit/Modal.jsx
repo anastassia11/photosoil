@@ -1,12 +1,14 @@
 'use client'
 
+import { useTranslation } from '@/i18n/client';
 import { closeModal, setConfirm } from '@/store/slices/modalSlice';
-import { useTranslation } from 'react-i18next';
+import { useParams } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 
 export default function Modal({ isOpen, title, message, buttonText }) {
     const dispatch = useDispatch();
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     return (
         <div className='modal'>

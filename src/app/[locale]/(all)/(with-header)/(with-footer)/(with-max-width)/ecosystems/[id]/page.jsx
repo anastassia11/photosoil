@@ -18,6 +18,6 @@ export async function generateMetadata({ params: { id, locale } }) {
     };
 }
 
-export default function EcosystemPage({ params: { id, locale } }) {
-    return <EcosystemPageComponent id={id} locale={locale} />
+export default function EcosystemPage({ params: { id } }) {
+    return <EcosystemPageComponent id={id} />
 }

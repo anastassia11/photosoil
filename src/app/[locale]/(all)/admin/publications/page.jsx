@@ -4,17 +4,19 @@ import { deletePublicationById } from '@/api/publication/delete_publication';
 import { getPublicationsForAdmin } from '@/api/publication/get_publications_forAdmin';
 import { putPublicationVisible } from '@/api/publication/put_publicationVisible';
 import ObjectsView from '@/components/admin-panel/ObjectsView';
+import { useTranslation } from '@/i18n/client';
 import { closeModal, openModal } from '@/store/slices/modalSlice';
 import modalThunkActions from '@/store/thunks/modalThunk';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 
 export default function PublicationsAdminPage() {
     const dispatch = useDispatch();
     const [publications, setPublications] = useState([]);
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     useEffect(() => {
         fetchPublications()

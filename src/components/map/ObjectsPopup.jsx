@@ -1,17 +1,16 @@
 'use client'
 
 import { useConstants } from '@/hooks/useConstants';
+import { useTranslation } from '@/i18n/client';
 import { BASE_SERVER_URL } from '@/utils/constants';
-import { t } from 'i18next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next';
 
 export default function ObjectsPopup({ visible, objects, onCloseClick }) {
     const { locale } = useParams();
-    const { t } = useTranslation();
+    const { t } = useTranslation(locale);
     const [soils, setSoils] = useState([]);
     const [ecosystems, setEcosystems] = useState([]);
     const [publications, setPublications] = useState([]);

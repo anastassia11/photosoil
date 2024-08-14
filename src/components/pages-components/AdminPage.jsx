@@ -5,19 +5,20 @@ import { getAuthor } from '@/api/author/get_author';
 import { getAuthors } from '@/api/author/get_authors';
 import { getAllNews } from '@/api/news/get_allNews';
 import Modal from '@/components/admin-panel/ui-kit/Modal'
+import { useTranslation } from '@/i18n/client';
 import { BASE_SERVER_URL } from '@/utils/constants';
 import moment from 'moment';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 export default function AdminPageComponent() {
-    const { t } = useTranslation();
     const [news, setNews] = useState([]);
     const [authors, setAuthors] = useState([]);
     const { locale } = useParams();
+    const { t } = useTranslation(locale);
+
     const _isEng = locale === 'en';
 
     useEffect(() => {

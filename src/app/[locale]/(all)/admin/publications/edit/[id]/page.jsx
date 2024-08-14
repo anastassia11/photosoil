@@ -3,10 +3,10 @@
 import { getPublication } from '@/api/publication/get_publication';
 import { putPublication } from '@/api/publication/put_publication';
 import PublicationForm from '@/components/admin-panel/PublicationForm'
+import { useTranslation } from '@/i18n/client';
 import { openAlert } from '@/store/slices/alertSlice';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 
 export default function EditPublicationPage({ params: { id } }) {
@@ -16,7 +16,8 @@ export default function EditPublicationPage({ params: { id } }) {
     const [isLoading, setIsLoading] = useState(false);
     const [publication, setPublication] = useState();
     const [oldTwoLang, setOldTwoLang] = useState(false);
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     useEffect(() => {
         fetchPublication();

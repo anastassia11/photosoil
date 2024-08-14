@@ -9,11 +9,11 @@ import { putPublicationVisible } from '@/api/publication/put_publicationVisible'
 import { deleteSoilById } from '@/api/soil/delete_soil';
 import { putSoilVisible } from '@/api/soil/put_soilVisible';
 import ObjectsView from '@/components/admin-panel/ObjectsView';
+import { useTranslation } from '@/i18n/client';
 import { closeModal, openModal } from '@/store/slices/modalSlice';
 import modalThunkActions from '@/store/thunks/modalThunk';
-import { usePathname } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 
 export default function AccountPage({ params: { id } }) {
@@ -22,8 +22,8 @@ export default function AccountPage({ params: { id } }) {
     const [userObjects, setUserObjects] = useState([]);
     const [selectedFilters, setSelectedFilters] = useState([]);
     const [filteredObjects, setFilteredObjects] = useState([]);
-    const pathname = usePathname();
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     const FILTERS = [
         { title: t('soils'), name: 'objects' },

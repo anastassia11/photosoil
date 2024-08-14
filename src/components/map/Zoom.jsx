@@ -1,5 +1,3 @@
-import React from 'react'
-
 export default function Zoom({ onClick }) {
     return (
         <div className='flex flex-col'>

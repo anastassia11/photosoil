@@ -2,18 +2,19 @@
 
 import { useEffect, useState } from 'react';
 import Soils from './Soils';
-import { useTranslation } from 'react-i18next';
 import NewGallery from './NewGallery';
 import { useParams } from 'next/navigation';
 import Publications from '../Publications';
 import MapSelect from '../map/MapSelect';
 import Link from 'next/link';
+import { useTranslation } from '@/i18n/client';
 
 export default function SoilObject({ object, children, type }) {
     const [mapVisible, setMapVisible] = useState(true);
-    const { t } = useTranslation();
-    const { locale } = useParams();
     const [tokenData, setTokenData] = useState({});
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
+
     let _isEng = locale === 'en';
 
     const handleScrollToSection = (sectionId) => {

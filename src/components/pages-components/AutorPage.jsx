@@ -6,13 +6,14 @@ import { useParams, useRouter } from 'next/navigation'
 import Soils from '@/components/soils/Soils'
 import { getAuthor } from '@/api/author/get_author'
 import { BASE_SERVER_URL } from '@/utils/constants'
-import { useTranslation } from 'react-i18next'
 import { isAbsoluteUrl } from 'next/dist/shared/lib/utils'
 import { useConstants } from '@/hooks/useConstants'
+import { useTranslation } from '@/i18n/client'
 
-export default function AuthorPageComponent({ id, locale }) {
+export default function AuthorPageComponent({ id }) {
     const [author, setAuthor] = useState({});
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
     const { AUTHOR_INFO } = useConstants();
 
     const authorLang = (locale === 'en' ? author.dataEng : locale === 'ru' ? author.dataRu : {})

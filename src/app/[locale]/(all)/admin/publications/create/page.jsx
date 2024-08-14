@@ -2,10 +2,10 @@
 
 import { createPublication } from '@/api/publication/create_publication'
 import PublicationForm from '@/components/admin-panel/PublicationForm'
+import { useTranslation } from '@/i18n/client';
 import { openAlert } from '@/store/slices/alertSlice';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 
 export default function CreatePublicationPage() {
@@ -13,7 +13,8 @@ export default function CreatePublicationPage() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const [createTwoLang, setCreateTwoLang] = useState(false);
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     const fetchCreateNews = async (data) => {
         const result = await createPublication(data);

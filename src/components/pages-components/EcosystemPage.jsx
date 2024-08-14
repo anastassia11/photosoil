@@ -4,11 +4,14 @@ import { getEcosystem } from '@/api/ecosystem/get_ecosystem';
 import SoilObject from '@/components/soils/SoilObject';
 import { useTranslation } from '@/i18n/client';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-export default function EcosystemPageComponent({ id, locale }) {
+export default function EcosystemPageComponent({ id }) {
     const [ecosystem, setEcosystem] = useState({});
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
+
     let _isEng = locale === 'en';
 
     useEffect(() => {

@@ -1,12 +1,16 @@
+'use client'
+
 import React, { useEffect, useState } from 'react'
 import { Oval } from 'react-loader-spinner';
 import Dropdown from './ui-kit/Dropdown';
 import { useConstants } from '@/hooks/useConstants';
-import { useTranslation } from 'react-i18next';
 import Input from './ui-kit/Input';
+import { useParams } from 'next/navigation';
+import { useTranslation } from '@/i18n/client';
 
 export default function DictionaryForm({ _dictionary, onFormSubmit, isLoading, isEdit, btnTitle }) {
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     const [dictionary, setDictionary] = useState({
         nameRu: '',

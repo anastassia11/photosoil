@@ -7,7 +7,6 @@ import DragAndDrop from './ui-kit/DragAndDrop';
 import { Oval } from 'react-loader-spinner';
 import { sendPhoto } from '@/api/photo/send_photo';
 import * as Tabs from "@radix-ui/react-tabs";
-import { useTranslation } from 'react-i18next';
 import { useConstants } from '@/hooks/useConstants';
 import Filter from '../soils/Filter';
 import { getBaseEcosystems } from '@/api/ecosystem/get_base_ecosystems';
@@ -21,6 +20,7 @@ import MapInput from './ui-kit/MapInput';
 import Textarea from './ui-kit/Textarea';
 import FileCard from './ui-kit/FileCard';
 import { openAlert } from '@/store/slices/alertSlice';
+import { useTranslation } from '@/i18n/client';
 
 export default function PublicationForm({ _publication, pathname, onPublicationSubmit, isLoading, btnText, oldTwoLang, oldIsEng }) {
     const [publication, setPublication] = useState({});
@@ -31,10 +31,10 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
     const [soils, setSoils] = useState([]);
     const [coordinates, setCoordinates] = useState([]);
     const [currentCoord, setCurrentCoord] = useState({});
-
+    const { locale } = useParams();
     const dispatch = useDispatch();
     const mapRef = useRef(null);
-    const { t } = useTranslation();
+    const { t } = useTranslation(locale);
     const { PUBLICATION_INFO, PUBLICATION_ENUM } = useConstants();
 
     useEffect(() => {

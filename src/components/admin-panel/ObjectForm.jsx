@@ -16,7 +16,6 @@ import uuid from 'react-uuid';
 import { closeModal, openModal } from '@/store/slices/modalSlice';
 import { getPublications } from '@/api/publication/get_publications';
 import { Oval } from 'react-loader-spinner';
-import { useTranslation } from 'react-i18next';
 import { useConstants } from '@/hooks/useConstants';
 import modalThunkActions from '@/store/thunks/modalThunk';
 import { getBaseEcosystems } from '@/api/ecosystem/get_base_ecosystems';
@@ -28,10 +27,13 @@ import MapInput from './ui-kit/MapInput';
 import Textarea from './ui-kit/Textarea';
 import PhotoCard from './ui-kit/PhotoCard';
 import { getClassifications } from '@/api/classification/get_classifications';
+import { useParams } from 'next/navigation';
+import { useTranslation } from '@/i18n/client';
 
 export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, mainObjectPhoto, otherObjectPhoto, onItemChange, onMainPhotoChange, onOtherPhotosChange }) {
-    const dispatch = useDispatch()
-    const { t } = useTranslation();
+    const dispatch = useDispatch();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     const [classifications, setClassifications] = useState([]);
     const [object, setObject] = useState({});

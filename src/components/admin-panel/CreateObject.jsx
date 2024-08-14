@@ -5,6 +5,7 @@ import { putPhoto } from '@/api/photo/put_photo';
 import { sendPhoto } from '@/api/photo/send_photo';
 import ObjectForm from '@/components/admin-panel/ObjectForm';
 import DragAndDrop from '@/components/admin-panel/ui-kit/DragAndDrop';
+import { useTranslation } from '@/i18n/client';
 import { openAlert } from '@/store/slices/alertSlice';
 import { closeModal, openModal } from '@/store/slices/modalSlice';
 import modalThunkActions from '@/store/thunks/modalThunk';
@@ -12,7 +13,6 @@ import { BASE_SERVER_URL } from '@/utils/constants';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react'
-import { useTranslation } from 'react-i18next';
 import { Oval } from 'react-loader-spinner';
 import { useDispatch } from 'react-redux';
 import uuid from 'react-uuid';
@@ -28,7 +28,7 @@ export default function CreateObject({ title, onCreate, type }) {
     const [isLoading, setIsLoading] = useState(false);
     const formRef = useRef(null);
     const { locale } = useParams();
-    const { t } = useTranslation();
+    const { t } = useTranslation(locale);
 
     const handleChange = (e) => {
         e.preventDefault();

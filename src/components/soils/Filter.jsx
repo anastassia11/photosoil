@@ -1,12 +1,14 @@
+'use client'
+
 import { createTag } from '@/api/tags/create_tag';
 import { deleteTag } from '@/api/tags/delete_tag';
 import { putTag } from '@/api/tags/put_tag';
+import { useTranslation } from '@/i18n/client';
 import { setDropdown } from '@/store/slices/generalSlice'
 import { openModal } from '@/store/slices/modalSlice';
 import modalThunkActions from '@/store/thunks/modalThunk';
-import { usePathname } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next';
 import { Oval } from 'react-loader-spinner';
 import { useDispatch, useSelector } from 'react-redux'
 import { Tooltip } from 'react-tooltip';
@@ -27,7 +29,8 @@ export default function Filter({ type, itemId, name, items, setTags, allSelected
     });
     const [isLoading, setIsLoading] = useState(false);
     const [tagData, setTagData] = useState({});
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     const _id = itemId ? `filter-${itemId}` : name;
 

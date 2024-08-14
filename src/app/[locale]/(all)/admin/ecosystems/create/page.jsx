@@ -2,10 +2,12 @@
 
 import { createEcosystem } from '@/api/ecosystem/create_ecosystem'
 import CreateObject from '@/components/admin-panel/CreateObject'
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@/i18n/client';
+import { useParams } from 'next/navigation';
 
 export default function CreateEcosystemPage() {
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     const fetchCreateEcosystem = async (data) => {
         const result = await createEcosystem(data)

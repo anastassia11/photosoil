@@ -10,9 +10,9 @@ import { Oval } from 'react-loader-spinner';
 import { useDispatch } from 'react-redux';
 import { putEcosystem } from '@/api/ecosystem/put_ecosystem';
 import { useSearchParams } from 'next/navigation';
-import { useTranslation } from 'react-i18next';
 import { getSoil } from '@/api/soil/get_soil';
 import { getEcosystem } from '@/api/ecosystem/get_ecosystem';
+import { useTranslation } from '@/i18n/client';
 
 export default function EditObject({ id, type, title }) {
     const dispatch = useDispatch();
@@ -22,7 +22,8 @@ export default function EditObject({ id, type, title }) {
     const [otherPhotos, setOtherPhotos] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [oldTwoLang, setOldTwoLang] = useState(false);
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     useEffect(() => {
         fetchObject()

@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 import { BASE_SERVER_URL } from '@/utils/constants';
 import { sendPhoto } from '@/api/photo/send_photo';
 import Image from 'next/image';
-import { useTranslation } from 'react-i18next';
 import { useConstants } from '@/hooks/useConstants';
 import Dropdown from './ui-kit/Dropdown';
 import Input from './ui-kit/Input';
@@ -14,13 +13,15 @@ import { openAlert } from '@/store/slices/alertSlice';
 import { useDispatch } from 'react-redux';
 import { closeModal, openModal } from '@/store/slices/modalSlice';
 import modalThunkActions from '@/store/thunks/modalThunk';
+import { useTranslation } from '@/i18n/client';
 
 export default function AuthorForm({ _author, onFormSubmit, isLoading, btnText }) {
     const dispatch = useDispatch();
     const [author, setAuthor] = useState({});
     const [photo, setPhoto] = useState({});
     const [role, setRole] = useState(null);
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
     const { AUTHOR_INFO, RANK_ENUM } = useConstants();
 
     useEffect(() => {

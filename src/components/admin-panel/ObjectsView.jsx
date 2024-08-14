@@ -6,10 +6,10 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Pagination from '@/components/Pagination';
 import Dropdown from './ui-kit/Dropdown';
-import { useTranslation } from 'react-i18next';
 import { useParams } from 'next/navigation';
 import { PAGINATION_OPTIONS } from '@/utils/constants';
 import moment from 'moment';
+import { useTranslation } from '@/i18n/client';
 
 export default function ObjectsView({ _objects, onDeleteClick, objectType, visibilityControl, languageChanger, onVisibleChange, onRoleChange }) {
     const dispatch = useDispatch();
@@ -24,8 +24,9 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
     const [filteredObjects, setFilteredObjects] = useState([]);
 
     const dropdown = useSelector(state => state.general.dropdown);
-    const { t } = useTranslation();
     const { locale } = useParams();
+    const { t } = useTranslation(locale);
+
     let _isEng = locale === 'en';
 
     const LANGUAGES = {

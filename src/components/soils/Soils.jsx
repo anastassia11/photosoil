@@ -9,17 +9,19 @@ import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigat
 import { BASE_SERVER_URL, PAGINATION_OPTIONS } from '@/utils/constants'
 import { addCategory, addTerm, deleteCategory, deleteTerm } from '@/store/slices/dataSlice'
 import Pagination from '../Pagination'
-import { useTranslation } from 'react-i18next'
 import Dropdown from '../admin-panel/ui-kit/Dropdown'
 import { useConstants } from '@/hooks/useConstants'
 import { getClassifications } from '@/api/classification/get_classifications'
 import Loader from '../Loader'
 import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper'
+import { useTranslation } from '@/i18n/client'
+import { getEcosystems } from '@/api/ecosystem/get_ecosystems'
+import { getSoils } from '@/api/soil/get_soils'
 
-export default function Soils({ _soils, getItems, isAllSoils, isFilters, type }) {
+export default function Soils({ _soils, isAllSoils, isFilters, type }) {
     const dispatch = useDispatch();
     const { locale } = useParams();
-    const { t } = useTranslation();
+    const { t } = useTranslation(locale);
 
     const didLogRef = useRef(true);
     const pathname = usePathname();
@@ -102,7 +104,7 @@ export default function Soils({ _soils, getItems, isAllSoils, isFilters, type })
     }
 
     const fetchItems = async () => {
-        const result = await getItems();
+        const result = type === 'ecosystem' ? await getEcosystems() : await getSoils();
         if (result.success) {
             const data = result.data;
             const items =
@@ -199,23 +201,10 @@ export default function Soils({ _soils, getItems, isAllSoils, isFilters, type })
                 {isSoils && isFilters ? <button className='text-blue-600 w-fit' onClick={() => setFiltersVisible(!filtersVisible)}>
                     {filtersVisible ? t('hide_filters') : t('show_filters')}
                 </button> : ''}
-
-                {/* <MotionWrapper>
-                    <label htmlFor='draftIsVisible' className={`flex-row cursor-pointer items-center justify-center max-w-fit
-                    ${isFilters || !token ? 'hidden' : 'flex'}`}>
-                        <input type="checkbox" id='draftIsVisible'
-                            checked={draftIsVisible}
-                            onChange={() => setDraftIsVisible(!draftIsVisible)}
-                            className="min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
-                        <span className='select-none'>{t('grafts_visible')}</span>
-                    </label>
-                </MotionWrapper> */}
-
                 <div className='self-end flex-row items-center justify-center w-[190px]'>
                     <Dropdown name={t('in_page')} value={itemsPerPage} items={PAGINATION_OPTIONS}
                         onCategotyChange={setItemsPerPage} flexRow={true} dropdownKey='in_page' noBold={true} />
                 </div>
-
             </div>
             {
                 isSoils && filtersVisible && isFilters ? <ul className='filters-grid z-10 w-full mt-4'>

@@ -3,16 +3,18 @@
 import { getAuthor } from '@/api/author/get_author';
 import { putAuthor } from '@/api/author/put_author';
 import AuthorForm from '@/components/admin-panel/AuthorForm';
+import { useTranslation } from '@/i18n/client';
 import { openAlert } from '@/store/slices/alertSlice';
+import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 
 export default function AuthorEditPage({ params: { id } }) {
     const dispatch = useDispatch();
     const [author, setAuthor] = useState({});
     const [isLoading, setIsLoading] = useState(false);
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     useEffect(() => {
         fetchAuthor()

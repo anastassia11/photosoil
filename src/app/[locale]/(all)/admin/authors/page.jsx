@@ -3,19 +3,18 @@
 import { deleteAuthor } from '@/api/author/delete_author';
 import { getAuthors } from '@/api/author/get_authors';
 import ObjectsView from '@/components/admin-panel/ObjectsView';
-import { closeModal, openModal } from '@/store/slices/modalSlice';
+import { useTranslation } from '@/i18n/client';
+import { openModal } from '@/store/slices/modalSlice';
 import modalThunkActions from '@/store/thunks/modalThunk';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 
 export default function AuthorsAdminPage() {
     const dispatch = useDispatch();
     const [authors, setAuthors] = useState([]);
-    const pathname = usePathname();
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     useEffect(() => {
         fetchAuthors()

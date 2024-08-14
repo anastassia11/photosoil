@@ -4,16 +4,18 @@ import { getPublication } from '@/api/publication/get_publication'
 import MapArraySelect from '@/components/map/MapArraySelect'
 import PdfGallery from '@/components/soils/PdfGallery'
 import Soils from '@/components/soils/Soils'
+import { useTranslation } from '@/i18n/client'
 import { BASE_SERVER_URL } from '@/utils/constants'
 import Link from 'next/link'
+import { useParams } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 
-export default function PublicationPageComponent({ id, locale }) {
+export default function PublicationPageComponent({ id }) {
     const [publication, setPublication] = useState({});
-    const { t } = useTranslation();
     const mapRef = useRef();
     const [tokenData, setTokenData] = useState({});
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     let _isEng = locale === 'en';
 

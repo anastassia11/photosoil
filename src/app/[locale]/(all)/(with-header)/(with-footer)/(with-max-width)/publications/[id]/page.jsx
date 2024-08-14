@@ -18,6 +18,6 @@ export async function generateMetadata({ params: { id, locale } }) {
     };
 }
 
-export default function PublicationPage({ params: { id, locale } }) {
-    return <PublicationPageComponent id={id} locale={locale} />
+export default function PublicationPage({ params: { id } }) {
+    return <PublicationPageComponent id={id} />
 }

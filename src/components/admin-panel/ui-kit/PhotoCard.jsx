@@ -1,12 +1,16 @@
 'use client'
+
+import { useTranslation } from '@/i18n/client'
 import { BASE_SERVER_URL } from '@/utils/constants'
 import Image from 'next/image'
+import { useParams } from 'next/navigation'
 import React from 'react'
-import { useTranslation } from 'react-i18next'
 import { Oval } from 'react-loader-spinner'
 
 export default function PhotoCard({ id, path, titleEng, titleRu, fileName, onDelete, onChange, isLoading, isEng }) {
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
+
     return <div className='flex flex-row space-x-4 h-[150px] mt-1'>
         <div className='bg-black/10 relative flex flex-col justify-center items-center min-w-[150px] aspect-[1/1] rounded-md overflow-hidden
                             shadow-lg'>

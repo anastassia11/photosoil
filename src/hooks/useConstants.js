@@ -1,7 +1,9 @@
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@/i18n/client';
+import { useParams } from 'next/navigation';
 
 export const useConstants = () => {
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     const AUTHOR_INFO = [
         { name: 'name', title: t('full_name'), },

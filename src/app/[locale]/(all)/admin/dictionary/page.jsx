@@ -3,17 +3,19 @@
 import { deleteClassification } from '@/api/classification/delete_classification';
 import { getClassifications } from '@/api/classification/get_classifications';
 import ObjectsView from '@/components/admin-panel/ObjectsView';
+import { useTranslation } from '@/i18n/client';
 import { closeModal, openModal } from '@/store/slices/modalSlice';
 import modalThunkActions from '@/store/thunks/modalThunk';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 
 export default function DictionaryAdminPage() {
     const dispatch = useDispatch();
     const [disconaries, setDisconaries] = useState([]);
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     useEffect(() => {
         fetchDisconaries()

@@ -4,17 +4,18 @@ import { getNewsById } from '@/api/news/get_news';
 import PdfGallery from '@/components/soils/PdfGallery';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import '@/styles/editor.css';
 import NewGallery from '@/components/soils/NewGallery';
 import Link from 'next/link';
 import moment from 'moment';
+import { useTranslation } from '@/i18n/client';
 
 export default function NewsItemPageComponent({ id }) {
     const [news, setNews] = useState({});
-    const { t } = useTranslation();
-    const { locale } = useParams();
     const [tokenData, setTokenData] = useState({});
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
+
     const parser = new DOMParser();
 
     let _isEng = locale === 'en';

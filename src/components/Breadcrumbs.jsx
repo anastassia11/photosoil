@@ -1,13 +1,15 @@
 'use client'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import React, { useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
 
-export default function Breadcrumbs({ homeElement }) {
-    const paths = usePathname()
+import { useTranslation } from '@/i18n/client';
+import Link from 'next/link'
+import { useParams, usePathname } from 'next/navigation'
+import React, { useEffect } from 'react'
+
+export default function Breadcrumbs() {
+    const paths = usePathname();
     const pathNames = paths.split('/').filter(path => path)
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     const linkTexts = {
         'soils': {

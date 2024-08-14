@@ -10,10 +10,10 @@ import { closeModal, openModal } from '@/store/slices/modalSlice';
 import { useEffect, useState } from 'react';
 import { Oval } from 'react-loader-spinner';
 import { useDispatch } from 'react-redux';
-import { useTranslation } from 'react-i18next';
 import { useConstants } from '@/hooks/useConstants';
 import modalThunkActions from '@/store/thunks/modalThunk';
 import Input from '@/components/admin-panel/ui-kit/Input';
+import { useTranslation } from '@/i18n/client';
 
 export default function AuthorsPage() {
     const dispatch = useDispatch();
@@ -22,7 +22,8 @@ export default function AuthorsPage() {
     const [userData, setUserData] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [isPasswordHidden, setPasswordHidden] = useState(true);
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
     const { MODERATOR_INFO } = useConstants();
 
     useEffect(() => {

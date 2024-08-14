@@ -1,10 +1,12 @@
+'use client'
+
 import { useDispatch, useSelector } from 'react-redux';
 import { setDropdown } from '@/store/slices/generalSlice';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { Oval } from 'react-loader-spinner';
 import LanguageChanger from '../header/LanguageChanger';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@/i18n/client';
 
 export default function Header() {
     const dispatch = useDispatch()
@@ -13,7 +15,8 @@ export default function Header() {
     const [isLoading, setIsLoading] = useState(false);
     const [email, setEmail] = useState(null);
     const [role, setRole] = useState(null);
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     useEffect(() => {
         localStorage.getItem('email') && setEmail(localStorage.getItem('email'));

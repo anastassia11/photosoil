@@ -1,4 +1,4 @@
-import EcosystemsPageComponent from '@/components/pages-components/EcosystemsPage';
+import Soils from '@/components/soils/Soils';
 import { useTranslation } from '@/i18n';
 
 export async function generateMetadata({ params: { locale } }) {
@@ -9,6 +9,14 @@ export async function generateMetadata({ params: { locale } }) {
     };
 }
 
-export default function EcosystemsPage({ params: { locale } }) {
-    return <EcosystemsPageComponent locale={locale} />
+export default async function EcosystemsPage({ params: { locale } }) {
+    const { t } = await useTranslation(locale);
+    return (
+        <div className='flex flex-col'>
+            <h1 className='sm:text-2xl text-xl font-semibold mb-4'>
+                {t('ecosystems')}
+            </h1>
+            <Soils type='ecosystems' isFilters={false} />
+        </div>
+    )
 }

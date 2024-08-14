@@ -18,6 +18,6 @@ export async function generateMetadata({ params: { id, locale } }) {
     };
 }
 
-export default function SoilPage({ params: { id, locale } }) {
-    return <SoilPageComponent id={id} locale={locale} />
+export default function SoilPage({ params: { id } }) {
+    return <SoilPageComponent id={id} />
 }

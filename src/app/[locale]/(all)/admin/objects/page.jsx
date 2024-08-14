@@ -8,13 +8,15 @@ import { closeModal, openModal } from '@/store/slices/modalSlice';
 import ObjectsView from '@/components/admin-panel/ObjectsView';
 import { putSoilVisible } from '@/api/soil/put_soilVisible';
 import { getSoilsForAdmin } from '@/api/soil/get_soils_forAdmin';
-import { useTranslation } from 'react-i18next';
 import modalThunkActions from '@/store/thunks/modalThunk';
+import { useParams } from 'next/navigation';
+import { useTranslation } from '@/i18n/client';
 
 export default function ObjectsPage() {
     const dispatch = useDispatch();
     const [soils, setSoils] = useState([]);
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     useEffect(() => {
         fetchSoils()

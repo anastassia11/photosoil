@@ -2,7 +2,6 @@
 
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import Pagination from './Pagination';
 import Link from 'next/link';
 import Dropdown from './admin-panel/ui-kit/Dropdown';
@@ -11,6 +10,7 @@ import { useConstants } from '@/hooks/useConstants';
 import MotionWrapper from './admin-panel/ui-kit/MotionWrapper';
 import { getPublications } from '@/api/publication/get_publications';
 import Loader from './Loader';
+import { useTranslation } from '@/i18n/client';
 
 export default function Publications() {
     const [filterName, setFilterName] = useState('');
@@ -23,7 +23,7 @@ export default function Publications() {
     const [isLoading, setIsLoading] = useState(true);
 
     const { locale } = useParams();
-    const { t } = useTranslation();
+    const { t } = useTranslation(locale);
     const { PUBLICATION_ENUM } = useConstants();
 
     const _isEng = locale === 'en';

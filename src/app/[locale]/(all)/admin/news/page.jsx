@@ -4,17 +4,19 @@ import { deleteNewsById } from '@/api/news/delete_news';
 import { getNewsForAdmin } from '@/api/news/get_news_forAdmin';
 import { putNewsVisible } from '@/api/news/put_newsVisible';
 import ObjectsView from '@/components/admin-panel/ObjectsView';
+import { useTranslation } from '@/i18n/client';
 import { closeModal, openModal } from '@/store/slices/modalSlice';
 import modalThunkActions from '@/store/thunks/modalThunk';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 
 export default function NewsPage() {
     const dispatch = useDispatch();
     const [news, setNews] = useState([]);
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     useEffect(() => {
         fetchNews()

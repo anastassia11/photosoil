@@ -1,11 +1,8 @@
-'use client'
-
+import { useTranslation } from '@/i18n';
 import Image from 'next/image'
-import React from 'react'
-import { useTranslation } from 'react-i18next';
 
-export default function Footer() {
-    const { t } = useTranslation();
+export default async function Footer({ locale }) {
+    const { t } = await useTranslation(locale);
 
     return (
         <footer className='absolute bottom-0 border-t w-full mt-24 flex xl:flex-row flex-col xl:space-x-6 justify-between xl:items-start items-center px-8 py-6'>

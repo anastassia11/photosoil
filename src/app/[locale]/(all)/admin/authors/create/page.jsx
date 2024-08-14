@@ -2,17 +2,18 @@
 
 import { createAuthor } from '@/api/author/create_author';
 import AuthorForm from '@/components/admin-panel/AuthorForm';
+import { useTranslation } from '@/i18n/client';
 import { openAlert } from '@/store/slices/alertSlice';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 
 export default function AuthorCreate() {
     const dispatch = useDispatch();
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
-    const { t } = useTranslation();
+    const { locale } = useParams();
+    const { t } = useTranslation(locale);
 
     const handleCreateAuthor = async (data) => {
         setIsLoading(true);

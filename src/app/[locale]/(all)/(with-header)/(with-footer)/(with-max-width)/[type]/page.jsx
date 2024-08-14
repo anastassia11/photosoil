@@ -9,6 +9,6 @@ export async function generateMetadata({ params: { locale, type } }) {
     };
 }
 
-export default function SoilsPage({ params: { type, locale } }) {
+export default function SoilsPage({ params: { locale, type } }) {
     return <SoilsPageComponent type={type} locale={locale} />
 }
