@@ -1,9 +1,8 @@
 'use client'
 
 import { useDispatch } from 'react-redux';
-import { Children, useEffect } from 'react';
+import { useEffect } from 'react';
 import { setDropdown } from '@/store/slices/generalSlice';
-import Header from '@/components/admin-panel/Header';
 
 export default function AllLayout({ params: { locale }, children }) {
   const dispatch = useDispatch();

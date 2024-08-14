@@ -104,7 +104,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
     }
 
     const fetchItems = async () => {
-        const result = type === 'ecosystem' ? await getEcosystems() : await getSoils();
+        const result = type === 'ecosystems' ? await getEcosystems() : await getSoils();
         if (result.success) {
             const data = result.data;
             const items =
