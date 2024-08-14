@@ -1,10 +1,16 @@
-'use client'
+import Publications from '@/components/Publications';
+import { useTranslation } from '@/i18n';
 
-import Publications from '@/components/publication/Publications';
-import { useTranslation } from 'react-i18next';
+export async function generateMetadata({ params: { locale } }) {
+    const { t } = await useTranslation(locale, 'seo');
+    return {
+        title: t(`publicationsPage-title`),
+        description: t(`publicationsPage-description`)
+    };
+}
 
-export default function PublicationsPage() {
-    const { t } = useTranslation();
+export default async function PublicationsPage({ params: { locale } }) {
+    const { t } = await useTranslation(locale);
 
     return (
         <div className='flex flex-col'>

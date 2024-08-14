@@ -4,7 +4,7 @@ import tokenVerification from '@/api/account/token_verification';
 import { getAuthor } from '@/api/author/get_author';
 import { getAuthors } from '@/api/author/get_authors';
 import { getAllNews } from '@/api/news/get_allNews';
-import Modal from '@/components/admin-panel/Modal'
+import Modal from '@/components/admin-panel/ui-kit/Modal'
 import { BASE_SERVER_URL } from '@/utils/constants';
 import moment from 'moment';
 import Image from 'next/image';

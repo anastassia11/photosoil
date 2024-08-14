@@ -1,6 +1,6 @@
 import ContentLoader from 'react-content-loader'
 
-export default function SoilsLoader(props) {
+export default function Loader(props) {
     return (
         <ContentLoader
             backgroundColor="#f0f0f0"

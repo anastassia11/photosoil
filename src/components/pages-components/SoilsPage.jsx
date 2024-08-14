@@ -2,11 +2,10 @@
 
 import { getSoils } from '@/api/soil/get_soils';
 import Soils from '@/components/soils/Soils';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@/i18n/client';
 
-export default function SoilsPageComponent({ type }) {
-    const { t } = useTranslation();
-
+export default function SoilsPageComponent({ type, locale }) {
+    const { t } = useTranslation(locale);
 
     return (
         <div className='flex flex-col' >

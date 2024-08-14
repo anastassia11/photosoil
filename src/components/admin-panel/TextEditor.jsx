@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react";
 import Link from "@tiptap/extension-link";
 import Underline from "@tiptap/extension-underline";
-import Dropdown from './Dropdown';
+import Dropdown from './ui-kit/Dropdown';
 import StarterKit from '@tiptap/starter-kit';
 import { useDispatch, useSelector } from 'react-redux';
 import { setDropdown } from '@/store/slices/generalSlice';

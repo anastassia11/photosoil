@@ -9,7 +9,7 @@ import Image from 'next/image';
 import { sendPhoto } from '@/api/photo/send_photo';
 import { getAuthors } from '@/api/author/get_authors';
 import { getEcosystems } from '@/api/ecosystem/get_ecosystems';
-import Dropdown from './Dropdown';
+import Dropdown from './ui-kit/Dropdown';
 import DragAndDrop from './ui-kit/DragAndDrop';
 import { deletePhotoById } from '@/api/photo/delete_photo';
 import uuid from 'react-uuid';

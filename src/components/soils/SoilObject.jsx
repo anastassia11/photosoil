@@ -5,7 +5,7 @@ import Soils from './Soils';
 import { useTranslation } from 'react-i18next';
 import NewGallery from './NewGallery';
 import { useParams } from 'next/navigation';
-import Publications from '../publication/Publications';
+import Publications from '../Publications';
 import MapSelect from '../map/MapSelect';
 import Link from 'next/link';
 
@@ -25,10 +25,6 @@ export default function SoilObject({ object, children, type }) {
         document.documentElement.style.setProperty('--product-view-height', '480px');
         localStorage.getItem('tokenData') && setTokenData(JSON.parse(localStorage.getItem('tokenData')));
     }, [])
-
-    useEffect(() => {
-        console.log(tokenData, object)
-    }, [tokenData, object])
 
     return (
         <div className='flex flex-col'>

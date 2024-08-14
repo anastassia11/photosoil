@@ -1,10 +1,11 @@
 'use client'
 
 import { useDispatch } from 'react-redux';
-import { Suspense, useEffect, useState } from 'react';
+import { Children, useEffect } from 'react';
 import { setDropdown } from '@/store/slices/generalSlice';
+import Header from '@/components/admin-panel/Header';
 
-export default function AllLayout({ children }) {
+export default function AllLayout({ params: { locale }, children }) {
   const dispatch = useDispatch();
 
   const handleClickOutside = (e) => {
@@ -21,8 +22,6 @@ export default function AllLayout({ children }) {
   }, [dispatch])
 
   return (
-    <>
-      {children}
-    </>
+    <>{children}</>
   );
 }

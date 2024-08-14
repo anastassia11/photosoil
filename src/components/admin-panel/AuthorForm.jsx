@@ -8,7 +8,7 @@ import { sendPhoto } from '@/api/photo/send_photo';
 import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 import { useConstants } from '@/hooks/useConstants';
-import Dropdown from './Dropdown';
+import Dropdown from './ui-kit/Dropdown';
 import Input from './ui-kit/Input';
 import { openAlert } from '@/store/slices/alertSlice';
 import { useDispatch } from 'react-redux';

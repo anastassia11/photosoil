@@ -4,20 +4,19 @@ import { setDropdown } from '@/store/slices/generalSlice';
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import LanguageChanger from './LanguageChanger';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { motion } from "framer-motion"
-import { BarLoader } from 'react-spinners';
+import { useTranslation } from '@/i18n/client';
 
-export default function Header() {
+export default function Header({ locale }) {
     const dispatch = useDispatch();
     const pathname = usePathname();
     const dropdown = useSelector(state => state.general.dropdown)
     const [prevScrollPos, setPrevScrollPos] = useState(0);
     const [visible, setVisible] = useState(true);
-    const { t } = useTranslation();
+    const { t } = useTranslation(locale);
     const [menuOpen, setMenuOpen] = useState(false);
     const [token, setToken] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -128,7 +127,7 @@ export default function Header() {
                         {t('dashboard')}
                     </Link>}
                     <div className='w-[80px] h-full flex items-center'>
-                        <LanguageChanger />
+                        <LanguageChanger locale={locale} />
                     </div>
                 </motion.div>
                 : <div className='flex-1 justify-end space-x-4 h-full flex flex-row items-center w-fit'></div>}
@@ -203,16 +202,6 @@ export default function Header() {
                         }
                     </li>)}
                 </ul>
-
-                {/* <li className='h-fit flex-col space-y-2 justify-end flex sm:hidden w-full px-2'>
-                    {!token ? <Link href={`/join`} className="max-h-[40px] px-4 py-2 font-medium text-center text-white transition-colors duration-300 
-                transform bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600">
-                        {t('join')}
-                    </Link> : <Link href={`/admin`} className="min-w-fit max-h-[40px] px-2 py-2 font-medium text-left text-blue-600 transition-colors duration-300 
-                transform ">
-                        {t('dashboard')}
-                    </Link>}
-                </li> */}
             </div>
         </header>
     )

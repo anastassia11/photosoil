@@ -1,4 +1,4 @@
-import AdminPageComponent from '@/components/admin-panel/AdminPage'
+import AdminPageComponent from '@/components/pages-components/AdminPage'
 
 export const metadata = {
     title: "Панель управления | PhotoSOIL",

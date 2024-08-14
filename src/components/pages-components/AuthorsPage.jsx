@@ -1,6 +1,6 @@
 'use client'
 
-import Authors from '@/components/author/Authors';
+import Authors from '@/components/Authors';
 import { useTranslation } from 'react-i18next';
 
 export default function AuthorsPageComponent() {

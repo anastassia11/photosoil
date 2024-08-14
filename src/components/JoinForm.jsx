@@ -4,7 +4,7 @@ import Link from 'next/link'
 import React from 'react'
 import { useTranslation } from 'react-i18next';
 
-export default function Form() {
+export default function JoinForm() {
     const { t } = useTranslation();
 
     return (

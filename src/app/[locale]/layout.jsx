@@ -1,17 +1,9 @@
-import initTranslations from '@/app/i18n';
-import TranslationsProvider from '@/components/TranslationsProvider';
+import { languages } from '@/i18n/settings'
 
-const i18nNamespaces = ['system'];
+export async function generateStaticParams() {
+    return languages.map((lng) => ({ lng }))
+}
 
-export default async function TranslationsLayout({ params: { locale }, children }) {
-    const { resources } = await initTranslations(locale, i18nNamespaces);
-
-    return (
-        <TranslationsProvider
-            namespaces={i18nNamespaces}
-            locale={locale}
-            resources={resources} >
-            {children}
-        </TranslationsProvider>
-    );
+export default function TranslationsLayout({ params: { locale }, children }) {
+    return <>{children}</>
 }

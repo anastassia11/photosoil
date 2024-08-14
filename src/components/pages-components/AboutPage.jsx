@@ -1,12 +1,10 @@
-'use client'
-
+import { useTranslation } from '@/i18n';
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
-import { useTranslation } from 'react-i18next';
 
-export default function AboutPageComponent() {
-    const { t } = useTranslation();
+export default async function AboutPageComponent({ locale }) {
+    const { t } = await useTranslation(locale);
 
     return (
         <div className='flex flex-col sm:space-y-24 space-y-12 items-center w-full'>

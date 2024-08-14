@@ -1,3 +1,5 @@
+'use client'
+
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
@@ -8,10 +10,10 @@ import { BASE_SERVER_URL, PAGINATION_OPTIONS } from '@/utils/constants'
 import { addCategory, addTerm, deleteCategory, deleteTerm } from '@/store/slices/dataSlice'
 import Pagination from '../Pagination'
 import { useTranslation } from 'react-i18next'
-import Dropdown from '../admin-panel/Dropdown'
+import Dropdown from '../admin-panel/ui-kit/Dropdown'
 import { useConstants } from '@/hooks/useConstants'
 import { getClassifications } from '@/api/classification/get_classifications'
-import SoilsLoader from '../content-loaders/SoilsLoader'
+import Loader from '../Loader'
 import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper'
 
 export default function Soils({ _soils, getItems, isAllSoils, isFilters, type }) {
@@ -219,7 +221,7 @@ export default function Soils({ _soils, getItems, isAllSoils, isFilters, type })
                 isSoils && filtersVisible && isFilters ? <ul className='filters-grid z-10 w-full mt-4'>
                     <>
                         {isLoading?.classifications ? Array(8).fill('').map((item, idx) => <li key={idx}>
-                            <SoilsLoader className='w-full h-[40px]' />
+                            <Loader className='w-full h-[40px]' />
                         </li>)
                             : <>
                                 {isAllSoils ? <li key='category'>
@@ -270,7 +272,7 @@ export default function Soils({ _soils, getItems, isAllSoils, isFilters, type })
 
             <ul className='soils-grid my-4'>
                 {isLoading?.items ? Array(8).fill('').map((item, idx) => <li key={idx}>
-                    <SoilsLoader className='aspect-[2/3]' />
+                    <Loader className='aspect-[2/3]' />
                 </li>)
                     : <>
                         {soils.length && filteredSoils.length ? currentItems.map(({ id, photo, translations, dataRu, dataEng }) => <li key={id}>

@@ -3,13 +3,13 @@ import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { BASE_SERVER_URL, PAGINATION_OPTIONS } from '@/utils/constants'
-import Pagination from '../Pagination'
+import Pagination from './Pagination'
 import { useTranslation } from 'react-i18next'
-import Dropdown from '../admin-panel/Dropdown'
+import Dropdown from './admin-panel/ui-kit/Dropdown'
 import { useConstants } from '@/hooks/useConstants'
 import { getAuthors } from '@/api/author/get_authors'
-import SoilsLoader from '../content-loaders/SoilsLoader'
-import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper'
+import Loader from './Loader'
+import MotionWrapper from './admin-panel/ui-kit/MotionWrapper'
 
 export default function Authors() {
     const { locale } = useParams();
@@ -97,7 +97,7 @@ export default function Authors() {
 
             <ul className='soils-grid mb-4'>
                 {isLoading ? Array(8).fill('').map((item, idx) => <li key={idx}>
-                    <SoilsLoader className='w-full h-full aspect-[2/3]' />
+                    <Loader className='w-full h-full aspect-[2/3]' />
                 </li>) :
                     authors.length && filteredAuthors.length ? currentItems.map(author => <li key={author.id}>
                         <MotionWrapper>

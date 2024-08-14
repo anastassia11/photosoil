@@ -3,14 +3,14 @@
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Pagination from '../Pagination';
+import Pagination from './Pagination';
 import Link from 'next/link';
-import Dropdown from '../admin-panel/Dropdown';
+import Dropdown from './admin-panel/ui-kit/Dropdown';
 import { PAGINATION_OPTIONS } from '@/utils/constants';
 import { useConstants } from '@/hooks/useConstants';
-import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper';
+import MotionWrapper from './admin-panel/ui-kit/MotionWrapper';
 import { getPublications } from '@/api/publication/get_publications';
-import SoilsLoader from '../content-loaders/SoilsLoader';
+import Loader from './Loader';
 
 export default function Publications() {
     const [filterName, setFilterName] = useState('');
@@ -101,7 +101,7 @@ export default function Publications() {
                     <ul className="">
                         {isLoading ? Array(8).fill('').map((item, idx) => <li key={idx}
                             className={`mt-4 border-b flex flex-row`}>
-                            <SoilsLoader className='w-full h-[140px] mb-4 ' />
+                            <Loader className='w-full h-[140px] mb-4 ' />
                         </li>) :
                             publications.length && filteredPublications.length ? currentItems.map((item, idx) => (
                                 <li key={idx} className={`mt-4 ${idx + 1 === currentItems.length ? '' : 'border-b'} flex flex-row min-w-full`}>

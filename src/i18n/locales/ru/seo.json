@@ -1,0 +1,37 @@
+{
+  "homePage-title": "HomePage-title",
+  "homePage-description": "HomePage-description",
+
+  "aboutPage-title": "AboutPage-title",
+  "aboutPage-description": "AboutPage-description",
+
+  "soilsPage-title": "SoilsPage-title2",
+  "soilsPage-description": "SoilsPage-description",
+
+  "profilesPage-title": "profilesPage-title2",
+  "profilesPage-description": "profilesPage-description",
+
+  "dynamicsPage-title": "dynamicsPage-title2",
+  "dynamicsPage-description": "dynamicsPage-description",
+
+  "morphologicalPage-title": "morphologicalPage-title2",
+  "morphologicalPage-description": "morphologicalPage-description",
+
+  "EcosystemsPage-title": "EcosystemsPage-title2",
+  "EcosystemsPage-description": "EcosystemsPage-description",
+
+  "PublicationsPage-title": "PublicationsPage-title2",
+  "PublicationsPage-description": "PublicationsPage-description",
+
+  "JoinPage-title": "JoinPage-title2",
+  "JoinPage-description": "JoinPage-description",
+
+  "LoginPage-title": "LoginPage-title2",
+  "LoginPage-description": "LoginPage-description",
+
+  "AuthorsPage-title": "AuthorsPage-title2",
+  "AuthorsPage-description": "AuthorsPage-description",
+
+  "NewsPage-title": "NewsPage-title2",
+  "NewsPage-description": "NewsPage-description"
+}

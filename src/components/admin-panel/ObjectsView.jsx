@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Pagination from '@/components/Pagination';
-import Dropdown from './Dropdown';
+import Dropdown from './ui-kit/Dropdown';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'next/navigation';
 import { PAGINATION_OPTIONS } from '@/utils/constants';

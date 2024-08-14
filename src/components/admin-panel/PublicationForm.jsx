@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import Dropdown from './Dropdown';
+import Dropdown from './ui-kit/Dropdown';
 import { BASE_SERVER_URL } from '@/utils/constants';
 import DragAndDrop from './ui-kit/DragAndDrop';
 import { Oval } from 'react-loader-spinner';

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Oval } from 'react-loader-spinner';
-import Dropdown from './Dropdown';
+import Dropdown from './ui-kit/Dropdown';
 import { useConstants } from '@/hooks/useConstants';
 import { useTranslation } from 'react-i18next';
 import Input from './ui-kit/Input';

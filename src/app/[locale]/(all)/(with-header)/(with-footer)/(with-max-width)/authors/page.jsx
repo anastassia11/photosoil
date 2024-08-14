@@ -1,8 +1,12 @@
-import AuthorsPageComponent from '@/components/author/AuthorsPage';
+import AuthorsPageComponent from '@/components/pages-components/AuthorsPage';
+import { useTranslation } from '@/i18n';
 
-export const metadata = {
-    title: "Авторы фотоматериалов | PhotoSOIL",
-    description: "",
+export async function generateMetadata({ params: { locale } }) {
+    const { t } = await useTranslation(locale, 'seo');
+    return {
+        title: t(`AuthorsPage-title`),
+        description: t(`AuthorsPage-description`)
+    };
 }
 
 export default function AuthorsPage() {

@@ -1,10 +1,11 @@
 import Header from '@/components/header/Header'
+import { Children } from 'react';
 
-export default function HeaderLayout({ children }) {
+export default function HeaderLayout({ params: { locale }, children }) {
 
     return (
         <div className='min-h-screen relative pt-16'>
-            <Header />
+            <Header locale={locale} />
             {children}
         </div>
     )
