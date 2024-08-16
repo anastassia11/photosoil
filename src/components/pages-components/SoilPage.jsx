@@ -3,7 +3,7 @@
 import { getSoil } from '@/api/soil/get_soil'
 import SoilObject from '@/components/soils/SoilObject'
 import { useConstants } from '@/hooks/useConstants'
-import { useTranslation } from '@/i18n/client'
+import { getTranslation } from '@/i18n/client'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
@@ -11,10 +11,24 @@ import React, { useEffect, useState } from 'react'
 export default function SoilPageComponent({ id }) {
     const [soil, setSoil] = useState({});
     const { locale } = useParams();
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
     const { SOIL_INFO, SOIL_ENUM } = useConstants();
 
     const _isEng = locale === 'en';
+    const currentTransl = soil?.translations?.find(({ isEnglish }) => isEnglish === _isEng);
+
+    useEffect(() => {
+        fetchSoil();
+    }, [])
+
+    useEffect(() => {
+        if (typeof document !== 'undefined' && currentTransl) {
+            const title = currentTransl.name
+            if (title) {
+                document.title = `${title} | PhotoSOIL`;
+            }
+        }
+    }, [currentTransl])
 
     const fetchSoil = async () => {
         const result = await getSoil(id)
@@ -23,26 +37,21 @@ export default function SoilPageComponent({ id }) {
         }
     }
 
-    useEffect(() => {
-        fetchSoil();
-    }, [])
-
     return (
         <SoilObject object={soil} type='soil'>
             <ul className='flex flex-col space-y-2 '>
                 {SOIL_INFO.map(({ name, title }) => {
                     let _isEng = locale === 'en';
-                    const _soil = soil?.translations?.find(({ isEnglish }) => isEnglish === _isEng)
-                    return (soil?.hasOwnProperty(name) || _soil?.hasOwnProperty(name)) ? <li key={name}
+                    return (soil?.hasOwnProperty(name) || currentTransl?.hasOwnProperty(name)) ? <li key={name}
                         className='flex lg:flex-row flex-col w-full lg:space-x-4 space-x-0'>
                         <span className='lg:w-[40%] w-full text-zinc-500 font-semibold'>
                             {title}
                         </span>
                         <span className={`lg:w-[60%] w-full  }`}>
-                            {name === 'objectType' ? <Link href={`/soils?categories=${soil.objectType}`}
+                            {name === 'objectType' ? <Link href={`/${locale}/soils?categories=${soil.objectType}`}
                                 className='text-blue-600 hover:underline'>
                                 {SOIL_ENUM[soil.objectType]}
-                            </Link> : _soil[name]}
+                            </Link> : currentTransl[name]}
                         </span>
                     </li> : ''
                 })}
@@ -55,7 +64,7 @@ export default function SoilPageComponent({ id }) {
                     <ul className={`lg:w-[60%] w-full flex flex-row flex-wrap items-start justify-start h-fit`}>
                         {soil.authors?.map(({ id, dataEng, dataRu }, index) =>
                             <li key={`author-${index}`} className='mr-2 min-w-fit h-fit'>
-                                <Link href={`/authors/${id}`}
+                                <Link href={`/${locale}/authors/${id}`}
                                     className='text-blue-600 hover:underline'>
                                     {_isEng ? dataEng?.name : dataRu?.name}
                                 </Link>
@@ -74,7 +83,7 @@ export default function SoilPageComponent({ id }) {
                         <ul className={`lg:w-[60%] w-full flex flex-row flex-wrap items-start justify-start h-fit`}>
                             {terms.map(({ id, nameRu, nameEng }, index) =>
                                 <li key={`term-${id}`} className='mr-2 min-w-fit h-fit'>
-                                    <Link href={`/soils?terms=${id}`}
+                                    <Link href={`/${locale}/soils?terms=${id}`}
                                         className='text-blue-600 hover:underline'>
                                         {_isEng ? nameEng : nameRu}{terms.length > 1 && index + 1 < terms.length && ','}
                                     </Link>

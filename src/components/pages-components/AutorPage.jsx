@@ -1,26 +1,37 @@
 'use client'
 
 import Image from 'next/image'
-import React, { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import React, { useEffect, useMemo, useState } from 'react'
+import { useParams } from 'next/navigation'
 import Soils from '@/components/soils/Soils'
 import { getAuthor } from '@/api/author/get_author'
 import { BASE_SERVER_URL } from '@/utils/constants'
 import { isAbsoluteUrl } from 'next/dist/shared/lib/utils'
 import { useConstants } from '@/hooks/useConstants'
-import { useTranslation } from '@/i18n/client'
+import { getTranslation } from '@/i18n/client'
 
 export default function AuthorPageComponent({ id }) {
     const [author, setAuthor] = useState({});
     const { locale } = useParams();
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
     const { AUTHOR_INFO } = useConstants();
 
-    const authorLang = (locale === 'en' ? author.dataEng : locale === 'ru' ? author.dataRu : {})
+    const authorLang = useMemo(() => {
+        return locale === 'en' ? author.dataEng : locale === 'ru' ? author.dataRu : {};
+    }, [locale, author.dataEng, author.dataRu]);
 
     useEffect(() => {
         fetchAuthor()
     }, [])
+
+    useEffect(() => {
+        if (typeof document !== 'undefined' && authorLang) {
+            const title = authorLang.name
+            if (title) {
+                document.title = `${title} | PhotoSOIL`;
+            }
+        }
+    }, [authorLang])
 
     const fetchAuthor = async () => {
         const result = await getAuthor(id)

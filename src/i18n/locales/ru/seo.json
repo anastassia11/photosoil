@@ -1,37 +1,37 @@
 {
-  "homePage-title": "HomePage-title",
+  "homePage-title": "Главная | PhotoSOIL",
   "homePage-description": "HomePage-description",
 
-  "aboutPage-title": "AboutPage-title",
-  "aboutPage-description": "AboutPage-description",
+  "aboutPage-title": "О нас | PhotoSOIL",
+  "aboutPage-description": "База данных PhotoSOIL призвана стать научной площадкой для исследователей, желающих делиться своими фотографиями почв с теми, кому они могут быть потенциально полезны.",
 
-  "soilsPage-title": "SoilsPage-title2",
+  "soilsPage-title": "Поиск по всем объектам | PhotoSOIL",
   "soilsPage-description": "SoilsPage-description",
 
-  "profilesPage-title": "profilesPage-title2",
+  "profilesPage-title": "Почвенные профили | PhotoSOIL",
   "profilesPage-description": "profilesPage-description",
 
-  "dynamicsPage-title": "dynamicsPage-title2",
-  "dynamicsPage-description": "dynamicsPage-description",
+  "dynamicsPage-title": "Динамика почв | PhotoSOIL",
+  "dynamicsPage-description": "В категории 'Динамика почв' размещены фотографи, которые явным образом демонстрируют быстрые трансформации почв, например, связанные с эрозионными процессами.",
 
-  "morphologicalPage-title": "morphologicalPage-title2",
+  "morphologicalPage-title": "Почвенные морфологические элементы | PhotoSOIL",
   "morphologicalPage-description": "morphologicalPage-description",
 
-  "EcosystemsPage-title": "EcosystemsPage-title2",
-  "EcosystemsPage-description": "EcosystemsPage-description",
+  "ecosystemsPage-title": "Экосистемы | PhotoSOIL",
+  "ecosystemsPage-description": "EcosystemsPage-description",
 
-  "PublicationsPage-title": "PublicationsPage-title2",
-  "PublicationsPage-description": "PublicationsPage-description",
+  "publicationsPage-title": "Публикации | PhotoSOIL",
+  "publicationsPage-description": "PublicationsPage-description",
 
-  "JoinPage-title": "JoinPage-title2",
-  "JoinPage-description": "JoinPage-description",
+  "joinPage-title": "Стать автором | PhotoSOIL",
+  "joinPage-description": "JoinPage-description",
 
-  "LoginPage-title": "LoginPage-title2",
-  "LoginPage-description": "LoginPage-description",
+  "loginPage-title": "Авторизация | PhotoSOIL",
+  "loginPage-description": "LoginPage-description",
 
-  "AuthorsPage-title": "AuthorsPage-title2",
-  "AuthorsPage-description": "AuthorsPage-description",
+  "authorsPage-title": "Авторы | PhotoSOIL",
+  "authorsPage-description": "AuthorsPage-description",
 
-  "NewsPage-title": "NewsPage-title2",
-  "NewsPage-description": "NewsPage-description"
+  "newsPage-title": "Новости | PhotoSOIL",
+  "newsPage-description": "NewsPage-description"
 }

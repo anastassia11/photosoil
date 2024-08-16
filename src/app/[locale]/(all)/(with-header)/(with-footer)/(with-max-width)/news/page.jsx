@@ -1,12 +1,12 @@
 
 import NewsPageComponent from '@/components/pages-components/NewsPage';
-import { useTranslation } from '@/i18n';
+import { getTranslation } from '@/i18n';
 
 export async function generateMetadata({ params: { locale } }) {
-    const { t } = await useTranslation(locale, 'seo');
+    const { t } = await getTranslation(locale, 'seo');
     return {
-        title: t(`NewsPage-title`),
-        description: t(`NewsPage-description`)
+        title: t(`newsPage-title`),
+        description: t(`newsPage-description`)
     };
 }
 

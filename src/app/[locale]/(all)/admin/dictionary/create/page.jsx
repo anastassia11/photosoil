@@ -1,39 +1,14 @@
-'use client'
+import DictionatyCreatePageComponent from '@/components/pages-components/admin/DictionatyCreate';
+import { getTranslation } from '@/i18n';
 
-import { createClassification } from '@/api/classification/create_classification';
-import DictionaryForm from '@/components/admin-panel/DictionaryForm';
-import { useTranslation } from '@/i18n/client';
-import { openAlert } from '@/store/slices/alertSlice';
-import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react'
-import { Oval } from 'react-loader-spinner';
-import { useDispatch } from 'react-redux';
+export async function generateMetadata({ params: { locale } }) {
+    const { t } = await getTranslation(locale);
+
+    return {
+        title: `${t('creation_dictionary')} | ${t('dashboard')} | PhotoSOIL`,
+    };
+}
 
 export default function DictionatyCreatePage() {
-    const dispatch = useDispatch();
-    const router = useRouter();
-    const [isLoading, setIsLoading] = useState(false);
-    const { locale } = useParams();
-    const { t } = useTranslation(locale);
-
-    const createDictionary = async (data) => {
-        setIsLoading(true);
-        const result = await createClassification(data);
-        if (result.success) {
-            router.push('/admin/dictionary');
-            dispatch(openAlert({ title: t('success'), message: t('created_dictionary'), type: 'success' }))
-        } else {
-            dispatch(openAlert({ title: t('error'), message: t('error_dictionary'), type: 'error' }))
-        }
-        setIsLoading(false);
-    }
-
-    return (
-        <div className="flex flex-col w-full flex-1">
-            <h1 className='text-2xl font-semibold mb-4'>
-                {t('creation_dictionary')}
-            </h1>
-            <DictionaryForm onFormSubmit={createDictionary} isLoading={isLoading} btnTitle={t('create_dictionary')} />
-        </div>
-    )
+    return <DictionatyCreatePageComponent />
 }

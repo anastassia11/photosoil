@@ -1,7 +1,7 @@
 'use client'
 
 import { auth } from '@/api/account/login';
-import { useTranslation } from '@/i18n/client';
+import { getTranslation } from '@/i18n/client';
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -13,7 +13,7 @@ export default function LoginPageComponent() {
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
     const { locale } = useParams();
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
@@ -34,7 +34,7 @@ export default function LoginPageComponent() {
             <div className="text-center">
                 <div className="mt-5 space-y-2">
                     <h3 className="sm:text-2xl text-xl font-semibold">{t('authorization')}</h3>
-                    <p className="">{t('no_account')} <Link href={`/join`}
+                    <p className="">{t('no_account')} <Link href={`/${locale}/join`}
                         className='text-blue-600 hover:underline duration-300'>{t('join')}</Link></p>
                 </div>
             </div>

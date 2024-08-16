@@ -4,7 +4,7 @@ import { getPublication } from '@/api/publication/get_publication'
 import MapArraySelect from '@/components/map/MapArraySelect'
 import PdfGallery from '@/components/soils/PdfGallery'
 import Soils from '@/components/soils/Soils'
-import { useTranslation } from '@/i18n/client'
+import { getTranslation } from '@/i18n/client'
 import { BASE_SERVER_URL } from '@/utils/constants'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
@@ -15,7 +15,7 @@ export default function PublicationPageComponent({ id }) {
     const mapRef = useRef();
     const [tokenData, setTokenData] = useState({});
     const { locale } = useParams();
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
 
     let _isEng = locale === 'en';
 
@@ -25,6 +25,15 @@ export default function PublicationPageComponent({ id }) {
         localStorage.getItem('tokenData') && setTokenData(JSON.parse(localStorage.getItem('tokenData')));
         fetchPublication();
     }, [])
+
+    useEffect(() => {
+        if (typeof document !== 'undefined' && currentTransl) {
+            const title = currentTransl.name
+            if (title) {
+                document.title = `${title} | PhotoSOIL`;
+            }
+        }
+    }, [currentTransl]);
 
     const fetchPublication = async () => {
         const result = await getPublication(id)
@@ -60,7 +69,7 @@ export default function PublicationPageComponent({ id }) {
                 {tokenData.role === 'Admin' || (tokenData.name === publication.user?.name) ? <Link target="_blank"
                     className='text-blue-700 cursor-pointer flex flex-row items-center hover:underline duration-300'
                     href={{
-                        pathname: `/admin/publications/edit/${publication.id}`,
+                        pathname: `/${locale}/admin/publications/edit/${publication.id}`,
                         query: { lang: _isEng ? 'eng' : 'ru' }
                     }}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 mr-1">

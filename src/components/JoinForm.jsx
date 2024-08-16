@@ -1,12 +1,12 @@
 'use client'
 
-import { useTranslation } from '@/i18n/client';
+import { getTranslation } from '@/i18n/client';
 import Link from 'next/link'
 import { useParams } from 'next/navigation';
 
 export default function JoinForm() {
     const { locale } = useParams();
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
 
     return (
         <div className="sm:space-y-6 sm:max-w-md m-auto sm:mt-16">
@@ -15,7 +15,7 @@ export default function JoinForm() {
                     <h3 className="sm:text-2xl text-xl font-semibold">{t('join')}</h3>
                     <p className="">{t('join_text')}<br />
                         {t('account_exists')} <Link className='text-blue-600 hover:underline duration-300'
-                            href='/login'>{t('login')}</Link></p>
+                            href={`/${locale}/login`}>{t('login')}</Link></p>
                 </div>
             </div>
             <div className="sm:bg-white sm:shadow p-4 py-6 sm:p-6 sm:rounded-lg">

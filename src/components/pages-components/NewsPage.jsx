@@ -14,7 +14,7 @@ import Link from 'next/link';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useTranslation } from '@/i18n/client';
+import { getTranslation } from '@/i18n/client';
 
 export default function NewsPageComponent() {
     const pathname = usePathname();
@@ -35,7 +35,7 @@ export default function NewsPageComponent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const { locale } = useParams();
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
 
     const { selectedTags } = useSelector(state => state.data);
 
@@ -105,7 +105,7 @@ export default function NewsPageComponent() {
 
     const NewsCard = ({ id, tags, translations }) => {
         const currentTransl = translations?.find(({ isEnglish }) => isEnglish === _isEng) || {};
-        return <Link href={`${pathname}/${id}`}
+        return <Link href={`/${locale}/news/${id}`}
             className="px-8 py-4 bg-white rounded-md hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] transition-all duration-300
              w-full h-full flex flex-col justify-between">
             <div className='flex flex-col'>

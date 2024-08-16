@@ -1,12 +1,12 @@
 import LoginPageComponent from '@/components/pages-components/LoginPage';
-import { useTranslation } from '@/i18n';
+import { getTranslation } from '@/i18n';
 
 export async function generateMetadata({ params: { locale } }) {
-    const { t } = await useTranslation(locale, 'seo');
+    const { t } = await getTranslation(locale, 'seo');
 
     return {
-        title: t('LoginPage-title'),
-        description: t('LoginPage-description')
+        title: t('loginPage-title'),
+        description: t('loginPage-description')
     };
 }
 

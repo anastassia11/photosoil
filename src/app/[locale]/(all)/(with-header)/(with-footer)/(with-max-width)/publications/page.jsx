@@ -1,8 +1,8 @@
 import Publications from '@/components/Publications';
-import { useTranslation } from '@/i18n';
+import { getTranslation } from '@/i18n';
 
 export async function generateMetadata({ params: { locale } }) {
-    const { t } = await useTranslation(locale, 'seo');
+    const { t } = await getTranslation(locale, 'seo');
     return {
         title: t(`publicationsPage-title`),
         description: t(`publicationsPage-description`)
@@ -10,7 +10,7 @@ export async function generateMetadata({ params: { locale } }) {
 }
 
 export default async function PublicationsPage({ params: { locale } }) {
-    const { t } = await useTranslation(locale);
+    const { t } = await getTranslation(locale);
 
     return (
         <div className='flex flex-col'>

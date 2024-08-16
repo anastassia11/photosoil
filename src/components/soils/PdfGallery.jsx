@@ -9,11 +9,11 @@ import 'lightgallery/css/lg-zoom.css';
 import 'lightgallery/css/lg-video.css';
 import { BASE_SERVER_URL } from '@/utils/constants';
 import { useParams } from 'next/navigation';
-import { useTranslation } from '@/i18n/client';
+import { getTranslation } from '@/i18n/client';
 
 export default function PdfGallery({ path, title }) {
     const { locale } = useParams();
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
 
     return (
         <div className="">

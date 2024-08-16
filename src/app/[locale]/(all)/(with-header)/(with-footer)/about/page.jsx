@@ -1,12 +1,12 @@
 import AboutPageComponent from '@/components/pages-components/AboutPage';
-import { useTranslation } from '@/i18n';
+import { getTranslation } from '@/i18n';
 
 export async function generateMetadata({ params: { locale } }) {
-    const { t } = await useTranslation(locale, 'seo');
+    const { t } = await getTranslation(locale, 'seo');
 
     return {
-        title: t('AboutPage-title'),
-        description: t('AboutPage-description')
+        title: t('aboutPage-title'),
+        description: t('aboutPage-description')
     };
 }
 

@@ -82,6 +82,7 @@
   "organization": "Organization",
   "password": "Password",
   "password_check": "Password must contain at least 8 characters",
+  "photo_author": "Author of photo materials",
   "photo_authors": "Authors of photo materials",
   "plantCommunity": "Plant community",
   "post": "Job title",
@@ -247,7 +248,7 @@
 
   "published_news": "The news will be published",
   "published_manyNews": "News will be published",
-
+  "news_one": "News",
   "rem_published_news": "The news will be removed from publication",
   "rem_published_manyNews": "News will be removed from publication",
   "edit_news": "Editing news",

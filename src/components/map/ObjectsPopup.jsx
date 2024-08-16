@@ -1,7 +1,7 @@
 'use client'
 
 import { useConstants } from '@/hooks/useConstants';
-import { useTranslation } from '@/i18n/client';
+import { getTranslation } from '@/i18n/client';
 import { BASE_SERVER_URL } from '@/utils/constants';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -10,7 +10,7 @@ import React, { useEffect, useState } from 'react'
 
 export default function ObjectsPopup({ visible, objects, onCloseClick }) {
     const { locale } = useParams();
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
     const [soils, setSoils] = useState([]);
     const [ecosystems, setEcosystems] = useState([]);
     const [publications, setPublications] = useState([]);
@@ -35,7 +35,7 @@ export default function ObjectsPopup({ visible, objects, onCloseClick }) {
 
     const ObjectCard = (object) => {
         const currentTransl = object.translations?.find(({ isEnglish }) => isEnglish === (locale === 'en')) || {};
-        return <Link href={`${object._type}s/${object.id}`}
+        return <Link href={`/${locale}/${object._type}s/${object.id}`}
             className={`flex flex-row hover:bg-zinc-100 duration-300 px-4 ${object._type === 'publication' ? 'py-2' : 'py-3'}`}>
             {object._type === 'publication' ? <div className='flex flex-col ml-1 max-w-full'>
                 <p className='text-blue-700'>

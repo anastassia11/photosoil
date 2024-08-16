@@ -13,7 +13,8 @@ import { openAlert } from '@/store/slices/alertSlice';
 import { useDispatch } from 'react-redux';
 import { closeModal, openModal } from '@/store/slices/modalSlice';
 import modalThunkActions from '@/store/thunks/modalThunk';
-import { useTranslation } from '@/i18n/client';
+import { getTranslation } from '@/i18n/client';
+import { useParams } from 'next/navigation';
 
 export default function AuthorForm({ _author, onFormSubmit, isLoading, btnText }) {
     const dispatch = useDispatch();
@@ -21,7 +22,7 @@ export default function AuthorForm({ _author, onFormSubmit, isLoading, btnText }
     const [photo, setPhoto] = useState({});
     const [role, setRole] = useState(null);
     const { locale } = useParams();
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
     const { AUTHOR_INFO, RANK_ENUM } = useConstants();
 
     useEffect(() => {

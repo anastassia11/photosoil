@@ -6,11 +6,11 @@ import Dropdown from './ui-kit/Dropdown';
 import { useConstants } from '@/hooks/useConstants';
 import Input from './ui-kit/Input';
 import { useParams } from 'next/navigation';
-import { useTranslation } from '@/i18n/client';
+import { getTranslation } from '@/i18n/client';
 
 export default function DictionaryForm({ _dictionary, onFormSubmit, isLoading, isEdit, btnTitle }) {
     const { locale } = useParams();
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
 
     const [dictionary, setDictionary] = useState({
         nameRu: '',

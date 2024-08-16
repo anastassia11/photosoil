@@ -2,7 +2,7 @@
 
 import { getEcosystem } from '@/api/ecosystem/get_ecosystem';
 import SoilObject from '@/components/soils/SoilObject';
-import { useTranslation } from '@/i18n/client';
+import { getTranslation } from '@/i18n/client';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -10,13 +10,24 @@ import { useEffect, useState } from 'react';
 export default function EcosystemPageComponent({ id }) {
     const [ecosystem, setEcosystem] = useState({});
     const { locale } = useParams();
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
 
     let _isEng = locale === 'en';
+
+    const currentTransl = ecosystem?.translations?.find(({ isEnglish }) => isEnglish === _isEng);
 
     useEffect(() => {
         fetchEcosystem();
     }, [])
+
+    useEffect(() => {
+        if (typeof document !== 'undefined' && currentTransl) {
+            const title = currentTransl.name
+            if (title) {
+                document.title = `${title} | PhotoSOIL`;
+            }
+        }
+    }, [currentTransl])
 
     const fetchEcosystem = async () => {
         const result = await getEcosystem(id)
@@ -28,14 +39,14 @@ export default function EcosystemPageComponent({ id }) {
     return (
         <SoilObject object={ecosystem} type='ecosystem'>
             <ul className='flex flex-col space-y-2 '>
-                {ecosystem?.translations?.find(({ isEnglish }) => isEnglish === _isEng)?.description ?
+                {currentTransl?.description ?
                     <li key='ecosystem-description'
                         className='flex lg:flex-row flex-col w-full lg:space-x-4 space-x-0'>
                         <span className='lg:w-[40%] w-full text-zinc-500 font-semibold'>
                             {t('description')}
                         </span>
                         <span className={`lg:w-[60%] w-full }`}>
-                            {ecosystem?.translations?.find(({ isEnglish }) => isEnglish === _isEng)?.description}
+                            {currentTransl?.description}
                         </span>
                     </li> : ''}
 
@@ -47,7 +58,7 @@ export default function EcosystemPageComponent({ id }) {
                     <ul className={`lg:w-[60%] w-full flex flex-row`}>
                         {ecosystem.authors?.map(({ id, name }, index) =>
                             <li key={`author-${index}`} className='mr-2'>
-                                <Link href={`/authors/${id}`}
+                                <Link href={`/${locale}/authors/${id}`}
                                     className='text-blue-600 hover:underline'>
                                     {name}
                                 </Link>

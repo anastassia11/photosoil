@@ -14,14 +14,14 @@ import { useConstants } from '@/hooks/useConstants'
 import { getClassifications } from '@/api/classification/get_classifications'
 import Loader from '../Loader'
 import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper'
-import { useTranslation } from '@/i18n/client'
+import { getTranslation } from '@/i18n/client'
 import { getEcosystems } from '@/api/ecosystem/get_ecosystems'
 import { getSoils } from '@/api/soil/get_soils'
 
 export default function Soils({ _soils, isAllSoils, isFilters, type }) {
     const dispatch = useDispatch();
     const { locale } = useParams();
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
 
     const didLogRef = useRef(true);
     const pathname = usePathname();
@@ -162,7 +162,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
     }
 
     const SoilCard = ({ photo, name, id }) => {
-        return <Link href={`/${type}/${id}`}
+        return <Link href={`/${locale}/${type}/${id}`}
             className='relative aspect-[2/3] overflow-hidden transition-all
     rounded-md  hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] flex flex-col  duration-300 cursor-pointer'>
             <div className='h-[100%] w-full overflow-hidden opacity-80'>

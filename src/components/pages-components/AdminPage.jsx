@@ -4,8 +4,7 @@ import tokenVerification from '@/api/account/token_verification';
 import { getAuthor } from '@/api/author/get_author';
 import { getAuthors } from '@/api/author/get_authors';
 import { getAllNews } from '@/api/news/get_allNews';
-import Modal from '@/components/admin-panel/ui-kit/Modal'
-import { useTranslation } from '@/i18n/client';
+import { getTranslation } from '@/i18n/client';
 import { BASE_SERVER_URL } from '@/utils/constants';
 import moment from 'moment';
 import Image from 'next/image';
@@ -17,7 +16,7 @@ export default function AdminPageComponent() {
     const [news, setNews] = useState([]);
     const [authors, setAuthors] = useState([]);
     const { locale } = useParams();
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
 
     const _isEng = locale === 'en';
 
@@ -62,7 +61,7 @@ export default function AdminPageComponent() {
 
     const NewsCard = ({ id, tags, translations }) => {
         const currentTransl = translations?.find(({ isEnglish }) => isEnglish === _isEng) || null;
-        return currentTransl ? <Link href={`/news/${id}`}
+        return currentTransl ? <Link href={`/${locale}/news/${id}`}
             className="px-8 py-4 bg-white rounded-md hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] transition-all duration-300
              w-full h-full flex flex-col justify-between">
             <div className='flex flex-col'>
@@ -84,7 +83,7 @@ export default function AdminPageComponent() {
     const AuthorCard = ({ photo, dataEng, dataRu, authorType, id, soilsLength, ecosystemsLength }) => {
         const curData = _isEng ? dataEng : dataRu;
 
-        return <Link href={`authors/${id}`}
+        return <Link href={`/${locale}/authors/${id}`}
             className='px-8 py-4 bg-white rounded-md hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] transition-all duration-300
              w-full h-full flex flex-col justify-start'>
 

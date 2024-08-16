@@ -7,7 +7,7 @@ import { useConstants } from '@/hooks/useConstants';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { addCategory, addTerm, deleteCategory, deleteTerm } from '@/store/slices/dataSlice';
 import { getClassifications } from '@/api/classification/get_classifications';
-import { useTranslation } from '@/i18n/client';
+import { getTranslation } from '@/i18n/client';
 
 export default function SideBar({ popupVisible, onVisibleChange, onLocationHandler }) {
   const dispatch = useDispatch();
@@ -28,7 +28,7 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
   const [searchTitle, setSearchTitle] = useState('');
   const { selectedTerms, selectedCategories } = useSelector(state => state.data);
   const { locale } = useParams();
-  const { t } = useTranslation(locale);
+  const { t } = getTranslation(locale);
   const { SOIL_ENUM } = useConstants();
   const CATEGORY_ARRAY = Object.entries(SOIL_ENUM).map(([key, value]) => ({
     id: Number(key),

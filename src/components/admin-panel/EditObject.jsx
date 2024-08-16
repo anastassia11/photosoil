@@ -9,10 +9,10 @@ import React, { useEffect, useState } from 'react'
 import { Oval } from 'react-loader-spinner';
 import { useDispatch } from 'react-redux';
 import { putEcosystem } from '@/api/ecosystem/put_ecosystem';
-import { useSearchParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { getSoil } from '@/api/soil/get_soil';
 import { getEcosystem } from '@/api/ecosystem/get_ecosystem';
-import { useTranslation } from '@/i18n/client';
+import { getTranslation } from '@/i18n/client';
 
 export default function EditObject({ id, type, title }) {
     const dispatch = useDispatch();
@@ -23,11 +23,21 @@ export default function EditObject({ id, type, title }) {
     const [isLoading, setIsLoading] = useState(false);
     const [oldTwoLang, setOldTwoLang] = useState(false);
     const { locale } = useParams();
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
 
     useEffect(() => {
         fetchObject()
     }, [])
+
+    useEffect(() => {
+        if (typeof document !== 'undefined' && Object.keys(object).length) {
+            const title = object.translations?.find(({ isEnglish }) =>
+                isEnglish === (searchParams.get('lang') === 'eng'))?.name
+            if (title) {
+                document.title = `${title} | ${t('edit')} | PhotoSOIL`;
+            }
+        }
+    }, [object]);
 
     const fetchObject = async () => {
         const result = type === 'soil' ? await getSoil(id) : await getEcosystem(id);

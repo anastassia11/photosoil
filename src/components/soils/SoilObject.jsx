@@ -7,13 +7,13 @@ import { useParams } from 'next/navigation';
 import Publications from '../Publications';
 import MapSelect from '../map/MapSelect';
 import Link from 'next/link';
-import { useTranslation } from '@/i18n/client';
+import { getTranslation } from '@/i18n/client';
 
 export default function SoilObject({ object, children, type }) {
     const [mapVisible, setMapVisible] = useState(true);
     const [tokenData, setTokenData] = useState({});
     const { locale } = useParams();
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
 
     let _isEng = locale === 'en';
 
@@ -36,7 +36,7 @@ export default function SoilObject({ object, children, type }) {
                 {tokenData.role === 'Admin' || (tokenData.name === object.user?.name) ? <Link target="_blank"
                     className='text-blue-700 cursor-pointer flex flex-row items-center hover:underline duration-300'
                     href={{
-                        pathname: `/admin/${type === 'soil' ? 'objects' : 'ecosystems'}/edit/${object.id}`,
+                        pathname: `/${locale}/admin/${type === 'soil' ? 'objects' : 'ecosystems'}/edit/${object.id}`,
                         query: { lang: _isEng ? 'eng' : 'ru' }
                     }}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 mr-1">

@@ -1,6 +1,6 @@
 'use client'
 
-import { useTranslation } from '@/i18n/client';
+import { getTranslation } from '@/i18n/client';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -9,7 +9,7 @@ import React, { useEffect, useState } from 'react'
 export default function Sidebar() {
     const [role, setRole] = useState(null);
     const { locale } = useParams();
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
 
     useEffect(() => {
         localStorage.getItem('tokenData') && setRole(JSON.parse(localStorage.getItem('tokenData')).role)
@@ -76,7 +76,7 @@ export default function Sidebar() {
     ]
 
     const LinkItem = ({ url, title, svg }) =>
-        <Link href={`/admin/${url}`} className="cursor-pointer flex items-center px-3 py-2 transition-colors duration-300 
+        <Link href={`/${locale}/admin/${url}`} className="cursor-pointer flex items-center px-3 py-2 transition-colors duration-300 
             transform rounded-lg hover:bg-gray-100 hover:text-gray-700">
             {svg && <div className='text-zinc-500'>{svg}</div>}
             <span className="mx-2 font-medium">{title}</span>
@@ -86,7 +86,7 @@ export default function Sidebar() {
     return (
         <aside className="flex flex-col sm:min-w-[290px] min-w-[270px] h-screen sm:px-6 px-4 overflow-y-auto bg-white 
         border-r border-l rtl:border-r-0 rtl:border-l">
-            <Link href='/' className='hover:cursor-pointer border-b flex flex-row items-center sm:h-[70px] h-[60px]'>
+            <Link href={`/${locale}`} className='hover:cursor-pointer border-b flex flex-row items-center sm:h-[70px] h-[60px]'>
                 <Image src={'/logo.png'} width={300} height={300} alt='logo' className='sm:w-9 w-6' />
                 <p className='text-zinc-600 ml-2 sm:text-3xl text-xl font-semibold'>Photo<span className='pl-[2px] text-[#226eaf] font-bold'>SOIL</span></p>
             </Link>

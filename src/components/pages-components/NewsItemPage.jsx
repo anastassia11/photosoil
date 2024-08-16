@@ -8,13 +8,13 @@ import '@/styles/editor.css';
 import NewGallery from '@/components/soils/NewGallery';
 import Link from 'next/link';
 import moment from 'moment';
-import { useTranslation } from '@/i18n/client';
+import { getTranslation } from '@/i18n/client';
 
 export default function NewsItemPageComponent({ id }) {
     const [news, setNews] = useState({});
     const [tokenData, setTokenData] = useState({});
     const { locale } = useParams();
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
 
     const parser = new DOMParser();
 
@@ -27,6 +27,15 @@ export default function NewsItemPageComponent({ id }) {
         document.documentElement.style.setProperty('--product-view-height', '600px');
         fetchNews();
     }, [])
+
+    useEffect(() => {
+        if (typeof document !== 'undefined' && currentTransl) {
+            const title = currentTransl.title
+            if (title) {
+                document.title = `${title} | PhotoSOIL`;
+            }
+        }
+    }, [currentTransl]);
 
     const fetchNews = async () => {
         const result = await getNewsById(id)
@@ -50,7 +59,7 @@ export default function NewsItemPageComponent({ id }) {
                 {tokenData.role === 'Admin' || (tokenData.name === news.user?.name) ? <Link target="_blank"
                     className='text-blue-700 cursor-pointer flex flex-row items-center hover:underline duration-300'
                     href={{
-                        pathname: `/admin/news/edit/${news.id}`,
+                        pathname: `/${locale}/admin/news/edit/${news.id}`,
                         query: { lang: _isEng ? 'eng' : 'ru' }
                     }}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 mr-1">
@@ -80,7 +89,7 @@ export default function NewsItemPageComponent({ id }) {
                 <ul className="flex items-center flex-row">
                     {news?.tags?.map(({ id, nameRu, nameEng }, index) =>
                         <li key={`tag-${id}`} className='mr-2 min-w-fit h-fit'>
-                            <Link href={`/news?tags=${id}`}
+                            <Link href={`/${locale}/news?tags=${id}`}
                                 className='text-blue-600 hover:underline'>
                                 {_isEng ? (nameEng || '') : (nameRu || '')}{news?.tags?.length > 1 && index + 1 < news?.tags?.length && ','}
                             </Link>

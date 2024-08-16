@@ -1,3 +1,37 @@
 {
-  "HomePage-title": "HomePage-title"
+  "homePage-title": "Home | PhotoSOIL",
+  "homePage-description": "HomePage-description",
+
+  "aboutPage-title": "About Us | PhotoSOIL",
+  "aboutPage-description": "The PhotoSOIL database is intended to be a scientific platform for researchers wishing to share their soil photographs with those who may potentially benefit from them.",
+
+  "soilsPage-title": "Search all objects | PhotoSOIL",
+  "soilsPage-description": "SoilsPage-description",
+
+  "profilesPage-title": "Soil profiles | PhotoSOIL",
+  "profilesPage-description": "profilesPage-description",
+
+  "dynamicsPage-title": "Soil dynamics | PhotoSOIL",
+  "dynamicsPage-description": "The 'Soil dynamics' category contains photographs that clearly demonstrate rapid soil transformations, such as those associated with erosive processes.",
+
+  "morphologicalPage-title": "Soil morphological elements | PhotoSOIL",
+  "morphologicalPage-description": "morphologicalPage-description",
+
+  "ecosystemsPage-title": "Ecosystems | PhotoSOIL",
+  "ecosystemsPage-description": "EcosystemsPage-description",
+
+  "publicationsPage-title": "Publications | PhotoSOIL",
+  "publicationsPage-description": "PublicationsPage-description",
+
+  "joinPage-title": "Become an author | PhotoSOIL",
+  "joinPage-description": "JoinPage-description",
+
+  "loginPage-title": "Authorization | PhotoSOIL",
+  "loginPage-description": "LoginPage-description",
+
+  "authorsPage-title": "Authors | PhotoSOIL",
+  "authorsPage-description": "AuthorsPage-description",
+
+  "newsPage-title": "News | PhotoSOIL",
+  "newsPage-description": "NewsPage-description"
 }

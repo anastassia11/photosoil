@@ -1,6 +1,6 @@
 'use client'
 
-import { useTranslation } from '@/i18n/client';
+import { getTranslation } from '@/i18n/client';
 import { openAlert } from '@/store/slices/alertSlice';
 import { useParams } from 'next/navigation';
 import { useState } from 'react'
@@ -10,7 +10,7 @@ export default function DragAndDrop({ onLoadClick, isMultiple, accept }) {
     const dispatch = useDispatch();
     const [drag, setDrag] = useState(false);
     const { locale } = useParams();
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
 
     const handleChange = (e) => {
         e.preventDefault();

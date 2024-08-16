@@ -1,6 +1,6 @@
 'use client'
 
-import { useTranslation } from '@/i18n/client';
+import { getTranslation } from '@/i18n/client';
 import Link from 'next/link'
 import { useParams, usePathname } from 'next/navigation'
 import React, { useEffect } from 'react'
@@ -9,7 +9,7 @@ export default function Breadcrumbs() {
     const paths = usePathname();
     const pathNames = paths.split('/').filter(path => path)
     const { locale } = useParams();
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
 
     const linkTexts = {
         'soils': {
@@ -124,7 +124,7 @@ export default function Breadcrumbs() {
     return (
         <ul className='flex items-center py-4 whitespace-nowrap flex-wrap w-full'>
             <li className='hover:underline mb-1 2xl:mb-0 flex flex-row items-center '>
-                <Link href='/'>PhotoSOIL</Link>
+                <Link href={`/${locale}`}>PhotoSOIL</Link>
                 {separator}
             </li>
 

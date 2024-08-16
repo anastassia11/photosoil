@@ -11,11 +11,11 @@ import { useConstants } from '@/hooks/useConstants'
 import { getAuthors } from '@/api/author/get_authors'
 import Loader from './Loader'
 import MotionWrapper from './admin-panel/ui-kit/MotionWrapper'
-import { useTranslation } from '@/i18n/client'
+import { getTranslation } from '@/i18n/client'
 
 export default function Authors() {
     const { locale } = useParams();
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
 
     const [authors, setAuthors] = useState([]);
     const [filterName, setFilterName] = useState('');
@@ -48,7 +48,7 @@ export default function Authors() {
     }
 
     const AuthorCard = ({ photo, dataEng, dataRu, authorType, id }) => {
-        return <Link href={`authors/${id}`}
+        return <Link href={`/${locale}/authors/${id}`}
             className='relative aspect-[2/3] overflow-hidden
     rounded-md hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] transition-all duration-300 flex flex-col  cursor-pointer'>
             <div className='w-full h-full relative'>

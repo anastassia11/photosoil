@@ -1,23 +1,14 @@
-'use client'
+import SoilCreateComponent from '@/components/pages-components/admin/SoilCreate';
+import { getTranslation } from '@/i18n';
 
-import { createSoil } from '@/api/soil/create_soil';
-import CreateObject from '@/components/admin-panel/CreateObject';
-import { useTranslation } from '@/i18n/client';
-import { useParams } from 'next/navigation';
+export async function generateMetadata({ params: { locale } }) {
+    const { t } = await getTranslation(locale);
 
+    return {
+        title: `${t('creation_soils')} | ${t('dashboard')} | PhotoSOIL`,
+    };
+}
 
-export default function CreateSoilPage() {
-    const { locale } = useParams();
-    const { t } = useTranslation(locale);
-
-    const fetchCreateSoil = async (data) => {
-        const result = await createSoil(data)
-        if (result.success) {
-            return { success: true }
-        } else return { success: false, status: result.status }
-    }
-
-    return (
-        <CreateObject title={t('creation_soils')} onCreate={fetchCreateSoil} type='soil' />
-    )
+export default function SoilCreatePage() {
+    return <SoilCreateComponent />
 }

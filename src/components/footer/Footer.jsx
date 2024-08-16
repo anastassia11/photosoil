@@ -1,8 +1,8 @@
-import { useTranslation } from '@/i18n';
+import { getTranslation } from '@/i18n';
 import Image from 'next/image'
 
 export default async function Footer({ locale }) {
-    const { t } = await useTranslation(locale);
+    const { t } = await getTranslation(locale);
 
     return (
         <footer className='absolute bottom-0 border-t w-full mt-24 flex xl:flex-row flex-col xl:space-x-6 justify-between xl:items-start items-center px-8 py-6'>

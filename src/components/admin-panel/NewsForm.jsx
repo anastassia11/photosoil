@@ -18,7 +18,7 @@ import Textarea from './ui-kit/Textarea';
 import PhotoCard from './ui-kit/PhotoCard';
 import FileCard from './ui-kit/FileCard';
 import { useParams } from 'next/navigation';
-import { useTranslation } from '@/i18n/client';
+import { getTranslation } from '@/i18n/client';
 
 export default function NewsForm({ _news, pathname, onNewsSubmit, isLoading, btnText, oldTwoLang, oldIsEng }) {
     const dispatch = useDispatch();
@@ -30,7 +30,7 @@ export default function NewsForm({ _news, pathname, onNewsSubmit, isLoading, btn
     const [isEng, setIsEng] = useState(false);
     const [createTwoLang, setCreateTwoLang] = useState(false);
     const { locale } = useParams();
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
 
     useEffect(() => {
         if (_news) {

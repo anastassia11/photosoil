@@ -10,7 +10,7 @@ import { useConstants } from '@/hooks/useConstants';
 import MotionWrapper from './admin-panel/ui-kit/MotionWrapper';
 import { getPublications } from '@/api/publication/get_publications';
 import Loader from './Loader';
-import { useTranslation } from '@/i18n/client';
+import { getTranslation } from '@/i18n/client';
 
 export default function Publications() {
     const [filterName, setFilterName] = useState('');
@@ -23,7 +23,7 @@ export default function Publications() {
     const [isLoading, setIsLoading] = useState(true);
 
     const { locale } = useParams();
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
     const { PUBLICATION_ENUM } = useConstants();
 
     const _isEng = locale === 'en';
@@ -106,7 +106,7 @@ export default function Publications() {
                             publications.length && filteredPublications.length ? currentItems.map((item, idx) => (
                                 <li key={idx} className={`mt-4 ${idx + 1 === currentItems.length ? '' : 'border-b'} flex flex-row min-w-full`}>
                                     <MotionWrapper className='min-w-full'>
-                                        <Link href={`/publications/${item.id}`}
+                                        <Link href={`/${locale}/publications/${item.id}`}
                                             className='justify-between items-start flex flex-row flex-1 mb-4 px-4 py-5 cursor-pointer hover:bg-white
                                         rounded-md hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] transition-all duration-300'>
                                             <div className='space-y-3'>

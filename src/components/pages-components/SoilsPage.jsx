@@ -1,8 +1,8 @@
 import Soils from '@/components/soils/Soils';
-import { useTranslation } from '@/i18n';
+import { getTranslation } from '@/i18n';
 
 export default async function SoilsPageComponent({ type, locale }) {
-    const { t } = await useTranslation(locale);
+    const { t } = await getTranslation(locale);
 
     return (
         <div className='flex flex-col' >

@@ -1,12 +1,12 @@
 import MainMap from '@/components/map/MainMap';
-import { useTranslation } from '@/i18n';
+import { getTranslation } from '@/i18n';
 
 export async function generateMetadata({ params: { locale } }) {
-  const { t } = await useTranslation(locale, 'seo');
+  const { t } = await getTranslation(locale, 'seo');
 
   return {
-    title: t('HomePage-title'),
-    description: t('HomePage-description')
+    title: t('homePage-title'),
+    description: t('homePage-description')
   };
 }
 

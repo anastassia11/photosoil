@@ -1,13 +1,13 @@
 'use client'
 
-import { useTranslation } from '@/i18n/client';
+import { getTranslation } from '@/i18n/client';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 
 export default function LayersPanel({ onLayerChange, currentLayer }) {
     const [drapdownState, setDrapdownState] = useState({ isActive: false, key: null });
     const { locale } = useParams();
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
 
     const layers = [
         { key: 'OSM', title: t('OSM') },

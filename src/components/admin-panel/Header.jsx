@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Oval } from 'react-loader-spinner';
 import LanguageChanger from '../header/LanguageChanger';
-import { useTranslation } from '@/i18n/client';
+import { getTranslation } from '@/i18n/client';
 
 export default function Header() {
     const dispatch = useDispatch()
@@ -16,7 +16,7 @@ export default function Header() {
     const [email, setEmail] = useState(null);
     const [role, setRole] = useState(null);
     const { locale } = useParams();
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
 
     useEffect(() => {
         localStorage.getItem('email') && setEmail(localStorage.getItem('email'));
@@ -94,8 +94,7 @@ export default function Header() {
                 </div>
             </div>
 
-
-            <LanguageChanger isTransparent={true} />
+            <LanguageChanger isTransparent={true} locale={locale} />
         </div>
     )
 }

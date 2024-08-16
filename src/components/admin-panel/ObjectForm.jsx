@@ -28,12 +28,12 @@ import Textarea from './ui-kit/Textarea';
 import PhotoCard from './ui-kit/PhotoCard';
 import { getClassifications } from '@/api/classification/get_classifications';
 import { useParams } from 'next/navigation';
-import { useTranslation } from '@/i18n/client';
+import { getTranslation } from '@/i18n/client';
 
 export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, mainObjectPhoto, otherObjectPhoto, onItemChange, onMainPhotoChange, onOtherPhotosChange }) {
     const dispatch = useDispatch();
     const { locale } = useParams();
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
 
     const [classifications, setClassifications] = useState([]);
     const [object, setObject] = useState({});

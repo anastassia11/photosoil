@@ -20,7 +20,8 @@ import MapInput from './ui-kit/MapInput';
 import Textarea from './ui-kit/Textarea';
 import FileCard from './ui-kit/FileCard';
 import { openAlert } from '@/store/slices/alertSlice';
-import { useTranslation } from '@/i18n/client';
+import { getTranslation } from '@/i18n/client';
+import { useParams } from 'next/navigation';
 
 export default function PublicationForm({ _publication, pathname, onPublicationSubmit, isLoading, btnText, oldTwoLang, oldIsEng }) {
     const [publication, setPublication] = useState({});
@@ -34,7 +35,7 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
     const { locale } = useParams();
     const dispatch = useDispatch();
     const mapRef = useRef(null);
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
     const { PUBLICATION_INFO, PUBLICATION_ENUM } = useConstants();
 
     useEffect(() => {

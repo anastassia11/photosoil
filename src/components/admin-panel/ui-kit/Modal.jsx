@@ -1,6 +1,6 @@
 'use client'
 
-import { useTranslation } from '@/i18n/client';
+import { getTranslation } from '@/i18n/client';
 import { closeModal, setConfirm } from '@/store/slices/modalSlice';
 import { useParams } from 'next/navigation';
 import { useDispatch } from 'react-redux';
@@ -8,7 +8,7 @@ import { useDispatch } from 'react-redux';
 export default function Modal({ isOpen, title, message, buttonText }) {
     const dispatch = useDispatch();
     const { locale } = useParams();
-    const { t } = useTranslation(locale);
+    const { t } = getTranslation(locale);
 
     return (
         <div className='modal'>
