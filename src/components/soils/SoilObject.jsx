@@ -8,6 +8,8 @@ import Publications from '../Publications';
 import MapSelect from '../map/MapSelect';
 import Link from 'next/link';
 import { getTranslation } from '@/i18n/client';
+import Loader from '../Loader';
+import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper';
 
 export default function SoilObject({ object, children, type }) {
     const [mapVisible, setMapVisible] = useState(true);
@@ -27,12 +29,21 @@ export default function SoilObject({ object, children, type }) {
         localStorage.getItem('tokenData') && setTokenData(JSON.parse(localStorage.getItem('tokenData')));
     }, [])
 
+    useEffect(() => {
+        console.log(object.photo)
+    }, [object.photo])
+
     return (
         <div className='flex flex-col'>
             <div className='flex flex-col sm:flex-row mb-2 justify-between sm:items-center'>
-                <h1 className='sm:text-2xl text-xl font-semibold'>
-                    {object?.translations?.find(({ isEnglish }) => isEnglish === _isEng)?.name}
-                </h1>
+                <div className='w-full'>
+                    {object.translations ? <MotionWrapper>
+                        <h1 className='sm:text-2xl text-xl font-semibold w-full'>
+                            {object.translations?.find(({ isEnglish }) => isEnglish === _isEng)?.name}
+                        </h1>
+                    </MotionWrapper>
+                        : <Loader className='w-[80%] h-[30px]' />}
+                </div>
                 {tokenData.role === 'Admin' || (tokenData.name === object.user?.name) ? <Link target="_blank"
                     className='text-blue-700 cursor-pointer flex flex-row items-center hover:underline duration-300'
                     href={{
@@ -75,48 +86,65 @@ export default function SoilObject({ object, children, type }) {
                 </button>
             </div>
             <div className='flex md:flex-row flex-col mt-6 '>
-                <div className='w-full md:min-w-[50%] md:max-w-[50%] lg:max-w-[550px] lg:min-w-[550px]'>
-                    <NewGallery mainPhoto={object.photo} objectPhoto={object.objectPhoto} />
+                <div className='relative w-full md:min-w-[50%] md:max-w-[50%] lg:max-w-[550px] lg:min-w-[550px]'>
+                    {object.photo ? <MotionWrapper>
+                        <NewGallery mainPhoto={object.photo} objectPhoto={object.objectPhoto} />
+                    </MotionWrapper>
+                        : <div className='opacity-90 absolute top-0 h-full w-full grid gap-2 lg:grid-cols-[106px_minmax(0px,_1fr)]'>
+                            <div className='max-h-full overflow-hidden flex lg:flex-col lg:space-y-2 lg:space-x-0 space-x-2 lg:px-2 lg:order-1 order-2 py-2 lg:py-0'>
+                                {Array(5).fill('').map((item, idx) => <Loader key={idx} className='lg:w-full min-w-[90px] min-h-[135px]' />)}
+                            </div>
+                            <Loader className='w-full h-[480px] lg:order-2 order-1' />
+                        </div>}
+
                 </div>
-                <div className='md:ml-8 mt-12 md:mt-0 w-full'>
+                {Object.keys(object).length ? <div className='md:ml-8 mt-12 md:mt-0 w-full'>
                     <h3 className='sm:text-2xl text-xl font-semibold mb-2'>
                         {t('info_obj')}
                     </h3>
                     {children}
-                </div>
+                </div> : ''}
             </div>
-            {object.latitude && <div id='map-section'>
-                <button className='text-blue-600 w-fit mt-6' onClick={() => setMapVisible(!mapVisible)}>
-                    {mapVisible ? t('hide_map') : t('show_map')}
-                </button>
-                {mapVisible ? <div className='mt-4 border rounded-lg overflow-hidden'>
-                    <div className='relative w-full aspect-[2/1]'>
-                        <MapSelect type={type}
-                            latitude={object?.latitude} longtitude={object?.longtitude} />
-                    </div>
-                </div> : ''}
-            </div>}
+            {
+                object.latitude && <div id='map-section'>
+                    <button className='text-blue-600 w-fit mt-6' onClick={() => setMapVisible(!mapVisible)}>
+                        {mapVisible ? t('hide_map') : t('show_map')}
+                    </button>
+                    {mapVisible ? <div className='mt-4 border rounded-lg overflow-hidden'>
+                        <div className='relative w-full aspect-[2/1]'>
+                            <MapSelect type={type}
+                                latitude={object?.latitude} longtitude={object?.longtitude} />
+                        </div>
+                    </div> : ''}
+                </div>
+            }
 
-            {object.soilObjects?.length ?
-                <div id='soilObjects-section'>
+            {
+                object.soilObjects?.length ?
+                    <div id='soilObjects-section'>
+                        <h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-4'>
+                            {t('connect_soils')}
+                        </h3>
+                        <Soils _soils={object.soilObjects} isFilters={false} type='soils' />
+                    </div> : ''
+            }
+            {
+                object.ecoSystems?.length ?
+                    <div id='ecosystems-section'>
+                        <h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-4'>
+                            {t('connect_ecosystems')}
+                        </h3>
+                        <Soils _soils={object.ecoSystems} isFilters={false} type='ecosystems' />
+                    </div> : ''
+            }
+            {
+                object.publications?.length ? <div id='publications-section'>
                     <h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-4'>
-                        {t('connect_soils')}
+                        {t('connect_publ')}
                     </h3>
-                    <Soils _soils={object.soilObjects} isFilters={false} type='soils' />
-                </div> : ''}
-            {object.ecoSystems?.length ?
-                <div id='ecosystems-section'>
-                    <h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-4'>
-                        {t('connect_ecosystems')}
-                    </h3>
-                    <Soils _soils={object.ecoSystems} isFilters={false} type='ecosystems' />
-                </div> : ''}
-            {object.publications?.length ? <div id='publications-section'>
-                <h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-4'>
-                    {t('connect_publ')}
-                </h3>
-                <Publications publications={object.publications} />
-            </div> : ''}
-        </div>
+                    <Publications publications={object.publications} />
+                </div> : ''
+            }
+        </div >
     )
 }

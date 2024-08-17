@@ -12,7 +12,7 @@ import modalThunkActions from '@/store/thunks/modalThunk';
 import { BASE_SERVER_URL } from '@/utils/constants';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Oval } from 'react-loader-spinner';
 import { useDispatch } from 'react-redux';
 import uuid from 'react-uuid';
@@ -271,11 +271,11 @@ export default function CreateObject({ title, onCreate, type }) {
     }
 
     return (
-        <div className="flex flex-col w-full h-full">
-            <h1 className='sm:text-2xl text-xl font-semibold mb-4'>
+        <div className="flex flex-col w-full">
+            <h1 className='sm:text-2xl text-xl font-semibold mb-2'>
                 {title}
             </h1>
-            <div className='relative h-full pb-16'>
+            <div className='relative h-full'>
                 {!photos.length ? <>
                     {drag
                         ? <div className={`h-[calc(100%-64px)] absolute bg-black/45 top-0 w-full rounded-lg border-dashed border-[1.5px]
@@ -314,7 +314,7 @@ export default function CreateObject({ title, onCreate, type }) {
                     </div>
                 </> :
                     <div className='flex xl:flex-row flex-col'>
-                        <div ref={formRef} className='flex-1 xl:order-1 order-2 xl:pr-6 xl:border-r'>
+                        <div ref={formRef} className='pt-2 flex-1 xl:order-1 order-2 xl:pr-6 xl:border-r'>
                             {currentForm !== null ?
                                 <ObjectForm type={type}
                                     id={currentForm}
@@ -327,8 +327,8 @@ export default function CreateObject({ title, onCreate, type }) {
                                 /> : ""}
                         </div>
 
-                        <div className={`mb-6 xl:mb-0 flex flex-col w-full xl:w-[250px] space-y-2 xl:order-2 order-1 xl:pl-6 xl:sticky xl:top-0 
-                            xl:max-h-[calc(100vh-100px)] h-[250px] xl:h-fit`}>
+                        <div className={`pt-2 xl:mb-0 flex flex-col w-full xl:w-[250px] space-y-2 xl:order-2 order-1 xl:pl-6 xl:sticky xl:top-0 
+                            xl:max-h-[calc(100vh-40px)] h-[250px] xl:h-fit`}>
                             <p className="font-medium">
                                 {`${type === 'soil' ? t('soils') : type === 'ecosystem' ? t('ecosystems') : ''}`}
                             </p>

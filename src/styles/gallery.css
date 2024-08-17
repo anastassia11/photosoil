@@ -160,6 +160,8 @@
 
 .fancybox__content {
   cursor: auto !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .fancybox__viewport.is-draggable {
@@ -183,6 +185,7 @@
 .f-carousel__slide > img {
   object-fit: contain !important;
   max-height: 100%;
+  min-width: 100%;
   /* max-width: 80%; */
   /* margin-bottom: 20%; */
 }

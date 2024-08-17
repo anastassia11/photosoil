@@ -172,8 +172,8 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
             <div className='h-[77%] absolute top-0 w-full flex'>
                 <Image priority src={`${BASE_SERVER_URL}${photo.path}`} width={500} height={500} alt='soil' className='m-auto w-full h-full object-contain self-start' />
             </div>
-            <div className='overflow-hidden rounded-b-md flex items-start p-4 text-sm font-medium z-10 absolute bottom-0 h-[24%] backdrop-blur-md bg-black/40 text-white w-full'>
-                <p className='max-h-full overflow-hidden line-clamp-5'>
+            <div className='rounded-b-md flex p-4 items-start text-sm font-medium z-10 absolute bottom-0 h-[24%] backdrop-blur-md bg-black/40 text-white w-full'>
+                <p className='max-h-full overflow-hidden max-w-full'>
                     {name}
                 </p>
             </div>

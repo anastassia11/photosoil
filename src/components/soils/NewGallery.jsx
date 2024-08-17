@@ -44,7 +44,7 @@ export default function NewGallery({ mainPhoto, objectPhoto }) {
                             data-src={`${BASE_SERVER_URL}${path}`}
                             data-caption={`<div className='flex flex-col h-full'>
                           <p class="text-base font-medium mb-3">${moment(lastUpdated).format('DD.MM.YYYY HH:mm')}</p>
-                                <p className='text-sm'>${locale === 'en' ? (titleEng || '') : locale === 'ru' ? (titleRu || '') : ''}</p>
+                                <p class='font-light'>${locale === 'en' ? (titleEng || '') : locale === 'ru' ? (titleRu || '') : ''}</p>
                       </div>`}
                         >
                             <div className="absolute inset-0 z-[-1] overflow-hidden">

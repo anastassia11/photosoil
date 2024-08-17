@@ -225,7 +225,6 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
             setObject(updatedObject);
             // onItemChange(updatedObject);
         }
-
     }
 
     const handleOtherPhotoDelete = async (id) => {

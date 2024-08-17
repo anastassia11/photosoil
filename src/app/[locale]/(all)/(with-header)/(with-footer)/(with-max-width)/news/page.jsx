@@ -1,6 +1,7 @@
 
 import NewsPageComponent from '@/components/pages-components/NewsPage';
 import { getTranslation } from '@/i18n';
+import { Suspense } from 'react';
 
 export async function generateMetadata({ params: { locale } }) {
     const { t } = await getTranslation(locale, 'seo');
@@ -11,5 +12,7 @@ export async function generateMetadata({ params: { locale } }) {
 }
 
 export default function NewsPage() {
-    return <NewsPageComponent />
+    return <Suspense>
+        <NewsPageComponent />
+    </Suspense>
 }

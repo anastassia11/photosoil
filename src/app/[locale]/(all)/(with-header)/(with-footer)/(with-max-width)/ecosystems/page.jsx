@@ -1,5 +1,6 @@
 import Soils from '@/components/soils/Soils';
 import { getTranslation } from '@/i18n';
+import { Suspense } from 'react';
 
 export async function generateMetadata({ params: { locale } }) {
     const { t } = await getTranslation(locale, 'seo');
@@ -16,7 +17,9 @@ export default async function EcosystemsPage({ params: { locale } }) {
             <h1 className='sm:text-2xl text-xl font-semibold mb-4'>
                 {t('ecosystems')}
             </h1>
-            <Soils type='ecosystems' isFilters={false} />
+            <Suspense>
+                <Soils type='ecosystems' isFilters={false} />
+            </Suspense>
         </div>
     )
 }
