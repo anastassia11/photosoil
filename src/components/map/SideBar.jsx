@@ -8,8 +8,9 @@ import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigat
 import { addCategory, addTerm, deleteCategory, deleteTerm } from '@/store/slices/dataSlice';
 import { getClassifications } from '@/api/classification/get_classifications';
 import { getTranslation } from '@/i18n/client';
+import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper';
 
-export default function SideBar({ popupVisible, onVisibleChange, onLocationHandler }) {
+export default function SideBar({ popupVisible, onVisibleChange, onLocationHandler, draftIsVisible, setDraftIsVisible }) {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -26,9 +27,13 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
 
   const [classifications, setClassifications] = useState([]);
   const [searchTitle, setSearchTitle] = useState('');
+
+  const [token, setToken] = useState(null);
+
   const { selectedTerms, selectedCategories } = useSelector(state => state.data);
   const { locale } = useParams();
   const { t } = getTranslation(locale);
+
   const { SOIL_ENUM } = useConstants();
   const CATEGORY_ARRAY = Object.entries(SOIL_ENUM).map(([key, value]) => ({
     id: Number(key),
@@ -36,6 +41,7 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
   }));
 
   useEffect(() => {
+    setToken(JSON.parse(localStorage.getItem('tokenData'))?.token);
     setSideBarOpen(window.innerWidth > 640);
     fetchClassifications();
   }, [])
@@ -249,9 +255,19 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
           </ul>
         </div> : ''}
 
-        <div className='flex-1 h-full overflow-y-auto scroll sm:px-5 px-3 flex flex-col sm:space-y-3 space-y-2 w-full pb-3'>
-          <div className=''>
-            <p className='font-medium sm:text-xl text-lg sm:mt-3 mt-2 sm:mb-1.5 '>
+        <div className='flex-1 h-full overflow-y-auto scroll sm:px-5 px-3 flex flex-col sm:space-y-3 space-y-1 w-full pb-3'>
+          <MotionWrapper className='ml-1'>
+            <label htmlFor='draftIsVisible' className={`sm:mt-4 mt-3 flex-row cursor-pointer max-w-fit
+            ${!token ? 'hidden h-0 my-0' : 'flex'}`}>
+              <input type="checkbox" id='draftIsVisible'
+                checked={draftIsVisible}
+                onChange={() => setDraftIsVisible(!draftIsVisible)}
+                className="min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
+              <span className='select-none'>{t('grafts_visible')}</span>
+            </label>
+          </MotionWrapper>
+          <div className='pb-1.5'>
+            <p className='font-medium sm:text-xl text-lg sm:mb-1.5'>
               {t('map_layers')}
             </p>
             <div x-show="show" x-transition className="sm:space-y-2.5 space-y-1 px-1">
@@ -271,6 +287,7 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
                 <li key={'category'}>
                   <Filter name={t('category')} itemId='category' items={CATEGORY_ARRAY}
                     allSelectedItems={selectedCategories}
+                    type='category'
                     isMapFilter={true}
                     addItem={handleAddCategory}
                     deleteItem={handleDeleteCategorie}
@@ -285,6 +302,7 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
                     return (
                       <li key={item.id}>
                         <Filter isEng={locale === 'en'} itemId={item.id}
+                          type='classif'
                           isMapFilter={true}
                           name={isEnglish ? item.nameEng : item.nameRu}
                           items={item.terms}

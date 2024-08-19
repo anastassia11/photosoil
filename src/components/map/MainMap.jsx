@@ -42,11 +42,13 @@ export default function MainMap() {
     const [ecosystems, setEcosystems] = useState([]);
     const [publications, setPublications] = useState([]);
     const [popupVisible, setPopupVisible] = useState(false);
+    const [draftIsVisible, setDraftIsVisible] = useState(false);
 
     const didLogRef = useRef(false);
     const mapElement = useRef();
 
     const mapRef = useRef(null);
+    const _isEng = locale === 'en';
 
     useEffect(() => {
         const initializeMap = () => {
@@ -74,17 +76,31 @@ export default function MainMap() {
 
     useEffect(() => {
         const filteredIds = soils.filter(soil =>
+            (draftIsVisible ? true : soil.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible) &&
             (selectedCategories.length === 0 || selectedCategories.includes(soil.objectType)) &&
             (selectedTerms.length === 0 || selectedTerms.some(selectedTerm => soil.terms.some(term => term === selectedTerm)))
         ).map(({ id }) => id);
-        clusterLayer && filterSoilsById(filteredIds);
-    }, [selectedTerms, selectedCategories, soils])
+        clusterLayer && filterById(filteredIds, 'soil');
+    }, [selectedTerms, selectedCategories, soils, draftIsVisible])
 
-    const filterSoilsById = (filteredIds) => {
+    useEffect(() => {
+        const filteredPublIds = publications.filter(publication =>
+            (draftIsVisible ? true : publication.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible)
+        ).map(({ id }) => id);
+        const filteredEcoIds = ecosystems.filter(ecosystem =>
+            (draftIsVisible ? true : ecosystem.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible)
+        ).map(({ id }) => id);
+        if (clusterLayer) {
+            filterById(filteredPublIds, 'publication');
+            filterById(filteredEcoIds, 'ecosystem');
+        }
+    }, [publications, ecosystems, draftIsVisible])
+
+    const filterById = (filteredIds, type) => {
         const layerSource = clusterLayer.getSource().getSource(); // Получаем источник кластера
 
         features.forEach(feature => {
-            if (feature.get('p_type') === 'soil') {
+            if (feature.get('p_type') === type) {
                 const featureId = feature.get('p_Id');
                 if (filteredIds.includes(featureId)) {
                     !layerSource.hasFeature(feature) && layerSource.addFeature(feature);
@@ -299,7 +315,7 @@ export default function MainMap() {
         if (layerName === "soil") {
             return createIconStyle('/soil-marker.svg');
         }
-        return createIconStyle('/public/mapicons/map-marker.svg');
+        return createIconStyle('/map-marker.svg');
     }
 
     //Создает стиль иконки по Url
@@ -390,7 +406,8 @@ export default function MainMap() {
                 <Zoom onClick={handleZoomClick} />
             </div>
             <SideBar popupVisible={popupVisible}
-                onVisibleChange={handleLayerChange} onLocationHandler={selectLocationHandler} />
+                onVisibleChange={handleLayerChange} onLocationHandler={selectLocationHandler}
+                draftIsVisible={draftIsVisible} setDraftIsVisible={setDraftIsVisible} />
             <ObjectsPopup visible={popupVisible} objects={selectedObjects} onCloseClick={handlePopupClose} />
         </div>
     )
