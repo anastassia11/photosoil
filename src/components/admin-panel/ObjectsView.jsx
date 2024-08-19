@@ -121,6 +121,7 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
                 <div className="max-w-full md:w-fit w-[300px] flex flex-row items-center gap-x-3 overflow-hidden">
                     <input type="checkbox"
                         checked={!!(selectedObjects.includes(id) || selectedObjects.find(obj => obj.id === id && obj.type === type.name))}
+                        onClick={(e) => e.stopPropagation()}
                         onChange={(e) => handleObjectSelect(e.target.checked, id, type?.name)}
                         className="cursor-pointer text-blue-500 border-zinc-300 rounded min-w-4 min-h-4" />
                     <Link onClick={e => e.stopPropagation()}
@@ -193,7 +194,11 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
             <div className="flex flex-row items-center gap-x-3">
                 <input type="checkbox"
                     checked={selectedObjects.includes(id)}
-                    onChange={(e) => handleObjectSelect(e.target.checked, id)}
+                    onClick={(e) => e.stopPropagation()}
+                    onChange={(e) => {
+                        e.stopPropagation();
+                        handleObjectSelect(e.target.checked, id)
+                    }}
                     className="text-blue-500 border-zinc-300 rounded min-w-4 min-h-4 cursor-pointer" />
                 <Link href={`/${locale}/admin/${objectType}/edit/${id}`}
                     onClick={e => e.stopPropagation()}
@@ -239,6 +244,7 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
             <div className="flex flex-row items-center gap-x-3">
                 <input type="checkbox"
                     checked={selectedObjects.includes(id)}
+                    onClick={(e) => e.stopPropagation()}
                     onChange={(e) => handleObjectSelect(e.target.checked, id)}
                     className="cursor-pointer text-blue-500 border-zinc-300 rounded min-w-4 min-h-4" />
                 <Link href={`/${locale}/admin/${objectType}/edit/${id}`} onClick={e => e.stopPropagation()}
@@ -287,64 +293,72 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
         </td>
     </tr>
 
-    const ModeratorTableRow = ({ name, email, id, role }) => <tr className={`cursor-pointer 
+
+
+    const ModeratorTableRow = ({ name, email, id, role }) => {
+        return <tr className={`cursor-pointer 
     ${selectedObjects.includes(id) ? 'bg-yellow-100/50' : ''}`}
-        onClick={() => handleObjectSelect(!selectedObjects.includes(id), id)}>
-        <td key={`tableRow_moderator_${id}`}
-            className="px-4 py-3 text-sm font-medium text-zinc-700 whitespace-nowrap ">
-            <div className="flex flex-row items-center gap-x-3">
-                <input type="checkbox"
-                    checked={selectedObjects.includes(id)}
-                    onChange={(e) => handleObjectSelect(e.target.checked, id)}
-                    className="cursor-pointer text-blue-500 border-zinc-300 rounded min-w-4 min-h-4" />
-                <Link onClick={e => e.stopPropagation()} href={`/${locale}/admin/${objectType}/${id}`}
-                    className="font-medium text-blue-600 hover:underline whitespace-normal">{email}</Link>
-            </div>
-        </td>
-        <td className="px-4 py-3 text-sm text-zinc-500 whitespace-nowrap">{name || t('no_name')}</td>
-        <td className="px-4 py-3 text-sm whitespace-nowrap ">
-            <div className="flex items-center gap-x-2">
-                {role === 'Admin' ? <p className="px-3 py-1 text-sm text-emerald-500 rounded-full bg-emerald-100/60">Администратор</p> :
-                    role === 'Moderator' ? <p className="px-3 py-1 text-sm rounded-full text-blue-500 bg-blue-100">Модератор</p> : ''}
-            </div>
-        </td>
+            onClick={() => handleObjectSelect(!selectedObjects.includes(id), id)}>
+            <td key={`tableRow_moderator_${id}`}
+                className="px-4 py-3 text-sm font-medium text-zinc-700 whitespace-nowrap ">
+                <div className="flex flex-row items-center gap-x-3">
+                    <input type="checkbox"
+                        checked={selectedObjects.includes(id)}
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={(e) => {
+                            e.stopPropagation();
+                            handleObjectSelect(e.target.checked, id)
+                        }}
+                        className="cursor-pointer text-blue-500 border-zinc-300 rounded min-w-4 min-h-4" />
+                    <Link onClick={e => e.stopPropagation()} href={`/${locale}/admin/${objectType}/${id}`}
+                        className="font-medium text-blue-600 hover:underline whitespace-normal">{email}</Link>
+                </div>
+            </td>
+            <td className="px-4 py-3 text-sm text-zinc-500 whitespace-nowrap">{name || t('no_name')}</td>
+            <td className="px-4 py-3 text-sm whitespace-nowrap ">
+                <div className="flex items-center gap-x-2">
+                    {role === 'Admin' ? <p className="px-3 py-1 text-sm text-emerald-500 rounded-full bg-emerald-100/60">Администратор</p> :
+                        role === 'Moderator' ? <p className="px-3 py-1 text-sm rounded-full text-blue-500 bg-blue-100">Модератор</p> : ''}
+                </div>
+            </td>
 
 
-        <td className="px-4 py-3 text-sm whitespace-nowrap xl:flex hidden flex-row justify-end">
-            <div className="relative inline-block">
-                <button onClick={(e) => {
-                    e.stopPropagation();
-                    dispatch(setDropdown({ key: id, isActive: dropdown.key !== null && dropdown.key !== id ? true : !dropdown.isActive }))
-                }} className="dropdown px-1 py-1 text-gray-500 transition-colors duration-200 rounded-lg hover:bg-gray-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" />
-                    </svg>
-                </button>
+            <td className="px-4 py-3 text-sm whitespace-nowrap xl:flex hidden flex-row justify-end">
+                <div className="relative inline-block">
+                    <button onClick={(e) => {
+                        e.stopPropagation();
+                        dispatch(setDropdown({ key: id, isActive: dropdown.key !== null && dropdown.key !== id ? true : !dropdown.isActive }))
+                    }} className="dropdown px-1 py-1 text-gray-500 transition-colors duration-200 rounded-lg hover:bg-gray-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" />
+                        </svg>
+                    </button>
 
-                <div onClick={(e) => {
-                    e.stopPropagation();
-                    dispatch(setDropdown({ key: null, isActive: false }))
-                }}
-                    className={`absolute right-0 z-20 w-56 py-2 mt-2 origin-top-right bg-white rounded-md shadow-md border
+                    <div onClick={(e) => {
+                        e.stopPropagation();
+                        dispatch(setDropdown({ key: null, isActive: false }))
+                    }}
+                        className={`absolute right-0 z-20 w-56 py-2 mt-2 origin-top-right bg-white rounded-md shadow-md border
                     duration-200 transition-all border-gray-200  top-3
                     ${dropdown.key == id && dropdown.isActive ? 'visible translate-y-4' : 'invisible opacity-0'}`}>
-                    <Link href={`/${locale}/admin/${objectType}/${id}`}
-                        className="w-full duration-300 cursor-pointer hover:text-blue-600 h-9 hover:bg-zinc-100 flex items-center px-4">{t('view')}</Link>
-                    <button className="w-full duration-300 cursor-pointer hover:text-blue-600 h-9 hover:bg-zinc-100 flex items-center px-4"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            handleRoleChange(id, role === 'Moderator')
-                        }}>
-                        {role === 'Moderator' ? t('make_admin') : t('make_moderator')}</button>
-                    <button className="w-full duration-300 cursor-pointer text-red-500 hover:bg-red-100/40 h-9 hover:bg-zinc-100 flex items-center px-4"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onDeleteClick({ id })
-                        }}>{t('delete')}</button>
+                        <Link href={`/${locale}/admin/${objectType}/${id}`}
+                            className="w-full duration-300 cursor-pointer hover:text-blue-600 h-9 hover:bg-zinc-100 flex items-center px-4">{t('view')}</Link>
+                        <button className="w-full duration-300 cursor-pointer hover:text-blue-600 h-9 hover:bg-zinc-100 flex items-center px-4"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleRoleChange(id, role === 'Moderator')
+                            }}>
+                            {role === 'Moderator' ? t('make_admin') : t('make_moderator')}</button>
+                        <button className="w-full duration-300 cursor-pointer text-red-500 hover:bg-red-100/40 h-9 hover:bg-zinc-100 flex items-center px-4"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onDeleteClick({ id })
+                            }}>{t('delete')}</button>
+                    </div>
                 </div>
-            </div>
-        </td>
-    </tr>
+            </td>
+        </tr>
+    }
 
     const TableHead = ({ }) => {
         return <thead className="bg-zinc-100">
@@ -539,7 +553,7 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
                         onCategotyChange={setItemsPerPage} flexRow={true} dropdownKey='in_page' />
                 </div>
                 <Pagination itemsPerPage={PAGINATION_OPTIONS[itemsPerPage]} items={filteredObjects}
-                    updateCurrentItems={(newCurrentItems) => setCurrentItems(newCurrentItems)} />
+                    updateCurrentItems={setCurrentItems} />
             </div>
         </div >
     );
