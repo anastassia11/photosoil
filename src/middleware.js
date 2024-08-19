@@ -14,9 +14,13 @@ export function middleware(req) {
     if (!lng) lng = acceptLanguage.get(req.headers.get('Accept-Language'))
     if (!lng) lng = fallbackLng
 
+    // Проверяем, является ли запрашиваемый путь изображением
+    const isImageRequest = /\.(png|jpg|jpeg|gif|svg)$/.test(req.nextUrl.pathname);
+
     if (
         !languages.some(loc => req.nextUrl.pathname.startsWith(`/${loc}`)) &&
-        !req.nextUrl.pathname.startsWith('/_next')
+        !req.nextUrl.pathname.startsWith('/_next') &&
+        !isImageRequest
     ) {
         return NextResponse.redirect(new URL(`/${lng}${req.nextUrl.pathname}`, req.url))
     }
