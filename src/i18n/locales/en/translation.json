@@ -128,7 +128,7 @@
   "warning": "Warning",
   "will_admin": "User will receive administrator rights",
   "will_moderator": "User will no longer be an administrator and will receive moderator rights",
-
+  "search": "Search",
   "delete_accounts": "Accounts will be deleted",
   "error_account": "Error creating account",
   "created_account": "Account created",
@@ -285,6 +285,6 @@
   "soils_rod": "Soils",
   "ecosystems_rod": "Ecosystems",
   "publ_rod": "Publications",
-  "aythors_rod": "Authors",
+  "news_rod": "News",
   "last_news": "Latest news"
 }
