@@ -18,7 +18,7 @@ import { useParams } from 'next/navigation';
 
 export default function AuthorForm({ _author, onFormSubmit, isLoading, btnText }) {
     const dispatch = useDispatch();
-    const [author, setAuthor] = useState({});
+    const [author, setAuthor] = useState({ authorType: 3 });
     const [photo, setPhoto] = useState({});
     const [role, setRole] = useState(null);
     const { locale } = useParams();

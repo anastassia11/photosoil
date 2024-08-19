@@ -35,7 +35,7 @@ export default function CreateObject({ title, onCreate, type }) {
         let files = [...e.target.files];
         files.forEach((file, index) => {
             setPhotos(prev => [...prev, { createTwoLang: false, currentLang: 'ru', isLoading: true }]);
-            setFormData(prevData => [...prevData, { translations: [{ isEnglish: true }, { isEnglish: false }] }]);
+            setFormData(prevData => [...prevData, { objectType: 1, translations: [{ isEnglish: true }, { isEnglish: false }] }]);
             setOtherPhotos(prev => [...prev, []]);
             requestSendPhoto(file, index);
         });
@@ -57,7 +57,7 @@ export default function CreateObject({ title, onCreate, type }) {
         let files = [...e.dataTransfer.files];
         files.forEach((file, index) => {
             setPhotos(prev => [...prev, { createTwoLang: false, currentLang: 'ru', isLoading: true }]);
-            setFormData(prevData => [...prevData, { translations: [{ isEnglish: true }, { isEnglish: false }] }]);
+            setFormData(prevData => [...prevData, { objectType: 1, translations: [{ isEnglish: true }, { isEnglish: false }] }]);
             setOtherPhotos(prev => [...prev, []]);
             requestSendPhoto(file, index);
         });
@@ -67,7 +67,7 @@ export default function CreateObject({ title, onCreate, type }) {
 
     const handleSendPhoto = (file, index) => {
         setPhotos(prev => [...prev, { createTwoLang: false, currentLang: 'ru', isLoading: true }]);
-        setFormData(prevData => [...prevData, { translations: [{ isEnglish: true }, { isEnglish: false }] }]);
+        setFormData(prevData => [...prevData, { objectType: 1, translations: [{ isEnglish: true }, { isEnglish: false }] }]);
         setOtherPhotos(prev => [...prev, []]);
         requestSendPhoto(file, index + photos.length);
     }
@@ -211,7 +211,7 @@ export default function CreateObject({ title, onCreate, type }) {
         setCurrentForm(0);
         setPhotos([{ id, isLoading: false }]);
         setOtherPhotos([[]]);
-        setFormData([{ photoId: id, translations: [{ isEnglish: true }, { isEnglish: false }] }]);
+        setFormData([{ photoId: id, objectType: 1, translations: [{ isEnglish: true }, { isEnglish: false }] }]);
     }
 
     const PhotoCard = ({ id, path, idx, isLoading }) => {
@@ -278,7 +278,7 @@ export default function CreateObject({ title, onCreate, type }) {
             <div className='relative h-full'>
                 {!photos.length ? <>
                     {drag
-                        ? <div className={`h-[calc(100%-64px)] absolute bg-black/45 top-0 w-full rounded-lg border-dashed border-[1.5px]
+                        ? <div className={`h-[calc(100vh-200px)] absolute bg-black/45 top-0 w-full rounded-lg border-dashed border-[1.5px]
                 border-black/80 items-center justify-center flex z-30`}
                             onDragStart={e => handleDragStart(e)}
                             onDragLeave={e => handleDragLeave(e)}
