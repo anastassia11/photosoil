@@ -3,6 +3,7 @@
 import tokenVerification from '@/api/account/token_verification';
 import { getAuthor } from '@/api/author/get_author';
 import { getAuthors } from '@/api/author/get_authors';
+import { getQuantity } from '@/api/enums/get_quantity';
 import { getAllNews } from '@/api/news/get_allNews';
 import { getTranslation } from '@/i18n/client';
 import { BASE_SERVER_URL } from '@/utils/constants';
@@ -15,6 +16,7 @@ import { useEffect, useState } from 'react';
 export default function AdminPageComponent() {
     const [news, setNews] = useState([]);
     const [authors, setAuthors] = useState([]);
+    const [quantity, setQuantity] = useState({});
     const { locale } = useParams();
     const { t } = getTranslation(locale);
 
@@ -22,18 +24,31 @@ export default function AdminPageComponent() {
 
     useEffect(() => {
         fetchNews();
-        fetchAuthors();
+        // fetchAuthors();
+        fetchQuantity();
     }, [])
 
     useEffect(() => {
         authors.length && authors.forEach(({ id }) => fetchAuthor(id));
     }, [authors.length])
 
+
+    const fetchQuantity = async () => {
+        const result = await getQuantity();
+        if (result.success) {
+            setQuantity(result.data);
+        }
+    }
+
     const fetchNews = async () => {
         await tokenVerification({ isRequired: true });
         const result = await getAllNews();
         if (result.success) {
-            const _news = result.data.slice(0, 8);
+            const _news = result.data.slice(0, 8).sort((a, b) => {
+                const dateA = new Date(a.createdDate);
+                const dateB = new Date(b.createdDate);
+                return dateB.getTime() - dateA.getTime();
+            });
             setNews(_news);
         }
     }
@@ -131,24 +146,24 @@ export default function AdminPageComponent() {
                         <div className="flex flex-col px-4 sm:py-8 py-4 text-center">
                             <dt className="order-last text-lg font-medium text-gray-500">{t('soils_rod')}</dt>
 
-                            <dd className="text-4xl font-extrabold text-blue-600 md:text-5xl">48</dd>
+                            <dd className="text-4xl font-extrabold text-blue-600 md:text-5xl">{quantity.soilObject}</dd>
                         </div>
 
                         <div className="flex flex-col px-4 sm:py-8 py-4 text-center">
                             <dt className="order-last text-lg font-medium text-gray-500">{t('ecosystems_rod')}</dt>
 
-                            <dd className="text-4xl font-extrabold text-blue-600 md:text-5xl">24</dd>
+                            <dd className="text-4xl font-extrabold text-blue-600 md:text-5xl">{quantity.ecoSystem}</dd>
                         </div>
 
                         <div className="flex flex-col px-4 sm:py-8 py-4 text-center">
                             <dt className="order-last text-lg font-medium text-gray-500">{t('publ_rod')}</dt>
 
-                            <dd className="text-4xl font-extrabold text-blue-600 md:text-5xl">86</dd>
+                            <dd className="text-4xl font-extrabold text-blue-600 md:text-5xl">{quantity.publication}</dd>
                         </div>
                         <div className="flex flex-col px-4 sm:py-8 py-4 text-center">
-                            <dt className="order-last text-lg font-medium text-gray-500">{t('aythors_rod')}</dt>
+                            <dt className="order-last text-lg font-medium text-gray-500">{t('news_rod')}</dt>
 
-                            <dd className="text-4xl font-extrabold text-blue-600 md:text-5xl">48</dd>
+                            <dd className="text-4xl font-extrabold text-blue-600 md:text-5xl">{quantity.news}</dd>
                         </div>
                     </dl>
                 </div>
@@ -157,9 +172,9 @@ export default function AdminPageComponent() {
                 <h3 className="sm:text-3xl text-2xl font-semibold mb-8 text-center">{t('last_news')}</h3>
 
                 <ul className='w-full news-grid mb-4'>
-                    {news.map((item, idx) => <li key={`news_${idx}`} className='w-full h-full'>
+                    {news.map((item, idx) => item.translations?.find(({ isEnglish }) => isEnglish === _isEng) ? <li key={`news_${idx}`} className='w-full h-full'>
                         <NewsCard {...item} />
-                    </li>)}
+                    </li> : '')}
                 </ul>
             </section> : ''}
             {/* <section className='mt-12  mx-auto w-full max-w-[2000px]'>
