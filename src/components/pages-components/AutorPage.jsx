@@ -52,9 +52,9 @@ export default function AuthorPageComponent({ id }) {
 
     return (
         <div className='flex flex-col'>
-            <h1 className='sm:text-2xl text-xl font-semibold mb-2 flex flex-row items-center'>
+            <h1 className='sm:text-2xl text-xl font-semibold mb-2 flex justify-between md:flex-row md:items-center flex-col'>
                 {authorLang?.name}
-                <span className='ml-4'>
+                <span className='md:ml-4 mt-2 md:mt-0'>
                     {author.authorType !== undefined && <div className="flex items-center gap-x-2">
                         {author.authorType == '0' ? <p className="px-3 py-1 text-sm text-red-600 rounded-full bg-red-100/70">{t('main_editor')}</p> :
                             author.authorType == '1' ? <p className="px-3 py-1 text-sm text-emerald-600 rounded-full bg-emerald-100/70">{t('executive_editor')}</p> :

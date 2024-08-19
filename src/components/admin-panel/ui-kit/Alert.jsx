@@ -8,7 +8,7 @@ export default function Alert({ isOpen, type, message, title }) {
 
     return (
         <div className={`duration-300 fixed self-center mt-6 z-[100] border ${type === 'success' ? 'border-green-500 bg-green-50' :
-            type === 'error' ? 'border-red-500 bg-red-50' : 'border-amber-500 bg-orange-50'} px-2 rounded-md bg-green-50 md:max-w-2xl md:mx-auto md:px-8
+            type === 'error' ? 'border-red-500 bg-red-50' : 'border-amber-500 bg-orange-50'} px-2 rounded-md bg-green-50 md:max-w-2xl sm:mx-auto md:px-8 mx-4
         ${isOpen ? 'top-0' : '-top-32'}`}>
             <div className="flex justify-between py-3">
                 <div className="flex">

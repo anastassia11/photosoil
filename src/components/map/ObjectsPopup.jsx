@@ -38,30 +38,31 @@ export default function ObjectsPopup({ visible, objects, onCloseClick }) {
         return <Link href={`/${locale}/${object._type}s/${object.id}`}
             className={`flex flex-row hover:bg-zinc-100 duration-300 px-4 ${object._type === 'publication' ? 'py-2' : 'py-3'}`}>
             {object._type === 'publication' ? <div className='flex flex-col ml-1 max-w-full'>
-                <p className='text-blue-700'>
+                <p className='text-blue-700 text-sm sm:text-base'>
                     {PUBLICATION_ENUM[object.type] || ''}
                 </p>
-                <p className='mt-1'>
+                <p className='mt-1 text-sm sm:text-base'>
                     {currentTransl.name}
                 </p>
-                <p className="text-gray-600 text-nowrap text-ellipsis max-w-full overflow-hidden mt-1">
+                <p className="text-gray-600 text-nowrap text-ellipsis max-w-full overflow-hidden mt-1 text-sm sm:text-base">
                     {currentTransl.authors}
                 </p>
-            </div> : <> {object?.photo?.path
-                ? <Image src={`${BASE_SERVER_URL}${object.photo?.path}`}
-                    className="aspect-[3/4] object-cover object-top border border-blue-600 shadow-md rounded-xl w-[40%]"
-                    alt={object?.name}
-                    width={500}
-                    height={500} /> : ''}
-                <div className='flex flex-col ml-2'>
-                    <p className='text-blue-700'>
+            </div> : <div className='flex flex-row'>
+                {object?.photo?.path
+                    ? <div className='max-w-[40%] w-[40%]'><Image src={`${BASE_SERVER_URL}${object.photo?.path}`}
+                        className="aspect-[3/4] object-cover object-top border border-blue-600 shadow-md rounded-xl overflow-hidden"
+                        alt={object?.name}
+                        width={500}
+                        height={500} /></div> : ''}
+                <div className='flex flex-col ml-2 max-w-[60%]'>
+                    <p className='text-blue-700 text-sm sm:text-base'>
                         {object._type === 'soil' ? (SOIL_ENUM[object.objectType] || '') : ''}
                     </p>
-                    <p className='mt-1'>
+                    <p className='mt-1 text-sm sm:text-base'>
                         {currentTransl.name}
                     </p>
                 </div>
-            </>
+            </div>
             }
         </Link>
     }
@@ -93,7 +94,7 @@ export default function ObjectsPopup({ visible, objects, onCloseClick }) {
     return (
         <div className={`${visible ? "-left-[2px] z-30" : "sm:-left-[440px] z-20 -left-[calc(100%-94px)]"} 
        absolute top-0 sm:w-[400px] w-[calc(100%-100px)] sm:max-w-[400px] 
-     max-h-[calc(100%-16px)] 
+     sm:max-h-[calc(100%-16px)] max-h-[calc(100%-100px)] 
         shadow-lg bg-white duration-300 rounded-lg m-2 flex flex-row`}>
             <div className={`relative flex-1 flex flex-col max-w-full`}>
                 <button
