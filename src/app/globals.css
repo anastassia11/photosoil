@@ -11,6 +11,10 @@ body {
   padding: 0;
 }
 
+input[type="file"]::-webkit-file-upload-button {
+  display: none; /* Скрыть встроенную кнопку */
+}
+
 .scroll::-webkit-scrollbar {
   width: 10px;
   height: 5px;
@@ -62,7 +66,7 @@ body {
 @media screen and (min-width: 640px) {
   .news-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
     gap: 20px;
   }
 }
