@@ -186,13 +186,6 @@ export default function NewsForm({ _news, pathname, onNewsSubmit, isLoading, btn
         }
     }
 
-    const handleContentChange = (html) => {
-        setNews(prevNews => ({
-            ...prevNews, translations: prevNews.translations?.map(translation =>
-                translation.isEnglish === isEng ? { ...translation, content: html } : translation)
-        }));
-    }
-
     const handleAddTag = (newItem) => {
         setNews(prevNews => ({ ...prevNews, tags: prevNews.tags ? [...prevNews.tags, newItem] : [newItem] }));
     }
@@ -266,9 +259,19 @@ export default function NewsForm({ _news, pathname, onNewsSubmit, isLoading, btn
                     <label className="font-medium min-h-fit">
                         {`${t('news_text')} ${isEng ? '(EN)' : ''}`}
                     </label>
-                    <div className='w-full relative'>
-                        <TextEditor content={news.translations?.find(({ isEnglish }) => isEng === isEnglish)?.content || ''}
-                            setContent={handleContentChange} />
+                    <div className={`w-full relative ${isEng ? 'hidden' : 'block'}`}>
+                        <TextEditor content={news.translations?.find(({ isEnglish }) => !isEnglish)?.content || ''}
+                            setContent={html => setNews(prevNews => ({
+                                ...prevNews, translations: prevNews.translations?.map(translation =>
+                                    (!translation.isEnglish) ? { ...translation, content: html } : translation)
+                            }))} />
+                    </div>
+                    <div className={`w-full relative ${isEng ? 'block' : 'hidden'}`}>
+                        <TextEditor content={news.translations?.find(({ isEnglish }) => isEnglish)?.content || ''}
+                            setContent={html => setNews(prevNews => ({
+                                ...prevNews, translations: prevNews.translations?.map(translation =>
+                                    (translation.isEnglish) ? { ...translation, content: html } : translation)
+                            }))} />
                     </div>
                 </div>
 
@@ -313,7 +316,7 @@ export default function NewsForm({ _news, pathname, onNewsSubmit, isLoading, btn
 
                 <div className='mt-8 flex flex-col w-full md:w-1/2'>
                     <Filter name={t('tags')} items={tags} setTags={setTags}
-                        isEng={isEng}
+                        isEng={isEng} type='news-tags'
                         allSelectedItems={news?.tags}
                         addItem={newItem => handleAddTag(newItem)}
                         deleteItem={deletedItem => handleDeleteTag(deletedItem)}

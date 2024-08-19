@@ -18,8 +18,7 @@ export default function TextEditor({ content, setContent }) {
   const dropdown = useSelector(state => state.general.dropdown);
   const [url, setUrl] = useState("");
   const [isFocusing, setIsFocusing] = useState(false);
-  const contentInserting = useRef(false);
-
+  const contentInserting = useRef(false)
   const HEADING = {
     0: 'Paragraph',
     // 1: 'Heading 1',
@@ -69,14 +68,17 @@ export default function TextEditor({ content, setContent }) {
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
-      setContent(html);
+      if (html !== content) {
+        setContent(html);
+      }
     },
   });
 
   useEffect(() => {
-    if (!contentInserting.current && content) {
-      insertHtmlContent(content);
+    if (!contentInserting.current) {
       contentInserting.current = true;
+      insertHtmlContent(content);
+      contentInserting.current = false;
     }
   }, [content]);
 
@@ -102,7 +104,7 @@ export default function TextEditor({ content, setContent }) {
   }, [dropdown]);
 
   const insertHtmlContent = (htmlContent) => {
-    if (editor) {
+    if (editor && htmlContent !== editor.getHTML()) {
       editor.commands.setContent(htmlContent);
     }
   };
