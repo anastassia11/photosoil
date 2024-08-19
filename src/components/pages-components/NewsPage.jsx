@@ -12,7 +12,7 @@ import { PAGINATION_OPTIONS } from '@/utils/constants';
 import moment from 'moment';
 import Link from 'next/link';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getTranslation } from '@/i18n/client';
 
@@ -41,6 +41,18 @@ export default function NewsPageComponent() {
 
     const _isEng = locale === 'en';
 
+    const _filteredNews = useMemo(() => {
+        return news.filter(item =>
+            (draftIsVisible ? true : item.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible)
+            && item.translations?.find(transl => transl.isEnglish === _isEng)?.title.toLowerCase().includes(filterName.toLowerCase())
+            && (selectedTags.length === 0 || selectedTags.some(selectedTag => item.tags.some(({ id }) => id === selectedTag)))
+        ).sort((a, b) => {
+            const dateA = new Date(a.createdDate);
+            const dateB = new Date(b.createdDate);
+            return dateB.getTime() - dateA.getTime();
+        });
+    }, [filterName, news, draftIsVisible, selectedTags]);
+
     useEffect(() => {
         localStorage.getItem('tokenData') && setToken(JSON.parse(localStorage.getItem('tokenData'))?.token);
         fetchTags();
@@ -48,16 +60,8 @@ export default function NewsPageComponent() {
     }, [])
 
     useEffect(() => {
-        setFilteredNews(prev => news.filter(item =>
-            (draftIsVisible ? true : item.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible) &&
-            item.translations?.find(transl => transl.isEnglish === _isEng)?.title.toLowerCase().includes(filterName.toLowerCase()) &&
-            (selectedTags.length === 0 || selectedTags.some(selectedTag => item.tags.some(({ id }) => id === selectedTag)))
-        ).sort((a, b) => {
-            const dateA = new Date(a.createdDate);
-            const dateB = new Date(b.createdDate);
-            return dateB.getTime() - dateA.getTime();
-        }))
-    }, [filterName, news, selectedTags, draftIsVisible])
+        setFilteredNews(_filteredNews);
+    }, [_filteredNews])
 
     useEffect(() => {
         updateFiltersInHistory();
@@ -89,7 +93,6 @@ export default function NewsPageComponent() {
     const fetchNews = async () => {
         const result = await getAllNews();
         if (result.success) {
-            console.log(result.data)
             setNews(result.data)
         }
         setIsLoading(prev => ({ ...prev, items: false }))
@@ -141,24 +144,10 @@ export default function NewsPageComponent() {
                     className="w-full py-2 pl-12 pr-4 border rounded-md outline-none bg-white focus:border-blue-600"
                 />
             </div>
-
-
-
             <div className={`flex flex-row justify-end items-center`}>
-
-                {/* <MotionWrapper>
-                    <label htmlFor='draftIsVisible' className={`flex-row cursor-pointer items-center justify-center
-                    flex ${!token ? 'hidden' : 'flex'}`}>
-                        <input type="checkbox" id='draftIsVisible'
-                            checked={draftIsVisible}
-                            onChange={() => setDraftIsVisible(!draftIsVisible)}
-                            className="min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
-                        <span className='select-none'>{t('grafts_visible')}</span>
-                    </label>
-                </MotionWrapper> */}
                 <div className='self-end flex-row items-center justify-center w-[190px]'>
                     <Dropdown name={t('in_page')} value={itemsPerPage} items={PAGINATION_OPTIONS}
-                        onCategotyChange={setItemsPerPage} flexRow={true} dropdownKey='in_page' />
+                        onCategotyChange={setItemsPerPage} flexRow={true} dropdownKey='in_page' noBold={true} />
                 </div>
             </div>
             <MotionWrapper>
@@ -174,7 +163,7 @@ export default function NewsPageComponent() {
             <div className='mt-4 mb-6 filters-grid'>
                 {isLoading.tags ? <Loader className='w-full h-[40px]' /> :
                     <MotionWrapper>
-                        <Filter isEng={_isEng} itemId='tags'
+                        <Filter isEng={_isEng} itemId='tags' type='news-tags'
                             name={t('tags')}
                             items={tags}
                             allSelectedItems={selectedTags}
@@ -186,12 +175,12 @@ export default function NewsPageComponent() {
                 }
             </div>
 
-            <ul className='soils-grid mb-4'>
+            <ul className='news-grid mb-4'>
                 {isLoading.items ? Array(8).fill('').map((item, idx) => <li key={idx}>
-                    <Loader className='w-full h-full aspect-[2/1.5]' />
+                    <Loader className='w-full h-full aspect-[2/1]' />
                 </li>) : (
-                    news.length && filteredNews.length ? currentItems.map((item, idx) => <li key={`news_${idx}`} className='w-full h-full'>
-                        <MotionWrapper>
+                    news.length && filteredNews.length ? filteredNews.map((item, idx) => <li key={`news_${idx}`} className='w-full h-full'>
+                        <MotionWrapper className='w-full h-full'>
                             <NewsCard {...item} />
                         </MotionWrapper>
                     </li>) : <MotionWrapper className='col-span-full'>
@@ -202,7 +191,7 @@ export default function NewsPageComponent() {
             </ul>
 
             <Pagination itemsPerPage={PAGINATION_OPTIONS[itemsPerPage]} items={filteredNews}
-                updateCurrentItems={(newCurrentItems) => setCurrentItems(newCurrentItems)} />
+                updateCurrentItems={setCurrentItems} />
         </div>
     )
 }

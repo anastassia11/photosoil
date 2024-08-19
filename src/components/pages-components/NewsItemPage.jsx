@@ -40,7 +40,6 @@ export default function NewsItemPageComponent({ id }) {
     const fetchNews = async () => {
         const result = await getNewsById(id)
         if (result.success) {
-            console.log(result.data)
             setNews(result.data)
         }
     }

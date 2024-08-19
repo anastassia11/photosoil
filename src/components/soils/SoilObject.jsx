@@ -29,10 +29,6 @@ export default function SoilObject({ object, children, type }) {
         localStorage.getItem('tokenData') && setTokenData(JSON.parse(localStorage.getItem('tokenData')));
     }, [])
 
-    useEffect(() => {
-        console.log(object.photo)
-    }, [object.photo])
-
     return (
         <div className='flex flex-col'>
             <div className='flex flex-col sm:flex-row mb-2 justify-between sm:items-center'>

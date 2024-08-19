@@ -109,7 +109,7 @@ export default function Authors() {
                     </MotionWrapper>}
             </ul>
             <Pagination itemsPerPage={PAGINATION_OPTIONS[itemsPerPage]} items={filteredAuthors}
-                updateCurrentItems={(newCurrentItems) => setCurrentItems(newCurrentItems)} />
+                updateCurrentItems={setCurrentItems} />
         </div >
     )
 }

@@ -8,7 +8,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { usePathname, useRouter } from 'next/navigation';
 import { closeAlert } from '@/store/slices/alertSlice';
 import dynamic from 'next/dynamic';
-import MotionWrapper from '@/components/admin-panel/ui-kit/MotionWrapper';
 
 const Alert = dynamic(() => import('@/components/admin-panel/ui-kit/Alert'), { ssr: false });
 const Modal = dynamic(() => import('@/components/admin-panel/ui-kit/Modal'), { ssr: false });

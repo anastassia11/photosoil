@@ -136,7 +136,7 @@ export default function Publications() {
                 </div>
             </section>
             <Pagination itemsPerPage={PAGINATION_OPTIONS[itemsPerPage]} items={filteredPublications}
-                updateCurrentItems={(newCurrentItems) => setCurrentItems(newCurrentItems)} />
+                updateCurrentItems={setCurrentItems} />
         </div>
     )
 }

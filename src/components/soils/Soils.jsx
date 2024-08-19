@@ -216,6 +216,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
                                 {isAllSoils ? <li key='category'>
                                     <MotionWrapper>
                                         <Filter name={t('category')} items={CATEGORY_ARRAY}
+                                            type='category'
                                             allSelectedItems={selectedCategories}
                                             addItem={handleAddCategory}
                                             deleteItem={handleDeleteCategorie}
@@ -230,6 +231,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
                                             <li key={item.id}>
                                                 <MotionWrapper>
                                                     <Filter isEng={locale === 'en'} itemId={item.id}
+                                                        type='classif'
                                                         name={isEnglish ? item.nameEng : item.nameRu}
                                                         items={item.terms}
                                                         allSelectedItems={selectedTerms}
@@ -279,7 +281,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
                     </>}
             </ul>
             <Pagination itemsPerPage={PAGINATION_OPTIONS[itemsPerPage]} items={filteredSoils}
-                updateCurrentItems={(newCurrentItems) => setCurrentItems(newCurrentItems)} />
+                updateCurrentItems={setCurrentItems} />
         </div >
     )
 }

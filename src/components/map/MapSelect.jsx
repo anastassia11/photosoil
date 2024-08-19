@@ -149,7 +149,7 @@ export default function MapSelect({ id, type, latitude, longtitude, onCoordinate
         if (type === "soil") {
             return createIconStyle('/soil-marker.svg');
         }
-        return createIconStyle('/public/mapicons/map-marker.svg');
+        return createIconStyle('/map-marker.svg');
     }
 
 
