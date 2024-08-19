@@ -8,7 +8,7 @@ import { setDropdown } from '@/store/slices/generalSlice'
 import { openModal } from '@/store/slices/modalSlice';
 import modalThunkActions from '@/store/thunks/modalThunk';
 import { useParams, usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Oval } from 'react-loader-spinner';
 import { useDispatch, useSelector } from 'react-redux'
 import { Tooltip } from 'react-tooltip';
@@ -18,7 +18,7 @@ export default function Filter({ type, itemId, name, items, setTags, allSelected
     const [filterOpen, setFilterOpen] = useState(false)
     const paths = usePathname();
     const pathNames = paths.split('/').filter(path => path);
-
+    const searchRef = useRef(null);
     const dropdown = useSelector(state => state.general.dropdown);
     const [selectedItems, setSelectedItems] = useState([]);
     const [filterName, setFilterName] = useState('');
@@ -33,6 +33,12 @@ export default function Filter({ type, itemId, name, items, setTags, allSelected
     const { t } = getTranslation(locale);
 
     const _id = itemId ? `filter-${itemId}` : name;
+
+    useEffect(() => {
+        if (dropdown.key == _id && dropdown.isActive) {
+            searchRef.current.focus();
+        }
+    }, [dropdown]);
 
     useEffect(() => {
         items && setSelectedItems(items.filter(({ id }) => allSelectedItems?.includes(id)).map(({ id }) => id));
@@ -222,8 +228,9 @@ export default function Filter({ type, itemId, name, items, setTags, allSelected
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                             <input value={filterName}
+                                ref={searchRef}
                                 type="text"
-                                placeholder="Найти"
+                                placeholder={t('search')}
                                 className={`w-full pr-4  outline-none  ${isMapFilter ? 'border-b focus:border-blue-600 py-1 pl-[32px]' : 'py-2 pl-12  border-y'}`}
                                 onChange={(e) => setFilterName(e.target.value)}
                             />

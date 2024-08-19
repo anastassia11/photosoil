@@ -359,7 +359,8 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                                 </li>
                             })}
                             <li key='authors' className={`mt-3`}>
-                                <Filter name={t('authors')} items={authors}
+                                <Filter itemId={`author`} name={t('authors')} items={authors}
+                                    type='authors'
                                     allSelectedItems={object?.authors} isEng={isEng}
                                     addItem={newItem => handleAddTerm('authors', newItem)}
                                     deleteItem={deletedItem => handleDeleteTerm('authors', deletedItem)}
@@ -427,7 +428,10 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                         {classifications?.map(item => {
                             const isVisible = item.translationMode == 0 || (isEng ? (item.translationMode == 1) : (item.translationMode == 2))
                             if (isVisible) return <li key={`classification-${item.id}`}>
-                                <Filter itemId={`classif-${item.id}`} name={isEng ? item.nameEng : item.nameRu} items={item.terms} isEng={isEng}
+                                <Filter
+                                    type='classif'
+                                    itemId={`classif-${item.id}`} name={isEng ? item.nameEng : item.nameRu}
+                                    items={item.terms} isEng={isEng}
                                     allSelectedItems={object?.soilTerms}
                                     addItem={newItem => handleAddTerm('soilTerms', newItem)}
                                     deleteItem={deletedItem => handleDeleteTerm('soilTerms', deletedItem)}
