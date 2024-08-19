@@ -7,9 +7,11 @@ import { getTranslation } from '@/i18n/client'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
+import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper'
 
 export default function SoilPageComponent({ id }) {
     const [soil, setSoil] = useState({});
+    const [featuresVisible, setFeaturesVisible] = useState(false);
     const { locale } = useParams();
     const { t } = getTranslation(locale);
     const { SOIL_INFO, SOIL_ENUM } = useConstants();
@@ -41,18 +43,30 @@ export default function SoilPageComponent({ id }) {
         <SoilObject object={soil} type='soil'>
             <ul className='flex flex-col space-y-2 '>
                 {SOIL_INFO.map(({ name, title }) => {
-                    let _isEng = locale === 'en';
                     return (soil?.hasOwnProperty(name) || currentTransl?.hasOwnProperty(name)) ? <li key={name}
                         className='flex lg:flex-row flex-col w-full lg:space-x-4 space-x-0'>
                         <span className='lg:w-[40%] w-full text-zinc-500 font-semibold'>
                             {title}
                         </span>
-                        <span className={`lg:w-[60%] w-full  }`}>
-                            {name === 'objectType' ? <Link href={`/${locale}/soils?categories=${soil.objectType}`}
-                                className='text-blue-600 hover:underline'>
-                                {SOIL_ENUM[soil.objectType]}
-                            </Link> : currentTransl[name]}
-                        </span>
+                        <div id={name} className='lg:w-[60%] w-full flex flex-col items-start'>
+                            <span className={`${name === 'soilFeatures' ? (featuresVisible ? '' : 'line-clamp-6') : ''}`}>
+                                {name === 'objectType' ? <Link href={`/${locale}/soils?categories=${soil.objectType}`}
+                                    className='text-blue-600 hover:underline'>
+                                    {SOIL_ENUM[soil.objectType]}
+                                </Link> : currentTransl[name]}
+                            </span>
+                            {name === 'soilFeatures' ? <button className='text-blue-600'
+                                onClick={() => {
+                                    document.getElementById('soilFeatures').scrollIntoView({
+                                        behavior: 'smooth',
+                                        block: 'start',
+                                        inline: 'nearest',
+                                    });
+                                    setFeaturesVisible(!featuresVisible)
+                                }}>
+                                {featuresVisible ? 'Свернуть' : 'Развернуть..'}
+                            </button> : ''}
+                        </div>
                     </li> : ''
                 })}
 
