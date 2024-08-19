@@ -5,7 +5,7 @@ import { putPublication } from '@/api/publication/put_publication';
 import PublicationForm from '@/components/admin-panel/PublicationForm'
 import { getTranslation } from '@/i18n/client';
 import { openAlert } from '@/store/slices/alertSlice';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -17,6 +17,7 @@ export default function PublicationEditComponent({ id }) {
     const [oldTwoLang, setOldTwoLang] = useState(false);
     const { locale } = useParams();
     const { t } = getTranslation(locale);
+    const router = useRouter();
 
     useEffect(() => {
         fetchPublication();
@@ -44,6 +45,7 @@ export default function PublicationEditComponent({ id }) {
     const fetchEditPublication = async (data) => {
         const result = await putPublication(id, data);
         if (result.success) {
+            router.push(`/${locale}/admin/publications`);
             dispatch(openAlert({ title: t('success'), message: t('success_edit'), type: 'success' }));
         } else {
             dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }));

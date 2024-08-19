@@ -18,6 +18,7 @@ export default function NewsEditComponent({ id }) {
     const [oldTwoLang, setOldTwoLang] = useState(false);
     const { locale } = useParams();
     const { t } = getTranslation(locale);
+    const router = useRouter();
 
     useEffect(() => {
         fetchNews();
@@ -45,6 +46,7 @@ export default function NewsEditComponent({ id }) {
     const fetchEditNews = async (data) => {
         const result = await putNews(id, data);
         if (result.success) {
+            router.push(`/${locale}/admin/news`);
             dispatch(openAlert({ title: t('success'), message: t('success_edit'), type: 'success' }));
         } else {
             dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }));

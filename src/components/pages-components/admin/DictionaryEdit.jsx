@@ -9,7 +9,7 @@ import DictionaryForm from '@/components/admin-panel/DictionaryForm';
 import { openAlert } from '@/store/slices/alertSlice';
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { getTranslation } from '@/i18n/client';
 
 export default function DictionaryEditPageComponent({ id }) {
@@ -18,6 +18,7 @@ export default function DictionaryEditPageComponent({ id }) {
     const [isLoading, setIsLoading] = useState(false);
     const { locale } = useParams();
     const { t } = getTranslation(locale);
+    const router = useRouter();
 
     useEffect(() => {
         fetchDictionary();
@@ -61,6 +62,7 @@ export default function DictionaryEditPageComponent({ id }) {
                     return Promise.resolve();
                 })
             ]);
+            router.push(`/${locale}/admin/dictionary`);
             dispatch(openAlert({ title: t('success'), message: t('success_edit'), type: 'success' }));
         } catch (error) {
             dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }));

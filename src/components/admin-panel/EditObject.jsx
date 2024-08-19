@@ -9,7 +9,7 @@ import React, { useEffect, useState } from 'react'
 import { Oval } from 'react-loader-spinner';
 import { useDispatch } from 'react-redux';
 import { putEcosystem } from '@/api/ecosystem/put_ecosystem';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { getSoil } from '@/api/soil/get_soil';
 import { getEcosystem } from '@/api/ecosystem/get_ecosystem';
 import { getTranslation } from '@/i18n/client';
@@ -24,6 +24,7 @@ export default function EditObject({ id, type, title }) {
     const [oldTwoLang, setOldTwoLang] = useState(false);
     const { locale } = useParams();
     const { t } = getTranslation(locale);
+    const router = useRouter();
 
     useEffect(() => {
         fetchObject()
@@ -122,6 +123,7 @@ export default function EditObject({ id, type, title }) {
                     ...otherPhotos.map(photo => editPhoto(photo.id, createTwoLang ? { titleEng: photo.titleEng || '', titleRu: photo.titleRu || '' }
                         : (searchParams.get('lang') === 'eng' ? { titleEng: photo.titleEng || '' } : { titleRu: photo.titleRu || '' })))
                 ]);
+                router.push(`/${locale}/admin/${type === 'soil' ? 'objects' : 'ecosystems'}`);
                 dispatch(openAlert({ title: t('success'), message: t('success_edit'), type: 'success' }));
             } catch (error) {
                 dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }));

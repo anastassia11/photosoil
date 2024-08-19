@@ -5,7 +5,7 @@ import { putAuthor } from '@/api/author/put_author';
 import AuthorForm from '@/components/admin-panel/AuthorForm';
 import { getTranslation } from '@/i18n/client';
 import { openAlert } from '@/store/slices/alertSlice';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -15,6 +15,7 @@ export default function AuthorEditComponent({ id }) {
     const [isLoading, setIsLoading] = useState(false);
     const { locale } = useParams();
     const { t } = getTranslation(locale);
+    const router = useRouter();
 
     useEffect(() => {
         fetchAuthor()
@@ -41,6 +42,7 @@ export default function AuthorEditComponent({ id }) {
         setIsLoading(true);
         const result = await putAuthor(id, data);
         if (result.success) {
+            router.push(`/${locale}/admin/authors`);
             dispatch(openAlert({ title: t('success'), message: t('success_edit'), type: 'success' }))
         } else {
             dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }))
