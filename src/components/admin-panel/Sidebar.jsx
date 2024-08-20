@@ -87,7 +87,7 @@ export default function Sidebar() {
 
 
     return (
-        <aside className="flex flex-col sm:min-w-[290px] min-w-[270px] h-screen sm:px-6 px-4 overflow-y-auto bg-white 
+        <aside className="backface flex flex-col sm:min-w-[290px] min-w-[270px] h-screen sm:px-6 px-4 overflow-y-auto bg-white 
         border-r border-l rtl:border-r-0 rtl:border-l">
             <Link prefetch={false}
                 href={`/${locale}`} className='hover:cursor-pointer border-b flex flex-row items-center sm:h-[70px] h-[60px]'>

@@ -188,7 +188,8 @@ export default function TextEditor({ content, setContent }) {
           </button>
         </BubbleMenu>
 
-        <div className='w-[155px]'>
+        <div className='w-[155px] backface'
+          onClick={e => e.stopPropagation()}>
           <Dropdown flexRow={true} noBold={true}
             value={editor?.isActive('heading', { level: 1 }) ? "1"
               : editor?.isActive('heading', { level: 2 }) ? "2"
@@ -247,12 +248,15 @@ export default function TextEditor({ content, setContent }) {
 
         <div
           className={`${editor.isActive("link") || (dropdown.key == 'linkModal' && dropdown.isActive) ? 'text-blue-600' : 'text-gray-700'} linkModal cursor-pointer relative border border-transparent
-          rounded-md hover:text-blue-600 duration-300`}>
+          rounded-md hover:text-blue-600 duration-300 backface`}
+          onClick={e => e.stopPropagation()}>
           <div onClick={openModal} className='linkModal h-full p-2 flex items-center justify-center'>
             <Icons.Link strokeWidth={(dropdown.key === 'linkModal' && dropdown.isActive) ? '2.5' : '2'} />
           </div>
-          <div className={`${dropdown.key == 'linkModal' && dropdown.isActive ? 'visible translate-y-4' : 'invisible opacity-0'} z-50 duration-200 space-x-4
-            transition-all absolute rounded-md border border-gray-200 bg-white p-2 min-w-fit flex flex-row top-[20px] -left-[120px]`}>
+          <div className={`${dropdown.key == 'linkModal' && dropdown.isActive ? 'visible translate-y-4' : 'invisible opacity-0'} z-50 duration-200 
+            sm:space-x-4 space-x-2
+            transition-all absolute rounded-md border border-gray-200 bg-white p-2 pr-4 min-w-fit flex flex-row top-[20px] -left-[120px]`}
+            onClick={e => e.stopPropagation()}>
             <input ref={linkRef}
               value={url}
               onChange={(e) => {
@@ -272,7 +276,7 @@ export default function TextEditor({ content, setContent }) {
         </div>
       </div>
 
-      <EditorContent editor={editor} className='p-2 focus:outline-none' />
+      <EditorContent editor={editor} className='pointer-events-auto z-40 p-2 focus:outline-none' />
     </div>
   );
 }

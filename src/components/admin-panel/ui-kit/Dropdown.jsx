@@ -27,7 +27,9 @@ export default function Dropdown({ name, value, items, onCategotyChange, flexRow
             <div className={`${flexRow ? 'w-full' : 'mt-1'} relative`}>
                 <div className={`h-[40px] ${dropdownKey} ${!isTransparent && 'bg-white border'} flex cursor-pointer 
                     items-center justify-between gap-2 p-2 transition rounded-md`}
-                    onClick={() => dispatch(setDropdown({ key: dropdownKey, isActive: dropdown.key !== null && dropdown.key !== dropdownKey ? true : !dropdown.isActive }))}>
+                    onClick={() =>
+                        dispatch(setDropdown({ key: dropdownKey, isActive: dropdown.key !== null && dropdown.key !== dropdownKey ? true : !dropdown.isActive }))
+                    }>
                     <span className="overflow-hidden whitespace-nowrap text-ellipsis">{selectedValue ? selectedValue.name : ''}</span>
                     <span className={`transition ${dropdown.key == dropdownKey && dropdown.isActive ? '-rotate-180' : ''} `}>
                         <svg
@@ -47,9 +49,7 @@ export default function Dropdown({ name, value, items, onCategotyChange, flexRow
                     absolute w-full rounded-md border border-gray-200 bg-white top-[30px]
                     ${dropdown.key == dropdownKey && dropdown.isActive ? 'visible translate-y-4' : 'invisible opacity-0'}`}
                     onClick={() => dispatch(setDropdown({ key: null, isActive: false }))}>
-
-                    <ul className={`scroll space-y-1 py-2 max-h-[200px] overflow-auto
-                 `}>
+                    <ul className={`scroll space-y-1 py-2 max-h-[200px] overflow-auto`}>
                         {items ? Object.entries(items).map(([key, value]) => <li key={`objectType-${key}`}>
                             <button type='button' className={`duration-300 space-x-2 flex-row justify-between w-full  cursor-pointer hover:text-blue-600 min-h-9 h-fit
                             hover:bg-zinc-100 flex px-4 items-center ${key === selectedValue?.id ? 'text-blue-600' : ''}`}
