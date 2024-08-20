@@ -20,7 +20,8 @@ export default function Dropdown({ name, value, items, onCategotyChange, flexRow
     }
 
     return (
-        <div className={`${flexRow && 'flex flex-row items-center space-x-3 '}`}>
+        <div className={`${flexRow && 'flex flex-row items-center space-x-3 '} backface`}
+            onClick={e => e.stopPropagation()}>
             <label className={`${!noBold && 'font-medium'} min-w-fit`}>
                 {name}
             </label>

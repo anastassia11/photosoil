@@ -188,8 +188,7 @@ export default function TextEditor({ content, setContent }) {
           </button>
         </BubbleMenu>
 
-        <div className='w-[155px] backface'
-          onClick={e => e.stopPropagation()}>
+        <div className='w-[155px]'>
           <Dropdown flexRow={true} noBold={true}
             value={editor?.isActive('heading', { level: 1 }) ? "1"
               : editor?.isActive('heading', { level: 2 }) ? "2"
