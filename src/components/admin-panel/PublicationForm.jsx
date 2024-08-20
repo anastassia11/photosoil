@@ -44,8 +44,18 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
     }, [])
 
     useEffect(() => {
+        fetchEcosystems();
+        fetchSoils();
+    }, [])
+
+    useEffect(() => {
         if (_publication) {
-            setPublication({ ..._publication, fileId: _publication.file?.id });
+            setPublication({
+                ..._publication,
+                fileId: _publication.file?.id,
+                soilObjects: _publication.soilObjects?.map(({ id }) => id),
+                ecoSystems: _publication.ecoSystems?.map(({ id }) => id),
+            });
             setCoordinates(_publication.coordinates ? JSON.parse(_publication.coordinates) : []);
             _publication.file && setFile(_publication.file);
             setIsEng(oldIsEng);
