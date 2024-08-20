@@ -1,21 +1,16 @@
 'use client'
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import * as Tabs from "@radix-ui/react-tabs";
 import Filter from '../soils/Filter'
 import { useCallback, useEffect, useState } from 'react';
-import { BASE_SERVER_URL } from '@/utils/constants';
-import Image from 'next/image';
 import { sendPhoto } from '@/api/photo/send_photo';
 import { getAuthors } from '@/api/author/get_authors';
-import { getEcosystems } from '@/api/ecosystem/get_ecosystems';
 import Dropdown from './ui-kit/Dropdown';
 import DragAndDrop from './ui-kit/DragAndDrop';
 import { deletePhotoById } from '@/api/photo/delete_photo';
 import uuid from 'react-uuid';
 import { closeModal, openModal } from '@/store/slices/modalSlice';
-import { getPublications } from '@/api/publication/get_publications';
-import { Oval } from 'react-loader-spinner';
 import { useConstants } from '@/hooks/useConstants';
 import modalThunkActions from '@/store/thunks/modalThunk';
 import { getBaseEcosystems } from '@/api/ecosystem/get_base_ecosystems';
@@ -291,7 +286,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
             className={`flex flex-col w-full h-fit max-h-full ${pathname !== 'edit' ? 'pb-[200px]' : 'pb-16'}`}>
             <div className='flex flex-col w-full h-full'>
                 <div className='grid md:grid-cols-2 grid-cols-1 gap-4 w-full'>
-                    <Tabs.Root defaultValue={false} className="md:col-span-2" value={isEng}
+                    <Tabs.Root defaultValue={false} className="pt-2 md:col-span-2 sticky top-0 z-40  bg-[#f6f7f9]" value={isEng}
                         onValueChange={handleLangChange}>
                         <Tabs.List className="w-full border-b flex md:items-center gap-x-4 overflow-x-auto justify-between md:flex-row flex-col">
                             <div className='flex items-center gap-x-4 overflow-x-auto md:order-1 order-2'>
@@ -393,92 +388,96 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                                 onCoordinateChange={handleCoordChange} />
                         </div>
                     </div>
-                </div>
-                <p className='font-medium mt-8'>{t('main_photo')}<span className='text-orange-500'>*</span></p>
-                {mainPhoto.isLoading || mainPhoto.path ?
-                    <div className='grid md:grid-cols-2 grid-cols-1 gap-4 mt-1'>
-                        <PhotoCard {...mainPhoto} isEng={isEng} onDelete={handleMainPhotoDelete}
-                            onChange={handleMainPhotoChange} />
-                    </div>
-                    : <div className='md:w-[50%] w-full h-[150px] pr-2 mt-1'>
-                        <DragAndDrop onLoadClick={handleMainPhotoSend} isMultiple={false} accept='img' />
-                    </div>}
+
+                    <div className='md:col-span-2'>
+                        <p className='font-medium mt-8'>{t('main_photo')}<span className='text-orange-500'>*</span></p>
+                        {mainPhoto.isLoading || mainPhoto.path ?
+                            <div className='grid md:grid-cols-2 grid-cols-1 gap-4 mt-1'>
+                                <PhotoCard {...mainPhoto} isEng={isEng} onDelete={handleMainPhotoDelete}
+                                    onChange={handleMainPhotoChange} />
+                            </div>
+                            : <div className='md:w-[50%] w-full h-[150px] pr-2 mt-1'>
+                                <DragAndDrop onLoadClick={handleMainPhotoSend} isMultiple={false} accept='img' />
+                            </div>}
 
 
-                <p className='font-medium mt-8'>{t('other_photos')}</p>
-                {!otherPhotos?.length ?
-                    <div className='md:w-[50%] w-full h-[150px] pr-2 mt-1'>
-                        <DragAndDrop onLoadClick={handleOtherPhotoSend} isMultiple={true} accept='img' />
-                    </div>
-                    :
-                    <ul className={`grid md:grid-cols-2 grid-cols-1 gap-4 `}>
-                        {otherPhotos.map(photo => <li key={photo.id}>
-                            <PhotoCard {...photo} isEng={isEng} onDelete={handleOtherPhotoDelete}
-                                onChange={handleOtherPhotosChange} />
-                        </li>)}
-                        <div className='h-[150px]'>
-                            <DragAndDrop onLoadClick={handleOtherPhotoSend} isMultiple={true} accept='img' />
+                        <p className='font-medium mt-8'>{t('other_photos')}</p>
+                        {!otherPhotos?.length ?
+                            <div className='md:w-[50%] w-full h-[150px] pr-2 mt-1'>
+                                <DragAndDrop onLoadClick={handleOtherPhotoSend} isMultiple={true} accept='img' />
+                            </div>
+                            :
+                            <ul className={`grid md:grid-cols-2 grid-cols-1 gap-4 `}>
+                                {otherPhotos.map(photo => <li key={photo.id}>
+                                    <PhotoCard {...photo} isEng={isEng} onDelete={handleOtherPhotoDelete}
+                                        onChange={handleOtherPhotosChange} />
+                                </li>)}
+                                <div className='h-[150px]'>
+                                    <DragAndDrop onLoadClick={handleOtherPhotoSend} isMultiple={true} accept='img' />
+                                </div>
+                            </ul>}
+
+
+                        {type === 'soil' && <>
+                            <p className='font-medium mt-8'>{t('classifications')}</p>
+                            <ul className='grid md:grid-cols-2 grid-cols-1 gap-4 w-full mt-1'>
+                                {classifications?.map(item => {
+                                    const isVisible = item.translationMode == 0 || (isEng ? (item.translationMode == 1) : (item.translationMode == 2))
+                                    if (isVisible) return <li key={`classification-${item.id}`}>
+                                        <Filter
+                                            type='classif'
+                                            itemId={`classif-${item.id}`} name={isEng ? item.nameEng : item.nameRu}
+                                            items={item.terms} isEng={isEng}
+                                            allSelectedItems={object?.soilTerms}
+                                            addItem={newItem => handleAddTerm('soilTerms', newItem)}
+                                            deleteItem={deletedItem => handleDeleteTerm('soilTerms', deletedItem)}
+                                            resetItems={deletedItems => handleResetTerms('soilTerms', deletedItems)}
+                                        />
+                                    </li>
+                                })}
+                            </ul>
+                        </>}
+
+                        <p className='font-medium mt-8'>{t('connection')}</p>
+                        <div className='grid md:grid-cols-2 grid-cols-1 gap-4 w-full mt-1'>
+                            {type !== 'ecosystem' && <Filter name={t('ecosystems')} items={ecosystems}
+                                type='ecosystem'
+                                allSelectedItems={object?.ecoSystems} isEng={isEng}
+                                addItem={newItem => handleAddTerm('ecoSystems', newItem)}
+                                deleteItem={deletedItem => handleDeleteTerm('ecoSystems', deletedItem)}
+                                resetItems={deletedItems => handleResetTerms('ecoSystems', deletedItems)}
+                            />}
+
+                            {type !== 'soil' && <Filter name={t('soils')} items={soils}
+                                type='soil'
+                                allSelectedItems={object?.soilObjects} isEng={isEng}
+                                addItem={newItem => handleAddTerm('soilObjects', newItem)}
+                                deleteItem={deletedItem => handleDeleteTerm('soilObjects', deletedItem)}
+                                resetItems={deletedItems => handleResetTerms('soilObjects', deletedItems)}
+                            />}
+
+                            <Filter name={t('publications')} items={publications}
+                                type='publications'
+                                allSelectedItems={object?.publications} isEng={isEng}
+                                addItem={newItem => handleAddTerm('publications', newItem)}
+                                deleteItem={deletedItem => handleDeleteTerm('publications', deletedItem)}
+                                resetItems={deletedItems => handleResetTerms('publications', deletedItems)}
+                            />
                         </div>
-                    </ul>}
 
-
-                {type === 'soil' && <>
-                    <p className='font-medium mt-8'>{t('classifications')}</p>
-                    <ul className='grid md:grid-cols-2 grid-cols-1 gap-4 w-full mt-1'>
-                        {classifications?.map(item => {
-                            const isVisible = item.translationMode == 0 || (isEng ? (item.translationMode == 1) : (item.translationMode == 2))
-                            if (isVisible) return <li key={`classification-${item.id}`}>
-                                <Filter
-                                    type='classif'
-                                    itemId={`classif-${item.id}`} name={isEng ? item.nameEng : item.nameRu}
-                                    items={item.terms} isEng={isEng}
-                                    allSelectedItems={object?.soilTerms}
-                                    addItem={newItem => handleAddTerm('soilTerms', newItem)}
-                                    deleteItem={deletedItem => handleDeleteTerm('soilTerms', deletedItem)}
-                                    resetItems={deletedItems => handleResetTerms('soilTerms', deletedItems)}
-                                />
-                            </li>
-                        })}
-                    </ul>
-                </>}
-
-                <p className='font-medium mt-8'>{t('connection')}</p>
-                <div className='grid md:grid-cols-2 grid-cols-1 gap-4 w-full mt-1'>
-                    {type !== 'ecosystem' && <Filter name={t('ecosystems')} items={ecosystems}
-                        type='ecosystem'
-                        allSelectedItems={object?.ecoSystems} isEng={isEng}
-                        addItem={newItem => handleAddTerm('ecoSystems', newItem)}
-                        deleteItem={deletedItem => handleDeleteTerm('ecoSystems', deletedItem)}
-                        resetItems={deletedItems => handleResetTerms('ecoSystems', deletedItems)}
-                    />}
-
-                    {type !== 'soil' && <Filter name={t('soils')} items={soils}
-                        type='soil'
-                        allSelectedItems={object?.soilObjects} isEng={isEng}
-                        addItem={newItem => handleAddTerm('soilObjects', newItem)}
-                        deleteItem={deletedItem => handleDeleteTerm('soilObjects', deletedItem)}
-                        resetItems={deletedItems => handleResetTerms('soilObjects', deletedItems)}
-                    />}
-
-                    <Filter name={t('publications')} items={publications}
-                        type='publications'
-                        allSelectedItems={object?.publications} isEng={isEng}
-                        addItem={newItem => handleAddTerm('publications', newItem)}
-                        deleteItem={deletedItem => handleDeleteTerm('publications', deletedItem)}
-                        resetItems={deletedItems => handleResetTerms('publications', deletedItems)}
-                    />
+                        <div className='mt-8 md:w-[50%] w-full md:pr-2 pr-0'>  {
+                            Input({
+                                label: t('code'),
+                                name: 'code',
+                                value: object.code,
+                                required: false,
+                                onChange: handleInputChange
+                            })
+                        }
+                        </div>
+                    </div>
                 </div>
 
-                <div className='mt-8 md:w-[50%] w-full md:pr-2 pr-0'>  {
-                    Input({
-                        label: t('code'),
-                        name: 'code',
-                        value: object.code,
-                        required: false,
-                        onChange: handleInputChange
-                    })
-                }
-                </div>
             </div>
         </form >
     )

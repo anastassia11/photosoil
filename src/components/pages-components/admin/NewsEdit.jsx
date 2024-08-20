@@ -85,7 +85,7 @@ export default function NewsEditComponent({ id }) {
 
     return (
         <div className="flex flex-col w-full flex-1 pb-44">
-            <h1 className='sm:text-2xl text-xl font-semibold mb-4'>
+            <h1 className='sm:text-2xl text-xl font-semibold mb-2'>
                 {t('edit_news')}
             </h1>
             {news && <NewsForm _news={news} isLoading={isLoading}

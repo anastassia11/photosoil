@@ -174,7 +174,7 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
             className="flex flex-col w-full h-fit pb-16">
             <div className='flex flex-col w-full h-full pb-16'>
                 <div className='grid md:grid-cols-2 grid-cols-1 gap-4 w-full'>
-                    <Tabs.Root defaultValue={false} className="md:col-span-2" value={isEng}
+                    <Tabs.Root defaultValue={false} className="pt-2 md:col-span-2 sticky top-0 z-40  bg-[#f6f7f9]" value={isEng}
                         onValueChange={handleLangChange}>
                         <Tabs.List className="w-full border-b flex md:items-center gap-x-4 overflow-x-auto justify-between md:flex-row flex-col">
                             <div className='flex items-center gap-x-4 overflow-x-auto md:order-1 order-2'>
