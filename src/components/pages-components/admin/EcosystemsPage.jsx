@@ -79,6 +79,7 @@ export default function EcosystemsAdminComponent() {
                     {t('ecosystems')}
                 </h1>
                 <Link href={`/${locale}/admin/ecosystems/create`}
+                    prefetch={false}
                     className="w-fit sm:px-8 px-2 py-2 font-medium text-center text-white transition-colors duration-300 
                 transform bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600">
                     {t('create_ecosystems')}

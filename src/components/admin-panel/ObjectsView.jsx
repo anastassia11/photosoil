@@ -125,6 +125,7 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
                         onChange={(e) => handleObjectSelect(e.target.checked, id, type?.name)}
                         className="cursor-pointer text-blue-500 border-zinc-300 rounded min-w-4 min-h-4" />
                     <Link onClick={e => e.stopPropagation()}
+                        prefetch={false}
                         href={{
                             pathname: `/${locale}/admin/${objectType === 'userPage' ? type?.name : objectType}/edit/${soilId || ecoSystemId || publicationId || newsId || id}`,
                             query: { lang: isEnglish ? 'eng' : 'ru' }
@@ -173,6 +174,7 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
                             {isVisible ? t('no_publish_go') : t('publish_go')}</button>}
 
                         <Link onClick={e => e.stopPropagation()}
+                            prefetch={false}
                             href={{ pathname: `/${locale}/admin/${objectType === 'userPage' ? type?.name : objectType}/edit/${soilId || ecoSystemId || publicationId || id}`, query: { lang: isEnglish ? 'eng' : 'ru' } }}
                             className="w-full duration-300 cursor-pointer hover:text-blue-600 h-9 hover:bg-zinc-100 flex items-center px-4">{t('edit_go')}</Link>
                         <button className="w-full duration-300 cursor-pointer text-red-500 hover:bg-red-100/40 h-9 hover:bg-zinc-100 flex items-center px-4"
@@ -201,6 +203,7 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
                     }}
                     className="text-blue-500 border-zinc-300 rounded min-w-4 min-h-4 cursor-pointer" />
                 <Link href={`/${locale}/admin/${objectType}/edit/${id}`}
+                    prefetch={false}
                     onClick={e => e.stopPropagation()}
                     className="font-medium text-blue-600 hover:underline whitespace-normal ">{
                         currentLang === 'any' ? (
@@ -247,7 +250,9 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
                     onClick={(e) => e.stopPropagation()}
                     onChange={(e) => handleObjectSelect(e.target.checked, id)}
                     className="cursor-pointer text-blue-500 border-zinc-300 rounded min-w-4 min-h-4" />
-                <Link href={`/${locale}/admin/${objectType}/edit/${id}`} onClick={e => e.stopPropagation()}
+                <Link href={`/${locale}/admin/${objectType}/edit/${id}`}
+                    prefetch={false}
+                    onClick={e => e.stopPropagation()}
                     className="font-medium text-blue-600 hover:underline whitespace-normal ">{_isEng ? dataEng.name : dataRu.name || ''}</Link>
             </div>
         </td>
@@ -281,6 +286,7 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
                     duration-200 transition-all border-gray-200  top-3
                     ${dropdown.key == id && dropdown.isActive ? 'visible translate-y-4' : 'invisible opacity-0'}`}>
                     <Link onClick={e => e.stopPropagation()}
+                        prefetch={false}
                         href={{ pathname: `/${locale}/admin/authors/edit/${id}` }}
                         className="w-full duration-300 cursor-pointer hover:text-blue-600 h-9 hover:bg-zinc-100 flex items-center px-4">{t('edit_go')}</Link>
                     <button className="w-full duration-300 cursor-pointer text-red-500 hover:bg-red-100/40 h-9 hover:bg-zinc-100 flex items-center px-4"
@@ -311,6 +317,7 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
                         }}
                         className="cursor-pointer text-blue-500 border-zinc-300 rounded min-w-4 min-h-4" />
                     <Link onClick={e => e.stopPropagation()} href={`/${locale}/admin/${objectType}/${id}`}
+                        prefetch={false}
                         className="font-medium text-blue-600 hover:underline whitespace-normal">{email}</Link>
                 </div>
             </td>
@@ -342,6 +349,7 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
                     duration-200 transition-all border-gray-200  top-3
                     ${dropdown.key == id && dropdown.isActive ? 'visible translate-y-4' : 'invisible opacity-0'}`}>
                         <Link href={`/${locale}/admin/${objectType}/${id}`}
+                            prefetch={false}
                             className="w-full duration-300 cursor-pointer hover:text-blue-600 h-9 hover:bg-zinc-100 flex items-center px-4">{t('view')}</Link>
                         <button className="w-full duration-300 cursor-pointer hover:text-blue-600 h-9 hover:bg-zinc-100 flex items-center px-4"
                             onClick={(e) => {

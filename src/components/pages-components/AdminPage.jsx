@@ -77,6 +77,7 @@ export default function AdminPageComponent() {
     const NewsCard = ({ id, tags, translations }) => {
         const currentTransl = translations?.find(({ isEnglish }) => isEnglish === _isEng) || null;
         return currentTransl ? <Link href={`/${locale}/news/${id}`}
+            prefetch={false}
             className="sm:px-8 px-4 py-4 bg-white rounded-md hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] transition-all duration-300
              w-full h-full flex flex-col justify-between">
             <div className='flex flex-col'>
@@ -99,6 +100,7 @@ export default function AdminPageComponent() {
         const curData = _isEng ? dataEng : dataRu;
 
         return <Link href={`/${locale}/authors/${id}`}
+            prefetch={false}
             className='px-8 py-4 bg-white rounded-md hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] transition-all duration-300
              w-full h-full flex flex-col justify-start'>
 

@@ -59,6 +59,7 @@ export default function EcosystemPageComponent({ id }) {
                         {ecosystem.authors?.map(({ id, name }, index) =>
                             <li key={`author-${index}`} className='mr-2'>
                                 <Link href={`/${locale}/authors/${id}`}
+                                    prefetch={false}
                                     className='text-blue-600 hover:underline'>
                                     {name}
                                 </Link>

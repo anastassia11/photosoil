@@ -124,7 +124,8 @@ export default function Breadcrumbs() {
     return (
         <ul className='flex items-center py-4 whitespace-nowrap flex-wrap w-full'>
             <li className='hover:underline mb-1 2xl:mb-0 flex flex-row items-center '>
-                <Link href={`/${locale}`}>PhotoSOIL</Link>
+                <Link href={`/${locale}`}
+                    prefetch={false}>PhotoSOIL</Link>
                 {separator}
             </li>
 
@@ -132,7 +133,7 @@ export default function Breadcrumbs() {
                 <li key={href} className='flex flex-row items-center mb-1 2xl:mb-0'>
                     <div className={`${breadcrumbs.length === index + 1 ? 'text-blue-600' : ''}
                     ${isRef ? 'hover:underline' : ''}`}>
-                        {isRef ? <Link href={href}>{itemTitle}</Link> : itemTitle}
+                        {isRef ? <Link href={href} prefetch={false}>{itemTitle}</Link> : itemTitle}
                     </div>
                     {breadcrumbs.length !== index + 1 && separator}
                 </li>)}

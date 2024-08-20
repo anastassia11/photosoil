@@ -286,5 +286,7 @@
   "ecosystems_rod": "Ecosystems",
   "publ_rod": "Publications",
   "news_rod": "News",
-  "last_news": "Latest news"
+  "last_news": "Latest news",
+  "collapse": "Collapse",
+  "expand": "Expand"
 }

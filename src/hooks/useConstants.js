@@ -65,7 +65,6 @@ export const useConstants = () => {
         "1": t('article'),
     }
 
-
     return {
         AUTHOR_INFO,
         SOIL_INFO,
@@ -75,6 +74,6 @@ export const useConstants = () => {
         SOIL_ENUM,
         RANK_ENUM,
         TRANSLATION_ENUM,
-        PUBLICATION_ENUM
+        PUBLICATION_ENUM,
     };
 };

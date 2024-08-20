@@ -46,6 +46,7 @@ export default function LoginPageComponent() {
                 <div className="mt-5 space-y-2">
                     <h3 className="sm:text-2xl text-xl font-semibold">{t('authorization')}</h3>
                     <p className="">{t('no_account')} <Link href={`/${locale}/join`}
+                        prefetch={false}
                         className='text-blue-600 hover:underline duration-300'>{t('join')}</Link></p>
                 </div>
             </div>

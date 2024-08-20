@@ -49,6 +49,7 @@ export default function SoilPageComponent({ id }) {
                         </span>
                         <div id={name} className='lg:w-[60%] w-full flex flex-col items-start'>
                             {name === 'objectType' ? <Link href={`/${locale}/soils?categories=${soil.objectType}`}
+                                prefetch={false}
                                 className='text-blue-600 hover:underline'>
                                 {SOIL_ENUM[soil.objectType]}
                             </Link>
@@ -67,6 +68,7 @@ export default function SoilPageComponent({ id }) {
                         {soil.authors?.map(({ id, dataEng, dataRu }, index) =>
                             <li key={`author-${index}`} className='mr-2 min-w-fit h-fit'>
                                 <Link href={`/${locale}/authors/${id}`}
+                                    prefetch={false}
                                     className='text-blue-600 hover:underline'>
                                     {_isEng ? dataEng?.name : dataRu?.name}
                                 </Link>
@@ -86,6 +88,7 @@ export default function SoilPageComponent({ id }) {
                             {terms.map(({ id, nameRu, nameEng }, index) =>
                                 <li key={`term-${id}`} className='mr-2 min-w-fit h-fit'>
                                     <Link href={`/${locale}/soils?terms=${id}`}
+                                        prefetch={false}
                                         className='text-blue-600 hover:underline'>
                                         {_isEng ? nameEng : nameRu}{terms.length > 1 && index + 1 < terms.length && ','}
                                     </Link>

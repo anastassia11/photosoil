@@ -49,6 +49,7 @@ export default function Authors() {
 
     const AuthorCard = ({ photo, dataEng, dataRu, authorType, id }) => {
         return <Link href={`/${locale}/authors/${id}`}
+            prefetch={false}
             className='relative aspect-[2/3] overflow-hidden
     rounded-md hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] transition-all duration-300 flex flex-col  cursor-pointer'>
             <div className='w-full h-full relative'>

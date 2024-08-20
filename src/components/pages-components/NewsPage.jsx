@@ -12,7 +12,7 @@ import { PAGINATION_OPTIONS } from '@/utils/constants';
 import moment from 'moment';
 import Link from 'next/link';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getTranslation } from '@/i18n/client';
 
@@ -31,7 +31,7 @@ export default function NewsPageComponent() {
         items: true,
         tags: true
     });
-
+    const didLogRef = useRef(true);
     const searchParams = useSearchParams();
     const router = useRouter();
     const { locale } = useParams();
@@ -57,6 +57,11 @@ export default function NewsPageComponent() {
         localStorage.getItem('tokenData') && setToken(JSON.parse(localStorage.getItem('tokenData'))?.token);
         fetchTags();
         fetchNews();
+        if (didLogRef.current) {
+            didLogRef.current = false;
+            const tagsParam = searchParams.get('tags');
+            tagsParam && tagsParam.split(',').forEach((param) => dispatch(addTag(Number(param))));
+        }
     }, [])
 
     useEffect(() => {
@@ -110,6 +115,7 @@ export default function NewsPageComponent() {
     const NewsCard = ({ id, tags, translations }) => {
         const currentTransl = translations?.find(({ isEnglish }) => isEnglish === _isEng) || {};
         return <Link href={`/${locale}/news/${id}`}
+            prefetch={false}
             className="sm:px-8 px-4 py-4 bg-white rounded-md hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] transition-all duration-300
              w-full h-full flex flex-col justify-between">
             <div className='flex flex-col'>
@@ -180,7 +186,7 @@ export default function NewsPageComponent() {
                 {isLoading.items ? Array(8).fill('').map((item, idx) => <li key={idx}>
                     <Loader className='w-full h-full aspect-[2/1]' />
                 </li>) : (
-                    news.length && filteredNews.length ? filteredNews.map((item, idx) => <li key={`news_${idx}`} className='w-full h-full'>
+                    news.length && filteredNews.length ? currentItems.map((item, idx) => <li key={`news_${idx}`} className='w-full h-full'>
                         <MotionWrapper className='w-full h-full'>
                             <NewsCard {...item} />
                         </MotionWrapper>

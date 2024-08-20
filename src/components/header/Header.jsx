@@ -66,7 +66,8 @@ export default function Header({ locale }) {
         <header className={`${visible ? 'fixed top-0 ' : 'fixed -top-20'} z-50 transition-all duration-200 
             ease-in-out px-4 sm:px-8 w-full border-b shadow-sm h-16 lg:bg-white bg-white/90 flex flex-row items-center justify-between`}>
             <div className='flex-1 '>
-                <Link href={`/${locale}`} className='flex flex-row items-center w-fit'>
+                <Link href={`/${locale}`} prefetch={false}
+                    className='flex flex-row items-center w-fit'>
                     <Image src={'/logo.png'} width={300} height={300} alt='logo' className='sm:w-9 w-8' />
                     <p className='text-zinc-600 ml-2 sm:text-3xl text-2xl font-semibold'>Photo<span className='pl-[2px] text-[#226eaf] font-bold'>SOIL</span></p>
                 </Link>
@@ -93,7 +94,9 @@ export default function Header({ locale }) {
                                 </span>
                             </button>
                         </> :
-                        <Link href={`/${locale}/${key}`} prefetch={true} className='duration-300 cursor-pointer hover:text-blue-600'>
+                        <Link href={`/${locale}/${key}`}
+                            prefetch={false}
+                            className='duration-300 cursor-pointer hover:text-blue-600'>
                             {title}
                         </Link>
                     }
@@ -103,7 +106,8 @@ export default function Header({ locale }) {
                         <ul className='py-2'>
                             {navs?.map(({ key: navKey, title }) => <li key={navKey} className='duration-300 cursor-pointer hover:text-blue-600 h-9 hover:bg-zinc-100 flex items-center px-4'
                                 onClick={() => dispatch(setDropdown({ isActive: false, key: null }))}>
-                                <Link href={`/${locale}/${navKey}`}>
+                                <Link href={`/${locale}/${navKey}`}
+                                    prefetch={false}>
                                     {title}
                                 </Link>
                             </li>)}
@@ -119,10 +123,13 @@ export default function Header({ locale }) {
                     transition={{ duration: 0.5 }}
                     className='flex-1 justify-end space-x-4 h-full flex flex-row items-center w-fit'>
 
-                    {!token ? <Link href={`/${locale}/join`} className="hidden sm:flex max-h-[40px] px-4 py-2 font-medium text-center text-white transition-colors duration-300 
+                    {!token ? <Link href={`/${locale}/join`}
+                        prefetch={false} className="hidden sm:flex max-h-[40px] px-4 py-2 font-medium text-center text-white transition-colors duration-300 
                 transform bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600">
                         {t('join')}
-                    </Link> : <Link href={`/${locale}/admin`} className="min-w-fit hidden sm:flex max-h-[40px] px-4 py-2 font-medium text-center text-blue-600 transition-colors duration-300 
+                    </Link> : <Link href={`/${locale}/admin`}
+                        prefetch={false}
+                        className="min-w-fit hidden sm:flex max-h-[40px] px-4 py-2 font-medium text-center text-blue-600 transition-colors duration-300 
                 transform ">
                         {t('dashboard')}
                     </Link>}
@@ -153,10 +160,14 @@ export default function Header({ locale }) {
             flex-col p-4
                 duration-300 ${menuOpen ? 'block right-0' : 'opacity-0 -right-[100%]'}`}>
                 <li className='mb-4 h-fit flex-col space-y-2 justify-end flex sm:hidden w-full px-2'>
-                    {!token ? <Link href={`/${locale}/join`} className="max-h-[40px] px-4 py-2 font-medium text-center text-white transition-colors duration-300 
+                    {!token ? <Link href={`/${locale}/join`}
+                        prefetch={false}
+                        className="max-h-[40px] px-4 py-2 font-medium text-center text-white transition-colors duration-300 
                 transform bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600">
                         {t('join')}
-                    </Link> : <Link href={`/${locale}/admin`} className="min-w-fit max-h-[40px] px-2 py-2 font-medium text-left text-blue-600 transition-colors duration-300 
+                    </Link> : <Link href={`/${locale}/admin`}
+                        prefetch={false}
+                        className="min-w-fit max-h-[40px] px-2 py-2 font-medium text-left text-blue-600 transition-colors duration-300 
                 transform ">
                         {t('dashboard')}
                     </Link>}
@@ -182,7 +193,9 @@ export default function Header({ locale }) {
                                     </span>
                                 </button>
                             </> :
-                            <Link href={`/${locale}/${key}`} className='px-4 duration-300 cursor-pointer hover:text-blue-600'>
+                            <Link href={`/${locale}/${key}`}
+                                prefetch={false}
+                                className='px-4 duration-300 cursor-pointer hover:text-blue-600'>
                                 {title}
                             </Link>
                         }
@@ -192,7 +205,7 @@ export default function Header({ locale }) {
                                     <ul className='pt-1 pl-4'>
                                         {navs.map(({ key: navKey, title }) => <li key={navKey} className='duration-300 cursor-pointer hover:text-blue-600 py-1 hover:bg-zinc-100 flex items-center px-4'
                                             onClick={() => dispatch(setDropdown({ isActive: false, key: null }))}>
-                                            <Link href={`/${locale}/${navKey}`}>
+                                            <Link href={`/${locale}/${navKey}`} prefetch={false}>
                                                 {title}
                                             </Link>
                                         </li>)}

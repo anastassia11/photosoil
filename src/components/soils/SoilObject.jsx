@@ -41,6 +41,7 @@ export default function SoilObject({ object, children, type }) {
                         : <Loader className='w-[80%] h-[30px]' />}
                 </div>
                 {tokenData.role === 'Admin' || (tokenData.name === object.user?.name) ? <Link target="_blank"
+                    prefetch={false}
                     className='text-blue-700 cursor-pointer flex flex-row items-center hover:underline duration-300'
                     href={{
                         pathname: `/${locale}/admin/${type === 'soil' ? 'objects' : 'ecosystems'}/edit/${object.id}`,

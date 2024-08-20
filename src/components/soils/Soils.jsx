@@ -49,10 +49,12 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
     const [token, setToken] = useState(null);
 
     const { SOIL_ENUM } = useConstants();
+
     const CATEGORY_ARRAY = Object.entries(SOIL_ENUM).map(([key, value]) => ({
         id: Number(key),
         name: value,
     }));
+
     const _isEng = locale === 'en';
 
     const isSoils = type === 'soils' || type === 'profiles' ||
@@ -163,6 +165,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 
     const SoilCard = ({ photo, name, id }) => {
         return <Link href={`/${locale}/${type}/${id}`}
+            prefetch={false}
             className='relative aspect-[2/3] overflow-hidden transition-all
     rounded-md  hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] flex flex-col  duration-300 cursor-pointer'>
             <div className='h-[100%] w-full overflow-hidden opacity-80'>

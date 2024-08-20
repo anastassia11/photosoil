@@ -55,6 +55,7 @@ export default function AuthorsAdminPage() {
                     {t('photo_authors')}
                 </h1>
                 <Link href={`/${locale}/admin/authors/create`}
+                    prefetch={false}
                     className="w-fit px-8 py-2 font-medium text-center text-white transition-colors duration-300 
                 transform bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600">
                     {t('add_author')}

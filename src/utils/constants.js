@@ -8,8 +8,3 @@ export const PAGINATION_OPTIONS = {
     2: '48',
     3: '96',
 };
-
-export const CATEGORIES = [
-    { name: 'Динамика почв', id: 0 },
-    { name: 'Почвенные профили', id: 1 },
-    { name: 'Почвенные морфологические элементы', id: 2 }]

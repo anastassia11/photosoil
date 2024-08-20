@@ -18,7 +18,9 @@ export default async function AboutPageComponent({ locale }) {
                         {t('tagline')}
                     </p>
                     <Image src='/map.png' alt='map' width={2000} height={2000} className='absolute sm:-top-2 top-8 sm:-right-[130px] lg:-right-[330px] scale-150 opacity-55 sm:scale-100 sm:object-scale-down' />
-                    <Link href={`/${locale}/join`} className="lg:w-[200px] w-full px-6 py-2 font-medium text-center text-white transition-colors duration-300 
+                    <Link href={`/${locale}/join`}
+                        prefetch={false}
+                        className="lg:w-[200px] w-full px-6 py-2 font-medium text-center text-white transition-colors duration-300 
                 transform bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600">
                         {t('join')}
                     </Link>

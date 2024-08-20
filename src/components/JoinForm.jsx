@@ -14,7 +14,8 @@ export default function JoinForm() {
                 <div className="mt-5 space-y-2">
                     <h3 className="sm:text-2xl text-xl font-semibold">{t('join')}</h3>
                     <p className="">{t('join_text')}<br />
-                        {t('account_exists')} <Link className='text-blue-600 hover:underline duration-300'
+                        {t('account_exists')} <Link
+                            className='text-blue-600 hover:underline duration-300'
                             href={`/${locale}/login`}>{t('login')}</Link></p>
                 </div>
             </div>

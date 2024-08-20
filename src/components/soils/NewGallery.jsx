@@ -42,9 +42,9 @@ export default function NewGallery({ mainPhoto, objectPhoto }) {
                             data-thumb-src={`${BASE_SERVER_URL}${path}`}
                             data-fancybox="gallery"
                             data-src={`${BASE_SERVER_URL}${path}`}
-                            data-caption={`<div className='flex flex-col h-full'>
-                          <p className="text-base font-medium mb-3">${moment(lastUpdated).format('DD.MM.YYYY HH:mm')}</p>
-                                <p className='font-light'>${locale === 'en' ? (titleEng || '') : locale === 'ru' ? (titleRu || '') : ''}</p>
+                            data-caption={`<div class='flex flex-col h-full'>
+                          <p class="text-base font-medium mb-3">${moment(lastUpdated).format('DD.MM.YYYY HH:mm')}</p>
+                                <p class='font-light'>${locale === 'en' ? (titleEng || '') : locale === 'ru' ? (titleRu || '') : ''}</p>
                       </div>`}
                         >
                             <div className="absolute inset-0 z-[-1] overflow-hidden">

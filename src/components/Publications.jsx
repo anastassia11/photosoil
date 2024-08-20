@@ -107,6 +107,7 @@ export default function Publications() {
                                 <li key={idx} className={`mt-4 ${idx + 1 === currentItems.length ? '' : 'border-b'} flex flex-row min-w-full`}>
                                     <MotionWrapper className='min-w-full'>
                                         <Link href={`/${locale}/publications/${item.id}`}
+                                            prefetch={false}
                                             className='justify-between items-start flex flex-row flex-1 mb-4 sm:px-4 px-2 sm:py-5 py-3 cursor-pointer hover:bg-white
                                         rounded-md hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] transition-all duration-300'>
                                             <div className='sm:space-y-3 space-y-1'>

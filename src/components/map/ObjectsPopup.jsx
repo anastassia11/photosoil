@@ -36,6 +36,7 @@ export default function ObjectsPopup({ visible, objects, onCloseClick }) {
     const ObjectCard = (object) => {
         const currentTransl = object.translations?.find(({ isEnglish }) => isEnglish === (locale === 'en')) || {};
         return <Link href={`/${locale}/${object._type}s/${object.id}`}
+            prefetch={false}
             className={`flex flex-row hover:bg-zinc-100 duration-300 px-4 ${object._type === 'publication' ? 'py-2' : 'py-3'}`}>
             {object._type === 'publication' ? <div className='flex flex-col ml-1 max-w-full'>
                 <p className='text-blue-700 text-sm sm:text-base'>

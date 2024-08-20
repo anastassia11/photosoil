@@ -23,7 +23,7 @@ export default function NewsItemPageComponent({ id }) {
 
     useEffect(() => {
         localStorage.getItem('tokenData') && setTokenData(JSON.parse(localStorage.getItem('tokenData')));
-        document.documentElement.style.setProperty('--product-view-height', '600px');
+        document.documentElement.style.setProperty('--product-view-height', window.innerWidth > 640 ? '600px' : '300px');
         fetchNews();
     }, [])
 
@@ -51,12 +51,13 @@ export default function NewsItemPageComponent({ id }) {
 
     return (
         <div className='flex flex-col'>
-            <div className='flex flex-col sm:flex-row mb-2 justify-between sm:items-center'>
+            <div className='flex flex-col md:flex-row mb-2 justify-between md:items-end'>
                 <h1 className='sm:text-2xl text-xl font-semibold'>
                     {currentTransl?.title}
                 </h1>
                 {tokenData.role === 'Admin' || (tokenData.name === news.user?.name) ? <Link target="_blank"
-                    className='text-blue-700 cursor-pointer flex flex-row items-center hover:underline duration-300'
+                    prefetch={false}
+                    className='text-blue-700 cursor-pointer flex flex-row items-center hover:underline duration-300 pb-1'
                     href={{
                         pathname: `/${locale}/admin/news/edit/${news.id}`,
                         query: { lang: _isEng ? 'eng' : 'ru' }
@@ -89,13 +90,14 @@ export default function NewsItemPageComponent({ id }) {
                     {news?.tags?.map(({ id, nameRu, nameEng }, index) =>
                         <li key={`tag-${id}`} className='mr-2 min-w-fit h-fit'>
                             <Link href={`/${locale}/news?tags=${id}`}
+                                prefetch={false}
                                 className='text-blue-600 hover:underline'>
                                 {_isEng ? (nameEng || '') : (nameRu || '')}{news?.tags?.length > 1 && index + 1 < news?.tags?.length && ','}
                             </Link>
                         </li>)}
                 </ul>
             </div>
-            {currentTransl?.content ? <div className='w-full bg-white sm:pl-16 px-4 sm:pr-32 sm:pb-8 pb-4 sm:mt-6 mt-2'>
+            {currentTransl?.content ? <div className='w-full bg-white md:pl-16 px-4 md:pr-32 md:pb-8 pb-4 md:mt-6 mt-2'>
                 <div className='tiptap sm:mt-8 mt-4'
                     dangerouslySetInnerHTML={{ __html: parser?.parseFromString(currentTransl?.content || '', 'text/html').body.innerHTML }}>
                 </div>

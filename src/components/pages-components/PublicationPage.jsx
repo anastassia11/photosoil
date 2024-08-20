@@ -67,6 +67,7 @@ export default function PublicationPageComponent({ id }) {
                     {currentTransl?.name}
                 </h1>
                 {tokenData.role === 'Admin' || (tokenData.name === publication.user?.name) ? <Link target="_blank"
+                    prefetch={false}
                     className='text-blue-700 cursor-pointer flex flex-row items-center hover:underline duration-300'
                     href={{
                         pathname: `/${locale}/admin/publications/edit/${publication.id}`,
