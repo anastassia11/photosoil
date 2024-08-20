@@ -7,11 +7,10 @@ import { getTranslation } from '@/i18n/client'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
-import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper'
+import CollapsibleText from '../admin-panel/ui-kit/CollapsibleText'
 
 export default function SoilPageComponent({ id }) {
     const [soil, setSoil] = useState({});
-    const [featuresVisible, setFeaturesVisible] = useState(false);
     const { locale } = useParams();
     const { t } = getTranslation(locale);
     const { SOIL_INFO, SOIL_ENUM } = useConstants();
@@ -49,23 +48,12 @@ export default function SoilPageComponent({ id }) {
                             {title}
                         </span>
                         <div id={name} className='lg:w-[60%] w-full flex flex-col items-start'>
-                            <span className={`${name === 'soilFeatures' ? (featuresVisible ? '' : 'line-clamp-6') : ''}`}>
-                                {name === 'objectType' ? <Link href={`/${locale}/soils?categories=${soil.objectType}`}
-                                    className='text-blue-600 hover:underline'>
-                                    {SOIL_ENUM[soil.objectType]}
-                                </Link> : currentTransl[name]}
-                            </span>
-                            {name === 'soilFeatures' ? <button className='text-blue-600'
-                                onClick={() => {
-                                    document.getElementById('soilFeatures').scrollIntoView({
-                                        behavior: 'smooth',
-                                        block: 'start',
-                                        inline: 'nearest',
-                                    });
-                                    setFeaturesVisible(!featuresVisible)
-                                }}>
-                                {featuresVisible ? 'Свернуть' : 'Развернуть..'}
-                            </button> : ''}
+                            {name === 'objectType' ? <Link href={`/${locale}/soils?categories=${soil.objectType}`}
+                                className='text-blue-600 hover:underline'>
+                                {SOIL_ENUM[soil.objectType]}
+                            </Link>
+                                : name === 'soilFeatures' ? <CollapsibleText text={currentTransl[name]} limit={100} />
+                                    : currentTransl[name]}
                         </div>
                     </li> : ''
                 })}
