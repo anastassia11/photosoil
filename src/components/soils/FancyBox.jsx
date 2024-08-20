@@ -63,12 +63,12 @@ const defaults = {
     //     },
     // },
     tpl: {
-        main: `<div class="fancybox__container" role="dialog" aria-modal="true" aria-label="{{MODAL}}" tabindex="-1">
-<div class="fancybox__backdrop"></div>
-<div class="fancybox__carousel"></div>
-<div class="fancybox__caption"></div>
-<div class="fancybox__toolbar"></div>
-<div class="fancybox__footer"></div>
+        main: `<div className="fancybox__container" role="dialog" aria-modal="true" aria-label="{{MODAL}}" tabindex="-1">
+<div className="fancybox__backdrop"></div>
+<div className="fancybox__carousel"></div>
+<div className="fancybox__caption"></div>
+<div className="fancybox__toolbar"></div>
+<div className="fancybox__footer"></div>
 </div>`,
     },
 }

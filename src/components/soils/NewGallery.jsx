@@ -43,8 +43,8 @@ export default function NewGallery({ mainPhoto, objectPhoto }) {
                             data-fancybox="gallery"
                             data-src={`${BASE_SERVER_URL}${path}`}
                             data-caption={`<div className='flex flex-col h-full'>
-                          <p class="text-base font-medium mb-3">${moment(lastUpdated).format('DD.MM.YYYY HH:mm')}</p>
-                                <p class='font-light'>${locale === 'en' ? (titleEng || '') : locale === 'ru' ? (titleRu || '') : ''}</p>
+                          <p className="text-base font-medium mb-3">${moment(lastUpdated).format('DD.MM.YYYY HH:mm')}</p>
+                                <p className='font-light'>${locale === 'en' ? (titleEng || '') : locale === 'ru' ? (titleRu || '') : ''}</p>
                       </div>`}
                         >
                             <div className="absolute inset-0 z-[-1] overflow-hidden">
@@ -54,7 +54,7 @@ export default function NewGallery({ mainPhoto, objectPhoto }) {
                             <Image priority src={`${BASE_SERVER_URL}${path}`} width={500} height={500} alt='soil' />
                             {/* <figcaption className='p-4 z-10 absolute bottom-0 h-[100px] backdrop-blur-md bg-black bg-opacity-40 text-white w-full
                             flex flex-col justify-center'>
-                                <p class="text-base font-medium">{lastUpdated}</p>
+                                <p className="text-base font-medium">{lastUpdated}</p>
                                 <p className='text-sm'>{locale === 'en' ? (titleEng || '') : locale === 'ru' ? (titleRu || '') : ''}</p>
                             </figcaption> */}
                         </figure>)}
