@@ -19,6 +19,7 @@ import PhotoCard from './ui-kit/PhotoCard';
 import FileCard from './ui-kit/FileCard';
 import { useParams } from 'next/navigation';
 import { getTranslation } from '@/i18n/client';
+import { openAlert } from '@/store/slices/alertSlice';
 
 export default function NewsForm({ _news, pathname, onNewsSubmit, isLoading, btnText, oldTwoLang, oldIsEng }) {
     const dispatch = useDispatch();
@@ -199,8 +200,24 @@ export default function NewsForm({ _news, pathname, onNewsSubmit, isLoading, btn
     }
 
     const handleFormSubmit = () => {
-        onNewsSubmit({ createTwoLang, isEng, news, newsPhotos });
-    }
+        const hasRequiredFields = () => {
+            if (createTwoLang) {
+                return news.translations?.some(({ isEnglish, title }) => (
+                    (isEnglish && title.length > 0) || (!isEnglish && title.length > 0)
+                ));
+            } else {
+                return news.translations?.some(({ isEnglish, title }) => (
+                    (isEng && isEnglish && title.length > 0) || (!isEng && !isEnglish && title.length > 0)
+                ));
+            }
+        };
+
+        if (hasRequiredFields()) {
+            onNewsSubmit({ createTwoLang, isEng, news, newsPhotos });
+        } else {
+            dispatch(openAlert({ title: t('warning'), message: t('form_required'), type: 'warning' }))
+        }
+    };
 
     return (
         <form
@@ -236,15 +253,22 @@ export default function NewsForm({ _news, pathname, onNewsSubmit, isLoading, btn
                     </Tabs.List>
                 </Tabs.Root>
                 <div className='flex flex-col w-full mt-4'>
-                    {Textarea({
-                        name: 'title',
-                        label: <>
+                    <Textarea name='title'
+                        label={<>
                             {`${t('heading')} ${isEng ? '(EN)' : ''}`}<span className='text-orange-600'>*</span>
-                        </>,
-                        value: news.translations?.find(({ isEnglish }) => isEng === isEnglish)?.title || '',
-                        onChange: handleInputChange,
-                        required: true
-                    })}
+                        </>}
+                        value={news.translations?.find(({ isEnglish }) => isEng === isEnglish)?.title || ''}
+                        onChange={handleInputChange}
+                        required={true} />
+                    {/* {Textarea({
+                            name: 'title',
+                            label: <>
+                                {`${t('heading')} ${isEng ? '(EN)' : ''}`}<span className='text-orange-600'>*</span>
+                            </>,
+                            value: news.translations?.find(({ isEnglish }) => isEng === isEnglish)?.title || '',
+                            onChange: handleInputChange,
+                            required: true
+                        })} */}
                 </div>
                 <div className='flex flex-col w-full mt-4'>
                     {Textarea({
