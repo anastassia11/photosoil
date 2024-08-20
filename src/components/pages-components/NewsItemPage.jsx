@@ -15,8 +15,7 @@ export default function NewsItemPageComponent({ id }) {
     const [tokenData, setTokenData] = useState({});
     const { locale } = useParams();
     const { t } = getTranslation(locale);
-
-    const parser = new DOMParser();
+    const [parser, setParser] = useState();
 
     let _isEng = locale === 'en';
 
@@ -34,6 +33,7 @@ export default function NewsItemPageComponent({ id }) {
             if (title) {
                 document.title = `${title} | PhotoSOIL`;
             }
+            setParser(new DOMParser());
         }
     }, [currentTransl]);
 
@@ -95,9 +95,12 @@ export default function NewsItemPageComponent({ id }) {
                         </li>)}
                 </ul>
             </div>
-            <div className='tiptap mt-8'
-                dangerouslySetInnerHTML={{ __html: parser.parseFromString(currentTransl?.content || '', 'text/html').body.innerHTML }}>
-            </div>
+            {currentTransl?.content ? <div className='w-full bg-white sm:pl-16 px-4 sm:pr-32 sm:pb-8 pb-4 sm:mt-6 mt-2'>
+                <div className='tiptap sm:mt-8 mt-4'
+                    dangerouslySetInnerHTML={{ __html: parser?.parseFromString(currentTransl?.content || '', 'text/html').body.innerHTML }}>
+                </div>
+            </div> : ''}
+
             <div id='gallery-section' className='mt-8 self-center'>
                 <NewGallery objectPhoto={news?.objectPhoto} />
             </div>
