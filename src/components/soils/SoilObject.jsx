@@ -108,7 +108,7 @@ export default function SoilObject({ object, children, type }) {
                         {mapVisible ? t('hide_map') : t('show_map')}
                     </button>
                     {mapVisible ? <div className='mt-4 border rounded-lg overflow-hidden'>
-                        <div className='relative w-full aspect-[2/1]'>
+                        <div className='relative w-full sm:aspect-[2/1] aspect-square'>
                             <MapSelect type={type}
                                 latitude={object?.latitude} longtitude={object?.longtitude} />
                         </div>

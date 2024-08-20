@@ -188,13 +188,13 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
 
   return (
     <div id='map-sidebar'
-      className={`${sidebarOpen ? "left-0 z-30" : "sm:-left-[408px] sm:z-20 z-30 -left-[calc(100%-94px)]"
+      className={`${sidebarOpen ? "left-0 z-30" : "sm:-left-[408px] sm:z-20 z-30 -left-[calc(100%-92px)]"
         } absolute top-0 sm:w-[400px] w-[calc(100%-100px)] sm:max-w-[400px] max-h-[calc(100%-100px)] 
         shadow-lg bg-white duration-300 rounded-lg m-2 flex flex-row pb-4`}>
       <div className="relative flex-1 flex flex-col max-w-full">
         <button
           onClick={handleViewSidebar}
-          className="absolute -right-[30px] top-0 bg-white w-6 h-10 rounded-md shadow-md">
+          className="absolute -right-[32px] top-0 bg-white w-[25px] h-10 rounded-md shadow-md">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"

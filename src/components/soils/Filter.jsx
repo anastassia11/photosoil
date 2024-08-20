@@ -283,8 +283,8 @@ export default function Filter({ type, itemId, name, items, setTags, allSelected
                             const isValid = isEng ? ((nameEng && nameEng !== '') || (dataEng && dataEng.name !== ''))
                                 : ((nameRu && nameRu !== '') || (dataRu && dataRu.name !== ''));
                             if (isValid) return <li key={id}
-                                className='border border-zinc-400 rounded-full w-fit max-w-full h-fit px-2 flex flex-row justify-center space-x-2 mr-2 mb-1'>
-                                <p className='overflow-hidden text-nowrap text-ellipsis max-w-full'>{name || (isEng ? nameEng : nameRu) || (isEng ? dataEng?.name : dataRu?.name)}</p>
+                                className='line-clamp-1 border border-zinc-400 rounded-full w-fit max-w-full h-fit px-2 flex flex-row justify-center space-x-2 mr-2 mb-1'>
+                                <p className='max-w-full line-clamp-1'>{name || (isEng ? nameEng : nameRu) || (isEng ? dataEng?.name : dataRu?.name)}</p>
                                 <button className='text-black pt-[1px]'
                                     onClick={(e) => handleItemSelect(e, _id)}>
                                     <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className='w-[10px] h-[10px]'>

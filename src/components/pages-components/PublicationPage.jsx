@@ -99,17 +99,17 @@ export default function PublicationPageComponent({ id }) {
                     {t('connect_ecosystems')} ({publication.ecosystems?.length})
                 </button>
             </div>
-            <div className='flex flex-row space-x-8 mt-6 mb-6'>
+            <div className='flex lg:flex-row flex-col lg:space-x-8 mt-6 mb-6'>
                 {publication.coordinates ?
-                    <div id='map-section' className='border rounded-lg mt-2 min-h-[574px] w-1/2'>
+                    <div id='map-section' className='border rounded-lg overflow-hidden mt-2 lg:min-h-[574px] lg:w-1/2 max-w-full aspect-[1/1] lg:aspect-auto'>
                         <MapArraySelect ref={mapRef}
                             coordinates={JSON.parse(publication.coordinates)}
                             isDisabled={true}
                         />
                     </div> : ''}
-                <div className='w-1/2 flex flex-col justify-between'>
+                <div className='lg:w-1/2 w-full flex flex-col justify-between mt-6 lg:mt-0'>
                     <div className='flex flex-col space-y-2'>
-                        {publication?.doi ? <div className='flex flex-row w-full space-x-4'>
+                        {publication?.doi ? <div className='flex lg:flex-row flex-col w-full lg:space-x-4'>
                             <span className=' text-zinc-500 font-semibold'>
                                 DOI
                             </span>
@@ -154,7 +154,7 @@ export default function PublicationPageComponent({ id }) {
             </div>
 
             {publication.soilObjects?.length ? <div id='soils-section'>
-                <h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-4'>
+                <h3 className='sm:text-2xl text-xl font-semibold sm:mt-12 mb-4'>
                     {t('connect_soils')}
                 </h3>
                 <Soils _soils={publication?.soilObjects} isFilters={false} type='soils' />

@@ -117,7 +117,10 @@ export default function MainMap() {
         //Создаем вид
         let view = new View({
             center: startcoords,
-            zoom: 8.5
+            zoom: 8.5,
+            rotation: 0,
+            constrainRotation: true,
+            rotateExtent: [0, 0, 0, 0],
         });
 
         // Базовый слой карты
@@ -294,8 +297,9 @@ export default function MainMap() {
                     fill: new Fill({ color: '#ffffff' }),
                     font: 'bold 16px sans-serif',
                     offsetX: 0,
-                    offsetY: 2,
+                    offsetY: 1,
                     textAlign: 'center',
+                    textBaseline: 'middle'
                 }),
             });
         } else {
