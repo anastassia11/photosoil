@@ -466,51 +466,53 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
                     className="w-full py-2 pl-12 pr-4 border rounded-md outline-none bg-white focus:border-blue-600"
                 />
             </div>
-            <div className={`relative flex flex-col lg:flex-row justify-between ${(visibilityControl || languageChanger) ? 'min-h-[42px]' : 'h-0'}`}>
-                <div className={`relative ${visibilityControl && 'min-w-[447px] min-h-[40px]'} flex-1 sm:text-base text-sm`}>
-                    <div className={`absolute overflow-hidden w-fit h-full inline-flex bg-white border divide-x rounded-md duration-200
+            <div className={`relative flex flex-col md:flex-row justify-between ${(visibilityControl || languageChanger) ? 'min-h-[42px]' : 'h-0'}`}>
+                <div className={`relative ${visibilityControl && 'sm:min-w-[447px] sm:w-[447px] w-full min-h-[40px]'} flex-1 sm:text-base text-sm`}>
+                    <div className={`absolute overflow-hidden sm:w-fit w-full h-full inline-flex
+                    justify-between bg-white border divide-x rounded-md duration-200
                     ${!visibilityControl ? 'opacity-0 hidden' : (selectedObjects.length ? 'opacity-0 invisible' : 'opacity-100')}`}>
-                        <button className={`min-w-fit px-2 sm:px-5 py-2 font-medium text-zinc-600 transition-colors duration-200
+                        <button className={`min-w-fit max-w-full px-2 mini:px-4 sm:px-5 py-2 font-medium text-zinc-600 transition-colors duration-200
                         ${publishStatus === 'all' ? 'bg-zinc-100' : 'hover:bg-zinc-100 bg-none'}`}
                             onClick={() => setPublichStatus('all')}>
                             {t('all')}
                         </button>
 
-                        <button className={`min-w-fit px-2 sm:px-5 py-2 font-medium text-zinc-600 transition-colors duration-200 hover:bg-zinc-100
+                        <button className={`min-w-fit w-full px-2 sm:px-5 py-2 font-medium text-zinc-600 transition-colors duration-200 hover:bg-zinc-100
                         ${publishStatus === 'publish' ? 'bg-zinc-100' : 'hover:bg-zinc-100 bg-none'}`}
                             onClick={() => setPublichStatus('publish')}>
                             {t('published')}
                         </button>
 
-                        <button className={`min-w-fit px-2 sm:px-5 py-2 font-medium text-zinc-600 transition-colors duration-200 hover:bg-zinc-100
+                        <button className={`min-w-fit w-full px-2 sm:px-5 py-2 font-medium text-zinc-600 transition-colors duration-200 hover:bg-zinc-100
                          ${publishStatus === 'not_publish' ? 'bg-zinc-100' : 'hover:bg-zinc-100 bg-none'}`}
                             onClick={() => setPublichStatus('not_publish')}>
                             {t('no_published')}
                         </button>
                     </div>
-                    <div className={`${visibilityControl ? (!_isEng ? 'sm:min-w-[588px]' : 'sm:min-w-[433px]') : '-top-[50px]'} shadow-md z-30 absolute overflow-hidden inline-flex bg-white border divide-x rounded-lg duration-200
+                    <div className={`${visibilityControl ? (!_isEng ? 'sm:min-w-[588px] sm:w-[588px] w-full' : 'sm:min-w-[433px] sm:w-[433px] w-full') : '-top-[50px]'} 
+                        shadow-md z-30 absolute overflow-hidden inline-flex justify-between bg-white border divide-x rounded-lg duration-200
                     ${selectedObjects.length ? 'opacity-100' : 'invisible opacity-0'}`}>
-                        <div className="min-w-fit sm:px-5 py-2 sm:block hidden font-medium text-blue-700 transition-colors duration-200 ">
+                        <div className="min-w-fit w-full px-2 mini:px-4 sm:px-5 py-2 sm:block hidden font-medium text-blue-700 transition-colors duration-200 ">
                             {selectedObjects.length} {t('select')}:
                         </div>
                         {visibilityControl ? <>
-                            <button className="min-w-fit px-2 sm:px-5 py-2 font-medium text-zinc-600 transition-colors duration-200 hover:bg-zinc-100"
+                            <button className="min-w-fit w-full px-2 mini:px-4 sm:px-5 py-2 font-medium text-zinc-600 transition-colors duration-200 hover:bg-zinc-100"
                                 onClick={() => handleSelectedVisibleChange(true)}>
                                 {t('publish_go')}
                             </button>
 
-                            <button className="min-w-fit px-2 sm:px-5 py-2 font-medium text-zinc-600 transition-colors duration-200 hover:bg-zinc-100"
+                            <button className="min-w-fit w-full px-2 mini:px-4 sm:px-5 py-2 font-medium text-zinc-600 transition-colors duration-200 hover:bg-zinc-100"
                                 onClick={() => handleSelectedVisibleChange(false)}>
                                 {t('no_publish_go')}
                             </button>
                         </> : ''}
-                        <button className="min-w-fit px-2 sm:px-5 py-2 font-medium text-red-500 transition-colors duration-200 hover:bg-zinc-100"
+                        <button className="min-w-fit w-full px-2 mini:px-4 sm:px-5 py-2 font-medium text-red-500 transition-colors duration-200 hover:bg-zinc-100"
                             onClick={handleSelectedDelete}>
                             {t('delete')}
                         </button>
                     </div>
                 </div>
-                {languageChanger ? <div className={`${languageChanger ? 'sm:mt-4' : 'mt-0'} sm:text-base text-sm mt-2 ml-2 sm:mt-0 sm:w-[232px] w-[328px] lg:mt-0 sm:ml-4 h-fit
+                {languageChanger ? <div className={`${languageChanger ? 'sm:mt-4' : 'mt-0'} sm:text-base text-sm mt-2 pl-1 sm:mt-0 sm:w-[232px] w-full md:mt-0 md:ml-4 h-fit
                      `}>
                     <Dropdown name={t('language')} value={currentLang} items={LANGUAGES} flexRow={true}
                         onCategotyChange={handleLangChange} dropdownKey='language' />

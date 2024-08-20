@@ -86,7 +86,7 @@ export default function LoginPageComponent() {
                     <button type='submit'
                         disabled={isLoading}
                         className="flex items-center justify-center w-full min-h-[40px] py-2 mt-3 font-medium tracking-wide text-white capitalize transition-colors duration-300 transform 
-                                    bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600 sm:mt-0">
+                                    disabled:bg-blue-500 bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600 sm:mt-0">
                         {isLoading ?
                             <Oval
                                 height={20}

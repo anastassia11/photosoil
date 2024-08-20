@@ -58,7 +58,7 @@ export default function AdminLayout({ children }) {
                         <Alert isOpen={alertIsOpen} {...alertProps} />
                         <div className='flex flex-row w-full justify-end items-center'>
                             <Header />
-                            <div className="block lg:hidden ml-2">
+                            <div className="block lg:hidden mini:ml-2">
                                 <button className="m-2 mr-0 transition text-gray-600"
                                     onClick={() => setMenuOpen(!menuOpen)} >
                                     {

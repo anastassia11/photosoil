@@ -93,8 +93,9 @@ export default function NewsPageComponent() {
     const fetchNews = async () => {
         const result = await getAllNews();
         if (result.success) {
+            console.log(result.data)
             setNews(result.data)
-        }
+        } else console.log(result)
         setIsLoading(prev => ({ ...prev, items: false }))
     }
 
@@ -109,14 +110,14 @@ export default function NewsPageComponent() {
     const NewsCard = ({ id, tags, translations }) => {
         const currentTransl = translations?.find(({ isEnglish }) => isEnglish === _isEng) || {};
         return <Link href={`/${locale}/news/${id}`}
-            className="px-8 py-4 bg-white rounded-md hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] transition-all duration-300
+            className="sm:px-8 px-4 py-4 bg-white rounded-md hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] transition-all duration-300
              w-full h-full flex flex-col justify-between">
             <div className='flex flex-col'>
                 <span className="text-sm font-light text-gray-600">{moment(currentTransl?.lastUpdated).format('DD.MM.YYYY HH:mm') || ''}</span>
 
                 <div className="mt-2">
-                    <h3 className="text-xl font-medium text-gray-700 hover:text-gray-600">{currentTransl?.title || ''}</h3>
-                    <p className="mt-2 text-gray-600 ">{currentTransl?.annotation || ''}</p>
+                    <h3 className="sm:text-xl text-base font-medium text-gray-700 hover:text-gray-600">{currentTransl?.title || ''}</h3>
+                    <p className="mt-2 text-gray-600">{currentTransl?.annotation || ''}</p>
                 </div>
             </div>
             <ul className="flex flex-row flex-wrap mt-4 align-bottom">

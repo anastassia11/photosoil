@@ -32,7 +32,7 @@ export default function Header() {
     return (
         <div className="relative w-fit self-end flex flex-row justify-center items-center">
             <div className='user relative w-fit self-end flex flex-row items-center space-x-4
-                px-4 py-1 cursor-pointer'
+                mini:px-4 py-1 cursor-pointer'
                 onClick={() => dispatch(setDropdown({ key: 'user', isActive: dropdown.key !== null && dropdown.key !== 'user' ? true : !dropdown.isActive }))}>
                 <span className='uppercase bg-blue-600 w-10 h-10 rounded-2xl text-white font-light text-2xl flex items-center justify-center'>
                     {email?.[0]}

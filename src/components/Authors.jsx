@@ -61,7 +61,7 @@ export default function Authors() {
                             authorType == '2' ? <p className="px-5 py-1 text-sm text-blue-600 rounded-full bg-blue-100/70">{t('editor')}</p> : ''}
                 </div>}
             </div>
-            <div className='flex flex-col space-y-2 p-4 z-10 absolute bottom-0 h-[25%] backdrop-blur-sm bg-white/50 w-full'>
+            <div className='flex flex-col space-y-2 p-4 z-10 absolute bottom-0 h-[25%] backdrop-blur-sm bg-white/50 w-full rounded-b-md'>
                 <p className='text-base font-medium text-black'>
                     {_isEng ? (dataEng.name || '') : (dataRu.name || '')}
                 </p>

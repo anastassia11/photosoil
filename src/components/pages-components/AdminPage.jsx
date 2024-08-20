@@ -77,13 +77,13 @@ export default function AdminPageComponent() {
     const NewsCard = ({ id, tags, translations }) => {
         const currentTransl = translations?.find(({ isEnglish }) => isEnglish === _isEng) || null;
         return currentTransl ? <Link href={`/${locale}/news/${id}`}
-            className="px-8 py-4 bg-white rounded-md hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] transition-all duration-300
+            className="sm:px-8 px-4 py-4 bg-white rounded-md hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] transition-all duration-300
              w-full h-full flex flex-col justify-between">
             <div className='flex flex-col'>
                 <span className="text-sm font-light text-gray-600">{moment(currentTransl?.lastUpdated).format('DD.MM.YYYY HH:mm') || ''}</span>
 
                 <div className="mt-2">
-                    <h3 className="text-xl font-medium text-gray-700 hover:text-gray-600">{currentTransl?.title || ''}</h3>
+                    <h3 className="sm:text-xl text-base font-medium text-gray-700 hover:text-gray-600">{currentTransl?.title || ''}</h3>
                     <p className="mt-2 text-gray-600 ">{currentTransl?.annotation || ''}</p>
                 </div>
             </div>
@@ -102,24 +102,24 @@ export default function AdminPageComponent() {
             className='px-8 py-4 bg-white rounded-md hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] transition-all duration-300
              w-full h-full flex flex-col justify-start'>
 
-            <div class="flex flex-col sm:-mx-4 sm:flex-row">
+            <div className="flex flex-col sm:-mx-4 sm:flex-row">
                 {photo && <Image src={`${BASE_SERVER_URL}${photo?.path}`} width={500} height={500} alt='soil' className='aspect-square object-cover object-top rounded-full w-24 h-24 sm:mx-4 ring-4 ring-gray-300' />}
 
-                <div class="mt-4 sm:mx-4 sm:mt-0">
-                    <h1 class="text-xl font-semibold text-gray-700 capitalize md:text-2xl group-hover:text-white">{curData.name || ''}</h1>
+                <div className="mt-4 sm:mx-4 sm:mt-0">
+                    <h1 className="text-xl font-semibold text-gray-700 capitalize md:text-2xl group-hover:text-white">{curData.name || ''}</h1>
 
-                    <p class="mt-2 text-blue-700">{curData.organization || ''}</p>
+                    <p className="mt-2 text-blue-700">{curData.organization || ''}</p>
                 </div>
             </div>
 
-            <p class="mt-4 text-gray-500">
+            <p className="mt-4 text-gray-500">
                 {curData.degree}, {curData.specialization}, {curData.position}.
             </p>
-            <p class="text-gray-600 font-medium mt-1">
+            <p className="text-gray-600 font-medium mt-1">
                 Автор {soilsLength} почвенных объектов и {ecosystemsLength} экосистем.
             </p>
 
-            <div class="flex mt-4 -mx-2 self-end">
+            <div className="flex mt-4 -mx-2 self-end">
                 {authorType !== undefined && <div className="flex items-center gap-x-2">
                     {authorType == '0' ? <p className="px-4 py-1 text-sm text-red-600 rounded-full bg-red-100/70">{t('main_editor')}</p> :
                         authorType == '1' ? <p className="px-4 py-1 text-sm text-emerald-600 rounded-full bg-emerald-100/70">{t('executive_editor')}</p> :
