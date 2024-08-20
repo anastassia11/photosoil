@@ -4,13 +4,14 @@ import { auth } from '@/api/account/login';
 import { getTranslation } from '@/i18n/client';
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Oval } from 'react-loader-spinner';
 
 export default function LoginPageComponent() {
     const [isPasswordHidden, setPasswordHidden] = useState(true);
     const [userData, setUserData] = useState({});
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
     const router = useRouter();
     const { locale } = useParams();
     const { t } = getTranslation(locale);
@@ -23,11 +24,21 @@ export default function LoginPageComponent() {
             localStorage.setItem('email', userData.email)
             router.push('/admin')
         } else {
+            setIsLoading(false);
+            setError('Неверный логин или пароль')
+            // setUserData({
+            //     password: '',
+            //     email: ''
+            // });
             if (result.status === 400) {
                 setIsLoading(false)
             }
         }
     }
+
+    useEffect(() => {
+        setError(null);
+    }, [userData])
 
     return (
         <div className="sm:space-y-6 sm:max-w-md m-auto sm:mt-24 w-full">
@@ -83,6 +94,7 @@ export default function LoginPageComponent() {
                             />
                         </div>
                     </div>
+                    {error ? <p className='text-red-600'>{error}</p> : ''}
                     <button type='submit'
                         disabled={isLoading}
                         className="flex items-center justify-center w-full min-h-[40px] py-2 mt-3 font-medium tracking-wide text-white capitalize transition-colors duration-300 transform 
