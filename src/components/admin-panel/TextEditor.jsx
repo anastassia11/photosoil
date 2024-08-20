@@ -29,6 +29,12 @@ export default function TextEditor({ content, setContent }) {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
+        bold: true,
+        italic: true,
+        strike: false,
+        heading: {
+          levels: [2, 3],
+        },
         bulletList: {
           keepMarks: true,
           keepAttributes: false,
@@ -37,6 +43,13 @@ export default function TextEditor({ content, setContent }) {
           keepMarks: true,
           keepAttributes: false,
         },
+        codeBlock: false,
+        hardBreak: false,
+        horizontalRule: false,
+        listItem: true,
+        paragraph: true,
+        text: true,
+        underline: true,
       }),
       Link.configure({
         openOnClick: false
@@ -47,22 +60,8 @@ export default function TextEditor({ content, setContent }) {
       attributes: {
         class: 'focus:outline-none',
       },
-      handlePaste: (view, event) => {
-        event.preventDefault();
-        const text = event.clipboardData.getData('text/plain');
-
-        const { state } = view;
-        const { selection } = state;
-
-        const transaction = state.tr;
-
-        if (!selection.empty) {
-          transaction.replaceSelectionWith(state.schema.text(text));
-        } else {
-          transaction.insertText(text);
-        }
-        view.dispatch(transaction);
-        return true;
+      transformPastedHTML: (html) => {
+        return html.replace(/style="[^"]*"/g, '').replace(/class="[^"]*"/g, '');
       },
     },
     immediatelyRender: false,
