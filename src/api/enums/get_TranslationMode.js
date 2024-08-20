@@ -6,7 +6,7 @@ export async function getTranslationMode() {
         const response = await axios.get(`${BASE_SERVER_URL}/api/Enum/TranslationMode`,
             // {
             //     headers: {
-            //         'Authorization': `Bearer ${JSON.parse(localStorage.getItem('tokenData')).token}`
+            //         'Authorization': `Bearer ${JSON.parse(localStorage.getItem('tokenData'))?.token}`
             //     }
             // }
         )

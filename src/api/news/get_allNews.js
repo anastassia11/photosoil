@@ -8,7 +8,7 @@ export async function getAllNews() {
         const response = await axios.get(`${BASE_SERVER_URL}/api/News/GetAll`,
             {
                 headers: {
-                    'Authorization': `Bearer ${JSON.parse(localStorage.getItem('tokenData')).token}`
+                    'Authorization': `Bearer ${JSON.parse(localStorage.getItem('tokenData'))?.token}`
                 }
             }
         )
