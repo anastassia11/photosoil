@@ -49,7 +49,6 @@ export default function CreateNewsComponent() {
             }
             await fetchCreateNews(createTwoLang ? news : langNews);
         } catch (error) {
-            console.log(error)
             dispatch(openAlert({ title: t('error'), message: t('error_news'), type: 'error' }));
         } finally {
             setIsLoading(false);

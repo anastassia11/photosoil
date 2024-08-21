@@ -76,7 +76,6 @@ export default function NewsEditComponent({ id }) {
             }
             await fetchEditNews(createTwoLang ? news : langNews);
         } catch (error) {
-            console.log(error)
             dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }));
         } finally {
             setIsLoading(false);

@@ -53,7 +53,12 @@ export default function EditObject({ id, type, title }) {
                 ecoSystems: data.ecoSystems?.map(({ id }) => id),
                 soilTerms: data.classification?.map(item => item.terms.map(({ id }) => id)).flat(),
             }
-            type === 'soil' ? delete dataForPut.soilObjects : delete dataForPut.ecoSystems;
+            if (type === 'soil') {
+                delete dataForPut.soilObjects;
+            } else {
+                delete dataForPut.ecoSystems;
+                delete dataForPut.soilTerms;
+            }
             let createTwoLang = data.translations?.length > 1;
 
             setObject(dataForPut);

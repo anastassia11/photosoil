@@ -98,9 +98,8 @@ export default function NewsPageComponent() {
     const fetchNews = async () => {
         const result = await getAllNews();
         if (result.success) {
-            console.log(result.data)
             setNews(result.data)
-        } else console.log(result)
+        }
         setIsLoading(prev => ({ ...prev, items: false }))
     }
 
