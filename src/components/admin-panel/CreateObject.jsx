@@ -12,7 +12,7 @@ import modalThunkActions from '@/store/thunks/modalThunk';
 import { BASE_SERVER_URL } from '@/utils/constants';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Oval } from 'react-loader-spinner';
 import { useDispatch } from 'react-redux';
 import uuid from 'react-uuid';
@@ -336,7 +336,7 @@ export default function CreateObject({ title, onCreate, type }) {
                                 <ul className={`h-full w-full flex xl:flex-col flex-row justify-start 
                                     xl:space-y-2 xl:pr-2 pb-2 xl:pb-0 rounded-lg overflow-y-auto overflow-x-auto xl:overflow-x-hidden scroll items-center`}>
                                     {
-                                        photos.map((photo, idx) => <li key={`${type}-${photo.id}`} className='xl:w-full h-full aspect-square p-[3px] flex flex-col items-center justify-center'>
+                                        photos.map((photo, idx) => <li key={`${type}-${photo.id || idx}`} className='xl:w-full h-full aspect-square p-[3px] flex flex-col items-center justify-center'>
                                             {PhotoCard({ ...photo, idx })}
                                         </li>)
                                     }
