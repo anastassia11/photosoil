@@ -13,7 +13,7 @@ export default function CreateEcosystemComponent() {
         const result = await createEcosystem(data)
         if (result.success) {
             return { success: true }
-        } else return { success: false }
+        } else return { success: false, status: result.status }
     }
 
     return (

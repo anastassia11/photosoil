@@ -25,6 +25,6 @@ export async function createEcosystem(dataArray) {
             return { success: true, data: response.data.response }
         }
     } catch (error) {
-        return { success: false, message: error.message }
+        return { success: false, message: error.message, status: error.response.status }
     }
 }
