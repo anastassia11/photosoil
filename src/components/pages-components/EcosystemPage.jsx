@@ -56,12 +56,12 @@ export default function EcosystemPageComponent({ id }) {
                         {t('authors')}
                     </span>
                     <ul className={`lg:w-[60%] w-full flex flex-row`}>
-                        {ecosystem.authors?.map(({ id, name }, index) =>
-                            <li key={`author-${index}`} className='mr-2'>
+                        {ecosystem.authors?.map(({ id, dataEng, dataRu }, index) =>
+                            <li key={`author-${index}`} className='mr-2 min-w-fit h-fit'>
                                 <Link href={`/${locale}/authors/${id}`}
                                     prefetch={false}
                                     className='text-blue-600 hover:underline'>
-                                    {name}
+                                    {_isEng ? dataEng?.name : dataRu?.name}
                                 </Link>
                                 {ecosystem.authors.length > 1 && index + 1 < ecosystem.authors.length && ','}
                             </li>
