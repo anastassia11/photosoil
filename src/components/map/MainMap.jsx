@@ -118,7 +118,7 @@ export default function MainMap() {
         //Создаем вид
         let view = new View({
             center: startcoords,
-            zoom: 8.5,
+            zoom: 3,
             rotation: 0,
             constrainRotation: true,
             rotateExtent: [0, 0, 0, 0],
