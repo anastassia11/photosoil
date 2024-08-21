@@ -124,8 +124,9 @@ export default function UsersPageComponent() {
                     {MODERATOR_INFO.map(({ title, name }) => <li key={name}>
                         {Input({
                             label: title,
+                            type: name,
                             name: name,
-                            required: name !== 'name',
+                            required: true,
                             value: userData[name] || '',
                             onChange: handleInputChange,
                         })}

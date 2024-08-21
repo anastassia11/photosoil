@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function Input({ label, name, value, required, onChange, isEng }) {
+export default function Input({ label, name, type, value, required, onChange, isEng }) {
 
     return (
         <div className='w-full'>
@@ -13,7 +13,7 @@ export default function Input({ label, name, value, required, onChange, isEng })
                 value={value}
                 onChange={onChange}
                 name={name}
-                type="text"
+                type={type || 'text'}
                 className="h-[40px] bg-white w-full mt-1 p-2 outline-none border focus:border-blue-600 shadow-sm rounded-md"
             />
         </div>
