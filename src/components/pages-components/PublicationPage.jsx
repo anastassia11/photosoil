@@ -85,15 +85,15 @@ export default function PublicationPageComponent({ id }) {
                 {currentTransl?.authors ? <p className='text-gray-600'>{currentTransl.authors}</p> : ''}
                 {currentTransl?.edition ? <p className='text-gray-600 font-medium'>{currentTransl.edition}</p> : ''}
             </div>
-            <div className='flex flex-row w-full border-b-2'>
-                <button className={`y-2 w-fit font-semibold border-b-2 translate-y-[2px]
-                hover:border-blue-600 text-blue-600 mr-10 py-2
+            <div className='mt-2 flex md:flex-row w-full md:border-b-2 md:border-l-0 flex-col'>
+                <button className={`w-fit font-semibold pl-2 md:pl-0 md:border-l-0 border-l-2 md:border-b-2 translate-y-[2px]
+                hover:border-blue-600 text-blue-600 md:mr-10 mr-4 md:py-2 py-1.5 text-sm sm:text-base 
                 ${!publication.soilObjects?.length && 'hidden'}`}
                     onClick={() => handleScrollToSection('soils-section')}>
                     {t('connect_soils')} ({publication.soilObjects?.length})
                 </button>
-                <button className={`y-2 w-fit font-semibold border-b-2 translate-y-[2px]
-                hover:border-blue-600 text-blue-600 mr-10 py-2
+                <button className={`text-blue-600 w-fit font-semibold text-sm sm:text-base md:border-l-0 pl-2 md:pl-0 border-l-2 md:border-b-2 translate-y-[2px]
+                hover:border-blue-600 md:py-2 py-1.5
                 ${!publication.ecosystems?.length && 'hidden'}`}
                     onClick={() => handleScrollToSection('ecosystems-section')}>
                     {t('connect_ecosystems')} ({publication.ecosystems?.length})

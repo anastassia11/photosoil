@@ -56,27 +56,27 @@ export default function SoilObject({ object, children, type }) {
                 </Link> : ''}
             </div>
 
-            <div className='flex flex-row w-full border-b-2'>
-                <button className={`y-2 w-fit font-semibold border-b-2 translate-y-[2px]
-                hover:border-blue-600 text-blue-600 sm:mr-10 mr-4 py-2 text-sm sm:text-base 
+            <div className='flex md:flex-row w-full md:border-b-2 md:border-l-0 flex-col'>
+                <button className={`w-fit font-semibold pl-2 md:pl-0 md:border-l-0 border-l-2 md:border-b-2 translate-y-[2px]
+                hover:border-blue-600 text-blue-600 md:mr-10 mr-4 md:py-2 py-1.5 text-sm sm:text-base 
                 ${!object.soilObjects?.length && 'hidden'}`}
                     onClick={() => handleScrollToSection('soilObjects-section')}>
                     {t('connect_soils')} ({object.soilObjects?.length})
                 </button>
-                <button className={`y-2 w-fit font-semibold border-b-2 translate-y-[2px]
-                hover:border-blue-600 text-blue-600 sm:mr-10 mr-4 py-2 text-sm sm:text-base
+                <button className={`w-fit font-semibold md:border-l-0 pl-2 md:pl-0 border-l-2 md:border-b-2 translate-y-[2px]
+                hover:border-blue-600 text-blue-600 md:mr-10 mr-4 md:py-2 py-1.5 text-sm sm:text-base
                 ${!object.ecoSystems?.length && 'hidden'}`}
                     onClick={() => handleScrollToSection('ecosystems-section')}>
                     {t('connect_ecosystems')} ({object.ecoSystems?.length})
                 </button>
-                <button className={`y-2 w-fit font-semibold border-b-2 translate-y-[2px]
-                hover:border-blue-600 text-blue-600 sm:mr-10 mr-4 py-2 text-sm sm:text-base
+                <button className={`w-fit font-semibold md:border-l-0 pl-2 md:pl-0 border-l-2 md:border-b-2 translate-y-[2px]
+                hover:border-blue-600 text-blue-600 md:mr-10 mr-4 md:py-2 py-1.5 text-sm sm:text-base
                 ${!object.publications?.length && 'hidden'}`}
                     onClick={() => handleScrollToSection('publications-section')}>
                     {t('connect_publ')} ({object.publications?.length})
                 </button>
-                <button className={`y-2 text-blue-600 w-fit font-semibold text-sm sm:text-base border-b-2 translate-y-[2px]
-                hover:border-blue-600 py-2
+                <button className={`text-blue-600 w-fit font-semibold text-sm sm:text-base md:border-l-0 pl-2 md:pl-0 border-l-2 md:border-b-2 translate-y-[2px]
+                hover:border-blue-600 md:py-2 py-1.5
                 ${!object.latitude && 'hidden'}`}
                     onClick={() => handleScrollToSection('map-section')}>
                     {t('show_inMap')}
