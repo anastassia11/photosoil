@@ -178,8 +178,9 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
           rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] 
           after:absolute after:top-0.5 after:start-[1px] after:bg-white after:border-gray-300 after:border 
           after:rounded-full after:h-[18px] after:w-[18px] after:transition-all 
-          ${type === 'soil' ? 'peer-checked:bg-[#3b82f6]'
-              : type === 'ecosystem' ? 'peer-checked:bg-[#19aa1e]' : 'peer-checked:bg-[#8b5cf6]'}
+
+          ${type === 'soil' ? 'peer-checked:bg-[#993300]/80'
+              : type === 'ecosystem' ? 'peer-checked:bg-[#73ac13]/80' : 'peer-checked:bg-[#8b008b]/80'}
           `}></div>
         </label>
       </label>

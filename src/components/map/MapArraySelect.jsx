@@ -97,12 +97,14 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref
             controls: []
         });
 
-        modifyRef.current = new Modify({ source: pointVectorSource });
-        mapRef.current.addInteraction(modifyRef.current);
+        if (onInputChange) {
+            modifyRef.current = new Modify({ source: pointVectorSource });
+            mapRef.current.addInteraction(modifyRef.current);
 
-        //добавляем функцию привязки к точке
-        const snap = new Snap({ source: pointVectorSource });
-        mapRef.current.addInteraction(snap);
+            //добавляем функцию привязки к точке
+            const snap = new Snap({ source: pointVectorSource });
+            mapRef.current.addInteraction(snap);
+        }
 
         //Слой точек метки
         const pointVectorLayer = new VectorLayer({
@@ -155,6 +157,7 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref
 
         //создаем новую точку
         if (selectedPointFeature.current == null) {
+            setIsDataLoaded(true);
             const clickCoordinate = e.coordinate;
             const newCord = toLonLat(clickCoordinate);
             const newPointFeature = new Feature({
@@ -188,6 +191,7 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref
 
     function onSelectedPointFeatureChenged() {
         let coords = toLonLat(selectedPointFeature.current.getGeometry().getCoordinates());
+
         onInputChange({
             latitude: coords[1],
             longtitude: coords[0]

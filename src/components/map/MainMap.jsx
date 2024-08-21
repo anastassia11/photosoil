@@ -6,7 +6,7 @@ import Feature from 'ol/Feature';
 import OLMap from 'ol/Map';
 import { Point } from 'ol/geom';
 import View from 'ol/View';
-import { Icon, Style, Fill, Stroke } from 'ol/style';
+import { Icon, Style, Fill, Stroke, RegularShape } from 'ol/style';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { fromLonLat, toLonLat } from 'ol/proj';
 import { OSM, Cluster, XYZ, BingMaps, Vector as VectorSource } from 'ol/source';
@@ -24,6 +24,7 @@ import { useSelector } from 'react-redux';
 import { getPublications } from '@/api/publication/get_publications';
 import ObjectsPopup from './ObjectsPopup';
 import { useParams } from 'next/navigation';
+import { Select } from 'ol/interaction';
 
 export default function MainMap() {
     const [baseLayer, setBaseLayer] = useState(null);
@@ -134,6 +135,7 @@ export default function MainMap() {
             controls: []
         });
         setBaseLayer(baseLayer);
+        // mapRef.current.addInteraction(select);
     }
 
     const getBaseLayerSourse = (layerValue) => {
@@ -266,7 +268,7 @@ export default function MainMap() {
                 setFeatures(prevFeatures => [...prevFeatures, ...newFeatures]);
             });
         const clusterSource = new Cluster({
-            distance: 35, // Расстояние для кластеризации в пикселях
+            distance: 17, // Расстояние для кластеризации в пикселях
             source: layerVectorSource // Исходный источник
         });
         const _clusterLayer = new VectorLayer({
@@ -282,26 +284,73 @@ export default function MainMap() {
         mapRef.current.addLayer(getLayer());
     }
 
+    // const select = new Select({
+    //     style: function (feature) {
+    //         // if (feature.get('p_type') === name) 
+    //         // const size = feature.get('size') || 0; // Пример получения размера
+    //         return new Style({
+    //             image: new RegularShape({
+    //                 stroke: new Stroke({ color: 'rgba(255, 69, 0, 1)', width: 2 }),
+    //                 fill: new Fill({ color: 'rgba(255, 69, 0, 1)' }), // Изменяем цвет при наведении
+    //                 points: 4,
+    //                 radius: 13, // Увеличиваем радиус для эффекта тени
+    //                 angle: Math.PI / 4,
+    //             }),
+    //             text: new Text({
+    //                 // text: size.toString(),
+    //                 fill: new Fill({ color: '#ffffff' }),
+    //                 font: '500 14px sans-serif',
+    //                 offsetX: 0,
+    //                 offsetY: 1,
+    //                 textAlign: 'center',
+    //                 textBaseline: 'middle'
+    //             }),
+    //             zIndex: 2
+    //         });
+    //     }
+    // });
+
+
+
     const clusterStyle = (feature) => {
         const size = feature.get('features').length;
         if (size > 1) {
             // Стиль для кластеров
             return new Style({
-                image: new CircleStyle({
-                    radius: 20,
-                    fill: new Fill({ color: '#fa9405' }),
-                    stroke: new Stroke({ color: '#fff4e5', width: 5 }),
+                image: new RegularShape({
+                    stroke: new Stroke({ color: 'rgba(255, 69, 0, 1)', width: 2 }),
+                    fill: new Fill({ color: 'rgba(255, 69, 0, 0.6)' }),
+                    points: 4, // Количество углов (4 для квадрата)
+                    radius: 13, // Радиус квадрата
+                    angle: Math.PI / 4, // Угол поворота
                 }),
                 text: new Text({
                     text: size.toString(),
                     fill: new Fill({ color: '#ffffff' }),
-                    font: 'bold 16px sans-serif',
+                    font: '500 14px sans-serif',
                     offsetX: 0,
                     offsetY: 1,
                     textAlign: 'center',
                     textBaseline: 'middle'
                 }),
+                zIndex: 2
             });
+            // return new Style({
+            //     image: new CircleStyle({
+            //         radius: 20,
+            //         fill: new Fill({ color: '#fa9405' }),
+            //         stroke: new Stroke({ color: '#fff4e5', width: 5 }),
+            //     }),
+            //     text: new Text({
+            //         text: size.toString(),
+            //         fill: new Fill({ color: '#ffffff' }),
+            //         font: 'bold 16px sans-serif',
+            //         offsetX: 0,
+            //         offsetY: 1,
+            //         textAlign: 'center',
+            //         textBaseline: 'middle'
+            //     }),
+            // });
         } else {
             const singleFeature = feature.get('features')[0];
             return singleFeature.getStyle();
@@ -310,27 +359,65 @@ export default function MainMap() {
 
     //Создает стиль иконки по типу слоя
     const getIconStyleByLayerName = (layerName) => {
-        if (layerName === "publication") {
-            return createIconStyle('/publ-marker_v2.svg');
-        }
-        if (layerName === "ecosystem") {
-            return createIconStyle('/ecosystem-marker.svg');
-        }
-        if (layerName === "soil") {
-            return createIconStyle('/soil-marker.svg');
-        }
-        return createIconStyle('/map-marker.svg');
+        return createIconStyle(layerName)
+        // if (layerName === "publication") {
+        //     return createIconStyle('/publ-marker_v2.svg');
+        // }
+        // if (layerName === "ecosystem") {
+        //     return createIconStyle('/ecosystem-marker.svg');
+        // }
+        // if (layerName === "soil") {
+        //     return createIconStyle('/soil-marker.svg');
+        // }
+        // return createIconStyle('/map-marker.svg');
     }
 
     //Создает стиль иконки по Url
-    const createIconStyle = (iconUrl, scale = 0.1) => {
-        return new Style({
-            image: new Icon({
-                anchor: [0.5, 1],
-                scale: scale,
-                src: iconUrl
-            }),
-        });
+    const createIconStyle = (layerName,
+        // iconUrl, scale = 0.1
+    ) => {
+        if (layerName === 'soil') {
+            return new Style({
+                image: new RegularShape({
+                    stroke: new Stroke({ color: 'rgba(153, 51, 0, 1)', width: 1.7 }),
+                    fill: new Fill({ color: 'rgba(153, 51, 0, 0.7)' }),
+                    points: 4, // Количество углов (4 для квадрата)
+                    radius: 10, // Радиус квадрата
+                    angle: Math.PI / 4, // Угол поворота
+                }),
+                zIndex: 1
+            });
+        } else if (layerName === 'ecosystem') {
+            return new Style({
+                image: new RegularShape({
+                    stroke: new Stroke({ color: 'rgba(115, 172, 19, 1)', width: 1.7 }),
+                    fill: new Fill({ color: 'rgba(115, 172, 19, 0.7)' }),
+                    points: 4, // Количество углов (4 для квадрата)
+                    radius: 10, // Радиус квадрата
+                    angle: Math.PI / 4, // Угол поворота
+                }),
+                zIndex: 1
+            });
+        } else if (layerName === 'publication') {
+            return new Style({
+                image: new RegularShape({
+                    stroke: new Stroke({ color: 'rgba(139, 0, 139, 1)', width: 1.7 }),
+                    fill: new Fill({ color: 'rgba(139, 0, 139, 0.7)' }),
+                    points: 4, // Количество углов (4 для квадрата)
+                    radius: 10, // Радиус квадрата
+                    angle: Math.PI / 4, // Угол поворота
+                }),
+                zIndex: 1
+            });
+        }
+
+        // return new Style({
+        //     image: new Icon({
+        //         anchor: [0.5, 1],
+        //         scale: scale,
+        //         src: iconUrl
+        //     }),
+        // });
     }
 
     const hangleMapClick = (e) => {
@@ -361,13 +448,93 @@ export default function MainMap() {
         }
     }
 
+    const handleMapHover = (e) => {
+        const features = mapRef.current.getFeaturesAtPixel(e.pixel);
+
+        if (features.length > 0) {
+            const feature = features[0];
+            const size = feature.get('features').length;
+            const points = feature.get('features');
+            if (points.length == 1) {
+                const point = points[0];
+                const layerName = point.get("p_type");
+                if (layerName === 'soil') {
+                    feature.setStyle(new Style({
+                        image: new RegularShape({
+                            stroke: new Stroke({ color: 'rgba(153, 51, 0, 1)', width: 1.7 }),
+                            fill: new Fill({ color: 'rgba(153, 51, 0, 0.8)' }),
+                            points: 4, // Количество углов (4 для квадрата)
+                            radius: 11, // Радиус квадрата
+                            angle: Math.PI / 4, // Угол поворота
+                        }),
+                        zIndex: 1
+                    }));
+                } else if (layerName === 'ecosystem') {
+                    feature.setStyle(new Style({
+                        image: new RegularShape({
+                            stroke: new Stroke({ color: 'rgba(115, 172, 19, 1)', width: 1.7 }),
+                            fill: new Fill({ color: 'rgba(115, 172, 19, 0.8)' }),
+                            points: 4, // Количество углов (4 для квадрата)
+                            radius: 11, // Радиус квадрата
+                            angle: Math.PI / 4, // Угол поворота
+                        }),
+                        zIndex: 1
+                    }));
+                } else if (layerName === 'publication') {
+                    feature.setStyle(new Style({
+                        image: new RegularShape({
+                            stroke: new Stroke({ color: 'rgba(139, 0, 139, 1)', width: 1.7 }),
+                            fill: new Fill({ color: 'rgba(139, 0, 139, 0.8)' }),
+                            points: 4, // Количество углов (4 для квадрата)
+                            radius: 11, // Радиус квадрата
+                            angle: Math.PI / 4, // Угол поворота
+                        }),
+                        zIndex: 1
+                    }));
+                }
+            } else {
+                feature.setStyle(new Style({
+                    image: new RegularShape({
+                        stroke: new Stroke({ color: 'rgba(255, 69, 0, 1)', width: 2 }),
+                        fill: new Fill({ color: 'rgba(255, 69, 0, 0.75)' }),
+                        points: 4, // Количество углов (4 для квадрата)
+                        radius: 14, // Радиус квадрата
+                        angle: Math.PI / 4, // Угол поворота
+                    }),
+                    text: new Text({
+                        text: size.toString(),
+                        fill: new Fill({ color: '#ffffff' }),
+                        font: '500 14px sans-serif',
+                        offsetX: 0,
+                        offsetY: 1,
+                        textAlign: 'center',
+                        textBaseline: 'middle'
+                    }),
+                    zIndex: 2
+                }));
+            }
+
+            mapRef.current.getTargetElement().style.cursor = 'pointer'
+        } else {
+            handleMapOut();
+            mapRef.current.getLayers().getArray()[1].getSource().getFeatures().forEach((feature) => {
+                feature.setStyle(null); // Сброс стиля
+            });
+        }
+    }
+
+    const handleMapOut = () => {
+        mapRef.current.getTargetElement().style.cursor = 'default';
+    };
 
     const addListeners = () => {
-        mapRef.current.addEventListener('singleclick', hangleMapClick)
+        mapRef.current.on('singleclick', hangleMapClick);
+        mapRef.current.on('pointermove', handleMapHover);
     }
 
     const removeListeners = () => {
-        mapRef.current.removeEventListener('singleclick', hangleMapClick)
+        mapRef.current.un('singleclick', hangleMapClick);
+        mapRef.current.un('pointermove', handleMapHover);
     }
 
     const handleLayerChange = ({ name, checked }) => {
