@@ -64,7 +64,7 @@ export default function Header({ locale }) {
 
     return (
         <header className={`${visible ? 'fixed top-0 ' : 'fixed -top-20'} z-50 transition-all duration-200 
-            ease-in-out px-4 sm:px-8 w-full border-b shadow-sm h-16 lg:bg-white bg-white/90 flex flex-row items-center justify-between`}>
+            ease-in-out px-4 2xl:px-8 w-full border-b shadow-sm h-16 lg:bg-white bg-white/90 flex flex-row items-center justify-between`}>
             <div className='flex-1 '>
                 <Link href={`/${locale}`} prefetch={false}
                     className='flex flex-row items-center w-fit'>
@@ -73,7 +73,7 @@ export default function Header({ locale }) {
                 </Link>
             </div>
 
-            <ul className='hidden 2xl:flex flex-row items-center space-x-8'>
+            <ul className='hidden xl:flex flex-row items-center space-x-7 2xl:space-x-8'>
                 {navigation.map(({ key, title, isDropdown, navs }) => <li key={key}>
                     {isDropdown ?
                         <>
@@ -104,7 +104,7 @@ export default function Header({ locale }) {
                     <div className={`${isDropdown && dropdown.key == key && dropdown.isActive ? 'visible translate-y-4' : 'invisible opacity-0'}
                             overflow-hidden w-[400px] absolute border shadow-md bg-white rounded-md transition-all duration-200`}>
                         <ul className='py-2'>
-                            {navs?.map(({ key: navKey, title }) => <li key={navKey} className='duration-300 cursor-pointer hover:text-blue-600 h-9 hover:bg-zinc-100 flex items-center px-4'
+                            {navs?.map(({ key: navKey, title }) => <li key={navKey} className='duration-300 cursor-pointer hover:text-blue-600 h-9 hover:bg-zinc-100 flex items-center xl:px-4 px-2'
                                 onClick={() => dispatch(setDropdown({ isActive: false, key: null }))}>
                                 <Link href={`/${locale}/${navKey}`}
                                     prefetch={false}>
@@ -121,10 +121,10 @@ export default function Header({ locale }) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.5 }}
-                    className='flex-1 justify-end space-x-4 h-full flex flex-row items-center w-fit'>
+                    className='flex-1 justify-end space-x-0 2xl:space-x-2 h-full flex flex-row items-center w-fit'>
 
                     {!token ? <Link href={`/${locale}/join`}
-                        prefetch={false} className="hidden sm:flex max-h-[40px] px-4 py-2 font-medium text-center text-white transition-colors duration-300 
+                        prefetch={false} className="hidden sm:flex max-h-[40px] xl:px-4 px-2 py-2 font-medium text-center text-white transition-colors duration-300 
                 transform bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600">
                         {t('join')}
                     </Link> : <Link href={`/${locale}/admin`}
@@ -137,10 +137,10 @@ export default function Header({ locale }) {
                         <LanguageChanger locale={locale} />
                     </div>
                 </motion.div>
-                : <div className='flex-1 justify-end space-x-4 h-full flex flex-row items-center w-fit'></div>}
+                : <div className='flex-1 justify-end xl:space-x-4 space-x-2 h-full flex flex-row items-center w-fit'></div>}
 
 
-            <div className="block 2xl:hidden ml-2">
+            <div className="block xl:hidden ml-2">
                 <button className="m-2 mr-0 transition text-gray-600"
                     onClick={() => setMenuOpen(!menuOpen)} >
                     {
@@ -156,7 +156,7 @@ export default function Header({ locale }) {
                     }
                 </button>
             </div>
-            <div className={`bg-white 2xl:block px-3 sm:w-[60%] w-full self-end h-[calc(100vh-64px)] fixed top-[64px] flex 
+            <div className={`bg-white xl:block px-3 sm:w-[400px] w-full self-end h-[calc(100vh-64px)] fixed top-[64px] flex 
             flex-col p-4
                 duration-300 ${menuOpen ? 'block right-0' : 'opacity-0 -right-[100%]'}`}>
                 <li className='mb-4 h-fit flex-col space-y-2 justify-end flex sm:hidden w-full px-2'>
