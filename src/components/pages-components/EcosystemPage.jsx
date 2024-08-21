@@ -55,7 +55,7 @@ export default function EcosystemPageComponent({ id }) {
                     <span className='lg:w-[40%] w-full text-zinc-500 font-semibold'>
                         {t('authors')}
                     </span>
-                    <ul className={`lg:w-[60%] w-full flex flex-row`}>
+                    <ul className={`lg:w-[60%] w-full flex flex-row flex-wrap items-start justify-start h-fit`}>
                         {ecosystem.authors?.map(({ id, dataEng, dataRu }, index) =>
                             <li key={`author-${index}`} className='mr-2 min-w-fit h-fit'>
                                 <Link href={`/${locale}/authors/${id}`}
