@@ -334,15 +334,14 @@ export default function CreateObject({ title, onCreate, type }) {
                             </p>
                             {photos.length &&
                                 <ul className={`h-full w-full flex xl:flex-col flex-row justify-start 
-                                    xl:space-y-2 xl:pr-2 pb-2 xl:pb-0 rounded-lg overflow-y-auto overflow-x-auto xl:overflow-x-hidden scroll items-center`}
-                                    onDragStart={e => !drag && handleDragStart(e)}
-                                    onDragLeave={e => !drag && handleDragLeave(e)}
-                                    onDragOver={e => !drag && handleDragStart(e)} >
-                                    {photos.map((photo, idx) => <li key={photo.id} className='xl:w-full h-full aspect-square p-[3px] flex flex-col items-center justify-center'>
-                                        {PhotoCard({ ...photo, idx })}
-                                    </li>)}
+                                    xl:space-y-2 xl:pr-2 pb-2 xl:pb-0 rounded-lg overflow-y-auto overflow-x-auto xl:overflow-x-hidden scroll items-center`}>
+                                    {
+                                        photos.map((photo, idx) => <li key={`${type}-${photo.id}`} className='xl:w-full h-full aspect-square p-[3px] flex flex-col items-center justify-center'>
+                                            {PhotoCard({ ...photo, idx })}
+                                        </li>)
+                                    }
                                     <div className='xl:min-w-[95%] xl:h-auto h-[95%] p-[3px] flex w-[150px] aspect-square max-w-[150px] xl:w-auto ml-2 xl:ml-0'>
-                                        <DragAndDrop onLoadClick={handleSendPhoto} accept='img' />
+                                        <DragAndDrop id='objects' onLoadClick={handleSendPhoto} isMultiple={true} accept='img' />
                                     </div>
                                 </ul>
                             }

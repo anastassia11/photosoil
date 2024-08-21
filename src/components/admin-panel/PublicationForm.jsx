@@ -275,7 +275,7 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
                     ...file,
                     onDelete: handleFileDelete,
                 }) : <div className='md:w-[50%] w-full h-[150px] pr-2 mt-1'>
-                    <DragAndDrop onLoadClick={handleFileLoad} isMultiple={false} accept='pdf' />
+                    <DragAndDrop id='publ-files' onLoadClick={handleFileLoad} isMultiple={false} accept='pdf' />
                 </div>}
 
                 <p className='font-medium mt-5'>{t('connection')}</p>

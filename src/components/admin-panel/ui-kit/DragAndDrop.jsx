@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation';
 import { useState } from 'react'
 import { useDispatch } from 'react-redux';
 
-export default function DragAndDrop({ onLoadClick, isMultiple, accept }) {
+export default function DragAndDrop({ id, onLoadClick, isMultiple, accept }) {
     const dispatch = useDispatch();
     const [drag, setDrag] = useState(false);
     const { locale } = useParams();
@@ -66,7 +66,7 @@ export default function DragAndDrop({ onLoadClick, isMultiple, accept }) {
                         {t('release_files')}
                     </p>
                 </div>
-                : <label htmlFor='geometry_file'
+                : <label htmlFor={id}
                     className="px-4 flex flex-col justify-center items-center space-y-2 
                      hover:border-zinc-600 flex-1 rounded border-dashed border-[1px] 
                     border-zinc-400 duration-300 cursor-pointer w-full"
@@ -76,7 +76,7 @@ export default function DragAndDrop({ onLoadClick, isMultiple, accept }) {
 
                     <p className='text-center'><span className='font-semibold'>{t('click_download')}</span> {t('drag_files')}</p>
 
-                    <input type="file" multiple={isMultiple} id='geometry_file' className="w-0 h-0"
+                    <input type="file" multiple={isMultiple} id={id} className="w-0 h-0"
                         accept={`${accept === 'img' ? "image/*" : accept === 'pdf' ? '.pdf' : ''} `}
                         onChange={handleChange} />
                 </label>}

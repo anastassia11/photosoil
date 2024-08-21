@@ -304,7 +304,7 @@ export default function NewsForm({ _news, pathname, onNewsSubmit, isLoading, btn
                     </label>
                     {!newsPhotos?.length ?
                         <div className='w-full md:w-1/2 h-[150px] pr-2 mt-1'>
-                            <DragAndDrop onLoadClick={handleNewsPhotoSend} isMultiple={true} accept='img' />
+                            <DragAndDrop id='news-photos' onLoadClick={handleNewsPhotoSend} isMultiple={true} accept='img' />
                         </div>
                         :
                         <ul className={`grid md:grid-cols-2 grid-cols-1 gap-4 `}>
@@ -313,7 +313,7 @@ export default function NewsForm({ _news, pathname, onNewsSubmit, isLoading, btn
                                     onChange={handleNewsPhotosChange} />
                             </li>)}
                             <div className='h-[150px]'>
-                                <DragAndDrop onLoadClick={handleNewsPhotoSend} isMultiple={true} accept='img' />
+                                <DragAndDrop id='news-photos' onLoadClick={handleNewsPhotoSend} isMultiple={true} accept='img' />
                             </div>
                         </ul>}
                 </div>
@@ -324,7 +324,7 @@ export default function NewsForm({ _news, pathname, onNewsSubmit, isLoading, btn
                     </label>
                     {!files?.length ?
                         <div className='w-full md:w-1/2 h-[150px] pr-2 mt-1'>
-                            <DragAndDrop onLoadClick={handleFilesSend} isMultiple={true} accept='pdf' />
+                            <DragAndDrop id='news-files' onLoadClick={handleFilesSend} isMultiple={true} accept='pdf' />
                         </div>
                         :
                         <ul className={`mt-1 flex flex-col w-full md:w-1/2`}>
@@ -332,7 +332,7 @@ export default function NewsForm({ _news, pathname, onNewsSubmit, isLoading, btn
                                 {FileCard({ ...file, onDelete: () => handleFileDelete(file.id) })}
                             </li>)}
                             <div className='mt-2 h-[150px] w-full'>
-                                <DragAndDrop onLoadClick={handleFilesSend} isMultiple={true} accept='pdf' />
+                                <DragAndDrop id='news-files' onLoadClick={handleFilesSend} isMultiple={true} accept='pdf' />
                             </div>
                         </ul>}
                 </div>

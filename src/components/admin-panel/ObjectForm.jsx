@@ -25,7 +25,8 @@ import { getClassifications } from '@/api/classification/get_classifications';
 import { useParams } from 'next/navigation';
 import { getTranslation } from '@/i18n/client';
 
-export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, mainObjectPhoto, otherObjectPhoto, onItemChange, onMainPhotoChange, onOtherPhotosChange }) {
+export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, mainObjectPhoto, otherObjectPhoto,
+    onItemChange, onMainPhotoChange, onOtherPhotosChange }) {
     const dispatch = useDispatch();
     const { locale } = useParams();
     const { t } = getTranslation(locale);
@@ -397,23 +398,23 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                                     onChange={handleMainPhotoChange} />
                             </div>
                             : <div className='md:w-[50%] w-full h-[150px] pr-2 mt-1'>
-                                <DragAndDrop onLoadClick={handleMainPhotoSend} isMultiple={false} accept='img' />
+                                <DragAndDrop id='main-photo' onLoadClick={handleMainPhotoSend} isMultiple={false} accept='img' />
                             </div>}
 
 
                         <p className='font-medium mt-8'>{t('other_photos')}</p>
                         {!otherPhotos?.length ?
                             <div className='md:w-[50%] w-full h-[150px] pr-2 mt-1'>
-                                <DragAndDrop onLoadClick={handleOtherPhotoSend} isMultiple={true} accept='img' />
+                                <DragAndDrop id='other-photos' onLoadClick={handleOtherPhotoSend} isMultiple={true} accept='img' />
                             </div>
                             :
                             <ul className={`grid md:grid-cols-2 grid-cols-1 gap-4 `}>
-                                {otherPhotos.map(photo => <li key={photo.id}>
-                                    <PhotoCard {...photo} isEng={isEng} onDelete={handleOtherPhotoDelete}
+                                {otherPhotos.map(otherPhoto => <li key={`otherPhoto-${otherPhoto.id}`}>
+                                    <PhotoCard {...otherPhoto} isEng={isEng} onDelete={handleOtherPhotoDelete}
                                         onChange={handleOtherPhotosChange} />
                                 </li>)}
-                                <div className='h-[150px]'>
-                                    <DragAndDrop onLoadClick={handleOtherPhotoSend} isMultiple={true} accept='img' />
+                                <div key='otherPhoto-dragAndDrop' className='h-[150px]'>
+                                    <DragAndDrop id='other-photos' onLoadClick={handleOtherPhotoSend} isMultiple={true} accept='img' />
                                 </div>
                             </ul>}
 

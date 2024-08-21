@@ -161,7 +161,7 @@ export default function AuthorForm({ _author, onFormSubmit, isLoading, btnText }
                                 className='object-cover rounded-md max-h-[370px] min-h-[370px] aspect-[3/4] overflow-hidden' />
                         </div> :
                             <div className='max-h-[370px] min-h-[370px] aspect-[3/4] overflow-hidden'>
-                                <DragAndDrop onLoadClick={fetchSendPhoto} isMultiple={false} accept='img' />
+                                <DragAndDrop id='author-photo' onLoadClick={fetchSendPhoto} isMultiple={false} accept='img' />
                             </div>
                         }
                     </div>
