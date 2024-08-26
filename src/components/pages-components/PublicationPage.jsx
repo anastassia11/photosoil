@@ -66,7 +66,7 @@ export default function PublicationPageComponent({ id }) {
                 <h1 className='sm:text-2xl text-xl font-semibold'>
                     {currentTransl?.name}
                 </h1>
-                {tokenData.role === 'Admin' || (tokenData.name === publication.user?.name) ? <Link target="_blank"
+                {tokenData.role === 'Admin' || (tokenData.email === publication.userEmail) ? <Link target="_blank"
                     prefetch={false}
                     className='text-blue-700 cursor-pointer flex flex-row items-center hover:underline duration-300'
                     href={{

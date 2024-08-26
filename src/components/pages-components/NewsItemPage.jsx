@@ -55,7 +55,7 @@ export default function NewsItemPageComponent({ id }) {
                 <h1 className='sm:text-2xl text-xl font-semibold'>
                     {currentTransl?.title}
                 </h1>
-                {tokenData.role === 'Admin' || (tokenData.name === news.user?.name) ? <Link target="_blank"
+                {tokenData.role === 'Admin' || (tokenData.email === news.userEmail) ? <Link target="_blank"
                     prefetch={false}
                     className='text-blue-700 cursor-pointer flex flex-row items-center hover:underline duration-300 pb-1'
                     href={{

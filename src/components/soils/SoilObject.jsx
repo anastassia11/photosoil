@@ -29,6 +29,10 @@ export default function SoilObject({ object, children, type }) {
         localStorage.getItem('tokenData') && setTokenData(JSON.parse(localStorage.getItem('tokenData')));
     }, [])
 
+    useEffect(() => {
+        console.log(object)
+    }, [object])
+
     return (
         <div className='flex flex-col'>
             <div className='flex flex-col sm:flex-row mb-2 justify-between sm:items-center'>
@@ -40,7 +44,7 @@ export default function SoilObject({ object, children, type }) {
                     </MotionWrapper>
                         : <Loader className='w-[80%] h-[30px]' />}
                 </div>
-                {tokenData.role === 'Admin' || (tokenData.name === object.user?.name) ? <Link target="_blank"
+                {tokenData.role === 'Admin' || (tokenData.email === object.userEmail) ? <Link target="_blank"
                     prefetch={false}
                     className='text-blue-700 cursor-pointer flex flex-row items-center hover:underline duration-300'
                     href={{
