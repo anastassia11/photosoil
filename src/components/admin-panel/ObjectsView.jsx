@@ -44,6 +44,7 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
         setFilteredObjects(prev => objects
             .filter(object =>
                 (object?.name?.toLowerCase().includes(filterName.toLowerCase()) ||
+                    object?.code?.toLowerCase().includes(filterName.toLowerCase()) ||
                     object?.email?.toLowerCase().includes(filterName.toLowerCase()) ||
                     object?.title?.toLowerCase().includes(filterName.toLowerCase()) ||
                     object?.dataEng?.name?.toLowerCase().includes(filterName.toLowerCase()) ||
@@ -470,7 +471,10 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
                     value={filterName}
                     onChange={(e) => setFilterName(e.target.value)}
                     type="text"
-                    placeholder={objectType === 'users' ? t('search_email') : objectType === 'authors' ? t('search_name') : t('search_title')}
+                    placeholder={objectType === 'users' ? t('search_email')
+                        : objectType === 'authors' ? t('search_name')
+                            : objectType === 'objects' || objectType === 'ecosystems' ? t('search_code')
+                                : t('search_title')}
                     className="w-full py-2 pl-12 pr-4 border rounded-md outline-none bg-white focus:border-blue-600"
                 />
             </div>

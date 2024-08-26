@@ -46,6 +46,7 @@ export default function Filter({ type, itemId, name, items, setTags, allSelected
 
     useEffect(() => {
         items && setFilteredItems(items.filter((item) => item.name?.toLowerCase().includes(filterName.toLowerCase()) ||
+            item.code?.toLowerCase().includes(filterName.toLowerCase()) ||
             item.dataEng?.name?.toLowerCase().includes(filterName.toLowerCase()) || item.dataRu?.name?.toLowerCase().includes(filterName.toLowerCase()) ||
             item.nameEng?.toLowerCase().includes(filterName.toLowerCase()) || item.nameRu?.toLowerCase().includes(filterName.toLowerCase()))
         )
