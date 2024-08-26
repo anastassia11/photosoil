@@ -13,6 +13,7 @@ export const useConstants = () => {
         { name: 'degree', title: t('degree') },
         { name: 'contacts', title: t('contacts'), isArray: true },
         { name: 'otherProfiles', title: t('otherProfiles'), isArray: true },
+        { name: 'about', title: t('author_about') }
     ];
 
     const SOIL_INFO = [

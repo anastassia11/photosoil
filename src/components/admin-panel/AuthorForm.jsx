@@ -15,6 +15,7 @@ import { closeModal, openModal } from '@/store/slices/modalSlice';
 import modalThunkActions from '@/store/thunks/modalThunk';
 import { getTranslation } from '@/i18n/client';
 import { useParams } from 'next/navigation';
+import Textarea from './ui-kit/Textarea';
 
 export default function AuthorForm({ _author, onFormSubmit, isLoading, btnText }) {
     const dispatch = useDispatch();
@@ -180,26 +181,35 @@ export default function AuthorForm({ _author, onFormSubmit, isLoading, btnText }
                 <ul className='space-y-3 xl:w-[50%] xl:pr-6 xl:border-r'>
                     <p className='text-blue-700 font-semibold'>Русская версия</p>
                     {AUTHOR_INFO.map(({ name, isArray, title }) => <li key={name}>
-                        {!isArray && Input({
-                            required: name === 'name',
-                            label: title,
-                            name: name,
-                            value: author.dataRu?.[name] || '',
-                            onChange: e => handleInputChange(e, 'ru')
-                        })}
+                        {!isArray &&
+                            (name === 'about' ? <Textarea name={name} label={title}
+                                value={author.dataRu?.[name] || ''}
+                                onChange={e => handleInputChange(e, 'ru')}
+                                required={false}
+                                placeholder='' />
+                                : <Input required={name === 'name'}
+                                    label={title} name={name}
+                                    value={author.dataRu?.[name] || ''}
+                                    onChange={e => handleInputChange(e, 'ru')}
+                                />)
+                        }
                     </li>)}
                 </ul>
                 <ul className='space-y-3 xl:w-[50%] xl:pl-6 xl:mt-0 mt-6'>
                     <p className='text-blue-700 font-semibold'>English version</p>
                     {AUTHOR_INFO.map(({ name, isArray, title }) => <li key={name}>
-                        {!isArray && Input({
-                            required: name === 'name',
-                            label: title,
-                            isEng: true,
-                            name: name,
-                            value: author.dataEng?.[name] || '',
-                            onChange: e => handleInputChange(e, 'eng')
-                        })}
+                        {!isArray &&
+                            (name === 'about' ? <Textarea name={name} label={title}
+                                value={author.dataRu?.[name] || ''}
+                                onChange={e => handleInputChange(e, 'eng')}
+                                required={false}
+                                placeholder='' />
+                                : <Input required={name === 'name'}
+                                    label={title} name={name}
+                                    value={author.dataRu?.[name] || ''}
+                                    onChange={e => handleInputChange(e, 'eng')}
+                                />)
+                        }
                     </li>)}
                 </ul>
             </div>
