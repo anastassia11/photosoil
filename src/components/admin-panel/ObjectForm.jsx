@@ -24,6 +24,7 @@ import PhotoCard from './ui-kit/PhotoCard';
 import { getClassifications } from '@/api/classification/get_classifications';
 import { useParams } from 'next/navigation';
 import { getTranslation } from '@/i18n/client';
+import TextEditor from './TextEditor';
 
 export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, mainObjectPhoto, otherObjectPhoto,
     onItemChange, onMainPhotoChange, onOtherPhotosChange }) {
@@ -148,6 +149,17 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
         onItemChange(updatedObject);
     }
 
+    const handleTextContentChange = (isEng, field, html) => {
+        setObject(prev => {
+            const _prev = {
+                ...prev, translations: prev.translations?.map(translation =>
+                    translation.isEnglish === isEng ? { ...translation, [field]: html } : translation)
+            };
+            onItemChange(_prev);
+            return (_prev)
+        })
+    }
+
     const handleCoordChange = useCallback(({ latitude, longtitude }) => {
         setObject(prev => {
             const _prev = { ...prev, latitude, longtitude };
@@ -257,6 +269,15 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
         onItemChange(updatedObject);
     }
 
+
+    const handleIsExternalChange = (e) => {
+        setObject(prev => {
+            const _prev = { ...prev, isExternal: e.target.checked };
+            onItemChange(_prev);
+            return (_prev)
+        })
+    }
+
     const handleTwoLangChange = (e) => {
         // setCreateTwoLang(e.target.checked);
         const updatedMainPhoto = { ...mainPhoto, createTwoLang: e.target.checked };
@@ -288,7 +309,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
             onSubmit={(e) => e.preventDefault()}
             className={`flex flex-col w-full h-fit max-h-full ${pathname !== 'edit' ? 'pb-[200px]' : 'pb-16'}`}>
             <div className='flex flex-col w-full h-full'>
-                <div className='grid md:grid-cols-2 grid-cols-1 gap-4 w-full'>
+                <div className='grid md:grid-cols-2 grid-cols-1 gap-x-4 w-full'>
                     <Tabs.Root defaultValue={false} className="pt-2 md:col-span-2 sticky top-0 z-40  bg-[#f6f7f9]" value={isEng}
                         onValueChange={handleLangChange}>
                         <Tabs.List className="w-full border-b flex md:items-center gap-x-4 overflow-x-auto justify-between md:flex-row flex-col">
@@ -319,7 +340,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                         </Tabs.List>
                     </Tabs.Root>
 
-                    <div className='flex flex-col w-full'>
+                    <div className='flex flex-col w-full mt-4'>
                         {Input({
                             label: t('title'),
                             isEng: isEng,
@@ -356,7 +377,8 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                                     }
                                 </li>
                             })}
-                            <li key='authors' className={`mt-3`}>
+
+                            <li key='authors' className={`mt-3 ${object?.isExternal ? 'opacity-50 pointer-events-none' : ''}`}>
                                 <Filter itemId={`author`} name={t('authors')} items={authors}
                                     type='authors'
                                     allSelectedItems={object?.authors} isEng={isEng}
@@ -366,8 +388,10 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                                 />
                             </li>
                         </ul>
+
+
                     </div>
-                    <div className='flex flex-col w-full xl:h-[528px] md:h-[500px] h-[400px]'>
+                    <div className='flex flex-col w-full xl:h-[528px] md:h-[500px] h-[400px] mt-4'>
                         <label className="font-medium">
                             {t('in_map')}
                         </label>
@@ -392,7 +416,44 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                         </div>
                     </div>
 
+
                     <div className='md:col-span-2'>
+                        <label htmlFor='isExternal'
+                            className={`font-medium select-none mt-3 flex flex-row cursor-pointer items-center`}>
+                            <input type="checkbox" id='isExternal'
+                                checked={object?.isExternal}
+                                onChange={handleIsExternalChange}
+                                className="cursor-pointer min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
+                            <span>{`${t('isExternal')} ${isEng ? '(EN)' : ''}`}</span>
+                        </label>
+
+                        <div className={`${isEng ? 'hidden' : 'block'}
+                            w-full relative mt-2 duration-300 
+                            ${object?.isExternal ? 'visible' : 'invisible opacity-0 max-h-0'}`}>
+                            <TextEditor content={object?.translations?.find(({ isEnglish }) => !isEnglish)?.externalSource || ''}
+                                isSoil={true}
+                                setContent={html => handleTextContentChange(false, 'externalSource', html)} />
+                        </div>
+                        <div className={`${isEng ? 'block' : 'hidden'}
+                            w-full relative mt-2 duration-300 
+                            ${object?.isExternal ? 'visible' : 'invisible opacity-0 max-h-0'}`}>
+                            <TextEditor content={object?.translations?.find(({ isEnglish }) => isEnglish)?.externalSource || ''}
+                                isSoil={true}
+                                setContent={html => handleTextContentChange(true, 'externalSource', html)} />
+                        </div>
+
+                        <p className='font-medium mt-8'>{`${t('comments')} ${isEng ? '(EN)' : ''}`}</p>
+                        <div className={`${isEng ? 'hidden' : 'block'} w-full relative mt-1`}>
+                            <TextEditor content={object?.translations?.find(({ isEnglish }) => !isEnglish)?.comments || ''}
+                                isSoil={true}
+                                setContent={html => handleTextContentChange(false, 'comments', html)} />
+                        </div>
+                        <div className={`${isEng ? 'block' : 'hidden'} w-full relative mt-1`}>
+                            <TextEditor content={object?.translations?.find(({ isEnglish }) => isEnglish)?.comments || ''}
+                                isSoil={true}
+                                setContent={html => handleTextContentChange(true, 'comments', html)} />
+                        </div>
+
                         <p className='font-medium mt-8'>{t('main_photo')}<span className='text-orange-500'>*</span></p>
                         {mainPhoto.isLoading || mainPhoto.path ?
                             <div className='grid md:grid-cols-2 grid-cols-1 gap-4 mt-1'>

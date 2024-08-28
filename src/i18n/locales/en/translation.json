@@ -290,5 +290,8 @@
   "last_news": "Latest news",
   "collapse": "Collapse",
   "expand": "Expand",
-  "author_about": "About yourself"
+  "author_about": "About yourself",
+  "isExternal": "Photo taken from publication",
+  "link": "Reference to publication",
+  "comments": "Other comments"
 }

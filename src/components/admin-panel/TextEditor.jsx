@@ -12,7 +12,7 @@ import { setDropdown } from '@/store/slices/generalSlice';
 import '@/styles/editor.css';
 import * as Icons from "./TextEditor/Icons";
 
-export default function TextEditor({ content, setContent }) {
+export default function TextEditor({ content, setContent, isSoil }) {
   const dispatch = useDispatch();
   const linkRef = useRef(null);
   const dropdown = useSelector(state => state.general.dropdown);
@@ -33,14 +33,14 @@ export default function TextEditor({ content, setContent }) {
         italic: true,
         strike: false,
         heading: {
-          levels: [2, 3],
+          levels: isSoil ? [] : [2, 3],
         },
         bulletList: {
-          keepMarks: true,
+          keepMarks: isSoil ? false : true,
           keepAttributes: false,
         },
         orderedList: {
-          keepMarks: true,
+          keepMarks: isSoil ? false : true,
           keepAttributes: false,
         },
         codeBlock: false,
@@ -152,7 +152,7 @@ export default function TextEditor({ content, setContent }) {
   }
 
   return (
-    <div className={`cursor-text min-h-[300px] editor mt-1 p-2 bg-white border rounded-md focus:border-blue-600 ${isFocusing ? 'border-blue-600' : ''}`}
+    <div className={`cursor-text ${isSoil ? '' : 'min-h-[300px]'} editor mt-1 p-2 bg-white border rounded-md focus:border-blue-600 ${isFocusing ? 'border-blue-600' : ''}`}
       onClick={e => {
         e.stopPropagation();
         editor.chain().focus();
@@ -188,13 +188,13 @@ export default function TextEditor({ content, setContent }) {
           </button>
         </BubbleMenu>
 
-        <div className='w-[155px]'>
+        {!isSoil ? <div className='w-[155px]'>
           <Dropdown flexRow={true} noBold={true}
             value={editor?.isActive('heading', { level: 1 }) ? "1"
               : editor?.isActive('heading', { level: 2 }) ? "2"
                 : editor?.isActive('heading', { level: 3 }) ? "3" : "0"} items={HEADING} dropdownKey='heading'
             onCategotyChange={handleHeadingChange} />
-        </div>
+        </div> : ''}
 
         <div className='flex flex-row'>
           <button
@@ -236,13 +236,13 @@ export default function TextEditor({ content, setContent }) {
             onClick={() => editor.chain().focus().toggleOrderedList().run()}>
             <Icons.NumberedList strokeWidth={editor.isActive('orderedList') ? '2' : '1.5'} />
           </button>
-          <button
+          {!isSoil ? <button
             className={`${editor.isActive('blockquote') ? 'text-blue-600' : 'text-gray-700'} disabled:text-gray-400 disabled:cursor-default border border-transparent p-2
           rounded-md hover:text-blue-600 duration-300`}
             onClick={() => editor.chain().focus().toggleBlockquote().run()}
             disabled={!editor.can().chain().focus().toggleBlockquote().run()}>
             <Icons.Blockquote strokeWidth={editor.isActive('blockquote') ? '2' : '1.5'} />
-          </button>
+          </button> : ''}
         </div>
 
         <div

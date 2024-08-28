@@ -85,7 +85,6 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
     }, [])
 
     useEffect(() => {
-        console.log(soils)
         soils?.length && setFilteredSoils(prev => soils.filter(soil =>
             (draftIsVisible ? true : soil.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible) &&
             (soil.translations?.find(transl => transl.isEnglish === _isEng)?.name.toLowerCase().includes(filterName.toLowerCase())
