@@ -36,34 +36,33 @@ export default function LayersPanel({ onLayerChange, currentLayer }) {
                     </svg>
                 </button>
                 {
-                    drapdownState.key == 'layer' && drapdownState.isActive ? (
-                        <div className="overflow-hidden w-[250px] absolute right-0 border shadow-md mt-0 bg-white rounded-md">
-                            <ul className='py-2'>
-                                {layers.map(({ key, title }) =>
-                                    <li key={key} className={`baseLayerSelector flex flex-row justify-between duration-300 cursor-pointer hover:text-blue-600 h-9 hover:bg-zinc-100  
+                    <div className={`${drapdownState.key == 'layer' && drapdownState.isActive ? 'visible translate-y-1' : '-translate-y-4 invisible opacity-0'} 
+                        transition-all duration-200 overflow-hidden w-[250px] absolute right-0 border shadow-md mt-0 bg-white rounded-md`}>
+                        <ul className='py-2'>
+                            {layers.map(({ key, title }) =>
+                                <li key={key} className={`baseLayerSelector flex flex-row justify-between duration-300 cursor-pointer hover:text-blue-600 h-9 hover:bg-zinc-100  
                                     items-center px-4
                                     ${currentLayer === key ? 'text-blue-600' : 'text-zinc-800'}`}
-                                        onClick={() => {
-                                            onLayerChange(key)
-                                        }}>
-                                        {title}
-                                        {currentLayer === key ?
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                className="w-5 h-5 text-blue-600"
-                                                viewBox="0 0 20 20"
-                                                fill="currentColor"
-                                            >
-                                                <path
-                                                    fillRule="evenodd"
-                                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                    clipRule="evenodd"
-                                                />
-                                            </svg> : ''}
-                                    </li>)}
-                            </ul>
-                        </div>
-                    ) : ""
+                                    onClick={() => {
+                                        onLayerChange(key)
+                                    }}>
+                                    {title}
+                                    {currentLayer === key ?
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="w-5 h-5 text-blue-600"
+                                            viewBox="0 0 20 20"
+                                            fill="currentColor"
+                                        >
+                                            <path
+                                                fillRule="evenodd"
+                                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                clipRule="evenodd"
+                                            />
+                                        </svg> : ''}
+                                </li>)}
+                        </ul>
+                    </div>
                 }
             </div>
         </div >

@@ -93,14 +93,14 @@ export default function ObjectsPopup({ visible, objects, onCloseClick }) {
     }
 
     return (
-        <div className={`${visible ? "-left-[2px] z-30" : "sm:-left-[440px] z-20 -left-[calc(100%-94px)]"} 
-       absolute top-0 sm:w-[400px] w-[calc(100%-100px)] sm:max-w-[400px] 
+        <div className={`${visible ? "-left-[0px] z-30" : "sm:-left-[440px] z-20 -left-[calc(100%-90px)]"} 
+       absolute lg:top-0 top-[45px] sm:w-[400px] w-[calc(100%-98px)] sm:max-w-[400px] 
      sm:max-h-[calc(100%-16px)] max-h-[calc(100%-100px)] 
         shadow-lg bg-white duration-300 rounded-lg m-2 flex flex-row`}>
             <div className={`relative flex-1 flex flex-col max-w-full`}>
                 <button
                     onClick={handleCloseClick}
-                    className="absolute -right-[30px] top-0 bg-white w-6 h-10 rounded-md shadow-md flex
+                    className="absolute -right-[33px] top-0 bg-white w-[25px] h-10 rounded-md shadow-md flex
                      items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"
                         className="size-5">

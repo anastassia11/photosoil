@@ -201,7 +201,7 @@ export default function Header({ locale }) {
                         }
                         {
                             isDropdown && dropdown.key == key && dropdown.isActive ? (
-                                <div className="overflow-hidden ">
+                                <div className="overflow-hidden">
                                     <ul className='pt-1 pl-4'>
                                         {navs.map(({ key: navKey, title }) => <li key={navKey} className='duration-300 cursor-pointer hover:text-blue-600 py-1 hover:bg-zinc-100 flex items-center px-4'
                                             onClick={() => dispatch(setDropdown({ isActive: false, key: null }))}>
