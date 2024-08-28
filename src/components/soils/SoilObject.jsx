@@ -29,10 +29,6 @@ export default function SoilObject({ object, children, type }) {
         localStorage.getItem('tokenData') && setTokenData(JSON.parse(localStorage.getItem('tokenData')));
     }, [])
 
-    useEffect(() => {
-        console.log(object)
-    }, [object])
-
     return (
         <div className='flex flex-col'>
             <div className='flex flex-col sm:flex-row mb-2 justify-between sm:items-center'>
@@ -143,7 +139,7 @@ export default function SoilObject({ object, children, type }) {
                     <h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-4'>
                         {t('connect_publ')}
                     </h3>
-                    <Publications publications={object.publications} />
+                    <Publications _publications={object.publications} />
                 </div> : ''
             }
         </div >

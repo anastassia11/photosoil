@@ -12,7 +12,7 @@ import { getPublications } from '@/api/publication/get_publications';
 import Loader from './Loader';
 import { getTranslation } from '@/i18n/client';
 
-export default function Publications() {
+export default function Publications({ _publications }) {
     const [filterName, setFilterName] = useState('');
     const [publications, setPublications] = useState([]);
     const [filteredPublications, setFilteredPublications] = useState([]);
@@ -30,7 +30,10 @@ export default function Publications() {
 
     useEffect(() => {
         localStorage.getItem('tokenData') && setToken(JSON.parse(localStorage.getItem('tokenData'))?.token);
-        fetchPublications();
+        if (_publications) {
+            setPublications(_publications);
+            setIsLoading(false);
+        } else fetchPublications();
     }, [])
 
     useEffect(() => {
