@@ -11,20 +11,15 @@ import { getTranslation } from '@/i18n/client';
 import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper';
 import { getAuthors } from '@/api/author/get_authors';
 
-export default function SideBar({ layersVisible, popupVisible, onVisibleChange, onLocationHandler, draftIsVisible, setDraftIsVisible }) {
+export default function SideBar({ sidebarOpen, setSideBarOpen, filterName, setFilterName, layersVisible, popupVisible, onVisibleChange, onLocationHandler, draftIsVisible, setDraftIsVisible }) {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
   const didLogRef = useRef(true);
 
-  const [sidebarOpen, setSideBarOpen] = useState(false);
-  const [location, setLocation] = useState([]);
-  const [debounceTimeout, setDebounceTimeout] = useState(null);
-
   const [classifications, setClassifications] = useState([]);
   const [authors, setAuthors] = useState([]);
-  const [searchTitle, setSearchTitle] = useState('');
 
   const [token, setToken] = useState(null);
 
@@ -102,52 +97,7 @@ export default function SideBar({ layersVisible, popupVisible, onVisibleChange, 
 
   const handleViewSidebar = () => {
     setSideBarOpen(!sidebarOpen);
-  };
-
-  const handleSearch = async (e) => {
-    const { value } = e.target;
-    setSearchTitle(value);
-
-    // Если есть активный таймер, сбрасываем его
-    if (debounceTimeout) {
-      clearTimeout(debounceTimeout);
-    }
-
-    // Устанавливаем новый таймер
-    const newTimeout = setTimeout(() => {
-      fetchLocations(value);
-      clearTimeout(debounceTimeout);
-    }, 300); // 300 мс задержка
-
-    setDebounceTimeout(newTimeout);
-  };
-
-  const fetchLocations = async (value) => {
-    const params = {
-      q: value,
-      format: "json",
-      addressdetails: 1,
-      polygon_geojson: 0,
-    };
-    const queryString = new URLSearchParams(params).toString();
-    if (!value.length) {
-      setLocation([]);
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?${queryString}`
-      );
-      const result = await response.json();
-
-      if (result.length > 0) {
-        setLocation(result.slice(0, 5));
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  }
 
   const handleVisibleChange = (e) => {
     const { name, checked } = e.target;
@@ -223,13 +173,13 @@ export default function SideBar({ layersVisible, popupVisible, onVisibleChange, 
 
   return (
     <div id='map-sidebar'
-      className={`${sidebarOpen ? "left-0 z-30" : "sm:-left-[408px] sm:z-20 z-30 -left-[calc(100%-92px)]"
-        } absolute top-0 sm:w-[400px] w-[calc(100%-100px)] sm:max-w-[400px] max-h-[calc(100%-100px)] 
+      className={`${sidebarOpen ? "left-0 z-30" : "sm:-left-[408px] sm:z-20 z-30 -left-[calc(100%-90px)]"
+        } absolute lg:top-0 top-[45px] sm:w-[400px] w-[calc(100%-98px)] sm:max-w-[400px] max-h-[calc(100%-150px)] sm:max-h-[calc(100%-16px)]
         shadow-lg bg-white duration-300 rounded-lg m-2 flex flex-row pb-4`}>
       <div className="relative flex-1 flex flex-col max-w-full">
         <button
           onClick={handleViewSidebar}
-          className="absolute -right-[32px] top-0 bg-white w-[25px] h-10 rounded-md shadow-md">
+          className="absolute -right-[33px] top-0 bg-white w-[25px] h-10 rounded-md shadow-md">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -246,7 +196,7 @@ export default function SideBar({ layersVisible, popupVisible, onVisibleChange, 
           <div className="relative">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="absolute top-0 bottom-0 w-6 h-6 my-auto text-zinc-400 left-3"
+              className="absolute top-0 bottom-0 w-6 h-6 my-auto text-zinc-400 left-1"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor">
@@ -257,14 +207,15 @@ export default function SideBar({ layersVisible, popupVisible, onVisibleChange, 
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
-              value={searchTitle}
-              onChange={handleSearch}
+              value={filterName}
+              onChange={e => setFilterName(e.target.value)}
               type="text"
-              placeholder={t('search_byRegion')}
-              className="w-full sm:py-2 py-2 px-12 border rounded-lg outline-none bg-white focus:border-blue-600" />
+              placeholder={t('search_code')}
+              className="w-full h-[40px] px-8 sm:px-10 border-b rounded-none outline-none bg-white focus:border-blue-600" />
 
-            <button className='absolute right-3 top-0 bottom-0 w-6 h-6 my-auto text-zinc-400 hover:text-zinc-600 duration-300'
-              onClick={() => setSearchTitle('')}>
+            <button className='absolute right-1 top-0 bottom-0 w-6 h-6 my-auto text-zinc-400 hover:text-zinc-600 duration-300'
+              onClick={() => setFilterName('')}
+            >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                 strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -272,23 +223,6 @@ export default function SideBar({ layersVisible, popupVisible, onVisibleChange, 
             </button>
           </div>
         </div>
-
-        {searchTitle !== '' ? <div className="absolute top-[54px] z-50 dropdown bg-white w-full min-h-[calc(100%-38px)] 
-        max-h-screen overflow-y-auto
-        rounded-md shadow-md">
-          <ul className="dropdown-menu space-y-1 mt-4">
-            {location.map((item) => (
-              <li key={item.id} className="cursor-pointer duration-300 hover:bg-zinc-100 sm:px-4 px-2 py-2" onClick={() => onLocationHandler(item)}>
-                <div className="flex items-start pl-2">
-                  <img className="w-6 h-6 mt-[2px]" src='/search-marker.svg' alt="Logo" />
-                  <p className='pl-2'>
-                    {item.display_name}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div> : ''}
 
         <div className='flex-1 h-full overflow-y-auto scroll sm:px-5 px-3 flex flex-col sm:space-y-3 space-y-1 w-full pb-3'>
           <MotionWrapper className='ml-1'>
@@ -324,7 +258,6 @@ export default function SideBar({ layersVisible, popupVisible, onVisibleChange, 
                     type='authors'
                     isMapFilter={true}
                     allSelectedItems={selectedAuthors}
-                    // isEng={isEng}
                     addItem={handleAddAuthor}
                     deleteItem={handleDeleteAuthor}
                     resetItems={handleResetAuthors}

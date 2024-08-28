@@ -23,15 +23,16 @@ import SideBar from './SideBar';
 import { useSelector } from 'react-redux';
 import { getPublications } from '@/api/publication/get_publications';
 import ObjectsPopup from './ObjectsPopup';
-import { useParams, useSearchParams } from 'next/navigation';
-import { Select } from 'ol/interaction';
-import { addAuthor, addCategory, addTerm } from '@/store/slices/dataSlice';
+import { useParams } from 'next/navigation';
+import SearchRegion from './SearchRegion';
 
 export default function MainMap() {
     const [baseLayer, setBaseLayer] = useState(null);
 
     const [clusterLayer, setClusterLayer] = useState(null);
     const [features, setFeatures] = useState([]);
+
+    const [sidebarOpen, setSideBarOpen] = useState(false);
     const { locale } = useParams();
 
     const { selectedTerms, selectedCategories, selectedAuthors } = useSelector(state => state.data);
@@ -49,6 +50,8 @@ export default function MainMap() {
     const [publications, setPublications] = useState([]);
     const [popupVisible, setPopupVisible] = useState(false);
     const [draftIsVisible, setDraftIsVisible] = useState(false);
+
+    const [filterName, setFilterName] = useState('');
 
     const didLogRef = useRef(false);
     const mapElement = useRef();
@@ -96,23 +99,31 @@ export default function MainMap() {
     useEffect(() => {
         const filteredIds = soils.filter(soil =>
             (draftIsVisible ? true : soil.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible) &&
+            (soil.translations?.find(transl => transl.isEnglish === _isEng)?.name.toLowerCase().includes(filterName.toLowerCase())
+                || soil.code?.toLowerCase().includes(filterName.toLowerCase())) &&
             (selectedCategories.length === 0 || selectedCategories.includes(soil.objectType)) &&
             (selectedAuthors.length === 0 || selectedAuthors.some(selectedAuthor => soil.authors?.some(author => author === selectedAuthor))) &&
             (selectedTerms.length === 0 || selectedTerms.some(selectedTerm => soil.terms?.some(term => term === selectedTerm)))
         ).map(({ id }) => id);
         const filteredPublIds = publications.filter(publication =>
-            (draftIsVisible ? true : publication.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible)
+            (draftIsVisible ? true : publication.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible) &&
+            (publication.translations?.find(transl => transl.isEnglish === _isEng)?.name.toLowerCase().includes(filterName.toLowerCase()))
         ).map(({ id }) => id);
         const filteredEcoIds = ecosystems.filter(ecosystem =>
             (selectedAuthors.length === 0 || selectedAuthors.some(selectedAuthor => ecosystem.authors?.some(author => author === selectedAuthor))) &&
-            (draftIsVisible ? true : ecosystem.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible)
+            (draftIsVisible ? true : ecosystem.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible) &&
+            (ecosystem.translations?.find(transl => transl.isEnglish === _isEng)?.name.toLowerCase().includes(filterName.toLowerCase())
+                || ecosystem.code?.toLowerCase().includes(filterName.toLowerCase()))
         ).map(({ id }) => id);
         if (clusterLayer) {
             filterById(filteredIds, 'soil');
             filterById(filteredPublIds, 'publication');
             filterById(filteredEcoIds, 'ecosystem');
         }
-    }, [selectedTerms, selectedCategories, selectedAuthors, soils, publications, ecosystems, draftIsVisible, clusterLayer])
+    }, [selectedTerms, selectedCategories, selectedAuthors,
+        soils, publications, ecosystems,
+        draftIsVisible, clusterLayer,
+        filterName])
 
     const filterById = (filteredIds, type) => {
         const layerSource = clusterLayer.getSource().getSource(); // Получаем источник кластера
@@ -335,8 +346,7 @@ export default function MainMap() {
     }
 
     //Создает стиль иконки по Url
-    const createIconStyle = (layerName,
-    ) => {
+    const createIconStyle = (layerName) => {
         if (layerName === 'soil') {
             return new Style({
                 image: new RegularShape({
@@ -492,18 +502,6 @@ export default function MainMap() {
 
     const handleLayerChange = ({ name, checked }) => {
         setLayersVisible(prev => ({ ...prev, [name]: checked }));
-
-        // const layerSource = clusterLayer.getSource().getSource(); // Получаем источник кластера
-
-        // features.forEach(feature => {
-        //     if (feature.get('p_type') === name) {
-        //         if (checked) {
-        //             !layerSource.hasFeature(feature) && layerSource.addFeature(feature); // Добавляем Feature обратно в источник, если checked
-        //         } else {
-        //             layerSource.removeFeature(feature); // Удаляем Feature из источника, если unchecked
-        //         }
-        //     }
-        // });
     };
 
     const selectLocationHandler = (item) => {
@@ -525,13 +523,18 @@ export default function MainMap() {
 
     return (
         <div ref={mapElement} className="w-full h-full z-10">
-            <div className='z-40 absolute top-0 right-0 m-2'>
+            <div className={`z-40 absolute top-0 right-0 m-2 flex flex-row duration-300 lg:w-[500px] w-full pl-2`}>
+                <SearchRegion onLocationHandler={selectLocationHandler} />
                 <LayersPanel onLayerChange={handleBaseLayerChange} currentLayer={selectedLayer} />
             </div>
             <div className='z-20 absolute top-[calc(50%-100px)] right-0 m-2 '>
                 <Zoom onClick={handleZoomClick} />
             </div>
-            <SideBar popupVisible={popupVisible} layersVisible={layersVisible}
+
+            <SideBar sidebarOpen={sidebarOpen}
+                filterName={filterName}
+                setFilterName={setFilterName}
+                setSideBarOpen={setSideBarOpen} popupVisible={popupVisible} layersVisible={layersVisible}
                 onVisibleChange={handleLayerChange} onLocationHandler={selectLocationHandler}
                 draftIsVisible={draftIsVisible} setDraftIsVisible={setDraftIsVisible} />
             <ObjectsPopup visible={popupVisible} objects={selectedObjects} onCloseClick={handlePopupClose} />
