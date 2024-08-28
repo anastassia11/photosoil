@@ -18,7 +18,7 @@ export default async function EcosystemsPage({ params: { locale } }) {
                 {t('ecosystems')}
             </h1>
             <Suspense>
-                <Soils type='ecosystems' isFilters={false} />
+                <Soils type='ecosystems' isFilters={true} />
             </Suspense>
         </div>
     )

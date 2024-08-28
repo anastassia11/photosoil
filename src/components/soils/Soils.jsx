@@ -7,7 +7,7 @@ import Filter from './Filter'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { BASE_SERVER_URL, PAGINATION_OPTIONS } from '@/utils/constants'
-import { addCategory, addTerm, deleteCategory, deleteTerm } from '@/store/slices/dataSlice'
+import { addAuthor, addCategory, addTerm, deleteAuthor, deleteCategory, deleteTerm, resetAuthor, resetCategory, resetTerm } from '@/store/slices/dataSlice'
 import Pagination from '../Pagination'
 import Dropdown from '../admin-panel/ui-kit/Dropdown'
 import { useConstants } from '@/hooks/useConstants'
@@ -17,6 +17,7 @@ import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper'
 import { getTranslation } from '@/i18n/client'
 import { getEcosystems } from '@/api/ecosystem/get_ecosystems'
 import { getSoils } from '@/api/soil/get_soils'
+import { getAuthors } from '@/api/author/get_authors'
 
 export default function Soils({ _soils, isAllSoils, isFilters, type }) {
     const dispatch = useDispatch();
@@ -28,10 +29,11 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    const { selectedTerms, selectedCategories } = useSelector(state => state.data);
+    const { selectedTerms, selectedCategories, selectedAuthors } = useSelector(state => state.data);
 
     const [classifications, setClassifications] = useState([]);
     const [soils, setSoils] = useState([]);
+    const [authors, setAuthors] = useState([]);
 
     const [filterName, setFilterName] = useState('');
     const [filtersVisible, setFiltersVisible] = useState(true);
@@ -61,31 +63,34 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
         type === 'morphological' || type === 'dynamics'
 
     useEffect(() => {
-        setFiltersVisible(window.innerWidth > 640);
+        setFiltersVisible(window.innerWidth > 640 || type === 'ecosystem');
         setToken(JSON.parse(localStorage.getItem('tokenData'))?.token);
-        fetchClassifications();
+        isSoils && fetchClassifications();
+        fetchAuthors();
         if (_soils) {
             setSoils(_soils);
             setIsLoading(prev => ({ ...prev, items: false }));
         } else fetchItems();
 
-        if (didLogRef.current) {
+        if (didLogRef.current && isFilters) {
             didLogRef.current = false
             const categoriesParam = searchParams.get('categories');
             const termsParam = searchParams.get('terms');
+            const authorsParam = searchParams.get('authors');
 
             categoriesParam && categoriesParam.split(',').forEach((param) => dispatch(addCategory(Number(param))));
             termsParam && termsParam.split(',').forEach((param) => dispatch(addTerm(Number(param))));
+            authorsParam && authorsParam.split(',').forEach((param) => dispatch(addAuthor(Number(param))));
         }
     }, [])
 
     useEffect(() => {
-        console.log(soils)
         soils?.length && setFilteredSoils(prev => soils.filter(soil =>
             (draftIsVisible ? true : soil.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible) &&
             (soil.translations?.find(transl => transl.isEnglish === _isEng)?.name.toLowerCase().includes(filterName.toLowerCase())
-                || soil.code?.toLowerCase().includes(filterName.toLowerCase()))
-            && (selectedCategories.length === 0 || selectedCategories.includes(soil.objectType)) &&
+                || soil.code?.toLowerCase().includes(filterName.toLowerCase())) &&
+            (selectedCategories.length === 0 || selectedCategories.includes(soil.objectType)) &&
+            (selectedAuthors.length === 0 || selectedAuthors.some(selectedAuthor => soil.authors?.some(author => author === selectedAuthor))) &&
             (selectedTerms.length === 0 || selectedTerms.some(selectedTerm => soil.terms.some(term => term === selectedTerm))))
             .sort((a, b) => {
                 const dateA = new Date(a.createdDate);
@@ -93,11 +98,11 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
                 return dateB.getTime() - dateA.getTime();
             })
         )
-    }, [filterName, selectedCategories, selectedTerms, soils, draftIsVisible])
+    }, [filterName, selectedCategories, selectedTerms, selectedAuthors, soils, draftIsVisible])
 
     useEffect(() => {
-        updateFiltersInHistory();
-    }, [selectedCategories, selectedTerms])
+        isFilters && updateFiltersInHistory();
+    }, [selectedCategories, selectedTerms, selectedAuthors])
 
     const fetchClassifications = async () => {
         const result = await getClassifications();
@@ -105,6 +110,13 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
             setClassifications(result.data);
         }
         setIsLoading(prev => ({ ...prev, classifications: false }))
+    }
+
+    const fetchAuthors = async () => {
+        const result = await getAuthors();
+        if (result.success) {
+            setAuthors(result.data);
+        }
     }
 
     const fetchItems = async () => {
@@ -134,6 +146,13 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
         } else {
             params.delete('terms');
         }
+
+        if (selectedAuthors.length > 0) {
+            params.set('authors', selectedAuthors.join(','));
+        } else {
+            params.delete('authors');
+        }
+
         router.replace(pathname + '?' + params.toString())
     };
 
@@ -165,8 +184,25 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
         }
     }
 
+    const handleAddAuthor = (newItem) => {
+        dispatch(addAuthor(newItem))
+    }
+
+    const handleDeleteAuthor = (deletedItem) => {
+        dispatch(deleteAuthor(deletedItem))
+    }
+
+    const handleResetAuthors = (deletedItems) => {
+        for (let item of deletedItems) {
+            dispatch(deleteAuthor(item))
+        }
+    }
+
     const SoilCard = ({ photo, name, id }) => {
-        return <Link href={`/${locale}/${type}/${id}`}
+        return <Link href={{
+            pathname: `/${locale}/${type}/${id}`,
+            query: {},
+        }}
             prefetch={false}
             className='relative aspect-[2/3] overflow-hidden transition-all
     rounded-md  hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] flex flex-col  duration-300 cursor-pointer'>
@@ -195,9 +231,8 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
                     <input value={filterName}
                         onChange={(e) => setFilterName(e.target.value)}
                         type="text"
-                        placeholder={`${isSoils ? t('search_code') :
-                            type === 'ecosystems' ? t('search_title') :
-                                t('search_name')}`}
+                        placeholder={`${isSoils || type === 'ecosystems' ? t('search_code') :
+                            t('search_name')}`}
                         className="w-full py-2 pl-12 pr-4 border rounded-md outline-none bg-white focus:border-blue-600"
                     />
                 </div>
@@ -212,12 +247,23 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
                 </div>
             </div>
             {
-                isSoils && filtersVisible && isFilters ? <ul className='filters-grid z-10 w-full mt-4'>
+                filtersVisible && isFilters ? <ul className='filters-grid z-10 w-full mt-4'>
                     <>
-                        {isLoading?.classifications ? Array(8).fill('').map((item, idx) => <li key={idx}>
+                        {isLoading?.classifications && type !== 'ecosystems' ? Array(8).fill('').map((item, idx) => <li key={idx}>
                             <Loader className='w-full h-[40px]' />
                         </li>)
                             : <>
+                                <MotionWrapper>
+                                    <li key={'authors'}>
+                                        <Filter itemId={`author`} name={t('authors')} items={authors}
+                                            type='authors'
+                                            allSelectedItems={selectedAuthors}
+                                            addItem={handleAddAuthor}
+                                            deleteItem={handleDeleteAuthor}
+                                            resetItems={handleResetAuthors}
+                                        />
+                                    </li>
+                                </MotionWrapper>
                                 {isAllSoils ? <li key='category'>
                                     <MotionWrapper>
                                         <Filter name={t('category')} items={CATEGORY_ARRAY}
@@ -273,10 +319,10 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
                     : <>
                         {soils.length && filteredSoils.length ? currentItems.map(({ id, photo, translations, dataRu, dataEng }) => <li key={id}>
                             <MotionWrapper>
-                                {SoilCard({
-                                    name: translations?.find(({ isEnglish }) => isEnglish === (locale === 'en'))?.name ||
-                                        (locale === 'en' ? dataEng.name : locale === 'ru' ? dataRu.name : ''), photo, id
-                                })}
+                                <SoilCard id={id}
+                                    photo={photo}
+                                    name={translations?.find(({ isEnglish }) => isEnglish === (locale === 'en'))?.name ||
+                                        (locale === 'en' ? dataEng.name : locale === 'ru' ? dataRu.name : '')} />
                             </MotionWrapper>
                         </li>) : <MotionWrapper className='col-span-full'>
                             <p className='text-gray-500 mt-6 col-span-full'>

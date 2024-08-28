@@ -35,7 +35,7 @@ const dataSlice = createSlice({
         // Category reducers
         addCategory(state, action) {
             const existingId = state.selectedCategories.find(id => id === action.payload);
-            if (!existingId) {
+            if (existingId === undefined) {
                 state.selectedCategories.push(action.payload);
             }
         },
