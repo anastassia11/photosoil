@@ -100,7 +100,7 @@ export default function MainMap() {
         const filteredIds = soils.filter(soil =>
             (draftIsVisible ? true : soil.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible) &&
             (soil.translations?.find(transl => transl.isEnglish === _isEng)?.name.toLowerCase().includes(filterName.toLowerCase())
-                || soil.code?.toLowerCase().includes(filterName.toLowerCase())) &&
+                || soil.translations?.find(transl => transl.isEnglish === _isEng)?.code?.toLowerCase().includes(filterName.toLowerCase())) &&
             (selectedCategories.length === 0 || selectedCategories.includes(soil.objectType)) &&
             (selectedAuthors.length === 0 || selectedAuthors.some(selectedAuthor => soil.authors?.some(author => author === selectedAuthor))) &&
             (selectedTerms.length === 0 || selectedTerms.some(selectedTerm => soil.terms?.some(term => term === selectedTerm)))
@@ -113,7 +113,7 @@ export default function MainMap() {
             (selectedAuthors.length === 0 || selectedAuthors.some(selectedAuthor => ecosystem.authors?.some(author => author === selectedAuthor))) &&
             (draftIsVisible ? true : ecosystem.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible) &&
             (ecosystem.translations?.find(transl => transl.isEnglish === _isEng)?.name.toLowerCase().includes(filterName.toLowerCase())
-                || ecosystem.code?.toLowerCase().includes(filterName.toLowerCase()))
+                || ecosystem.translations?.find(transl => transl.isEnglish === _isEng)?.code?.toLowerCase().includes(filterName.toLowerCase()))
         ).map(({ id }) => id);
         if (clusterLayer) {
             filterById(filteredIds, 'soil');

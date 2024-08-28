@@ -45,6 +45,8 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
 
     const INFO = type === 'soil' ? SOIL_INFO : type === 'ecosystem' ? ECOSYSTEM_INFO : {};
 
+    const currentTransl = object?.translations?.find(({ isEnglish }) => isEnglish === isEng);
+
     useEffect(() => {
         fetchAuthors();
         fetchPublications()
@@ -140,7 +142,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
 
     const handleInputChange = (e) => {
         const { value, name } = e.target;
-        const updatedObject = (name === 'code' || name === 'latitude' || name === 'longtitude') ? { ...object, [name]: value }
+        const updatedObject = (name === 'latitude' || name === 'longtitude') ? { ...object, [name]: value }
             : { ...object, translations: object.translations.map(translation => translation.isEnglish === isEng ? { ...translation, [name]: value } : translation) }
         setObject(updatedObject);
         onItemChange(updatedObject);
@@ -322,7 +324,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                             label: t('title'),
                             isEng: isEng,
                             name: 'name',
-                            value: object.translations?.find(({ isEnglish }) => isEng === isEnglish)?.name || '',
+                            value: currentTransl?.name || '',
                             required: true,
                             onChange: handleInputChange
                         })}
@@ -339,7 +341,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                                             ? Textarea({
                                                 name: name,
                                                 label: `${title} ${isEng ? '(EN)' : ''}`,
-                                                value: object.translations?.find(({ isEnglish }) => isEng === isEnglish)?.[name] || '',
+                                                value: currentTransl?.[name] || '',
                                                 onChange: handleInputChange,
                                                 required: false
                                             })
@@ -347,7 +349,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                                                 label: title,
                                                 isEng: isEng,
                                                 name: name,
-                                                value: object.translations?.find(({ isEnglish }) => isEng === isEnglish)?.[name] || '',
+                                                value: currentTransl?.[name] || '',
                                                 required: false,
                                                 onChange: handleInputChange
                                             })
@@ -470,7 +472,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                             Input({
                                 label: t('code'),
                                 name: 'code',
-                                value: object.code,
+                                value: currentTransl?.code || '',
                                 required: false,
                                 onChange: handleInputChange
                             })
