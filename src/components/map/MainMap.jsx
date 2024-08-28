@@ -23,8 +23,9 @@ import SideBar from './SideBar';
 import { useSelector } from 'react-redux';
 import { getPublications } from '@/api/publication/get_publications';
 import ObjectsPopup from './ObjectsPopup';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { Select } from 'ol/interaction';
+import { addAuthor, addCategory, addTerm } from '@/store/slices/dataSlice';
 
 export default function MainMap() {
     const [baseLayer, setBaseLayer] = useState(null);
@@ -33,11 +34,15 @@ export default function MainMap() {
     const [features, setFeatures] = useState([]);
     const { locale } = useParams();
 
-    const { selectedTerms, selectedCategories } = useSelector(state => state.data);
+    const { selectedTerms, selectedCategories, selectedAuthors } = useSelector(state => state.data);
     const [selectedLayer, setSelectedLayer] = useState('');
 
     const [selectedObjects, setSelectedObjects] = useState([]);
-
+    const [layersVisible, setLayersVisible] = useState({
+        soil: true,
+        ecosystem: false,
+        publication: false,
+    })
     const [objects, setObjects] = useState([]);
     const [soils, setSoils] = useState([]);
     const [ecosystems, setEcosystems] = useState([]);
@@ -71,6 +76,19 @@ export default function MainMap() {
     }, [])
 
     useEffect(() => {
+        if (clusterLayer) {
+            const layerSource = clusterLayer.getSource().getSource(); // Получаем источник кластера
+            features.forEach(feature => {
+                if (layersVisible[feature.get('p_type')]) {
+                    !layerSource.hasFeature(feature) && layerSource.addFeature(feature); // Добавляем Feature обратно в источник, если checked
+                } else {
+                    layerSource.removeFeature(feature); // Удаляем Feature из источника, если unchecked
+                }
+            });
+        }
+    }, [layersVisible, clusterLayer, soils, ecosystems, publications, features])
+
+    useEffect(() => {
         addListeners();
         return () => removeListeners();
     }, [soils, ecosystems, publications])
@@ -79,23 +97,22 @@ export default function MainMap() {
         const filteredIds = soils.filter(soil =>
             (draftIsVisible ? true : soil.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible) &&
             (selectedCategories.length === 0 || selectedCategories.includes(soil.objectType)) &&
-            (selectedTerms.length === 0 || selectedTerms.some(selectedTerm => soil.terms.some(term => term === selectedTerm)))
+            (selectedAuthors.length === 0 || selectedAuthors.some(selectedAuthor => soil.authors?.some(author => author === selectedAuthor))) &&
+            (selectedTerms.length === 0 || selectedTerms.some(selectedTerm => soil.terms?.some(term => term === selectedTerm)))
         ).map(({ id }) => id);
-        clusterLayer && filterById(filteredIds, 'soil');
-    }, [selectedTerms, selectedCategories, soils, draftIsVisible])
-
-    useEffect(() => {
         const filteredPublIds = publications.filter(publication =>
             (draftIsVisible ? true : publication.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible)
         ).map(({ id }) => id);
         const filteredEcoIds = ecosystems.filter(ecosystem =>
+            (selectedAuthors.length === 0 || selectedAuthors.some(selectedAuthor => ecosystem.authors?.some(author => author === selectedAuthor))) &&
             (draftIsVisible ? true : ecosystem.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible)
         ).map(({ id }) => id);
         if (clusterLayer) {
+            filterById(filteredIds, 'soil');
             filterById(filteredPublIds, 'publication');
             filterById(filteredEcoIds, 'ecosystem');
         }
-    }, [publications, ecosystems, draftIsVisible])
+    }, [selectedTerms, selectedCategories, selectedAuthors, soils, publications, ecosystems, draftIsVisible, clusterLayer])
 
     const filterById = (filteredIds, type) => {
         const layerSource = clusterLayer.getSource().getSource(); // Получаем источник кластера
@@ -103,7 +120,7 @@ export default function MainMap() {
         features.forEach(feature => {
             if (feature.get('p_type') === type) {
                 const featureId = feature.get('p_Id');
-                if (filteredIds.includes(featureId)) {
+                if (filteredIds.includes(featureId) && layersVisible[type]) {
                     !layerSource.hasFeature(feature) && layerSource.addFeature(feature);
                 } else {
                     layerSource.removeFeature(feature);
@@ -259,7 +276,7 @@ export default function MainMap() {
                             newPointFeature.set("p_Id", item.id);
                             newPointFeature.set("p_type", item._type);
                             newPointFeature.setStyle(getIconStyleByLayerName(item._type));
-                            item._type === 'soil' && layerVectorSource.addFeature(newPointFeature);
+                            layersVisible[item._type] && layerVectorSource.addFeature(newPointFeature);
                             newFeatures.push(newPointFeature);
                         }
                     })
@@ -474,17 +491,19 @@ export default function MainMap() {
     }
 
     const handleLayerChange = ({ name, checked }) => {
-        const layerSource = clusterLayer.getSource().getSource(); // Получаем источник кластера
+        setLayersVisible(prev => ({ ...prev, [name]: checked }));
 
-        features.forEach(feature => {
-            if (feature.get('p_type') === name) {
-                if (checked) {
-                    !layerSource.hasFeature(feature) && layerSource.addFeature(feature); // Добавляем Feature обратно в источник, если checked
-                } else {
-                    layerSource.removeFeature(feature); // Удаляем Feature из источника, если unchecked
-                }
-            }
-        });
+        // const layerSource = clusterLayer.getSource().getSource(); // Получаем источник кластера
+
+        // features.forEach(feature => {
+        //     if (feature.get('p_type') === name) {
+        //         if (checked) {
+        //             !layerSource.hasFeature(feature) && layerSource.addFeature(feature); // Добавляем Feature обратно в источник, если checked
+        //         } else {
+        //             layerSource.removeFeature(feature); // Удаляем Feature из источника, если unchecked
+        //         }
+        //     }
+        // });
     };
 
     const selectLocationHandler = (item) => {
@@ -512,7 +531,7 @@ export default function MainMap() {
             <div className='z-20 absolute top-[calc(50%-100px)] right-0 m-2 '>
                 <Zoom onClick={handleZoomClick} />
             </div>
-            <SideBar popupVisible={popupVisible}
+            <SideBar popupVisible={popupVisible} layersVisible={layersVisible}
                 onVisibleChange={handleLayerChange} onLocationHandler={selectLocationHandler}
                 draftIsVisible={draftIsVisible} setDraftIsVisible={setDraftIsVisible} />
             <ObjectsPopup visible={popupVisible} objects={selectedObjects} onCloseClick={handlePopupClose} />

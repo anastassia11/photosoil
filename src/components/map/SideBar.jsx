@@ -1,36 +1,34 @@
 "use client"
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Filter from '../soils/Filter';
 import { useDispatch, useSelector } from 'react-redux';
 import { useConstants } from '@/hooks/useConstants';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { addCategory, addTerm, deleteCategory, deleteTerm } from '@/store/slices/dataSlice';
+import { addAuthor, addCategory, addTerm, deleteAuthor, deleteCategory, deleteTerm } from '@/store/slices/dataSlice';
 import { getClassifications } from '@/api/classification/get_classifications';
 import { getTranslation } from '@/i18n/client';
 import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper';
+import { getAuthors } from '@/api/author/get_authors';
 
-export default function SideBar({ popupVisible, onVisibleChange, onLocationHandler, draftIsVisible, setDraftIsVisible }) {
+export default function SideBar({ layersVisible, popupVisible, onVisibleChange, onLocationHandler, draftIsVisible, setDraftIsVisible }) {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
+  const didLogRef = useRef(true);
 
   const [sidebarOpen, setSideBarOpen] = useState(false);
-  const [layersVisible, setLayersVisible] = useState({
-    soil: true,
-    ecosystem: false,
-    publication: false,
-  })
   const [location, setLocation] = useState([]);
   const [debounceTimeout, setDebounceTimeout] = useState(null);
 
   const [classifications, setClassifications] = useState([]);
+  const [authors, setAuthors] = useState([]);
   const [searchTitle, setSearchTitle] = useState('');
 
   const [token, setToken] = useState(null);
 
-  const { selectedTerms, selectedCategories } = useSelector(state => state.data);
+  const { selectedTerms, selectedCategories, selectedAuthors } = useSelector(state => state.data);
   const { locale } = useParams();
   const { t } = getTranslation(locale);
 
@@ -44,11 +42,22 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
     setToken(JSON.parse(localStorage.getItem('tokenData'))?.token);
     setSideBarOpen(window.innerWidth > 640);
     fetchClassifications();
+    fetchAuthors();
+    if (didLogRef.current) {
+      didLogRef.current = false
+      const categoriesParam = searchParams.get('categories');
+      const termsParam = searchParams.get('terms');
+      const authorsParam = searchParams.get('authors');
+
+      categoriesParam && categoriesParam.split(',').forEach((param) => dispatch(addCategory(Number(param))));
+      termsParam && termsParam.split(',').forEach((param) => dispatch(addTerm(Number(param))));
+      authorsParam && authorsParam.split(',').forEach((param) => dispatch(addAuthor(Number(param))));
+    }
   }, [])
 
   useEffect(() => {
     updateFiltersInHistory();
-  }, [selectedCategories, selectedTerms])
+  }, [selectedCategories, selectedTerms, selectedAuthors])
 
   useEffect(() => {
     window.innerWidth > 640 && setSideBarOpen(!popupVisible)
@@ -58,6 +67,13 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
     const result = await getClassifications();
     if (result.success) {
       setClassifications(result.data);
+    }
+  }
+
+  const fetchAuthors = async () => {
+    const result = await getAuthors();
+    if (result.success) {
+      setAuthors(result.data);
     }
   }
 
@@ -74,6 +90,12 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
       params.set('terms', selectedTerms.join(','));
     } else {
       params.delete('terms');
+    }
+
+    if (selectedAuthors.length > 0) {
+      params.set('authors', selectedAuthors.join(','));
+    } else {
+      params.delete('authors');
     }
     router.replace(pathname + '?' + params.toString())
   };
@@ -129,7 +151,6 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
 
   const handleVisibleChange = (e) => {
     const { name, checked } = e.target;
-    setLayersVisible(prev => ({ ...prev, [name]: checked }));
     onVisibleChange({ name, checked });
   }
 
@@ -158,6 +179,20 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
   const handleResetTerms = (deletedItems) => {
     for (let item of deletedItems) {
       dispatch(deleteTerm(item))
+    }
+  }
+
+  const handleAddAuthor = (newItem) => {
+    dispatch(addAuthor(newItem))
+  }
+
+  const handleDeleteAuthor = (deletedItem) => {
+    dispatch(deleteAuthor(deletedItem))
+  }
+
+  const handleResetAuthors = (deletedItems) => {
+    for (let item of deletedItems) {
+      dispatch(deleteAuthor(item))
     }
   }
 
@@ -284,6 +319,17 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
 
             {
               <ul className='flex flex-col z-10 max-h-full sm:space-y-2.5 space-y-1 px-1'>
+                <li key={'authors'}>
+                  <Filter itemId={`author`} name={t('authors')} items={authors}
+                    type='authors'
+                    isMapFilter={true}
+                    allSelectedItems={selectedAuthors}
+                    // isEng={isEng}
+                    addItem={handleAddAuthor}
+                    deleteItem={handleDeleteAuthor}
+                    resetItems={handleResetAuthors}
+                  />
+                </li>
                 <li key={'category'}>
                   <Filter name={t('category')} itemId='category' items={CATEGORY_ARRAY}
                     allSelectedItems={selectedCategories}
