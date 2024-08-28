@@ -19,8 +19,8 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
   const [sidebarOpen, setSideBarOpen] = useState(false);
   const [layersVisible, setLayersVisible] = useState({
     soil: true,
-    ecosystem: true,
-    publication: true,
+    ecosystem: false,
+    publication: false,
   })
   const [location, setLocation] = useState([]);
   const [debounceTimeout, setDebounceTimeout] = useState(null);
@@ -53,7 +53,6 @@ export default function SideBar({ popupVisible, onVisibleChange, onLocationHandl
   useEffect(() => {
     window.innerWidth > 640 && setSideBarOpen(!popupVisible)
   }, [popupVisible])
-
 
   const fetchClassifications = async () => {
     const result = await getClassifications();

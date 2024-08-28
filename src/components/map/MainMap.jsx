@@ -135,7 +135,6 @@ export default function MainMap() {
             controls: []
         });
         setBaseLayer(baseLayer);
-        // mapRef.current.addInteraction(select);
     }
 
     const getBaseLayerSourse = (layerValue) => {
@@ -260,7 +259,7 @@ export default function MainMap() {
                             newPointFeature.set("p_Id", item.id);
                             newPointFeature.set("p_type", item._type);
                             newPointFeature.setStyle(getIconStyleByLayerName(item._type));
-                            layerVectorSource.addFeature(newPointFeature);
+                            item._type === 'soil' && layerVectorSource.addFeature(newPointFeature);
                             newFeatures.push(newPointFeature);
                         }
                     })
@@ -283,34 +282,6 @@ export default function MainMap() {
     const loadLayers = () => {
         mapRef.current.addLayer(getLayer());
     }
-
-    // const select = new Select({
-    //     style: function (feature) {
-    //         // if (feature.get('p_type') === name) 
-    //         // const size = feature.get('size') || 0; // Пример получения размера
-    //         return new Style({
-    //             image: new RegularShape({
-    //                 stroke: new Stroke({ color: 'rgba(255, 69, 0, 1)', width: 2 }),
-    //                 fill: new Fill({ color: 'rgba(255, 69, 0, 1)' }), // Изменяем цвет при наведении
-    //                 points: 4,
-    //                 radius: 13, // Увеличиваем радиус для эффекта тени
-    //                 angle: Math.PI / 4,
-    //             }),
-    //             text: new Text({
-    //                 // text: size.toString(),
-    //                 fill: new Fill({ color: '#ffffff' }),
-    //                 font: '500 14px sans-serif',
-    //                 offsetX: 0,
-    //                 offsetY: 1,
-    //                 textAlign: 'center',
-    //                 textBaseline: 'middle'
-    //             }),
-    //             zIndex: 2
-    //         });
-    //     }
-    // });
-
-
 
     const clusterStyle = (feature) => {
         const size = feature.get('features').length;
@@ -335,22 +306,6 @@ export default function MainMap() {
                 }),
                 zIndex: 2
             });
-            // return new Style({
-            //     image: new CircleStyle({
-            //         radius: 20,
-            //         fill: new Fill({ color: '#fa9405' }),
-            //         stroke: new Stroke({ color: '#fff4e5', width: 5 }),
-            //     }),
-            //     text: new Text({
-            //         text: size.toString(),
-            //         fill: new Fill({ color: '#ffffff' }),
-            //         font: 'bold 16px sans-serif',
-            //         offsetX: 0,
-            //         offsetY: 1,
-            //         textAlign: 'center',
-            //         textBaseline: 'middle'
-            //     }),
-            // });
         } else {
             const singleFeature = feature.get('features')[0];
             return singleFeature.getStyle();
@@ -360,21 +315,10 @@ export default function MainMap() {
     //Создает стиль иконки по типу слоя
     const getIconStyleByLayerName = (layerName) => {
         return createIconStyle(layerName)
-        // if (layerName === "publication") {
-        //     return createIconStyle('/publ-marker_v2.svg');
-        // }
-        // if (layerName === "ecosystem") {
-        //     return createIconStyle('/ecosystem-marker.svg');
-        // }
-        // if (layerName === "soil") {
-        //     return createIconStyle('/soil-marker.svg');
-        // }
-        // return createIconStyle('/map-marker.svg');
     }
 
     //Создает стиль иконки по Url
     const createIconStyle = (layerName,
-        // iconUrl, scale = 0.1
     ) => {
         if (layerName === 'soil') {
             return new Style({
@@ -410,14 +354,6 @@ export default function MainMap() {
                 zIndex: 1
             });
         }
-
-        // return new Style({
-        //     image: new Icon({
-        //         anchor: [0.5, 1],
-        //         scale: scale,
-        //         src: iconUrl
-        //     }),
-        // });
     }
 
     const hangleMapClick = (e) => {
