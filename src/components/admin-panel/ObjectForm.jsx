@@ -116,9 +116,12 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
     }
 
     const handleOtherPhotoSend = async (file, index) => {
+        console.log(index, otherPhotos)
+
         setOtherPhotos(prev => [...prev, { isLoading: true }]);
         const result = await sendPhoto(file);
         if (result.success) {
+            console.log(otherPhotos)
             setOtherPhotos(prev => {
                 const _prev = prev.map((photo, idx) =>
                     idx === index + otherPhotos.length
@@ -489,7 +492,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                             </div>
                             :
                             <ul className={`grid md:grid-cols-2 grid-cols-1 gap-4 `}>
-                                {otherPhotos.map(otherPhoto => <li key={`otherPhoto-${otherPhoto.id}`}>
+                                {otherPhotos.map((otherPhoto, index) => <li key={`otherPhoto-${index}`}>
                                     <PhotoCard {...otherPhoto} isEng={isEng} onDelete={handleOtherPhotoDelete}
                                         onChange={handleOtherPhotosChange} />
                                 </li>)}
