@@ -330,7 +330,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                                 </Tabs.Trigger>
                             </div>
                             {(!oldTwoLang || pathname !== 'edit') && <label htmlFor='createTwoLang'
-                                className={`select-none md:order-2 order-1 pb-4  md:pb-2.5 flex flex-row cursor-pointer items-center`}>
+                                className={`select-none md:order-2 order-1 pb-4 pr-1 md:pb-2.5 flex flex-row cursor-pointer items-center`}>
                                 <input type="checkbox" id='createTwoLang'
                                     checked={createTwoLang}
                                     onChange={handleTwoLangChange}

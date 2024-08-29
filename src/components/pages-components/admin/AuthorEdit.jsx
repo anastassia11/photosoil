@@ -51,11 +51,7 @@ export default function AuthorEditComponent({ id }) {
     }
 
     return (
-        <div className="flex flex-col w-full flex-1">
-            <h1 className='sm:text-2xl text-xl font-semibold mb-4'>
-                {t('edit_author')}
-            </h1>
-            <AuthorForm _author={author} onFormSubmit={handleEditAuthor} isLoading={isLoading} btnText={t('save')} />
-        </div>
+        <AuthorForm _author={author} onFormSubmit={handleEditAuthor}
+            isLoading={isLoading} btnText={t('save')} title={t('edit_author')} />
     )
 }

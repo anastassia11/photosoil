@@ -20,7 +20,7 @@ import { useParams } from 'next/navigation';
 import { getTranslation } from '@/i18n/client';
 import { openAlert } from '@/store/slices/alertSlice';
 
-export default function NewsForm({ _news, pathname, onNewsSubmit, isLoading, btnText, oldTwoLang, oldIsEng }) {
+export default function NewsForm({ _news, title, pathname, onNewsSubmit, isLoading, btnText, oldTwoLang, oldIsEng }) {
     const dispatch = useDispatch();
     const [news, setNews] = useState({});
     const [newsPhotos, setNewsPhotos] = useState([]);
@@ -198,7 +198,8 @@ export default function NewsForm({ _news, pathname, onNewsSubmit, isLoading, btn
         setNews(prevNews => ({ ...prevNews, tags: [] }));
     }
 
-    const handleFormSubmit = () => {
+    const handleFormSubmit = (e) => {
+        e.preventDefault();
         const hasRequiredFields = () => {
             if (createTwoLang) {
                 return news.translations?.some(({ isEnglish, title }) => (
@@ -219,152 +220,151 @@ export default function NewsForm({ _news, pathname, onNewsSubmit, isLoading, btn
     };
 
     return (
-        <form
-            onSubmit={(e) => e.preventDefault()}
-            className="flex flex-col w-full h-fit pb-16">
-            <div className='flex flex-col w-full h-full'>
-                <Tabs.Root defaultValue={false} className="pt-2 md:col-span-2 sticky top-0 z-40  bg-[#f6f7f9]" value={isEng}
-                    onValueChange={handleLangChange}>
-                    <Tabs.List className="w-full border-b flex md:items-center gap-x-4 overflow-x-auto justify-between md:flex-row flex-col">
-                        <div className='flex items-center gap-x-4 overflow-x-auto md:order-1 order-2'>
-                            <Tabs.Trigger disabled={!createTwoLang && isEng}
-                                className="disabled:text-gray-400 group outline-none border-b-2 border-[#f6f7f9] data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
-                                value={false}>
-                                <div className="pb-2.5 px-2 group-disabled:text-current duration-150 group-hover:text-blue-600 font-medium">
-                                    Русскоязычная версия
-                                </div>
-                            </Tabs.Trigger>
-                            <Tabs.Trigger disabled={!createTwoLang}
-                                className="disabled:text-gray-400 group outline-none border-b-2 border-[#f6f7f9] data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
-                                value={true}>
-                                <div className="pb-2.5 px-2 group-disabled:text-current duration-150 group-hover:text-blue-600 font-medium">
-                                    English version
-                                </div>
-                            </Tabs.Trigger>
-                        </div>
-                        {(!oldTwoLang || pathname !== 'edit') && <label htmlFor='createTwoLang' className={`md:order-2 order-1 pb-4  md:pb-2.5 flex flex-row cursor-pointer items-center`}>
-                            <input type="checkbox" id='createTwoLang'
-                                checked={createTwoLang}
-                                onChange={handleTwoLangChange}
-                                className="min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
-                            <span>{pathname === 'edit' ? `${oldIsEng ? t('add_ru') : t('add_en')}` : t('create_two_lang')}</span>
-                        </label>}
-                    </Tabs.List>
-                </Tabs.Root>
-                <div className='flex flex-col w-full mt-4'>
-                    <Textarea name='title'
-                        label={<>
-                            {`${t('heading')} ${isEng ? '(EN)' : ''}`}<span className='text-orange-600'>*</span>
-                        </>}
-                        value={news.translations?.find(({ isEnglish }) => isEng === isEnglish)?.title || ''}
-                        onChange={handleInputChange}
-                        required={true} />
-                    {/* {Textarea({
-                            name: 'title',
-                            label: <>
-                                {`${t('heading')} ${isEng ? '(EN)' : ''}`}<span className='text-orange-600'>*</span>
-                            </>,
-                            value: news.translations?.find(({ isEnglish }) => isEng === isEnglish)?.title || '',
-                            onChange: handleInputChange,
-                            required: true
-                        })} */}
-                </div>
-                <div className='flex flex-col w-full mt-4'>
-                    {Textarea({
-                        name: 'annotation',
-                        label: `${t('annotation')} ${isEng ? '(EN)' : ''}`,
-                        value: news.translations?.find(({ isEnglish }) => isEng === isEnglish)?.annotation || '',
-                        onChange: handleInputChange,
-                        required: false
-                    })}
-                </div>
-                <div className='mt-4 flex flex-col'>
-                    <label className="font-medium min-h-fit">
-                        {`${t('news_text')} ${isEng ? '(EN)' : ''}`}
-                    </label>
-                    <div className={`w-full relative ${isEng ? 'hidden' : 'block'}`}>
-                        <TextEditor content={news.translations?.find(({ isEnglish }) => !isEnglish)?.content || ''}
-                            setContent={html => setNews(prevNews => ({
-                                ...prevNews, translations: prevNews.translations?.map(translation =>
-                                    (!translation.isEnglish) ? { ...translation, content: html } : translation)
-                            }))} />
-                    </div>
-                    <div className={`w-full relative ${isEng ? 'block' : 'hidden'}`}>
-                        <TextEditor content={news.translations?.find(({ isEnglish }) => isEnglish)?.content || ''}
-                            setContent={html => setNews(prevNews => ({
-                                ...prevNews, translations: prevNews.translations?.map(translation =>
-                                    (translation.isEnglish) ? { ...translation, content: html } : translation)
-                            }))} />
-                    </div>
-                </div>
-
-                <div className='mt-6 flex flex-col'>
-                    <label className="font-medium min-h-fit">
-                        {`${t('gallery')}`}
-                    </label>
-                    {!newsPhotos?.length ?
-                        <div className='w-full md:w-1/2 h-[150px] pr-2 mt-1'>
-                            <DragAndDrop id='news-photos' onLoadClick={handleNewsPhotoSend} isMultiple={true} accept='img' />
-                        </div>
-                        :
-                        <ul className={`grid md:grid-cols-2 grid-cols-1 gap-4 `}>
-                            {newsPhotos.map(photo => <li key={photo.id}>
-                                <PhotoCard {...photo} isEng={isEng} onDelete={handleNewsPhotoDelete}
-                                    onChange={handleNewsPhotosChange} />
-                            </li>)}
-                            <div className='h-[150px]'>
-                                <DragAndDrop id='news-photos' onLoadClick={handleNewsPhotoSend} isMultiple={true} accept='img' />
-                            </div>
-                        </ul>}
-                </div>
-
-                <div className='mt-8 flex flex-col'>
-                    <label className="font-medium min-h-fit">
-                        {`${t('files')}`}
-                    </label>
-                    {!files?.length ?
-                        <div className='w-full md:w-1/2 h-[150px] pr-2 mt-1'>
-                            <DragAndDrop id='news-files' onLoadClick={handleFilesSend} isMultiple={true} accept='pdf' />
-                        </div>
-                        :
-                        <ul className={`mt-1 flex flex-col w-full md:w-1/2`}>
-                            {files.map(file => <li key={file.id}>
-                                {FileCard({ ...file, onDelete: () => handleFileDelete(file.id) })}
-                            </li>)}
-                            <div className='mt-2 h-[150px] w-full'>
-                                <DragAndDrop id='news-files' onLoadClick={handleFilesSend} isMultiple={true} accept='pdf' />
-                            </div>
-                        </ul>}
-                </div>
-
-                <div className='mt-8 flex flex-col w-full md:w-1/2'>
-                    <Filter name={t('tags')} items={tags} setTags={setTags}
-                        isEng={isEng} type='news-tags'
-                        allSelectedItems={news?.tags}
-                        addItem={newItem => handleAddTag(newItem)}
-                        deleteItem={deletedItem => handleDeleteTag(deletedItem)}
-                        resetItems={deletedItems => handleResetTag(deletedItems)}
-                    />
-                </div>
+        <form onSubmit={handleFormSubmit} className="flex flex-col w-full flex-1 pb-[250px]">
+            <div
+                className='mb-2 flex md:flex-row flex-col md:items-end md:justify-between space-y-1 md:space-y-0'>
+                <h1 className='sm:text-2xl text-xl font-semibold mb-2 md:mb-0'>
+                    {title}
+                </h1>
+                <button
+                    type='submit'
+                    disabled={isLoading}
+                    className="md:min-w-[232px] w-full min-h-[40px] flex items-center justify-center self-end md:w-fit px-8 py-2 font-medium text-center text-white transition-colors duration-300 
+                transform bg-blue-600 disabled:bg-blue-600/70 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600 align-bottom">
+                    {isLoading ?
+                        <Oval
+                            height={20}
+                            width={20}
+                            color="#FFFFFF"
+                            visible={true}
+                            ariaLabel='oval-loading'
+                            secondaryColor="#FFFFFF"
+                            strokeWidth={4}
+                            strokeWidthSecondary={4} />
+                        : btnText}
+                </button>
             </div>
 
-            <button
-                onClick={handleFormSubmit}
-                disabled={isLoading}
-                className="min-w-[232px] mt-16 min-h-[40px] flex items-center justify-center self-end w-fit px-8 py-2 font-medium text-center text-white transition-colors duration-300 
-                transform bg-blue-600 disabled:bg-blue-600/70 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600 align-bottom">
-                {isLoading ?
-                    <Oval
-                        height={20}
-                        width={20}
-                        color="#FFFFFF"
-                        visible={true}
-                        ariaLabel='oval-loading'
-                        secondaryColor="#FFFFFF"
-                        strokeWidth={4}
-                        strokeWidthSecondary={4} />
-                    : btnText}
-            </button>
+
+            <div
+                className="flex flex-col w-full h-fit pb-16">
+                <div className='flex flex-col w-full h-full'>
+                    <Tabs.Root defaultValue={false} className="pt-2 md:col-span-2 sticky top-0 z-40  bg-[#f6f7f9]" value={isEng}
+                        onValueChange={handleLangChange}>
+                        <Tabs.List className="w-full border-b flex md:items-center gap-x-4 overflow-x-auto justify-between md:flex-row flex-col">
+                            <div className='flex items-center gap-x-4 overflow-x-auto md:order-1 order-2'>
+                                <Tabs.Trigger disabled={!createTwoLang && isEng}
+                                    className="disabled:text-gray-400 group outline-none border-b-2 border-[#f6f7f9] data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
+                                    value={false}>
+                                    <div className="pb-2.5 px-2 group-disabled:text-current duration-150 group-hover:text-blue-600 font-medium">
+                                        Русскоязычная версия
+                                    </div>
+                                </Tabs.Trigger>
+                                <Tabs.Trigger disabled={!createTwoLang}
+                                    className="disabled:text-gray-400 group outline-none border-b-2 border-[#f6f7f9] data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
+                                    value={true}>
+                                    <div className="pb-2.5 px-2 group-disabled:text-current duration-150 group-hover:text-blue-600 font-medium">
+                                        English version
+                                    </div>
+                                </Tabs.Trigger>
+                            </div>
+                            {(!oldTwoLang || pathname !== 'edit') && <label htmlFor='createTwoLang' className={`md:order-2 order-1 pb-4 pr-1 md:pb-2.5 flex flex-row cursor-pointer items-center`}>
+                                <input type="checkbox" id='createTwoLang'
+                                    checked={createTwoLang}
+                                    onChange={handleTwoLangChange}
+                                    className="min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
+                                <span>{pathname === 'edit' ? `${oldIsEng ? t('add_ru') : t('add_en')}` : t('create_two_lang')}</span>
+                            </label>}
+                        </Tabs.List>
+                    </Tabs.Root>
+                    <div className='flex flex-col w-full mt-4'>
+                        <Textarea name='title'
+                            label={<>
+                                {`${t('heading')} ${isEng ? '(EN)' : ''}`}<span className='text-orange-600'>*</span>
+                            </>}
+                            value={news.translations?.find(({ isEnglish }) => isEng === isEnglish)?.title || ''}
+                            onChange={handleInputChange}
+                            required={true} />
+                    </div>
+                    <div className='flex flex-col w-full mt-4'>
+                        {Textarea({
+                            name: 'annotation',
+                            label: `${t('annotation')} ${isEng ? '(EN)' : ''}`,
+                            value: news.translations?.find(({ isEnglish }) => isEng === isEnglish)?.annotation || '',
+                            onChange: handleInputChange,
+                            required: false
+                        })}
+                    </div>
+                    <div className='mt-4 flex flex-col'>
+                        <label className="font-medium min-h-fit">
+                            {`${t('news_text')} ${isEng ? '(EN)' : ''}`}
+                        </label>
+                        <div className={`w-full relative ${isEng ? 'hidden' : 'block'}`}>
+                            <TextEditor content={news.translations?.find(({ isEnglish }) => !isEnglish)?.content || ''}
+                                setContent={html => setNews(prevNews => ({
+                                    ...prevNews, translations: prevNews.translations?.map(translation =>
+                                        (!translation.isEnglish) ? { ...translation, content: html } : translation)
+                                }))} />
+                        </div>
+                        <div className={`w-full relative ${isEng ? 'block' : 'hidden'}`}>
+                            <TextEditor content={news.translations?.find(({ isEnglish }) => isEnglish)?.content || ''}
+                                setContent={html => setNews(prevNews => ({
+                                    ...prevNews, translations: prevNews.translations?.map(translation =>
+                                        (translation.isEnglish) ? { ...translation, content: html } : translation)
+                                }))} />
+                        </div>
+                    </div>
+
+                    <div className='mt-6 flex flex-col'>
+                        <label className="font-medium min-h-fit">
+                            {`${t('gallery')}`}
+                        </label>
+                        {!newsPhotos?.length ?
+                            <div className='w-full md:w-1/2 h-[150px] pr-2 mt-1'>
+                                <DragAndDrop id='news-photos' onLoadClick={handleNewsPhotoSend} isMultiple={true} accept='img' />
+                            </div>
+                            :
+                            <ul className={`grid md:grid-cols-2 grid-cols-1 gap-4 `}>
+                                {newsPhotos.map(photo => <li key={photo.id}>
+                                    <PhotoCard {...photo} isEng={isEng} onDelete={handleNewsPhotoDelete}
+                                        onChange={handleNewsPhotosChange} />
+                                </li>)}
+                                <div className='h-[150px]'>
+                                    <DragAndDrop id='news-photos' onLoadClick={handleNewsPhotoSend} isMultiple={true} accept='img' />
+                                </div>
+                            </ul>}
+                    </div>
+
+                    <div className='mt-8 flex flex-col'>
+                        <label className="font-medium min-h-fit">
+                            {`${t('files')}`}
+                        </label>
+                        {!files?.length ?
+                            <div className='w-full md:w-1/2 h-[150px] pr-2 mt-1'>
+                                <DragAndDrop id='news-files' onLoadClick={handleFilesSend} isMultiple={true} accept='pdf' />
+                            </div>
+                            :
+                            <ul className={`mt-1 flex flex-col w-full md:w-1/2`}>
+                                {files.map(file => <li key={file.id}>
+                                    {FileCard({ ...file, onDelete: () => handleFileDelete(file.id) })}
+                                </li>)}
+                                <div className='mt-2 h-[150px] w-full'>
+                                    <DragAndDrop id='news-files' onLoadClick={handleFilesSend} isMultiple={true} accept='pdf' />
+                                </div>
+                            </ul>}
+                    </div>
+
+                    <div className='mt-8 flex flex-col w-full md:w-1/2'>
+                        <Filter name={t('tags')} items={tags} setTags={setTags}
+                            isEng={isEng} type='news-tags'
+                            allSelectedItems={news?.tags}
+                            addItem={newItem => handleAddTag(newItem)}
+                            deleteItem={deletedItem => handleDeleteTag(deletedItem)}
+                            resetItems={deletedItems => handleResetTag(deletedItems)}
+                        />
+                    </div>
+                </div>
+            </div>
         </form >
     )
 }

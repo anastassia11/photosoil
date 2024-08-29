@@ -27,12 +27,6 @@ export default function DictionatyCreatePageComponent() {
         setIsLoading(false);
     }
 
-    return (
-        <div className="flex flex-col w-full flex-1">
-            <h1 className='text-2xl font-semibold mb-4'>
-                {t('creation_dictionary')}
-            </h1>
-            <DictionaryForm onFormSubmit={createDictionary} isLoading={isLoading} btnTitle={t('create_dictionary')} />
-        </div>
-    )
+    return <DictionaryForm title={t('creation_dictionary')} onFormSubmit={createDictionary} isLoading={isLoading} btnTitle={t('create_dictionary')} />
+
 }

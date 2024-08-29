@@ -254,12 +254,12 @@ export default function MainMap() {
             const result = await fetch();
             if (result.success && setState) {
                 setState(result.data);
+                const dataWithType = result.data.map(item => ({
+                    ...item,
+                    _type: type
+                }));
+                return dataWithType;
             }
-            const dataWithType = result.data.map(item => ({
-                ...item,
-                _type: type
-            }));
-            return dataWithType;
         });
 
         const results = await Promise.all(fetchPromises);

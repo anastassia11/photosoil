@@ -27,12 +27,5 @@ export default function AuthorCreateComponent() {
         setIsLoading(false);
     }
 
-    return (
-        <div className="flex flex-col w-full flex-1">
-            <h1 className='sm:text-2xl text-xl font-semibold mb-4'>
-                {t('creation_author')}
-            </h1>
-            <AuthorForm onFormSubmit={handleCreateAuthor} btnText={t('create_author')} isLoading={isLoading} />
-        </div>
-    )
+    return <AuthorForm title={t('creation_author')} onFormSubmit={handleCreateAuthor} btnText={t('create_author')} isLoading={isLoading} />
 }

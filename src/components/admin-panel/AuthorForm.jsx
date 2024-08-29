@@ -17,7 +17,7 @@ import { getTranslation } from '@/i18n/client';
 import { useParams } from 'next/navigation';
 import Textarea from './ui-kit/Textarea';
 
-export default function AuthorForm({ _author, onFormSubmit, isLoading, btnText }) {
+export default function AuthorForm({ _author, title, onFormSubmit, isLoading, btnText }) {
     const dispatch = useDispatch();
     const [author, setAuthor] = useState({ authorType: 3 });
     const [photo, setPhoto] = useState({});
@@ -139,98 +139,105 @@ export default function AuthorForm({ _author, onFormSubmit, isLoading, btnText }
     }
 
     return (
-        <form
-            onSubmit={handleCreateAuthor}
-            className="flex flex-col items-start pb-16">
-            <div className='flex sm:flex-row flex-col w-full 3xl:w-[50%]'>
-                <div className='mt-4'>
-                    <div className=''>
-                        <p className="font-medium mb-1">
-                            {t('photo')}<span className='text-orange-500'>*</span>
-                        </p>
-                        {photo?.path ? <div className='relative max-h-full rounded-md overflow-hidden'>
-                            <button type='button' className='overflow-hidden p-[6px] text-sm font-medium z-10 absolute top-0 right-0 rounded-bl-md
-                                backdrop-blur-md bg-black bg-opacity-40 text-zinc-200 hover:text-white duration-300'
-                                onClick={handlePhotoDelete}>
-                                <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className='w-4 h-4'>
-                                    <g id="Menu / Close_LG">
-                                        <path id="Vector" d="M21 21L12 12M12 12L3 3M12 12L21.0001 3M12 12L3 21.0001" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                                    </g>
-                                </svg>
-                            </button>
-                            <Image src={`${BASE_SERVER_URL}${photo.path}`} height={370} width={370} alt='author photo'
-                                className='object-cover rounded-md max-h-[370px] min-h-[370px] aspect-[3/4] overflow-hidden' />
-                        </div> :
-                            <div className='max-h-[370px] min-h-[370px] aspect-[3/4] overflow-hidden'>
-                                <DragAndDrop id='author-photo' onLoadClick={fetchSendPhoto} isMultiple={false} accept='img' />
-                            </div>
-                        }
-                    </div>
-                </div>
-                <ul className='sm:pl-6 w-full space-y-4'>
-                    {role === 'Admin' && <li key='rang' className='w-[285px] mt-4'>
-                        <Dropdown name={t('rank')} value={(author.authorType !== undefined) ? author.authorType : 3} items={RANK_ENUM} onCategotyChange={handleRankChange} dropdownKey='rang' />
-                    </li>}
-                    {AUTHOR_INFO.map(item => <li key={item.name}>
-                        {item.isArray && ArrayInput({ ...item })}
-                    </li>)}
-                </ul>
+        <form className="flex flex-col w-full flex-1">
+            <div
+                className='mb-2 flex md:flex-row flex-col md:items-end md:justify-between space-y-1 md:space-y-0'>
+                <h1 className='sm:text-2xl text-xl font-semibold mb-2 md:mb-0'>
+                    {title}
+                </h1>
+                <button
+                    type='submit'
+                    disabled={isLoading}
+                    className="self-end md:min-w-[200px] min-h-[40px] w-full md:w-fit flex items-center justify-center px-8 py-2 font-medium text-center text-white transition-colors duration-300 
+                transform bg-blue-600 disabled:bg-blue-600/70 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600 align-bottom">
+                    {isLoading ?
+                        <Oval
+                            height={20}
+                            width={20}
+                            color="#FFFFFF"
+                            visible={true}
+                            ariaLabel='oval-loading'
+                            secondaryColor="#FFFFFF"
+                            strokeWidth={4}
+                            strokeWidthSecondary={4} />
+                        : btnText}
+                </button>
             </div>
+            <div
+                onSubmit={handleCreateAuthor}
+                className="flex flex-col items-start pb-16">
+                <div className='flex sm:flex-row flex-col w-full 3xl:w-[50%]'>
+                    <div className='mt-4'>
+                        <div className=''>
+                            <p className="font-medium mb-1">
+                                {t('photo')}<span className='text-orange-500'>*</span>
+                            </p>
+                            {photo?.path ? <div className='relative max-h-full rounded-md overflow-hidden'>
+                                <button type='button' className='overflow-hidden p-[6px] text-sm font-medium z-10 absolute top-0 right-0 rounded-bl-md
+                                backdrop-blur-md bg-black bg-opacity-40 text-zinc-200 hover:text-white duration-300'
+                                    onClick={handlePhotoDelete}>
+                                    <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className='w-4 h-4'>
+                                        <g id="Menu / Close_LG">
+                                            <path id="Vector" d="M21 21L12 12M12 12L3 3M12 12L21.0001 3M12 12L3 21.0001" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                                        </g>
+                                    </svg>
+                                </button>
+                                <Image src={`${BASE_SERVER_URL}${photo.path}`} height={370} width={370} alt='author photo'
+                                    className='object-cover rounded-md max-h-[370px] min-h-[370px] aspect-[3/4] overflow-hidden' />
+                            </div> :
+                                <div className='max-h-[370px] min-h-[370px] aspect-[3/4] overflow-hidden'>
+                                    <DragAndDrop id='author-photo' onLoadClick={fetchSendPhoto} isMultiple={false} accept='img' />
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <ul className='sm:pl-6 w-full space-y-4'>
+                        {role === 'Admin' && <li key='rang' className='w-[285px] mt-4'>
+                            <Dropdown name={t('rank')} value={(author.authorType !== undefined) ? author.authorType : 3} items={RANK_ENUM} onCategotyChange={handleRankChange} dropdownKey='rang' />
+                        </li>}
+                        {AUTHOR_INFO.map(item => <li key={item.name}>
+                            {item.isArray && ArrayInput({ ...item })}
+                        </li>)}
+                    </ul>
+                </div>
 
-            <div className='flex xl:flex-row flex-col w-full mt-8'>
-                <ul className='space-y-3 xl:w-[50%] xl:pr-6 xl:border-r'>
-                    <p className='text-blue-700 font-semibold'>Русская версия</p>
-                    {AUTHOR_INFO.map(({ name, isArray, title }) => <li key={name}>
-                        {!isArray &&
-                            (name === 'about' ? <Textarea name={name} label={title}
-                                value={author.dataRu?.[name] || ''}
-                                onChange={e => handleInputChange(e, 'ru')}
-                                required={false}
-                                placeholder='' />
-                                : <Input required={name === 'name'}
-                                    label={title} name={name}
+                <div className='flex xl:flex-row flex-col w-full mt-8'>
+                    <ul className='space-y-3 xl:w-[50%] xl:pr-6 xl:border-r'>
+                        <p className='text-blue-700 font-semibold'>Русская версия</p>
+                        {AUTHOR_INFO.map(({ name, isArray, title }) => <li key={name}>
+                            {!isArray &&
+                                (name === 'about' ? <Textarea name={name} label={title}
                                     value={author.dataRu?.[name] || ''}
                                     onChange={e => handleInputChange(e, 'ru')}
-                                />)
-                        }
-                    </li>)}
-                </ul>
-                <ul className='space-y-3 xl:w-[50%] xl:pl-6 xl:mt-0 mt-6'>
-                    <p className='text-blue-700 font-semibold'>English version</p>
-                    {AUTHOR_INFO.map(({ name, isArray, title }) => <li key={name}>
-                        {!isArray &&
-                            (name === 'about' ? <Textarea name={name} label={title}
-                                value={author.dataRu?.[name] || ''}
-                                onChange={e => handleInputChange(e, 'eng')}
-                                required={false}
-                                placeholder='' />
-                                : <Input required={name === 'name'}
-                                    label={title} name={name}
+                                    required={false}
+                                    placeholder='' />
+                                    : <Input required={name === 'name'}
+                                        label={title} name={name}
+                                        value={author.dataRu?.[name] || ''}
+                                        onChange={e => handleInputChange(e, 'ru')}
+                                    />)
+                            }
+                        </li>)}
+                    </ul>
+                    <ul className='space-y-3 xl:w-[50%] xl:pl-6 xl:mt-0 mt-6'>
+                        <p className='text-blue-700 font-semibold'>English version</p>
+                        {AUTHOR_INFO.map(({ name, isArray, title }) => <li key={name}>
+                            {!isArray &&
+                                (name === 'about' ? <Textarea name={name} label={title}
                                     value={author.dataRu?.[name] || ''}
                                     onChange={e => handleInputChange(e, 'eng')}
-                                />)
-                        }
-                    </li>)}
-                </ul>
+                                    required={false}
+                                    placeholder='' />
+                                    : <Input required={name === 'name'}
+                                        label={title} name={name}
+                                        value={author.dataRu?.[name] || ''}
+                                        onChange={e => handleInputChange(e, 'eng')}
+                                    />)
+                            }
+                        </li>)}
+                    </ul>
+                </div>
             </div>
-
-            <button
-                type='submit'
-                disabled={isLoading}
-                className="self-end min-w-[200px] mt-6 min-h-[40px] w-fit flex items-center justify-center px-8 py-2 font-medium text-center text-white transition-colors duration-300 
-                transform bg-blue-600 disabled:bg-blue-600/70 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600 align-bottom">
-                {isLoading ?
-                    <Oval
-                        height={20}
-                        width={20}
-                        color="#FFFFFF"
-                        visible={true}
-                        ariaLabel='oval-loading'
-                        secondaryColor="#FFFFFF"
-                        strokeWidth={4}
-                        strokeWidthSecondary={4} />
-                    : btnText}
-            </button>
         </form>
     )
 }

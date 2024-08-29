@@ -141,11 +141,28 @@ export default function EditObject({ id, type, title }) {
     }
 
     return (
-        <div className="flex flex-col w-full space-y-2 pb-[100px]">
-            <div className='flex flex-row items-center justify-between'>
-                <h1 className='sm:text-2xl text-xl font-semibold'>
+        <div className="flex flex-col w-full pb-[140px]">
+            <div className='mb-2 flex md:flex-row flex-col md:items-end md:justify-between space-y-1 md:space-y-0'>
+                <h1 className='sm:text-2xl text-xl font-semibold mb-2 md:mb-0'>
                     {title}
                 </h1>
+                <button
+                    onClick={handleSubmit}
+                    className="flex items-center justify-center self-end min-h-[40px] md:min-w-[250px] w-full md:w-fit 
+                    px-8 py-2 font-medium text-center text-white transition-colors duration-300 
+                transform bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600">
+                    {isLoading ?
+                        <Oval
+                            height={20}
+                            width={20}
+                            color="#FFFFFF"
+                            visible={true}
+                            ariaLabel='oval-loading'
+                            secondaryColor="#FFFFFF"
+                            strokeWidth={4}
+                            strokeWidthSecondary={4} />
+                        : t('save')}
+                </button>
             </div>
             <ObjectForm type={type} item={object} pathname='edit'
                 oldTwoLang={oldTwoLang} oldIsEng={searchParams.get('lang') === 'eng'}
@@ -154,22 +171,6 @@ export default function EditObject({ id, type, title }) {
                 onItemChange={setObject}
                 onMainPhotoChange={handleMainPhotoChange}
                 onOtherPhotosChange={handleOtherPhotosChange} />
-            <button
-                onClick={handleSubmit}
-                className="flex items-center justify-center self-end min-h-[40px] w-[250px] px-8 py-2 font-medium text-center text-white transition-colors duration-300 
-                transform bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600">
-                {isLoading ?
-                    <Oval
-                        height={20}
-                        width={20}
-                        color="#FFFFFF"
-                        visible={true}
-                        ariaLabel='oval-loading'
-                        secondaryColor="#FFFFFF"
-                        strokeWidth={4}
-                        strokeWidthSecondary={4} />
-                    : t('save')}
-            </button>
         </div>
     )
 }

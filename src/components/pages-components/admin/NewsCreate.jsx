@@ -55,13 +55,6 @@ export default function CreateNewsComponent() {
         }
     }
 
-    return (
-        <div className="flex flex-col w-full flex-1 pb-44">
-            <h1 className='sm:text-2xl text-xl font-semibold mb-2'>
-                {t('creation_news')}
-            </h1>
-            <NewsForm isLoading={isLoading} onNewsSubmit={handleSubmit}
-                btnText={t('create_news')} />
-        </div>
-    )
+    return <NewsForm isLoading={isLoading} onNewsSubmit={handleSubmit}
+        btnText={t('create_news')} title={t('creation_news')} />
 }

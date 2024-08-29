@@ -39,13 +39,8 @@ export default function PublicationCreateComponent() {
     }
 
     return (
-        <div className="flex flex-col w-full flex-1 pb-24">
-            <h1 className='sm:text-2xl text-xl font-semibold mb-2'>
-                {t('creation_publication')}
-            </h1>
-            <PublicationForm isLoading={isLoading} onPublicationSubmit={fetchCreatePublication}
-                createTwoLang={createTwoLang} setCreateTwoLang={setCreateTwoLang}
-                btnText={t('create_publication')} />
-        </div>
+        <PublicationForm isLoading={isLoading} onPublicationSubmit={fetchCreatePublication}
+            createTwoLang={createTwoLang} setCreateTwoLang={setCreateTwoLang}
+            btnText={t('create_publication')} title={t('creation_publication')} />
     )
 }

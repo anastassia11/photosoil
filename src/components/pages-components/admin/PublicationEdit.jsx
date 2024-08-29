@@ -7,6 +7,7 @@ import { getTranslation } from '@/i18n/client';
 import { openAlert } from '@/store/slices/alertSlice';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { Oval } from 'react-loader-spinner';
 import { useDispatch } from 'react-redux';
 
 export default function PublicationEditComponent({ id }) {
@@ -65,15 +66,10 @@ export default function PublicationEditComponent({ id }) {
         }
     }
 
-    return (
-        <div className="flex flex-col w-full flex-1 pb-24">
-            <h1 className='sm:text-2xl text-xl font-semibold mb-2'>
-                {t('edit_publication')}
-            </h1>
-            <PublicationForm _publication={publication} isLoading={isLoading}
-                pathname='edit'
-                oldTwoLang={oldTwoLang} oldIsEng={searchParams.get('lang') === 'eng'}
-                onPublicationSubmit={handleSubmit} btnText={t('save')} />
-        </div>
-    )
+    return <PublicationForm _publication={publication}
+        title={t('edit_publication')}
+        isLoading={isLoading}
+        pathname='edit'
+        oldTwoLang={oldTwoLang} oldIsEng={searchParams.get('lang') === 'eng'}
+        onPublicationSubmit={handleSubmit} btnText={t('save')} />
 }

@@ -272,7 +272,7 @@ export default function CreateObject({ title, onCreate, type }) {
 
     return (
         <div className="flex flex-col w-full">
-            <h1 className='sm:text-2xl text-xl font-semibold'>
+            <h1 className='sm:text-2xl text-xl font-semibold h-[40px] flex items-end'>
                 {title}
             </h1>
             <div className='relative h-full'>

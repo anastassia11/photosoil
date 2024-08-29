@@ -71,13 +71,6 @@ export default function DictionaryEditPageComponent({ id }) {
         }
     }
 
-    return (
-        <div className="flex flex-col w-full flex-1">
-            <h1 className='sm:text-2xl text-xl font-semibold mb-4'>
-                {t('edit_dictionary')}
-            </h1>
-            <DictionaryForm _dictionary={dictionary} isEdit={true}
-                onFormSubmit={editDictionary} isLoading={isLoading} btnTitle={t('save')} />
-        </div>
-    )
+    return <DictionaryForm _dictionary={dictionary} isEdit={true} title={t('edit_dictionary')}
+        onFormSubmit={editDictionary} isLoading={isLoading} btnTitle={t('save')} />
 }
