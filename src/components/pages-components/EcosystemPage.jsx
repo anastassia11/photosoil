@@ -47,20 +47,21 @@ export default function EcosystemPageComponent({ id }) {
         <SoilObject object={ecosystem} type='ecosystem'>
             <ul className='flex flex-col space-y-2 '>
                 {ECOSYSTEM_INFO.map(({ name, title }) => {
-                    return (ecosystem?.hasOwnProperty(name) || currentTransl?.hasOwnProperty(name)) ? <li key={name}
-                        className='flex xl:flex-row flex-col w-full xl:space-x-4 space-x-0'>
-                        <span className='xl:w-[40%] w-full text-zinc-500 font-semibold'>
-                            {title}
-                        </span>
-                        <div id={name} className='xl:w-[60%] w-full flex flex-col items-start'>
-                            {name === 'comments' ? <div className='tiptap'
-                                dangerouslySetInnerHTML={{
-                                    __html: parser?.parseFromString(currentTransl[name] || '', 'text/html').body.innerHTML
-                                }}>
+                    return (currentTransl?.hasOwnProperty(name) && currentTransl[name].length && currentTransl[name] !== '<p></p>')
+                        ? <li key={name}
+                            className='flex xl:flex-row flex-col w-full xl:space-x-4 space-x-0'>
+                            <span className='xl:w-[40%] w-full text-zinc-500 font-semibold'>
+                                {title}
+                            </span>
+                            <div id={name} className='xl:w-[60%] w-full flex flex-col items-start'>
+                                {name === 'comments' ? <div className='tiptap'
+                                    dangerouslySetInnerHTML={{
+                                        __html: parser?.parseFromString(currentTransl[name] || '', 'text/html').body.innerHTML
+                                    }}>
+                                </div>
+                                    : currentTransl[name]}
                             </div>
-                                : currentTransl[name]}
-                        </div>
-                    </li> : ''
+                        </li> : ''
                 })}
 
                 {!ecosystem.isExternal && ecosystem.authors?.length ? <li key='authors'

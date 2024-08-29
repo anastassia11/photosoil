@@ -47,7 +47,7 @@ export default function SoilPageComponent({ id }) {
         <SoilObject object={soil} type='soil'>
             <ul className='flex flex-col space-y-2 '>
                 {SOIL_INFO.map(({ name, title }) => {
-                    return (soil?.hasOwnProperty(name) || currentTransl?.hasOwnProperty(name)) ? <li key={name}
+                    return ((soil?.hasOwnProperty(name) || currentTransl?.hasOwnProperty(name)) && (currentTransl[name].length || soil[name].length)) ? <li key={name}
                         className='flex xl:flex-row flex-col w-full xl:space-x-4 space-x-0'>
                         <span className='xl:w-[40%] w-full text-zinc-500 font-semibold'>
                             {title}
