@@ -49,11 +49,11 @@ export default function EcosystemPageComponent({ id }) {
                 {ECOSYSTEM_INFO.map(({ name, title }) => {
                     return (currentTransl?.hasOwnProperty(name) && currentTransl[name].length && currentTransl[name] !== '<p></p>')
                         ? <li key={name}
-                            className='flex xl:flex-row flex-col w-full xl:space-x-4 space-x-0'>
-                            <span className='xl:w-[40%] w-full text-zinc-500 font-semibold'>
+                            className='flex flex-col w-full space-x-0'>
+                            <span className='w-full text-zinc-500 font-semibold'>
                                 {title}
                             </span>
-                            <div id={name} className='xl:w-[60%] w-full flex flex-col items-start'>
+                            <div id={name} className='w-full flex flex-col items-start'>
                                 {name === 'comments' ? <div className='tiptap'
                                     dangerouslySetInnerHTML={{
                                         __html: parser?.parseFromString(currentTransl[name] || '', 'text/html').body.innerHTML
@@ -65,11 +65,11 @@ export default function EcosystemPageComponent({ id }) {
                 })}
 
                 {!ecosystem.isExternal && ecosystem.authors?.length ? <li key='authors'
-                    className='flex lg:flex-row flex-col w-full lg:space-x-4 space-x-0'>
-                    <span className='lg:w-[40%] w-full text-zinc-500 font-semibold'>
+                    className='flex flex-col w-full space-x-0'>
+                    <span className='w-full text-zinc-500 font-semibold'>
                         {t('authors')}
                     </span>
-                    <ul className={`lg:w-[60%] w-full flex flex-row flex-wrap items-start justify-start h-fit`}>
+                    <ul className={`w-full flex flex-row flex-wrap items-start justify-start h-fit`}>
                         {ecosystem.authors?.map(({ id, dataEng, dataRu }, index) =>
                             <li key={`author-${index}`} className='mr-2 min-w-fit h-fit'>
                                 <Link href={`/${locale}/authors/${id}`}
@@ -84,11 +84,11 @@ export default function EcosystemPageComponent({ id }) {
                 </li> : ''}
 
                 {currentTransl?.code ? <div
-                    className='flex xl:flex-row flex-col w-full xl:space-x-4 space-x-0'>
-                    <span className='xl:w-[40%] w-full text-zinc-500 font-semibold'>
+                    className='flex flex-col w-full space-x-0'>
+                    <span className='w-full text-zinc-500 font-semibold'>
                         {t('code')}
                     </span>
-                    <div className='xl:w-[60%] w-full flex flex-col items-start'>
+                    <div className='w-full flex flex-col items-start'>
                         {currentTransl.code}
                     </div>
                 </div> : ''}
