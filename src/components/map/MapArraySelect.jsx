@@ -278,9 +278,9 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref
 
     return (
         <div ref={mapElement} className="w-full h-full z-10 relative">
-            <div className='z-20 absolute top-0 right-0 m-2 sm:block hidden'>
+            {/* <div className='z-20 absolute top-0 right-0 m-2 sm:block hidden'>
                 <FullScreen onClick={handleFullClick} />
-            </div>
+            </div> */}
             <div className='z-20 absolute top-[calc(50%-50px)] right-0 m-2 '>
                 <Zoom onClick={handleZoomClick} />
             </div>
