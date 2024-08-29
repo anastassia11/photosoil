@@ -119,13 +119,12 @@ export default function DictionaryForm({ _dictionary, title, onFormSubmit, isLoa
                                 {t('terms')}
                             </p>
                             <ul className='w-full'>
-                                {dictionary.terms?.map((term, index) => <li className='flex flex-row min-w-full' key={`term-${term.id || index}`}>
-                                    {Input({
-                                        name: 'nameRu',
-                                        value: term.nameRu,
-                                        onChange: (e) => handleTermsChange(e, term.id || index),
-                                        required: dictionary.translationMode == 0 || dictionary.translationMode == 2
-                                    })}
+                                {dictionary.terms?.map((term, index) => <li className='flex flex-row items-center min-w-full' key={`term-${term.id || index}`}>
+                                    <p className='w-[40px]'>{index + 1}.</p>
+                                    <Input name='nameRu' value={term.nameRu}
+                                        onChange={(e) => handleTermsChange(e, term.id || index)}
+                                        required={dictionary.translationMode == 0 || dictionary.translationMode == 2} />
+
                                     <button type='button'
                                         className='p-2'
                                         onClick={() => handleDeleteTerm(term.id || index)}>
@@ -158,14 +157,13 @@ export default function DictionaryForm({ _dictionary, title, onFormSubmit, isLoa
                             <p className="font-medium">
                                 {`${t('terms')} (EN)`}
                             </p>
+
                             <ul>
-                                {dictionary.terms?.map((term, index) => <li className='flex flex-row' key={`term-${term.id || index}`}>
-                                    {Input({
-                                        name: 'nameEng',
-                                        value: term.nameEng,
-                                        onChange: (e) => handleTermsChange(e, term.id || index),
-                                        required: dictionary.translationMode == 0 || dictionary.translationMode == 1
-                                    })}
+                                {dictionary.terms?.map((term, index) => <li className='flex flex-row items-center' key={`term-${term.id || index}`}>
+                                    <p className='w-[40px]'>{index + 1}.</p>
+                                    <Input name='nameEng' value={term.nameEng}
+                                        onChange={(e) => handleTermsChange(e, term.id || index)}
+                                        required={dictionary.translationMode == 0 || dictionary.translationMode == 1} />
                                     <button type='button'
                                         className='p-2'
                                         onClick={() => handleDeleteTerm(term.id || index)}>
