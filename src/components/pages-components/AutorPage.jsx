@@ -87,34 +87,33 @@ export default function AuthorPageComponent({ id }) {
                     />
                 </div>}
 
-                <div className='md:col-start-2 md:col-end-4 mt-12 md:mt-0'>
+                <div className='md:col-start-2 md:col-end-4 mt-12 sm:mt-0'>
                     <h3 className='sm:text-2xl text-xl font-semibold mb-2'>
                         {t('author_info')}
                     </h3>
                     <ul className='flex flex-col space-y-2 '>
-                        {AUTHOR_INFO.map(({ title, name, isArray }, index) => name !== 'name' && <li key={`INFO-${index}`}
-                            className='flex flex-col w-full'>
-                            {(authorLang?.[name] || author[name]) ? <>
+                        {AUTHOR_INFO.map(({ title, name, isArray }, index) =>
+                            (name !== 'name')
+                                && (authorLang?.[name] || author[name])
+                                && (authorLang?.[name]?.length || author[name]?.length) ? <li key={`INFO-${index}`}
+                                    className='flex flex-col w-full'>
                                 <span className=' text-zinc-500 font-semibold'>
                                     {isArray ? (author[name].length ? title : '') : title}
                                 </span>
                                 {isArray ?
                                     <ul className='flex flex-col'>
                                         {author[name].map(item => <li key={item}>
-                                            {isAbsoluteUrl(item) ? <a href={item} className='text-blue-600'>
+                                            {isAbsoluteUrl(item) ? <a href={item} className='text-blue-600 break-words'>
                                                 {item}
-                                            </a> : isEmail(item) ? <a href={`mailto:${item}`} className='text-blue-600'>
+                                            </a> : isEmail(item) ? <a href={`mailto:${item}`} className='text-blue-600 break-words'>
                                                 {item}
                                             </a> : item}
                                         </li>)}
                                     </ul>
-                                    :
-                                    <span className=''>
+                                    : <span className=''>
                                         {authorLang[name]}
-                                    </span>
-                                }
-                            </> : ''}
-                        </li>)}
+                                    </span>}
+                            </li> : '')}
                     </ul>
                 </div>
             </div>
