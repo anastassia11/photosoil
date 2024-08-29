@@ -142,15 +142,16 @@ export default function CreateObject({ title, onCreate, type }) {
                 router.push(`/admin/${type === 'soil' ? 'objects' : 'ecosystems'}`);
                 dispatch(openAlert({ title: t('success'), message: t('created_objects'), type: 'success' }));
             } else {
-                _creationResults[0].status === 400 && dispatch(openAlert({ title: t('warning'), message: t('form_required'), type: 'warning' }));
-                _creationResults[0].status === 500 && dispatch(openAlert({ title: t('error'), message: t('error_objects'), type: 'error' }));
-                _creationResults.forEach((result, index) => {
-                    if (result.success) {
-                        setFormData(prevData => prevData.filter((data, idx) => index !== idx));
-                        setPhotos(prevPhotos => prevPhotos.filter((data, idx) => index !== idx));
-                        setOtherPhotos(prevOther => prevOther.filter((data, idx) => index !== idx));
+                const indicesToRemove = _creationResults.reduce((indices, result, index) => {
+                    if (!result.success) {
+                        indices.push(index);
+                        dispatch(openAlert({ title: t('warning'), message: t('form_required'), type: 'warning' }))
                     }
-                })
+                    return indices;
+                }, []);
+                setFormData(prevData => prevData.filter((data, idx) => indicesToRemove.includes(idx)));
+                setPhotos(prevPhotos => prevPhotos.filter((data, idx) => indicesToRemove.includes(idx)));
+                setOtherPhotos(prevOther => prevOther.filter((data, idx) => indicesToRemove.includes(idx)));
             }
         } catch (error) {
             dispatch(openAlert({ title: t('error'), message: t('error_objects'), type: 'error' }));
