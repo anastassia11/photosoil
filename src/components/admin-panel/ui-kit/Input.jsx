@@ -10,7 +10,7 @@ export default function Input({ label, name, type, value, required, onChange, is
             <input
                 autoComplete="off"
                 required={required}
-                value={value}
+                value={value || ''}
                 onChange={onChange}
                 name={name}
                 type={type || 'text'}

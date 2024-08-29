@@ -23,7 +23,11 @@ export default function DictionaryForm({ _dictionary, title, onFormSubmit, isLoa
 
     useEffect(() => {
         _dictionary && setDictionary(_dictionary)
-    }, [_dictionary]);
+    }, [_dictionary])
+
+    useEffect(() => {
+        console.log(dictionary);
+    }, [dictionary]);
 
     const handleNameChange = (e) => {
         const { name, value } = e.target;
@@ -32,12 +36,13 @@ export default function DictionaryForm({ _dictionary, title, onFormSubmit, isLoa
 
     const handleTermsChange = (e, id) => {
         const { name, value } = e.target;
+        console.log(name, value)
         setDictionary(prev => ({
             ...prev,
             terms: prev.terms.map((term) => {
                 if (term.id ? (term.id === id) : (prev.terms.indexOf(term) === id)) {
                     return { ...term, [name]: value };
-                }
+                } return term;
             })
         }));
     }
@@ -59,7 +64,7 @@ export default function DictionaryForm({ _dictionary, title, onFormSubmit, isLoa
     }
 
     const handleModeChange = (mode) => {
-        setDictionary(prev => ({ ...prev, translationMode: mode }));
+        setDictionary(prev => ({ ...prev, translationMode: Number(mode) }));
     }
 
     const handleFormSubmit = (e) => {
@@ -121,7 +126,7 @@ export default function DictionaryForm({ _dictionary, title, onFormSubmit, isLoa
                             <ul className='w-full'>
                                 {dictionary.terms?.map((term, index) => <li className='flex flex-row items-center min-w-full' key={`term-${term.id || index}`}>
                                     <p className='w-[40px]'>{index + 1}.</p>
-                                    <Input name='nameRu' value={term.nameRu}
+                                    <Input name='nameRu' value={term.nameRu || ''}
                                         onChange={(e) => handleTermsChange(e, term.id || index)}
                                         required={dictionary.translationMode == 0 || dictionary.translationMode == 2} />
 
@@ -161,7 +166,7 @@ export default function DictionaryForm({ _dictionary, title, onFormSubmit, isLoa
                             <ul>
                                 {dictionary.terms?.map((term, index) => <li className='flex flex-row items-center' key={`term-${term.id || index}`}>
                                     <p className='w-[40px]'>{index + 1}.</p>
-                                    <Input name='nameEng' value={term.nameEng}
+                                    <Input name='nameEng' value={term.nameEng || ''}
                                         onChange={(e) => handleTermsChange(e, term.id || index)}
                                         required={dictionary.translationMode == 0 || dictionary.translationMode == 1} />
                                     <button type='button'
