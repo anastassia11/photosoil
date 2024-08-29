@@ -52,13 +52,13 @@ export default function NewsItemPageComponent({ id }) {
 
     return (
         <div className='flex flex-col'>
-            <div className='flex flex-col md:flex-row mb-2 justify-between md:items-end'>
+            <div className='flex flex-col md:flex-row mb-2 justify-between sm:items-start'>
                 <h1 className='sm:text-2xl text-xl font-semibold'>
                     {currentTransl?.title}
                 </h1>
                 {tokenData.role === 'Admin' || (tokenData.email === news.userEmail) ? <Link target="_blank"
                     prefetch={false}
-                    className='text-blue-700 cursor-pointer flex flex-row items-center hover:underline duration-300 pb-1'
+                    className='pt-[3px] text-blue-700 cursor-pointer flex flex-row items-center hover:underline duration-300 pb-1'
                     href={{
                         pathname: `/${locale}/admin/news/edit/${news.id}`,
                         query: { lang: _isEng ? 'eng' : 'ru' }

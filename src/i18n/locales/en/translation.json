@@ -44,6 +44,7 @@
   "dictionaries": "Dictionaries",
   "dynamics": "Soil dynamics",
   "ecosystems": "Ecosystems",
+  "ecosystem": "Ecosystem",
   "edit": "Edit",
   "edit_author": "Author editing",
   "edit_dictionary": "Editing dictionary",
@@ -291,7 +292,9 @@
   "collapse": "Collapse",
   "expand": "Expand",
   "author_about": "About yourself",
-  "isExternal": "Photo taken from publication",
+  "isExternal": "Photos taken from publication",
   "link": "Reference to publication",
-  "comments": "Other comments"
+  "comments": "Other comments",
+  "monographs": "Monographs",
+  "other": "Other"
 }

@@ -356,7 +356,8 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
 
                         <ul className='flex flex-col w-full'>
                             {INFO.map(({ name, title }) => {
-                                return <li key={name} className={`mt-3 ${name === 'objectType' && 'hidden'}`}>
+                                return <li key={name} className={`mt-3 
+                                    ${(name === 'objectType' || name === 'comments') && 'hidden'}`}>
                                     {
                                         name === 'soilFeatures' || name === 'description'
                                             ? Textarea({
@@ -377,6 +378,20 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                                     }
                                 </li>
                             })}
+
+                            {type !== 'soil' ? <>
+                                <p className='font-medium mt-2'>{`${t('comments')} ${isEng ? '(EN)' : ''}`}</p>
+                                <div className={`${isEng ? 'hidden' : 'block'} w-full relative mt-1 mb-2`}>
+                                    <TextEditor type='comments-ru' content={object?.translations?.find(({ isEnglish }) => !isEnglish)?.comments || ''}
+                                        isSoil={true}
+                                        setContent={html => handleTextContentChange(false, 'comments', html)} />
+                                </div>
+                                <div className={`${isEng ? 'block' : 'hidden'} w-full relative mt-1 mb-2`}>
+                                    <TextEditor type='comments-en' content={object?.translations?.find(({ isEnglish }) => isEnglish)?.comments || ''}
+                                        isSoil={true}
+                                        setContent={html => handleTextContentChange(true, 'comments', html)} />
+                                </div>
+                            </> : ''}
 
                             <li key='authors' className={`mt-3 ${object?.isExternal ? 'opacity-50 pointer-events-none' : ''}`}>
                                 <Filter itemId={`author`} name={t('authors')} items={authors}
@@ -430,29 +445,31 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                         <div className={`${isEng ? 'hidden' : 'block'}
                             w-full relative mt-2 duration-300 
                             ${object?.isExternal ? 'visible' : 'invisible opacity-0 max-h-0'}`}>
-                            <TextEditor content={object?.translations?.find(({ isEnglish }) => !isEnglish)?.externalSource || ''}
+                            <TextEditor type='externalSource-ru' content={object?.translations?.find(({ isEnglish }) => !isEnglish)?.externalSource || ''}
                                 isSoil={true}
                                 setContent={html => handleTextContentChange(false, 'externalSource', html)} />
                         </div>
                         <div className={`${isEng ? 'block' : 'hidden'}
                             w-full relative mt-2 duration-300 
                             ${object?.isExternal ? 'visible' : 'invisible opacity-0 max-h-0'}`}>
-                            <TextEditor content={object?.translations?.find(({ isEnglish }) => isEnglish)?.externalSource || ''}
+                            <TextEditor type='externalSource-en' content={object?.translations?.find(({ isEnglish }) => isEnglish)?.externalSource || ''}
                                 isSoil={true}
                                 setContent={html => handleTextContentChange(true, 'externalSource', html)} />
                         </div>
 
-                        <p className='font-medium mt-8'>{`${t('comments')} ${isEng ? '(EN)' : ''}`}</p>
-                        <div className={`${isEng ? 'hidden' : 'block'} w-full relative mt-1`}>
-                            <TextEditor content={object?.translations?.find(({ isEnglish }) => !isEnglish)?.comments || ''}
-                                isSoil={true}
-                                setContent={html => handleTextContentChange(false, 'comments', html)} />
-                        </div>
-                        <div className={`${isEng ? 'block' : 'hidden'} w-full relative mt-1`}>
-                            <TextEditor content={object?.translations?.find(({ isEnglish }) => isEnglish)?.comments || ''}
-                                isSoil={true}
-                                setContent={html => handleTextContentChange(true, 'comments', html)} />
-                        </div>
+                        {type === 'soil' ? <>
+                            <p className='font-medium mt-8'>{`${t('comments')} ${isEng ? '(EN)' : ''}`}</p>
+                            <div className={`${isEng ? 'hidden' : 'block'} w-full relative mt-1`}>
+                                <TextEditor type='comments-ru' content={object?.translations?.find(({ isEnglish }) => !isEnglish)?.comments || ''}
+                                    isSoil={true}
+                                    setContent={html => handleTextContentChange(false, 'comments', html)} />
+                            </div>
+                            <div className={`${isEng ? 'block' : 'hidden'} w-full relative mt-1`}>
+                                <TextEditor type='comments-en' content={object?.translations?.find(({ isEnglish }) => isEnglish)?.comments || ''}
+                                    isSoil={true}
+                                    setContent={html => handleTextContentChange(true, 'comments', html)} />
+                            </div>
+                        </> : ''}
 
                         <p className='font-medium mt-8'>{t('main_photo')}<span className='text-orange-500'>*</span></p>
                         {mainPhoto.isLoading || mainPhoto.path ?

@@ -63,8 +63,8 @@ export default function Header({ locale }) {
     }, [handleScroll]);
 
     return (
-        <header className={`${visible ? 'fixed top-0 ' : 'fixed -top-20'} z-50 transition-all duration-200 
-            ease-in-out px-4 2xl:px-8 w-full border-b shadow-sm h-16 lg:bg-white bg-white/90 flex flex-row items-center justify-between`}>
+        <header className={`fixed top-0 z-50 transition-all duration-200 
+            ease-in-out px-4 2xl:px-8 w-full border-b shadow-sm h-16  bg-white/90 flex flex-row items-center justify-between`}>
             <div className='flex-1 '>
                 <Link href={`/${locale}`} prefetch={false}
                     className='flex flex-row items-center w-fit'>

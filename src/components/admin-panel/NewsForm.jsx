@@ -300,14 +300,14 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, isLoadi
                             {`${t('news_text')} ${isEng ? '(EN)' : ''}`}
                         </label>
                         <div className={`w-full relative ${isEng ? 'hidden' : 'block'}`}>
-                            <TextEditor content={news.translations?.find(({ isEnglish }) => !isEnglish)?.content || ''}
+                            <TextEditor type='news-ru' content={news.translations?.find(({ isEnglish }) => !isEnglish)?.content || ''}
                                 setContent={html => setNews(prevNews => ({
                                     ...prevNews, translations: prevNews.translations?.map(translation =>
                                         (!translation.isEnglish) ? { ...translation, content: html } : translation)
                                 }))} />
                         </div>
                         <div className={`w-full relative ${isEng ? 'block' : 'hidden'}`}>
-                            <TextEditor content={news.translations?.find(({ isEnglish }) => isEnglish)?.content || ''}
+                            <TextEditor type='news-en' content={news.translations?.find(({ isEnglish }) => isEnglish)?.content || ''}
                                 setContent={html => setNews(prevNews => ({
                                     ...prevNews, translations: prevNews.translations?.map(translation =>
                                         (translation.isEnglish) ? { ...translation, content: html } : translation)

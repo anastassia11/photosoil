@@ -2,6 +2,7 @@
 
 import { getEcosystem } from '@/api/ecosystem/get_ecosystem';
 import SoilObject from '@/components/soils/SoilObject';
+import { useConstants } from '@/hooks/useConstants';
 import { getTranslation } from '@/i18n/client';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -9,14 +10,20 @@ import { useEffect, useState } from 'react';
 
 export default function EcosystemPageComponent({ id }) {
     const [ecosystem, setEcosystem] = useState({});
+    const [parser, setParser] = useState();
+
     const { locale } = useParams();
     const { t } = getTranslation(locale);
+    const { ECOSYSTEM_INFO } = useConstants();
 
     let _isEng = locale === 'en';
 
     const currentTransl = ecosystem?.translations?.find(({ isEnglish }) => isEnglish === _isEng);
 
     useEffect(() => {
+        if (typeof document !== 'undefined') {
+            setParser(new DOMParser());
+        };
         fetchEcosystem();
     }, [])
 
@@ -39,18 +46,24 @@ export default function EcosystemPageComponent({ id }) {
     return (
         <SoilObject object={ecosystem} type='ecosystem'>
             <ul className='flex flex-col space-y-2 '>
-                {currentTransl?.description ?
-                    <li key='ecosystem-description'
-                        className='flex lg:flex-row flex-col w-full lg:space-x-4 space-x-0'>
-                        <span className='lg:w-[40%] w-full text-zinc-500 font-semibold'>
-                            {t('description')}
+                {ECOSYSTEM_INFO.map(({ name, title }) => {
+                    return (ecosystem?.hasOwnProperty(name) || currentTransl?.hasOwnProperty(name)) ? <li key={name}
+                        className='flex xl:flex-row flex-col w-full xl:space-x-4 space-x-0'>
+                        <span className='xl:w-[40%] w-full text-zinc-500 font-semibold'>
+                            {title}
                         </span>
-                        <span className={`lg:w-[60%] w-full }`}>
-                            {currentTransl?.description}
-                        </span>
-                    </li> : ''}
+                        <div id={name} className='xl:w-[60%] w-full flex flex-col items-start'>
+                            {name === 'comments' ? <div className='tiptap'
+                                dangerouslySetInnerHTML={{
+                                    __html: parser?.parseFromString(currentTransl[name] || '', 'text/html').body.innerHTML
+                                }}>
+                            </div>
+                                : currentTransl[name]}
+                        </div>
+                    </li> : ''
+                })}
 
-                {ecosystem.authors?.length ? <li key='authors'
+                {!ecosystem.isExternal && ecosystem.authors?.length ? <li key='authors'
                     className='flex lg:flex-row flex-col w-full lg:space-x-4 space-x-0'>
                     <span className='lg:w-[40%] w-full text-zinc-500 font-semibold'>
                         {t('authors')}
@@ -68,6 +81,16 @@ export default function EcosystemPageComponent({ id }) {
                         )}
                     </ul>
                 </li> : ''}
+
+                {currentTransl?.code ? <div
+                    className='flex xl:flex-row flex-col w-full xl:space-x-4 space-x-0'>
+                    <span className='xl:w-[40%] w-full text-zinc-500 font-semibold'>
+                        {t('code')}
+                    </span>
+                    <div className='xl:w-[60%] w-full flex flex-col items-start'>
+                        {currentTransl.code}
+                    </div>
+                </div> : ''}
             </ul>
         </SoilObject>
     )

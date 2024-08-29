@@ -12,7 +12,7 @@ import { setDropdown } from '@/store/slices/generalSlice';
 import '@/styles/editor.css';
 import * as Icons from "./TextEditor/Icons";
 
-export default function TextEditor({ content, setContent, isSoil }) {
+export default function TextEditor({ content, setContent, isSoil, type }) {
   const dispatch = useDispatch();
   const linkRef = useRef(null);
   const dropdown = useSelector(state => state.general.dropdown);
@@ -92,7 +92,7 @@ export default function TextEditor({ content, setContent, isSoil }) {
 
   useEffect(() => {
     let timeoutId;
-    if (dropdown.key === 'linkModal' && dropdown.isActive) {
+    if (dropdown.key === `linkModal-${type}` && dropdown.isActive) {
       timeoutId = setTimeout(() => {
         linkRef.current.focus();
       }, 100);
@@ -110,12 +110,12 @@ export default function TextEditor({ content, setContent, isSoil }) {
 
   const openModal = (e) => {
     e.stopPropagation();
-    if (dropdown.key === 'linkModal' && dropdown.isActive) {
+    if (dropdown.key === `linkModal-${type}` && dropdown.isActive) {
       dispatch(setDropdown({ key: null, isActive: false }))
       setUrl("");
     } else {
       setUrl(editor.getAttributes("link").href);
-      dispatch(setDropdown({ key: 'linkModal', isActive: true }));
+      dispatch(setDropdown({ key: `linkModal-${type}`, isActive: true }));
     }
   }
 
@@ -160,7 +160,7 @@ export default function TextEditor({ content, setContent, isSoil }) {
       <div className="flex flex-row flex-wrap space-x-4 border-b pb-2 mb-2">
 
         <BubbleMenu
-          className={`${dropdown.key === 'linkModal' ? 'invisible opacity-0' : 'visible'} flex duration-300 rounded-md border border-gray-200 bg-white p-2 flex-row z-40 space-x-2 items-center`}
+          className={`${dropdown.key === `linkModal-${type}` ? 'invisible opacity-0' : 'visible'} flex duration-300 rounded-md border border-gray-200 bg-white p-2 flex-row z-40 space-x-2 items-center`}
           tippyOptions={{ duration: 150 }}
           editor={editor}
           shouldShow={({ editor, view, state, oldState, from, to }) => {
@@ -246,13 +246,13 @@ export default function TextEditor({ content, setContent, isSoil }) {
         </div>
 
         <div
-          className={`${editor.isActive("link") || (dropdown.key == 'linkModal' && dropdown.isActive) ? 'text-blue-600' : 'text-gray-700'} linkModal cursor-pointer relative border border-transparent
+          className={`${editor.isActive("link") || (dropdown.key == `linkModal-${type}` && dropdown.isActive) ? 'text-blue-600' : 'text-gray-700'} linkModal cursor-pointer relative border border-transparent
           rounded-md hover:text-blue-600 duration-300 backface`}
           onClick={e => e.stopPropagation()}>
           <div onClick={openModal} className='linkModal h-full p-2 flex items-center justify-center'>
-            <Icons.Link strokeWidth={(dropdown.key === 'linkModal' && dropdown.isActive) ? '2.5' : '2'} />
+            <Icons.Link strokeWidth={(dropdown.key === `linkModal-${type}` && dropdown.isActive) ? '2.5' : '2'} />
           </div>
-          <div className={`${dropdown.key == 'linkModal' && dropdown.isActive ? 'visible translate-y-4' : 'invisible opacity-0'} z-50 duration-200 
+          <div className={`${dropdown.key == `linkModal-${type}` && dropdown.isActive ? 'visible translate-y-4' : 'invisible opacity-0'} z-50 duration-200 
             sm:space-x-4 space-x-2
             transition-all absolute rounded-md border border-gray-200 bg-white p-2 pr-4 min-w-fit flex flex-row top-[20px] -left-[120px]`}
             onClick={e => e.stopPropagation()}>

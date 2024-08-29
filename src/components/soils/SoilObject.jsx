@@ -10,10 +10,13 @@ import Link from 'next/link';
 import { getTranslation } from '@/i18n/client';
 import Loader from '../Loader';
 import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper';
+import '@/styles/editor.css';
 
 export default function SoilObject({ object, children, type }) {
     const [mapVisible, setMapVisible] = useState(true);
     const [tokenData, setTokenData] = useState({});
+    const [parser, setParser] = useState();
+
     const { locale } = useParams();
     const { t } = getTranslation(locale);
 
@@ -25,13 +28,40 @@ export default function SoilObject({ object, children, type }) {
     };
 
     useEffect(() => {
+        if (typeof document !== 'undefined') {
+            setParser(new DOMParser());
+        };
         document.documentElement.style.setProperty('--product-view-height', '480px');
         localStorage.getItem('tokenData') && setTokenData(JSON.parse(localStorage.getItem('tokenData')));
     }, [])
 
+    const Info = () =>
+        <div className="mt-2 mb-4 ml-2 flex justify-between py-2 px-4 rounded-md border border-blue-300">
+            <div className="flex gap-3">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                </div>
+                <div className="self-center">
+                    <span className="text-zinc-500 font-medium">
+                        {t('isExternal')}
+                    </span>
+                    <div className="text-zinc-600">
+                        <div className='tiptap mt-1 sm:text-sm'
+                            dangerouslySetInnerHTML={{
+                                __html: parser?.parseFromString(object.translations?.find(({ isEnglish }) =>
+                                    isEnglish === _isEng)?.externalSource || '', 'text/html').body.innerHTML
+                            }}>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     return (
         <div className='flex flex-col'>
-            <div className='flex flex-col sm:flex-row mb-2 justify-between sm:items-center'>
+            <div className='flex flex-col sm:flex-row mb-2 justify-between sm:items-start'>
                 <div className='w-full'>
                     {object.translations ? <MotionWrapper>
                         <h1 className='sm:text-2xl text-xl font-semibold w-full'>
@@ -42,7 +72,7 @@ export default function SoilObject({ object, children, type }) {
                 </div>
                 {tokenData.role === 'Admin' || (tokenData.email === object.userEmail) ? <Link target="_blank"
                     prefetch={false}
-                    className='text-blue-700 cursor-pointer flex flex-row items-center hover:underline duration-300'
+                    className='pt-[3px] text-blue-700 cursor-pointer flex flex-row items-center hover:underline duration-300'
                     href={{
                         pathname: `/${locale}/admin/${type === 'soil' ? 'objects' : 'ecosystems'}/edit/${object.id}`,
                         query: { lang: _isEng ? 'eng' : 'ru' }
@@ -82,11 +112,13 @@ export default function SoilObject({ object, children, type }) {
                     {t('show_inMap')}
                 </button>
             </div>
-            <div className='flex md:flex-row flex-col mt-6 '>
-                <div className='relative w-full md:min-w-[50%] md:max-w-[50%] lg:max-w-[550px] lg:min-w-[550px]'>
-                    {object.photo ? <MotionWrapper>
-                        <NewGallery mainPhoto={object.photo} objectPhoto={object.objectPhoto} />
-                    </MotionWrapper>
+            <div className='flex md:flex-row flex-col mt-6 relaltive'>
+                <div className='duration-300 sticky top-24 w-full md:min-w-[50%] md:max-w-[50%] lg:max-w-[550px] lg:min-w-[550px] h-fit'>
+                    {object.photo ?
+                        <MotionWrapper>
+                            <NewGallery mainPhoto={object.photo} objectPhoto={object.objectPhoto} />
+                            {object.isExternal ? <Info /> : ''}
+                        </MotionWrapper>
                         : <div className='opacity-90 absolute top-0 h-full w-full grid gap-2 lg:grid-cols-[106px_minmax(0px,_1fr)]'>
                             <div className='max-h-full overflow-hidden flex lg:flex-col lg:space-y-2 lg:space-x-0 space-x-2 lg:px-2 lg:order-1 order-2 py-2 lg:py-0'>
                                 {Array(5).fill('').map((item, idx) => <Loader key={idx} className='lg:w-full min-w-[90px] min-h-[135px]' />)}
@@ -96,9 +128,9 @@ export default function SoilObject({ object, children, type }) {
 
                 </div>
                 {Object.keys(object).length ? <div className='md:ml-8 mt-12 md:mt-0 w-full'>
-                    <h3 className='sm:text-2xl text-xl font-semibold mb-2'>
+                    {/* <h3 className='sm:text-2xl text-xl font-semibold mb-2'>
                         {t('info_obj')}
-                    </h3>
+                    </h3> */}
                     {children}
                 </div> : ''}
             </div>

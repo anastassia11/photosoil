@@ -66,13 +66,13 @@ export default function PublicationPageComponent({ id }) {
 
     return (
         <div className='flex flex-col'>
-            <div className='flex flex-col sm:flex-row mb-2 justify-between sm:items-center'>
+            <div className='flex flex-col sm:flex-row mb-2 justify-between sm:items-start'>
                 <h1 className='sm:text-2xl text-xl font-semibold'>
                     {currentTransl?.name}
                 </h1>
                 {tokenData.role === 'Admin' || (tokenData.email === publication.userEmail) ? <Link target="_blank"
                     prefetch={false}
-                    className='text-blue-700 cursor-pointer flex flex-row items-center hover:underline duration-300'
+                    className='pt-[3px] text-blue-700 cursor-pointer flex flex-row items-center hover:underline duration-300'
                     href={{
                         pathname: `/${locale}/admin/publications/edit/${publication.id}`,
                         query: { lang: _isEng ? 'eng' : 'ru' }

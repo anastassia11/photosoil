@@ -22,10 +22,12 @@ export const useConstants = () => {
         { name: 'reliefLocation', title: t('reliefLocation') },
         { name: 'plantCommunity', title: t('plantCommunity') },
         { name: 'soilFeatures', title: t('soilFeatures') },
+        { name: 'comments', title: t('comments') },
     ];
 
     const ECOSYSTEM_INFO = [
         { name: 'description', title: t('features') },
+        { name: 'comments', title: t('comments') },
     ];
 
     const PUBLICATION_INFO = [
@@ -64,6 +66,8 @@ export const useConstants = () => {
     const PUBLICATION_ENUM = {
         "0": t('thesis'),
         "1": t('article'),
+        "3": t('monographs'),
+        "4": t('other'),
     }
 
     return {

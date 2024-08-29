@@ -14,7 +14,7 @@ export default function CollapsibleText({ text, limit }) {
 
     return (
         <p>
-            {isExpanded ? text : `${text?.substring(0, limit)}${isTextLong ? '...' : ''}`}
+            {isExpanded ? text : `${text?.substring(0, limit)}${isTextLong ? '... ' : ''}`}
             {isTextLong && (
                 <button onClick={toggleExpand} className="text-blue-600">
                     {isExpanded ? t('collapse') : t('expand')}
