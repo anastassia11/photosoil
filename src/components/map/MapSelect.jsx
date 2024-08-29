@@ -5,7 +5,7 @@ import Feature from 'ol/Feature';
 import Map from 'ol/Map';
 import Point from 'ol/geom/Point';
 import View from 'ol/View';
-import { Icon, Style } from 'ol/style';
+import { Icon, Style, Fill, Stroke, RegularShape } from 'ol/style';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { fromLonLat, toLonLat } from 'ol/proj';
 import { OSM, Vector as VectorSource } from 'ol/source';
@@ -140,28 +140,46 @@ export default function MapSelect({ id, type, latitude, longtitude, onCoordinate
 
     //Создает стиль иконки по типу слоя
     const getIconStyleByLayerName = (type) => {
-        if (type === "publication") {
-            return createIconStyle('/publ-marker.svg');
-        }
-        if (type === "ecosystem") {
-            return createIconStyle('/ecosystem-marker.svg');
-        }
-        if (type === "soil") {
-            return createIconStyle('/soil-marker.svg');
-        }
-        return createIconStyle('/map-marker.svg');
+        return createIconStyle(type)
     }
 
 
     //Создает стиль иконки по Url
-    const createIconStyle = (iconUrl, scale = 0.15) => {
-        return new Style({
-            image: new Icon({
-                anchor: [0.5, 1],
-                scale: scale,
-                src: iconUrl
-            }),
-        });
+    const createIconStyle = (layerName) => {
+        if (layerName === 'soil') {
+            return new Style({
+                image: new RegularShape({
+                    stroke: new Stroke({ color: 'rgba(153, 51, 0, 1)', width: 1.7 }),
+                    fill: new Fill({ color: 'rgba(153, 51, 0, 0.7)' }),
+                    points: 4, // Количество углов (4 для квадрата)
+                    radius: 20, // Радиус квадрата
+                    angle: Math.PI / 4, // Угол поворота
+                }),
+                zIndex: 1
+            });
+        } else if (layerName === 'ecosystem') {
+            return new Style({
+                image: new RegularShape({
+                    stroke: new Stroke({ color: 'rgba(115, 172, 19, 1)', width: 1.7 }),
+                    fill: new Fill({ color: 'rgba(115, 172, 19, 0.7)' }),
+                    points: 4, // Количество углов (4 для квадрата)
+                    radius: 20, // Радиус квадрата
+                    angle: Math.PI / 4, // Угол поворота
+                }),
+                zIndex: 1
+            });
+        } else if (layerName === 'publication') {
+            return new Style({
+                image: new RegularShape({
+                    stroke: new Stroke({ color: 'rgba(139, 0, 139, 1)', width: 1.7 }),
+                    fill: new Fill({ color: 'rgba(139, 0, 139, 0.7)' }),
+                    points: 4, // Количество углов (4 для квадрата)
+                    radius: 20, // Радиус квадрата
+                    angle: Math.PI / 4, // Угол поворота
+                }),
+                zIndex: 1
+            });
+        }
     }
 
     const handleZoomClick = (zoomType) => {

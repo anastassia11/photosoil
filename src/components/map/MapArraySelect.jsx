@@ -5,7 +5,7 @@ import Feature from 'ol/Feature';
 import Map from 'ol/Map';
 import { LineString, Point } from 'ol/geom';
 import View from 'ol/View';
-import { Icon, Style } from 'ol/style';
+import { Icon, Style, Fill, Stroke, RegularShape } from 'ol/style';
 import { Draw, Modify, Snap } from 'ol/interaction';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { fromLonLat, toLonLat } from 'ol/proj';
@@ -27,20 +27,26 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref
 
     //Стиль невыбранных точек
     const basePointStyle = new Style({
-        image: new Icon({
-            anchor: [0.5, 1],
-            scale: 0.15,
-            src: '/publ-marker.svg'
+        image: new RegularShape({
+            stroke: new Stroke({ color: 'rgba(139, 0, 139, 1)', width: 1.7 }),
+            fill: new Fill({ color: 'rgba(139, 0, 139, 0.5)' }),
+            points: 4, // Количество углов (4 для квадрата)
+            radius: 20, // Радиус квадрата
+            angle: Math.PI / 4, // Угол поворота
         }),
+        zIndex: 1
     });
 
     //Стиль выбранных точек
     const selectedPointStyle = new Style({
-        image: new Icon({
-            anchor: [0.5, 1],
-            scale: 0.15,
-            src: '/publ-marker_v2.svg'
+        image: new RegularShape({
+            stroke: new Stroke({ color: 'rgba(139, 0, 139, 1)', width: 1.7 }),
+            fill: new Fill({ color: 'rgba(139, 0, 139, 0.9)' }),
+            points: 4, // Количество углов (4 для квадрата)
+            radius: 20, // Радиус квадрата
+            angle: Math.PI / 4, // Угол поворота
         }),
+        zIndex: 1
     });
 
     //Источник данных точек
