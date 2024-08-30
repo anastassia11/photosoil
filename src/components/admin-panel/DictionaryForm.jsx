@@ -36,7 +36,6 @@ export default function DictionaryForm({ _dictionary, title, onFormSubmit, isLoa
 
     const handleTermsChange = (e, id) => {
         const { name, value } = e.target;
-        console.log(name, value)
         setDictionary(prev => ({
             ...prev,
             terms: prev.terms.map((term) => {
@@ -98,9 +97,7 @@ export default function DictionaryForm({ _dictionary, title, onFormSubmit, isLoa
                 </button>
             </div>
 
-            <div
-                onSubmit={e => handleFormSubmit(e)}
-                className="flex flex-col h-fit items-start pb-16 mt-4">
+            <div className="flex flex-col h-fit items-start pb-16 mt-4">
                 <div className='xl:w-[50%] w-full'>
                     <Dropdown name='Язык' value={dictionary.translationMode} items={TRANSLATION_ENUM}
                         onCategotyChange={handleModeChange} dropdownKey='language' />
@@ -191,23 +188,6 @@ export default function DictionaryForm({ _dictionary, title, onFormSubmit, isLoa
                         {t('add_term')}
                     </button>
                 </div>
-                <button
-                    type='submit'
-                    disabled={isLoading}
-                    className="min-w-[250px] mt-4 min-h-[40px] w-fit flex items-center justify-center self-end px-8 py-2 font-medium text-center text-white transition-colors duration-300 
-                transform bg-blue-600 disabled:bg-blue-600/70 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600 align-bottom">
-                    {isLoading ?
-                        <Oval
-                            height={20}
-                            width={20}
-                            color="#FFFFFF"
-                            visible={true}
-                            ariaLabel='oval-loading'
-                            secondaryColor="#FFFFFF"
-                            strokeWidth={4}
-                            strokeWidthSecondary={4} />
-                        : btnTitle}
-                </button>
             </div>
         </form >
     )

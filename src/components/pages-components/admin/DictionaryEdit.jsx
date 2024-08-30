@@ -43,21 +43,43 @@ export default function DictionaryEditPageComponent({ id }) {
 
     const editDictionary = async (data) => {
         setIsLoading(true);
+        const { nameRu, nameEng, translationMode } = data;
+        const _data = {
+            translationMode,
+            ...(translationMode == 0 && { nameRu, nameEng }),
+            ...(translationMode == 1 && { nameEng }),
+            ...(translationMode == 2 && { nameRu })
+        };
+
+        const createTermData = (term) => ({
+            classificationId: Number(id),
+            ...(translationMode === 0 && { nameRu: term.nameRu, nameEng: term.nameEng }),
+            ...(translationMode === 1 && { nameEng: term.nameEng }),
+            ...(translationMode === 2 && { nameRu: term.nameRu })
+        });
         try {
             await Promise.all([
-                putClassification(id, { name: data.name, translationMode: data.translationMode }),
-                ...dictionary.terms.map((oldTerm) => {
-                    const newTerm = data.terms.find((newTerm) => newTerm.id === oldTerm.id);
+                await putClassification(id, _data),
+                ...dictionary.terms.map(async (oldTerm) => {
+                    const newTerm = data.terms.find((newTerm) => newTerm.id == oldTerm.id);
                     if (!newTerm) {
-                        deleteTerm(oldTerm.id);
-                    } else if (newTerm.name !== oldTerm.name) {
-                        putTerm(oldTerm.id, { name: newTerm.name });
+                        await deleteTerm(oldTerm.id);
+                    } else {
+                        const isChanged =
+                            translationMode == 0 ? ((newTerm.nameRu !== oldTerm.nameRu) || (newTerm.nameEng !== oldTerm.nameEng))
+                                : translationMode == 1 ? (newTerm.nameEng !== oldTerm.nameEng)
+                                    : (newTerm.nameRu !== oldTerm.nameRu)
+                        if (isChanged) {
+                            const _term = createTermData(newTerm);
+                            putTerm(oldTerm.id, _term);
+                        }
                     }
                     return Promise.resolve();
                 }),
-                ...data.terms.map((newTerm) => {
-                    if (typeof newTerm === "string") {
-                        createTerm({ classificationId: id, name: newTerm });
+                ...data.terms.map(async (newTerm) => {
+                    if (!newTerm.id) {
+                        const _term = createTermData(newTerm);
+                        await createTerm(_term);
                     }
                     return Promise.resolve();
                 })
