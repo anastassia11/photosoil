@@ -87,16 +87,16 @@ export default function AuthorPageComponent({ id }) {
                     />
                 </div>}
 
-                <div className='md:col-start-2 md:col-end-4 mt-12 sm:mt-0'>
-                    <h3 className='sm:text-2xl text-xl font-semibold mb-2'>
+                <div className='md:col-start-2 md:col-end-4 mt-6 md:mt-0'>
+                    {/* <h3 className='sm:text-2xl text-xl font-semibold mb-2'>
                         {t('author_info')}
-                    </h3>
+                    </h3> */}
                     <ul className='flex flex-col space-y-2 '>
                         {AUTHOR_INFO.map(({ title, name, isArray }, index) =>
                             (name !== 'name')
-                                && (authorLang?.[name] || author[name])
-                                && (authorLang?.[name]?.length || author[name]?.length) ? <li key={`INFO-${index}`}
-                                    className='flex flex-col w-full'>
+                                && ((authorLang?.[name] && authorLang?.[name]?.length)
+                                    || (author[name] && author[name]?.length)) ? <li key={`INFO-${index}`}
+                                        className='flex flex-col w-full'>
                                 <span className=' text-zinc-500 font-semibold'>
                                     {isArray ? (author[name].length ? title : '') : title}
                                 </span>

@@ -139,7 +139,7 @@ export default function AuthorForm({ _author, title, onFormSubmit, isLoading, bt
     }
 
     return (
-        <form className="flex flex-col w-full flex-1">
+        <form onSubmit={handleCreateAuthor} className="flex flex-col w-full flex-1">
             <div
                 className='mb-2 flex md:flex-row flex-col md:items-end md:justify-between space-y-1 md:space-y-0'>
                 <h1 className='sm:text-2xl text-xl font-semibold mb-2 md:mb-0'>
@@ -163,9 +163,7 @@ export default function AuthorForm({ _author, title, onFormSubmit, isLoading, bt
                         : btnText}
                 </button>
             </div>
-            <div
-                onSubmit={handleCreateAuthor}
-                className="flex flex-col items-start pb-16">
+            <div className="flex flex-col items-start pb-16">
                 <div className='flex sm:flex-row flex-col w-full 3xl:w-[50%]'>
                     <div className='mt-4'>
                         <div className=''>
@@ -206,7 +204,7 @@ export default function AuthorForm({ _author, title, onFormSubmit, isLoading, bt
                         <p className='text-blue-700 font-semibold'>Русская версия</p>
                         {AUTHOR_INFO.map(({ name, isArray, title }) => <li key={name}>
                             {!isArray &&
-                                (name === 'about' ? <Textarea name={name} label={title}
+                                (name === 'description' ? <Textarea name={name} label={title}
                                     value={author.dataRu?.[name] || ''}
                                     onChange={e => handleInputChange(e, 'ru')}
                                     required={false}
@@ -223,14 +221,14 @@ export default function AuthorForm({ _author, title, onFormSubmit, isLoading, bt
                         <p className='text-blue-700 font-semibold'>English version</p>
                         {AUTHOR_INFO.map(({ name, isArray, title }) => <li key={name}>
                             {!isArray &&
-                                (name === 'about' ? <Textarea name={name} label={title}
-                                    value={author.dataRu?.[name] || ''}
+                                (name === 'description' ? <Textarea name={name} label={title}
+                                    value={author.dataEng?.[name] || ''}
                                     onChange={e => handleInputChange(e, 'eng')}
                                     required={false}
                                     placeholder='' />
                                     : <Input required={name === 'name'}
                                         label={title} name={name}
-                                        value={author.dataRu?.[name] || ''}
+                                        value={author.dataEng?.[name] || ''}
                                         onChange={e => handleInputChange(e, 'eng')}
                                     />)
                             }
