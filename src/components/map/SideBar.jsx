@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Filter from '../soils/Filter';
 import { useDispatch, useSelector } from 'react-redux';
 import { useConstants } from '@/hooks/useConstants';
@@ -11,7 +11,8 @@ import { getTranslation } from '@/i18n/client';
 import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper';
 import { getAuthors } from '@/api/author/get_authors';
 
-export default function SideBar({ sidebarOpen, setSideBarOpen, filterName, setFilterName, layersVisible, popupVisible, onVisibleChange, onLocationHandler, draftIsVisible, setDraftIsVisible }) {
+const SideBar = memo(function SideBar({ sidebarOpen, setSideBarOpen, filterName, setFilterName,
+  layersVisible, popupVisible, onVisibleChange, draftIsVisible, setDraftIsVisible }) {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -28,10 +29,14 @@ export default function SideBar({ sidebarOpen, setSideBarOpen, filterName, setFi
   const { t } = getTranslation(locale);
 
   const { SOIL_ENUM } = useConstants();
-  const CATEGORY_ARRAY = Object.entries(SOIL_ENUM).map(([key, value]) => ({
-    id: Number(key),
-    name: value,
-  }));
+  const SOIL_ENUM_REF = useRef(SOIL_ENUM);
+
+  const CATEGORY_ARRAY = useMemo(() => {
+    return Object.entries(SOIL_ENUM_REF.current).map(([key, value]) => ({
+      id: Number(key),
+      name: value,
+    }));
+  }, [SOIL_ENUM_REF]);
 
   useEffect(() => {
     setToken(JSON.parse(localStorage.getItem('tokenData'))?.token);
@@ -104,47 +109,47 @@ export default function SideBar({ sidebarOpen, setSideBarOpen, filterName, setFi
     onVisibleChange({ name, checked });
   }
 
-  const handleAddCategory = (newItem) => {
+  const handleAddCategory = useCallback((newItem) => {
     dispatch(addCategory(newItem))
-  }
+  }, [dispatch])
 
-  const handleDeleteCategorie = (newItem) => {
+  const handleDeleteCategorie = useCallback((newItem) => {
     dispatch(deleteCategory(newItem))
-  }
+  }, [dispatch])
 
-  const handleResetCategories = (deletedItems) => {
+  const handleResetCategories = useCallback((deletedItems) => {
     for (let item of deletedItems) {
       dispatch(deleteCategory(item))
     }
-  }
+  }, [dispatch])
 
-  const handleAddTerm = (newItem) => {
+  const handleAddTerm = useCallback((newItem) => {
     dispatch(addTerm(newItem))
-  }
+  }, [])
 
-  const handleDeleteTerm = (deletedItem) => {
+  const handleDeleteTerm = useCallback((deletedItem) => {
     dispatch(deleteTerm(deletedItem))
-  }
+  }, [dispatch])
 
-  const handleResetTerms = (deletedItems) => {
+  const handleResetTerms = useCallback((deletedItems) => {
     for (let item of deletedItems) {
       dispatch(deleteTerm(item))
     }
-  }
+  }, [dispatch])
 
-  const handleAddAuthor = (newItem) => {
+  const handleAddAuthor = useCallback((newItem) => {
     dispatch(addAuthor(newItem))
-  }
+  }, [dispatch])
 
-  const handleDeleteAuthor = (deletedItem) => {
+  const handleDeleteAuthor = useCallback((deletedItem) => {
     dispatch(deleteAuthor(deletedItem))
-  }
+  }, [dispatch])
 
-  const handleResetAuthors = (deletedItems) => {
+  const handleResetAuthors = useCallback((deletedItems) => {
     for (let item of deletedItems) {
       dispatch(deleteAuthor(item))
     }
-  }
+  }, [dispatch])
 
   const LayerSwitch = ({ title, type }) => {
     return <div className="form-control">
@@ -272,7 +277,6 @@ export default function SideBar({ sidebarOpen, setSideBarOpen, filterName, setFi
                     deleteItem={handleDeleteCategorie}
                     resetItems={handleResetCategories}
                   />
-
                 </li>
                 {classifications?.map(item => {
                   const isEnglish = locale === 'en';
@@ -300,4 +304,5 @@ export default function SideBar({ sidebarOpen, setSideBarOpen, filterName, setFi
       </div>
     </div>
   );
-}
+})
+export default SideBar;

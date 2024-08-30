@@ -128,7 +128,6 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                 onOtherPhotosChange(_prev);
                 return _prev;
             });
-            // pathname === 'edit' && setObject(prev => ({ ...prev, objectPhoto: [...prev.objectPhoto, result.data.id] }));
         }
     }
 
@@ -143,10 +142,12 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
 
     const handleInputChange = (e) => {
         const { value, name } = e.target;
-        const updatedObject = (name === 'latitude' || name === 'longtitude') ? { ...object, [name]: value }
-            : { ...object, translations: object.translations.map(translation => translation.isEnglish === isEng ? { ...translation, [name]: value } : translation) }
-        setObject(updatedObject);
-        onItemChange(updatedObject);
+        setObject(prev => {
+            const _prev = (name === 'latitude' || name === 'longtitude') ? { ...prev, [name]: value }
+                : { ...prev, translations: prev.translations.map(translation => translation.isEnglish === isEng ? { ...translation, [name]: value } : translation) }
+            // onItemChange(_prev);
+            return _prev
+        });
     }
 
     const handleTextContentChange = (isEng, field, html) => {
@@ -166,7 +167,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
             onItemChange(_prev);
             return _prev;
         });
-    }, [object])
+    }, [onItemChange])
 
     const handleCategotyChange = (id) => {
         const updatedObject = { ...object, objectType: Number(id) };
@@ -201,7 +202,6 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
             onMainPhotoChange({});
             const updatedObject = { ...object, photoId: newId };
             setObject(updatedObject);
-            // onItemChange(updatedObject);
         }
     }
 
@@ -233,7 +233,6 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                 objectPhoto: updatedOtherPhotos
             };
             setObject(updatedObject);
-            // onItemChange(updatedObject);
         }
     }
 
@@ -251,24 +250,45 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
         dispatch(closeModal());
     }
 
-    const handleAddTerm = (type, newItem) => {
-        const updatedObject = { ...object, [type]: object[type] ? [...object[type], newItem] : [newItem] };
-        setObject(updatedObject);
-        onItemChange(updatedObject);
-    }
+    const handleAddTerm = useCallback((type, newItem) => {
+        setObject(prev => {
+            const _prev = { ...prev, [type]: prev[type] ? [...prev[type], newItem] : [newItem] };
+            // onItemChange(_prev);
+            return _prev
+        })
+    }, [])
 
-    const handleDeleteTerm = (type, deletedItem) => {
-        const updatedObject = { ...object, [type]: object[type]?.filter(id => id !== deletedItem) };
-        setObject(updatedObject);
-        onItemChange(updatedObject);
-    }
+    const handleDeleteTerm = useCallback((type, deletedItem) => {
+        setObject(prev => {
+            const _prev = { ...prev, [type]: prev[type]?.filter(id => id !== deletedItem) };
+            onItemChange(_prev);
+            return _prev;
+        })
+    }, [])
 
-    const handleResetTerms = (type, deletedItems) => {
-        const updatedObject = { ...object, [type]: object[type].filter(id => !deletedItems.includes(id)) };
-        setObject(updatedObject);
-        onItemChange(updatedObject);
-    }
+    const handleResetTerms = useCallback((type, deletedItems) => {
+        setObject(prev => {
+            const _prev = { ...prev, [type]: prev[type].filter(id => !deletedItems.includes(id)) };
+            onItemChange(_prev);
+            return _prev;
+        })
+    }, [])
 
+    const addTerm = useCallback((newItem) => handleAddTerm('soilTerms', newItem), [handleAddTerm]);
+    const deleteTerm = useCallback((deletedItem) => handleDeleteTerm('soilTerms', deletedItem), [handleDeleteTerm]);
+    const resetTerms = useCallback((deletedItems) => handleResetTerms('soilTerms', deletedItems), [handleResetTerms]);
+
+    const addEcosystem = useCallback((newItem) => handleAddTerm('ecoSystems', newItem), [handleAddTerm]);
+    const deleteEcosystem = useCallback((deletedItem) => handleDeleteTerm('ecoSystems', deletedItem), [handleDeleteTerm]);
+    const resetEcosystems = useCallback((deletedItems) => handleResetTerms('ecoSystems', deletedItems), [handleResetTerms]);
+
+    const addSoil = useCallback((newItem) => handleAddTerm('soilObjects', newItem), [handleAddTerm]);
+    const deleteSoil = useCallback((deletedItem) => handleDeleteTerm('soilObjects', deletedItem), [handleDeleteTerm]);
+    const resetSoils = useCallback((deletedItems) => handleResetTerms('soilObjects', deletedItems), [handleResetTerms]);
+
+    const addPublication = useCallback((newItem) => handleAddTerm('publications', newItem), [handleAddTerm]);
+    const deletePublication = useCallback((deletedItem) => handleDeleteTerm('publications', deletedItem), [handleDeleteTerm]);
+    const resetPublications = useCallback((deletedItems) => handleResetTerms('publications', deletedItems), [handleResetTerms]);
 
     const handleIsExternalChange = (e) => {
         setObject(prev => {
@@ -499,7 +519,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                             </ul>}
 
 
-                        {type === 'soil' && <>
+                        {type === 'soil' ? <>
                             <p className='font-medium mt-8'>{t('classifications')}</p>
                             <ul className='grid md:grid-cols-2 grid-cols-1 gap-4 w-full mt-1'>
                                 {classifications?.map(item => {
@@ -510,39 +530,39 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                                             itemId={`classif-${item.id}`} name={isEng ? item.nameEng : item.nameRu}
                                             items={item.terms} isEng={isEng}
                                             allSelectedItems={object?.soilTerms}
-                                            addItem={newItem => handleAddTerm('soilTerms', newItem)}
-                                            deleteItem={deletedItem => handleDeleteTerm('soilTerms', deletedItem)}
-                                            resetItems={deletedItems => handleResetTerms('soilTerms', deletedItems)}
+                                            addItem={addTerm}
+                                            deleteItem={deleteTerm}
+                                            resetItems={resetTerms}
                                         />
                                     </li>
                                 })}
                             </ul>
-                        </>}
+                        </> : ''}
 
                         <p className='font-medium mt-8'>{t('connection')}</p>
                         <div className='grid md:grid-cols-2 grid-cols-1 gap-4 w-full mt-1'>
                             {type !== 'ecosystem' && <Filter name={t('ecosystems')} items={ecosystems}
                                 type='ecosystem'
                                 allSelectedItems={object?.ecoSystems} isEng={isEng}
-                                addItem={newItem => handleAddTerm('ecoSystems', newItem)}
-                                deleteItem={deletedItem => handleDeleteTerm('ecoSystems', deletedItem)}
-                                resetItems={deletedItems => handleResetTerms('ecoSystems', deletedItems)}
+                                addItem={addEcosystem}
+                                deleteItem={deleteEcosystem}
+                                resetItems={resetEcosystems}
                             />}
 
                             {type !== 'soil' && <Filter name={t('soils')} items={soils}
                                 type='soil'
                                 allSelectedItems={object?.soilObjects} isEng={isEng}
-                                addItem={newItem => handleAddTerm('soilObjects', newItem)}
-                                deleteItem={deletedItem => handleDeleteTerm('soilObjects', deletedItem)}
-                                resetItems={deletedItems => handleResetTerms('soilObjects', deletedItems)}
+                                addItem={addSoil}
+                                deleteItem={deleteSoil}
+                                resetItems={resetSoils}
                             />}
 
                             <Filter name={t('publications')} items={publications}
                                 type='publications'
                                 allSelectedItems={object?.publications} isEng={isEng}
-                                addItem={newItem => handleAddTerm('publications', newItem)}
-                                deleteItem={deletedItem => handleDeleteTerm('publications', deletedItem)}
-                                resetItems={deletedItems => handleResetTerms('publications', deletedItems)}
+                                addItem={addPublication}
+                                deleteItem={deletePublication}
+                                resetItems={resetPublications}
                             />
                         </div>
 
@@ -558,7 +578,6 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                         </div>
                     </div>
                 </div>
-
             </div>
         </form >
     )

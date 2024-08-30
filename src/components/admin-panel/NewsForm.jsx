@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { BASE_SERVER_URL } from '@/utils/constants';
 import DragAndDrop from './ui-kit/DragAndDrop';
 import { Oval } from 'react-loader-spinner';
@@ -186,17 +186,17 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, isLoadi
         }
     }
 
-    const handleAddTag = (newItem) => {
+    const handleAddTag = useCallback((newItem) => {
         setNews(prevNews => ({ ...prevNews, tags: prevNews.tags ? [...prevNews.tags, newItem] : [newItem] }));
-    }
+    }, [])
 
-    const handleDeleteTag = (deletedItem) => {
+    const handleDeleteTag = useCallback((deletedItem) => {
         setNews(prevNews => ({ ...prevNews, tags: prevNews.tags.filter(id => id !== deletedItem) }));
-    }
+    }, [])
 
-    const handleResetTag = () => {
+    const handleResetTag = useCallback(() => {
         setNews(prevNews => ({ ...prevNews, tags: [] }));
-    }
+    }, [])
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
@@ -358,9 +358,9 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, isLoadi
                         <Filter name={t('tags')} items={tags} setTags={setTags}
                             isEng={isEng} type='news-tags'
                             allSelectedItems={news?.tags}
-                            addItem={newItem => handleAddTag(newItem)}
-                            deleteItem={deletedItem => handleDeleteTag(deletedItem)}
-                            resetItems={deletedItems => handleResetTag(deletedItems)}
+                            addItem={handleAddTag}
+                            deleteItem={handleDeleteTag}
+                            resetItems={handleResetTag}
                         />
                     </div>
                 </div>

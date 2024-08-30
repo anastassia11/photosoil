@@ -12,7 +12,7 @@ import { PAGINATION_OPTIONS } from '@/utils/constants';
 import moment from 'moment';
 import Link from 'next/link';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getTranslation } from '@/i18n/client';
 
@@ -83,17 +83,17 @@ export default function NewsPageComponent() {
         router.replace(pathname + '?' + params.toString())
     }
 
-    const handleAddTag = (newItem) => {
+    const handleAddTag = useCallback((newItem) => {
         dispatch(addTag(newItem))
-    }
+    }, [dispatch])
 
-    const handleDeleteTag = (deletedItem) => {
+    const handleDeleteTag = useCallback((deletedItem) => {
         dispatch(deleteTag(deletedItem))
-    }
+    }, [dispatch])
 
-    const handleResetTags = () => {
+    const handleResetTags = useCallback(() => {
         dispatch(resetTags())
-    }
+    }, [dispatch])
 
     const fetchNews = async () => {
         const result = await getAllNews();

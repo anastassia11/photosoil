@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Filter from './Filter'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
@@ -51,11 +51,14 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
     const [token, setToken] = useState(null);
 
     const { SOIL_ENUM } = useConstants();
+    const SOIL_ENUM_REF = useRef(SOIL_ENUM);
 
-    const CATEGORY_ARRAY = Object.entries(SOIL_ENUM).map(([key, value]) => ({
-        id: Number(key),
-        name: value,
-    }));
+    const CATEGORY_ARRAY = useMemo(() => {
+        return Object.entries(SOIL_ENUM_REF.current).map(([key, value]) => ({
+            id: Number(key),
+            name: value,
+        }));
+    }, [SOIL_ENUM_REF]);
 
     const _isEng = locale === 'en';
 
@@ -156,47 +159,47 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
         router.replace(pathname + '?' + params.toString())
     };
 
-    const handleAddCategory = (newItem) => {
+    const handleAddCategory = useCallback((newItem) => {
         dispatch(addCategory(newItem))
-    }
+    }, [dispatch])
 
-    const handleDeleteCategorie = (newItem) => {
+    const handleDeleteCategorie = useCallback((newItem) => {
         dispatch(deleteCategory(newItem))
-    }
+    }, [dispatch])
 
-    const handleResetCategories = (deletedItems) => {
+    const handleResetCategories = useCallback((deletedItems) => {
         for (let item of deletedItems) {
             dispatch(deleteCategory(item))
         }
-    }
+    }, [dispatch])
 
-    const handleAddTerm = (newItem) => {
+    const handleAddTerm = useCallback((newItem) => {
         dispatch(addTerm(newItem))
-    }
+    }, [dispatch])
 
-    const handleDeleteTerm = (deletedItem) => {
+    const handleDeleteTerm = useCallback((deletedItem) => {
         dispatch(deleteTerm(deletedItem))
-    }
+    }, [dispatch])
 
-    const handleResetTerms = (deletedItems) => {
+    const handleResetTerms = useCallback((deletedItems) => {
         for (let item of deletedItems) {
             dispatch(deleteTerm(item))
         }
-    }
+    }, [dispatch])
 
-    const handleAddAuthor = (newItem) => {
+    const handleAddAuthor = useCallback((newItem) => {
         dispatch(addAuthor(newItem))
-    }
+    }, [dispatch])
 
-    const handleDeleteAuthor = (deletedItem) => {
+    const handleDeleteAuthor = useCallback((deletedItem) => {
         dispatch(deleteAuthor(deletedItem))
-    }
+    }, [dispatch])
 
-    const handleResetAuthors = (deletedItems) => {
+    const handleResetAuthors = useCallback((deletedItems) => {
         for (let item of deletedItems) {
             dispatch(deleteAuthor(item))
         }
-    }
+    }, [dispatch])
 
     const SoilCard = ({ photo, name, id }) => {
         return <Link href={{

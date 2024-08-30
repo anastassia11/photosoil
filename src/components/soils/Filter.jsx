@@ -8,12 +8,12 @@ import { setDropdown } from '@/store/slices/generalSlice'
 import { openModal } from '@/store/slices/modalSlice';
 import modalThunkActions from '@/store/thunks/modalThunk';
 import { useParams, usePathname } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
 import { Oval } from 'react-loader-spinner';
 import { useDispatch, useSelector } from 'react-redux'
 import { Tooltip } from 'react-tooltip';
 
-export default function Filter({ type, itemId, name, items, setTags, allSelectedItems, addItem, deleteItem, resetItems, isMapFilter, isEng }) {
+const Filter = memo(function Filter({ type, itemId, name, items, setTags, allSelectedItems, addItem, deleteItem, resetItems, isMapFilter, isEng }) {
     const dispatch = useDispatch();
     const [filterOpen, setFilterOpen] = useState(false)
     const paths = usePathname();
@@ -33,12 +33,6 @@ export default function Filter({ type, itemId, name, items, setTags, allSelected
     const { t } = getTranslation(locale);
 
     const _id = itemId ? `filter-${itemId}` : name;
-
-    useEffect(() => {
-        if (dropdown.key == _id && dropdown.isActive) {
-            searchRef.current.focus();
-        }
-    }, [dropdown]);
 
     useEffect(() => {
         items && setSelectedItems(items.filter(({ id }) => allSelectedItems?.includes(id)).map(({ id }) => id));
@@ -313,4 +307,5 @@ export default function Filter({ type, itemId, name, items, setTags, allSelected
             {formVisible.visible ? TagForm() : ''}
         </div >
     )
-}
+})
+export default Filter;

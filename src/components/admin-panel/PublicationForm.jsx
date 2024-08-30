@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Dropdown from './ui-kit/Dropdown';
 import { BASE_SERVER_URL } from '@/utils/constants';
 import DragAndDrop from './ui-kit/DragAndDrop';
@@ -143,17 +143,17 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
         setIsEng(value);
     }
 
-    const handleAddTerm = (type, newItem) => {
+    const handleAddTerm = useCallback((type, newItem) => {
         setPublication(prevPubl => ({ ...prevPubl, [type]: prevPubl[type] ? [...prevPubl[type], newItem] : [newItem] }));
-    }
+    }, [])
 
-    const handleDeleteTerm = (type, deletedItem) => {
+    const handleDeleteTerm = useCallback((type, deletedItem) => {
         setPublication(prevPubl => ({ ...prevPubl, [type]: prevPubl[type]?.filter(id => id !== deletedItem) }));
-    }
+    }, [])
 
-    const handleResetTerms = (type, deletedItems) => {
+    const handleResetTerms = useCallback((type, deletedItems) => {
         setPublication(prevPubl => ({ ...prevPubl, [type]: prevPubl[type].filter(id => !deletedItems.includes(id)) }));
-    }
+    }, [])
 
     const handleCoordChange = ({ latitude, longtitude }) => {
         setCurrentCoord({ latitude, longtitude });

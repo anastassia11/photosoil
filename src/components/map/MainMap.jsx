@@ -123,7 +123,7 @@ export default function MainMap() {
     }, [selectedTerms, selectedCategories, selectedAuthors,
         soils, publications, ecosystems,
         draftIsVisible, clusterLayer,
-        filterName])
+        filterName, _isEng])
 
     const filterById = (filteredIds, type) => {
         const layerSource = clusterLayer.getSource().getSource(); // Получаем источник кластера
@@ -160,7 +160,9 @@ export default function MainMap() {
             layers: [baseLayer],
             target: mapElement.current,
             view: view,
-            controls: []
+            controls: [],
+            transition: 0,
+            renderers: ['Canvas', 'VML']
         });
         setBaseLayer(baseLayer);
     }
@@ -522,7 +524,7 @@ export default function MainMap() {
     }
 
     return (
-        <div ref={mapElement} className="w-full h-full z-10">
+        <div ref={mapElement} className="w-full h-full">
             <div className={`z-40 absolute top-0 right-0 m-2 flex flex-row duration-300 lg:w-[500px] w-full pl-2`}>
                 <SearchRegion onLocationHandler={selectLocationHandler} />
                 <LayersPanel onLayerChange={handleBaseLayerChange} currentLayer={selectedLayer} />

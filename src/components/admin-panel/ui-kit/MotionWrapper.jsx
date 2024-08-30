@@ -1,7 +1,7 @@
 import { motion } from "framer-motion"
+import { memo } from 'react';
 
-export default function MotionWrapper({ children, className }) {
-
+const MotionWrapper = memo(function MotionWrapper({ children, className }) {
     return (
         <motion.div
             initial={{ opacity: 0 }}
@@ -11,4 +11,5 @@ export default function MotionWrapper({ children, className }) {
             {children}
         </motion.div>
     )
-}
+})
+export default MotionWrapper;
