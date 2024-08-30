@@ -47,7 +47,7 @@ export default function EcosystemPageComponent({ id }) {
         <SoilObject object={ecosystem} type='ecosystem'>
             <ul className='flex flex-col space-y-2 '>
                 {ECOSYSTEM_INFO.map(({ name, title }) => {
-                    return (currentTransl?.hasOwnProperty(name) && currentTransl[name].length && currentTransl[name] !== '<p></p>')
+                    return (currentTransl?.hasOwnProperty(name) && currentTransl[name]?.length && currentTransl[name] !== '<p></p>')
                         ? <li key={name}
                             className='flex flex-col w-full space-x-0'>
                             <span className='w-full text-zinc-500 font-semibold'>

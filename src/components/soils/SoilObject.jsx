@@ -36,13 +36,14 @@ export default function SoilObject({ object, children, type }) {
     }, [])
 
     const Info = () =>
-        <div className="mt-2 mb-4 ml-2 flex justify-between py-2 px-4 rounded-md border border-blue-300">
+        <div className="mt-2 mb-4 md:ml-2 flex justify-between py-2 px-4 rounded-md border border-blue-300">
             <div className="flex gap-3">
-                <div>
+                <div className='md:block hidden'>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                     </svg>
                 </div>
+
                 <div className="self-center">
                     <span className="text-zinc-500 font-medium">
                         {t('isExternal')}
@@ -113,7 +114,7 @@ export default function SoilObject({ object, children, type }) {
                 </button>
             </div>
             <div className='flex md:flex-row flex-col mt-6 relaltive'>
-                <div className='duration-300 sticky top-24 w-full md:min-w-[50%] md:max-w-[50%] lg:max-w-[550px] lg:min-w-[550px] h-fit'>
+                <div className='duration-300 md:sticky relative md:top-24 w-full md:min-w-[50%] md:max-w-[50%] lg:max-w-[550px] lg:min-w-[550px] h-fit'>
                     {object.photo ?
                         <MotionWrapper>
                             <NewGallery mainPhoto={object.photo} objectPhoto={object.objectPhoto} />
@@ -127,7 +128,7 @@ export default function SoilObject({ object, children, type }) {
                         </div>}
 
                 </div>
-                {Object.keys(object).length ? <div className='md:ml-8 mt-12 md:mt-0 w-full'>
+                {Object.keys(object).length ? <div className='md:ml-8 mt-6 md:mt-0 w-full'>
                     {/* <h3 className='sm:text-2xl text-xl font-semibold mb-2'>
                         {t('info_obj')}
                     </h3> */}

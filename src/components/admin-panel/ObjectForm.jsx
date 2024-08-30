@@ -116,12 +116,9 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
     }
 
     const handleOtherPhotoSend = async (file, index) => {
-        console.log(index, otherPhotos)
-
         setOtherPhotos(prev => [...prev, { isLoading: true }]);
         const result = await sendPhoto(file);
         if (result.success) {
-            console.log(otherPhotos)
             setOtherPhotos(prev => {
                 const _prev = prev.map((photo, idx) =>
                     idx === index + otherPhotos.length
