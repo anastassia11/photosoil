@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useLayoutEffect, useCallback } from 'react';
 import 'ol/ol.css';
 import Feature from 'ol/Feature';
 import OLMap from 'ol/Map';
@@ -59,7 +59,7 @@ export default function MainMap() {
     const mapRef = useRef(null);
     const _isEng = locale === 'en';
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         const initializeMap = () => {
             if (didLogRef.current === false) {
                 didLogRef.current = true;
@@ -123,7 +123,7 @@ export default function MainMap() {
     }, [selectedTerms, selectedCategories, selectedAuthors,
         soils, publications, ecosystems,
         draftIsVisible, clusterLayer,
-        filterName, _isEng])
+        filterName])
 
     const filterById = (filteredIds, type) => {
         const layerSource = clusterLayer.getSource().getSource(); // Получаем источник кластера
@@ -161,13 +161,14 @@ export default function MainMap() {
             target: mapElement.current,
             view: view,
             controls: [],
-            transition: 0,
-            renderers: ['Canvas', 'VML']
+            // transition: 0,
+            // renderers: ['Canvas', 'VML']
         });
         setBaseLayer(baseLayer);
     }
 
     const getBaseLayerSourse = (layerValue) => {
+        console.log(layerValue)
         setSelectedLayer(layerValue);
         if (layerValue === "OSM") {
             return new OSM();
@@ -502,9 +503,9 @@ export default function MainMap() {
         mapRef.current.un('pointermove', handleMapHover);
     }
 
-    const handleLayerChange = ({ name, checked }) => {
+    const handleLayerChange = useCallback(({ name, checked }) => {
         setLayersVisible(prev => ({ ...prev, [name]: checked }));
-    };
+    }, []);
 
     const selectLocationHandler = (item) => {
         let up = fromLonLat([item.boundingbox[3], item.boundingbox[1]]);
@@ -524,7 +525,7 @@ export default function MainMap() {
     }
 
     return (
-        <div ref={mapElement} className="w-full h-full">
+        <div ref={mapElement} className="w-full h-full z-10">
             <div className={`z-40 absolute top-0 right-0 m-2 flex flex-row duration-300 lg:w-[500px] w-full pl-2`}>
                 <SearchRegion onLocationHandler={selectLocationHandler} />
                 <LayersPanel onLayerChange={handleBaseLayerChange} currentLayer={selectedLayer} />

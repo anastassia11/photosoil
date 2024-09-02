@@ -10,6 +10,7 @@ import { getClassifications } from '@/api/classification/get_classifications';
 import { getTranslation } from '@/i18n/client';
 import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper';
 import { getAuthors } from '@/api/author/get_authors';
+import LayerSwitch from '../admin-panel/ui-kit/LayerSwitch';
 
 const SideBar = memo(function SideBar({ sidebarOpen, setSideBarOpen, filterName, setFilterName,
   layersVisible, popupVisible, onVisibleChange, draftIsVisible, setDraftIsVisible }) {
@@ -18,6 +19,7 @@ const SideBar = memo(function SideBar({ sidebarOpen, setSideBarOpen, filterName,
   const router = useRouter();
   const pathname = usePathname();
   const didLogRef = useRef(true);
+  const dropdown = useSelector(state => state.general.dropdown);
 
   const [classifications, setClassifications] = useState([]);
   const [authors, setAuthors] = useState([]);
@@ -38,26 +40,27 @@ const SideBar = memo(function SideBar({ sidebarOpen, setSideBarOpen, filterName,
     }));
   }, [SOIL_ENUM_REF]);
 
+
   useEffect(() => {
     setToken(JSON.parse(localStorage.getItem('tokenData'))?.token);
     setSideBarOpen(window.innerWidth > 640);
     fetchClassifications();
     fetchAuthors();
-    if (didLogRef.current) {
-      didLogRef.current = false
-      const categoriesParam = searchParams.get('categories');
-      const termsParam = searchParams.get('terms');
-      const authorsParam = searchParams.get('authors');
+    // if (didLogRef.current) {
+    //   didLogRef.current = false
+    //   const categoriesParam = searchParams.get('categories');
+    //   const termsParam = searchParams.get('terms');
+    //   const authorsParam = searchParams.get('authors');
 
-      categoriesParam && categoriesParam.split(',').forEach((param) => dispatch(addCategory(Number(param))));
-      termsParam && termsParam.split(',').forEach((param) => dispatch(addTerm(Number(param))));
-      authorsParam && authorsParam.split(',').forEach((param) => dispatch(addAuthor(Number(param))));
-    }
+    //   categoriesParam && categoriesParam.split(',').forEach((param) => dispatch(addCategory(Number(param))));
+    //   termsParam && termsParam.split(',').forEach((param) => dispatch(addTerm(Number(param))));
+    //   authorsParam && authorsParam.split(',').forEach((param) => dispatch(addAuthor(Number(param))));
+    // }
   }, [])
 
-  useEffect(() => {
-    updateFiltersInHistory();
-  }, [selectedCategories, selectedTerms, selectedAuthors])
+  // useEffect(() => {
+  //   updateFiltersInHistory();
+  // }, [selectedCategories, selectedTerms, selectedAuthors])
 
   useEffect(() => {
     window.innerWidth > 640 && setSideBarOpen(!popupVisible)
@@ -104,10 +107,10 @@ const SideBar = memo(function SideBar({ sidebarOpen, setSideBarOpen, filterName,
     setSideBarOpen(!sidebarOpen);
   }
 
-  const handleVisibleChange = (e) => {
+  const handleVisibleChange = useCallback((e) => {
     const { name, checked } = e.target;
     onVisibleChange({ name, checked });
-  }
+  }, [onVisibleChange])
 
   const handleAddCategory = useCallback((newItem) => {
     dispatch(addCategory(newItem))
@@ -125,7 +128,7 @@ const SideBar = memo(function SideBar({ sidebarOpen, setSideBarOpen, filterName,
 
   const handleAddTerm = useCallback((newItem) => {
     dispatch(addTerm(newItem))
-  }, [])
+  }, [dispatch])
 
   const handleDeleteTerm = useCallback((deletedItem) => {
     dispatch(deleteTerm(deletedItem))
@@ -150,31 +153,6 @@ const SideBar = memo(function SideBar({ sidebarOpen, setSideBarOpen, filterName,
       dispatch(deleteAuthor(item))
     }
   }, [dispatch])
-
-  const LayerSwitch = ({ title, type }) => {
-    return <div className="form-control">
-      <label className="flex justify-between cursor-pointer label">
-        <span className="label-text">{title}</span>
-        <label className="inline-flex items-center cursor-pointer">
-          <input
-            checked={layersVisible[type]}
-            onChange={handleVisibleChange}
-            type="checkbox"
-            name={type}
-            className="sr-only peer toggle layerCheker toggle-primary"
-          />
-          <div className={`relative w-10 h-[22px] bg-gray-200 rounded-full peer peer-checked:after:translate-x-full 
-          rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] 
-          after:absolute after:top-0.5 after:start-[1px] after:bg-white after:border-gray-300 after:border 
-          after:rounded-full after:h-[18px] after:w-[18px] after:transition-all 
-
-          ${type === 'soil' ? 'peer-checked:bg-[#993300]/80'
-              : type === 'ecosystem' ? 'peer-checked:bg-[#73ac13]/80' : 'peer-checked:bg-[#8b008b]/80'}
-          `}></div>
-        </label>
-      </label>
-    </div>
-  }
 
   return (
     <div id='map-sidebar'
@@ -245,9 +223,9 @@ const SideBar = memo(function SideBar({ sidebarOpen, setSideBarOpen, filterName,
               {t('map_layers')}
             </p>
             <div x-show="show" x-transition className="sm:space-y-2.5 space-y-1 px-1">
-              {LayerSwitch({ title: t('soils'), type: 'soil' })}
-              {LayerSwitch({ title: t('ecosystems'), type: 'ecosystem' })}
-              {LayerSwitch({ title: t('publications'), type: 'publication' })}
+              <LayerSwitch title={t('soils')} type='soil' visible={layersVisible.soil} onVisibleChange={handleVisibleChange} />
+              <LayerSwitch title={t('ecosystems')} type='ecosystem' visible={layersVisible.ecosystem} onVisibleChange={handleVisibleChange} />
+              <LayerSwitch title={t('publications')} type='publication' visible={layersVisible.publication} onVisibleChange={handleVisibleChange} />
             </div>
           </div>
 
@@ -259,7 +237,9 @@ const SideBar = memo(function SideBar({ sidebarOpen, setSideBarOpen, filterName,
             {
               <ul className='flex flex-col z-10 max-h-full sm:space-y-2.5 space-y-1 px-1'>
                 <li key={'authors'}>
-                  <Filter itemId={`author`} name={t('authors')} items={authors}
+                  <Filter dropdown={dropdown}
+                    itemId={`author`} name={t('authors')}
+                    items={authors}
                     type='authors'
                     isMapFilter={true}
                     allSelectedItems={selectedAuthors}
@@ -269,7 +249,9 @@ const SideBar = memo(function SideBar({ sidebarOpen, setSideBarOpen, filterName,
                   />
                 </li>
                 <li key={'category'}>
-                  <Filter name={t('category')} itemId='category' items={CATEGORY_ARRAY}
+                  <Filter dropdown={dropdown}
+                    name={t('category')} itemId='category'
+                    items={CATEGORY_ARRAY}
                     allSelectedItems={selectedCategories}
                     type='category'
                     isMapFilter={true}
@@ -284,7 +266,8 @@ const SideBar = memo(function SideBar({ sidebarOpen, setSideBarOpen, filterName,
                   if (isTranslationModeValid) {
                     return (
                       <li key={item.id}>
-                        <Filter isEng={locale === 'en'} itemId={item.id}
+                        <Filter dropdown={dropdown}
+                          isEng={locale === 'en'} itemId={item.id}
                           type='classif'
                           isMapFilter={true}
                           name={isEnglish ? item.nameEng : item.nameRu}

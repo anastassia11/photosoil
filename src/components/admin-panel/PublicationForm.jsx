@@ -32,6 +32,8 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
     const [soils, setSoils] = useState([]);
     const [coordinates, setCoordinates] = useState([]);
     const [currentCoord, setCurrentCoord] = useState({});
+
+    const dropdown = useSelector(state => state.general.dropdown);
     const { locale } = useParams();
     const dispatch = useDispatch();
     const mapRef = useRef(null);
@@ -303,14 +305,16 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
 
                     <p className='font-medium mt-5'>{t('connection')}</p>
                     <div className='md:w-[50%] w-full mt-1 flex flex-col space-y-4'>
-                        <Filter name={t('soils')} items={soils}
+                        <Filter dropdown={dropdown}
+                            name={t('soils')} items={soils}
                             type='soil'
                             allSelectedItems={publication?.soilObjects} isEng={isEng}
                             addItem={newItem => handleAddTerm('soilObjects', newItem)}
                             deleteItem={deletedItem => handleDeleteTerm('soilObjects', deletedItem)}
                             resetItems={deletedItems => handleResetTerms('soilObjects', deletedItems)}
                         />
-                        <Filter name={t('ecosystems')} items={ecosystems}
+                        <Filter dropdown={dropdown}
+                            name={t('ecosystems')} items={ecosystems}
                             type='ecosystem'
                             allSelectedItems={publication?.ecoSystems} isEng={isEng}
                             addItem={newItem => handleAddTerm('ecoSystems', newItem)}

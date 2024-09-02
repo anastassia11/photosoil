@@ -13,13 +13,12 @@ import { Oval } from 'react-loader-spinner';
 import { useDispatch, useSelector } from 'react-redux'
 import { Tooltip } from 'react-tooltip';
 
-const Filter = memo(function Filter({ type, itemId, name, items, setTags, allSelectedItems, addItem, deleteItem, resetItems, isMapFilter, isEng }) {
+const Filter = memo(function Filter({ dropdown, type, itemId, name, items, setTags, allSelectedItems, addItem, deleteItem, resetItems, isMapFilter, isEng }) {
     const dispatch = useDispatch();
     const [filterOpen, setFilterOpen] = useState(false)
     const paths = usePathname();
     const pathNames = paths.split('/').filter(path => path);
     const searchRef = useRef(null);
-    const dropdown = useSelector(state => state.general.dropdown);
     const [selectedItems, setSelectedItems] = useState([]);
     const [filterName, setFilterName] = useState('');
     const [filteredItems, setFilteredItems] = useState([]);
@@ -61,7 +60,7 @@ const Filter = memo(function Filter({ type, itemId, name, items, setTags, allSel
     }
 
     const handleOpenClick = () => {
-        isMapFilter ? setFilterOpen(!filterOpen) : dispatch(setDropdown({ key: _id, isActive: dropdown.key !== null && dropdown.key !== _id ? true : !dropdown.isActive }))
+        isMapFilter ? setFilterOpen(!filterOpen) : dispatch(setDropdown({ key: _id, isActive: dropdown?.key !== null && dropdown?.key !== _id ? true : !dropdown?.isActive }))
     }
 
     const handleAddTag = () => {
@@ -181,7 +180,7 @@ const Filter = memo(function Filter({ type, itemId, name, items, setTags, allSel
     return (
         <div className="select-none flex gap-8 w-full">
             <div className="relative w-full">
-                <div className="filter_dropdown">
+                <div className="filter_dropdown" id='filter_dropdown'>
                     <div className={`overflow-visible flex cursor-pointer items-center justify-between gap-2 ${!isMapFilter ? 'bg-white border h-[40px] p-2' : ''} transition rounded-md`}
                         onClick={handleOpenClick}
                         data-tooltip-id={`${_id}`}
@@ -190,7 +189,7 @@ const Filter = memo(function Filter({ type, itemId, name, items, setTags, allSel
                         data-tooltip-variant="dark">
                         <span className={`text-base overflow-hidden whitespace-nowrap text-ellipsis duration-300
                         ${isMapFilter && filterOpen && 'font-medium text-blue-700'} ${!isMapFilter && 'font-medium'}`}>{name}</span>
-                        <span className={`transition ${(dropdown.key == _id && dropdown.isActive) || filterOpen ? '-rotate-180' : ''} `}>
+                        <span className={`transition ${(dropdown?.key == _id && dropdown?.isActive) || filterOpen ? '-rotate-180' : ''} `}>
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
@@ -206,7 +205,7 @@ const Filter = memo(function Filter({ type, itemId, name, items, setTags, allSel
 
                     <div className={`w-full duration-200 transition-all ${!isMapFilter ? 'top-[30px] absolute border z-50' : ''} 
                     ${isMapFilter ? (filterOpen ? 'block' : 'hidden') :
-                            (dropdown.key == _id && dropdown.isActive ? 'visible translate-y-4' : 'invisible opacity-0')}
+                            (dropdown?.key == _id && dropdown?.isActive ? 'visible translate-y-4' : 'invisible opacity-0')}
                      rounded-md border-gray-200 bg-white`}>
 
                         <header className={`flex items-center justify-between ${!isMapFilter ? 'px-4 py-2' : 'px-4 py-1 pt-2'}`}>
@@ -307,5 +306,11 @@ const Filter = memo(function Filter({ type, itemId, name, items, setTags, allSel
             {formVisible.visible ? TagForm() : ''}
         </div >
     )
-})
+}, (prevProps, nextProps) => {
+    // Проверяем, изменились ли значения ключей dropdown
+    return (
+        prevProps.dropdown?.isActive === nextProps.dropdown?.isActive &&
+        prevProps.dropdown?.key === nextProps.dropdown?.key
+    );
+});
 export default Filter;

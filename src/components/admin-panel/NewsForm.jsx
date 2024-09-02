@@ -27,6 +27,7 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, isLoadi
     const [files, setFiles] = useState([]);
     const [tags, setTags] = useState([]);
 
+    const dropdown = useSelector(state => state.general.dropdown);
     const [isEng, setIsEng] = useState(false);
     const [createTwoLang, setCreateTwoLang] = useState(false);
     const { locale } = useParams();
@@ -355,7 +356,8 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, isLoadi
                     </div>
 
                     <div className='mt-8 flex flex-col w-full md:w-1/2'>
-                        <Filter name={t('tags')} items={tags} setTags={setTags}
+                        <Filter dropdown={dropdown}
+                            name={t('tags')} items={tags} setTags={setTags}
                             isEng={isEng} type='news-tags'
                             allSelectedItems={news?.tags}
                             addItem={handleAddTag}

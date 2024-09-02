@@ -1,6 +1,6 @@
 'use client'
 
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import * as Tabs from "@radix-ui/react-tabs";
 import Filter from '../soils/Filter'
 import { useCallback, useEffect, useState } from 'react';
@@ -31,7 +31,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
     const dispatch = useDispatch();
     const { locale } = useParams();
     const { t } = getTranslation(locale);
-
+    const dropdown = useSelector(state => state.general.dropdown);
     const [classifications, setClassifications] = useState([]);
     const [object, setObject] = useState({});
     const [createTwoLang, setCreateTwoLang] = useState(false);
@@ -145,7 +145,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
         setObject(prev => {
             const _prev = (name === 'latitude' || name === 'longtitude') ? { ...prev, [name]: value }
                 : { ...prev, translations: prev.translations.map(translation => translation.isEnglish === isEng ? { ...translation, [name]: value } : translation) }
-            // onItemChange(_prev);
+            onItemChange(_prev);
             return _prev
         });
     }
@@ -414,7 +414,8 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                             </> : ''}
 
                             <li key='authors' className={`mt-3 ${object?.isExternal ? 'opacity-50 pointer-events-none' : ''}`}>
-                                <Filter itemId={`author`} name={t('authors')} items={authors}
+                                <Filter dropdown={dropdown}
+                                    itemId={`author`} name={t('authors')} items={authors}
                                     type='authors'
                                     allSelectedItems={object?.authors} isEng={isEng}
                                     addItem={newItem => handleAddTerm('authors', newItem)}
@@ -525,7 +526,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                                 {classifications?.map(item => {
                                     const isVisible = item.translationMode == 0 || (isEng ? (item.translationMode == 1) : (item.translationMode == 2))
                                     if (isVisible) return <li key={`classification-${item.id}`}>
-                                        <Filter
+                                        <Filter dropdown={dropdown}
                                             type='classif'
                                             itemId={`classif-${item.id}`} name={isEng ? item.nameEng : item.nameRu}
                                             items={item.terms} isEng={isEng}
@@ -541,7 +542,8 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
 
                         <p className='font-medium mt-8'>{t('connection')}</p>
                         <div className='grid md:grid-cols-2 grid-cols-1 gap-4 w-full mt-1'>
-                            {type !== 'ecosystem' && <Filter name={t('ecosystems')} items={ecosystems}
+                            {type !== 'ecosystem' && <Filter dropdown={dropdown}
+                                name={t('ecosystems')} items={ecosystems}
                                 type='ecosystem'
                                 allSelectedItems={object?.ecoSystems} isEng={isEng}
                                 addItem={addEcosystem}
@@ -549,7 +551,8 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                                 resetItems={resetEcosystems}
                             />}
 
-                            {type !== 'soil' && <Filter name={t('soils')} items={soils}
+                            {type !== 'soil' && <Filter dropdown={dropdown}
+                                name={t('soils')} items={soils}
                                 type='soil'
                                 allSelectedItems={object?.soilObjects} isEng={isEng}
                                 addItem={addSoil}
@@ -557,7 +560,8 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                                 resetItems={resetSoils}
                             />}
 
-                            <Filter name={t('publications')} items={publications}
+                            <Filter dropdown={dropdown}
+                                name={t('publications')} items={publications}
                                 type='publications'
                                 allSelectedItems={object?.publications} isEng={isEng}
                                 addItem={addPublication}

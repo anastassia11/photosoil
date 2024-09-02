@@ -31,12 +31,13 @@ export default function NewsPageComponent() {
         items: true,
         tags: true
     });
+    const dropdown = useSelector(state => state.general.dropdown);
+
     const didLogRef = useRef(true);
     const searchParams = useSearchParams();
     const router = useRouter();
     const { locale } = useParams();
     const { t } = getTranslation(locale);
-
     const { selectedTags } = useSelector(state => state.data);
 
     const _isEng = locale === 'en';
@@ -57,20 +58,20 @@ export default function NewsPageComponent() {
         localStorage.getItem('tokenData') && setToken(JSON.parse(localStorage.getItem('tokenData'))?.token);
         fetchTags();
         fetchNews();
-        if (didLogRef.current) {
-            didLogRef.current = false;
-            const tagsParam = searchParams.get('tags');
-            tagsParam && tagsParam.split(',').forEach((param) => dispatch(addTag(Number(param))));
-        }
+        // if (didLogRef.current) {
+        //     didLogRef.current = false;
+        //     const tagsParam = searchParams.get('tags');
+        //     tagsParam && tagsParam.split(',').forEach((param) => dispatch(addTag(Number(param))));
+        // }
     }, [])
 
     useEffect(() => {
         setFilteredNews(_filteredNews);
     }, [_filteredNews])
 
-    useEffect(() => {
-        updateFiltersInHistory();
-    }, [selectedTags])
+    // useEffect(() => {
+    //     updateFiltersInHistory();
+    // }, [selectedTags])
 
     const updateFiltersInHistory = () => {
         const params = new URLSearchParams(searchParams.toString())
@@ -169,7 +170,8 @@ export default function NewsPageComponent() {
             <div className='mt-4 mb-6 filters-grid'>
                 {isLoading.tags ? <Loader className='w-full h-[40px]' /> :
                     <MotionWrapper>
-                        <Filter isEng={_isEng} itemId='tags' type='news-tags'
+                        <Filter dropdown={dropdown}
+                            isEng={_isEng} itemId='tags' type='news-tags'
                             name={t('tags')}
                             items={tags}
                             allSelectedItems={selectedTags}

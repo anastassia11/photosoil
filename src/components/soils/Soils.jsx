@@ -28,6 +28,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
     const pathname = usePathname();
     const router = useRouter();
     const searchParams = useSearchParams();
+    const dropdown = useSelector(state => state.general.dropdown);
 
     const { selectedTerms, selectedCategories, selectedAuthors } = useSelector(state => state.data);
 
@@ -75,16 +76,16 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
             setIsLoading(prev => ({ ...prev, items: false }));
         } else fetchItems();
 
-        if (didLogRef.current && isFilters) {
-            didLogRef.current = false
-            const categoriesParam = searchParams.get('categories');
-            const termsParam = searchParams.get('terms');
-            const authorsParam = searchParams.get('authors');
+        // if (didLogRef.current && isFilters) {
+        //     didLogRef.current = false
+        //     const categoriesParam = searchParams.get('categories');
+        //     const termsParam = searchParams.get('terms');
+        //     const authorsParam = searchParams.get('authors');
 
-            categoriesParam && categoriesParam.split(',').forEach((param) => dispatch(addCategory(Number(param))));
-            termsParam && termsParam.split(',').forEach((param) => dispatch(addTerm(Number(param))));
-            authorsParam && authorsParam.split(',').forEach((param) => dispatch(addAuthor(Number(param))));
-        }
+        //     categoriesParam && categoriesParam.split(',').forEach((param) => dispatch(addCategory(Number(param))));
+        //     termsParam && termsParam.split(',').forEach((param) => dispatch(addTerm(Number(param))));
+        //     authorsParam && authorsParam.split(',').forEach((param) => dispatch(addAuthor(Number(param))));
+        // }
     }, [])
 
     useEffect(() => {
@@ -103,9 +104,9 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
         )
     }, [filterName, selectedCategories, selectedTerms, selectedAuthors, soils, draftIsVisible])
 
-    useEffect(() => {
-        isFilters && updateFiltersInHistory();
-    }, [selectedCategories, selectedTerms, selectedAuthors])
+    // useEffect(() => {
+    //     isFilters && updateFiltersInHistory();
+    // }, [selectedCategories, selectedTerms, selectedAuthors])
 
     const fetchClassifications = async () => {
         const result = await getClassifications();
@@ -258,7 +259,8 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
                             : <>
                                 <MotionWrapper>
                                     <li key={'authors'}>
-                                        <Filter itemId={`author`} name={t('authors')} items={authors}
+                                        <Filter dropdown={dropdown}
+                                            itemId={`author`} name={t('authors')} items={authors}
                                             type='authors'
                                             allSelectedItems={selectedAuthors}
                                             addItem={handleAddAuthor}
@@ -269,7 +271,8 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
                                 </MotionWrapper>
                                 {isAllSoils ? <li key='category'>
                                     <MotionWrapper>
-                                        <Filter name={t('category')} items={CATEGORY_ARRAY}
+                                        <Filter dropdown={dropdown}
+                                            name={t('category')} items={CATEGORY_ARRAY}
                                             type='category'
                                             allSelectedItems={selectedCategories}
                                             addItem={handleAddCategory}
@@ -284,7 +287,8 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
                                         return (
                                             <li key={item.id}>
                                                 <MotionWrapper>
-                                                    <Filter isEng={locale === 'en'} itemId={item.id}
+                                                    <Filter dropdown={dropdown}
+                                                        isEng={locale === 'en'} itemId={item.id}
                                                         type='classif'
                                                         name={isEnglish ? item.nameEng : item.nameRu}
                                                         items={item.terms}
