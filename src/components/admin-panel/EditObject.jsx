@@ -5,9 +5,9 @@ import { putPhoto } from '@/api/photo/put_photo';
 import { putSoil } from '@/api/soil/put_soil';
 import ObjectForm from '@/components/admin-panel/ObjectForm';
 import { openAlert } from '@/store/slices/alertSlice';
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Oval } from 'react-loader-spinner';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { putEcosystem } from '@/api/ecosystem/put_ecosystem';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { getSoil } from '@/api/soil/get_soil';
@@ -25,6 +25,7 @@ export default function EditObject({ id, type, title }) {
     const { locale } = useParams();
     const { t } = getTranslation(locale);
     const router = useRouter();
+    const dropdown = useSelector(state => state.general.dropdown);
 
     useEffect(() => {
         fetchObject()
@@ -101,13 +102,13 @@ export default function EditObject({ id, type, title }) {
         }
     }
 
-    const handleMainPhotoChange = (data) => {
+    const handleMainPhotoChange = useCallback((data) => {
         setMainPhoto(data);
-    }
+    }, [])
 
-    const handleOtherPhotosChange = (data) => {
+    const handleOtherPhotosChange = useCallback((data) => {
         setOtherPhotos(data);
-    }
+    }, [])
 
     const handleSubmit = async () => {
         if (mainPhoto.id) {
@@ -164,7 +165,8 @@ export default function EditObject({ id, type, title }) {
                         : t('save')}
                 </button>
             </div>
-            <ObjectForm type={type} item={object} pathname='edit'
+            <ObjectForm dropdown={dropdown}
+                type={type} item={object} pathname='edit'
                 oldTwoLang={oldTwoLang} oldIsEng={searchParams.get('lang') === 'eng'}
                 mainObjectPhoto={mainPhoto}
                 otherObjectPhoto={otherPhotos}

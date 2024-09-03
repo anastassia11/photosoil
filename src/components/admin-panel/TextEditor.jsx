@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react";
 import Link from "@tiptap/extension-link";
 import Underline from "@tiptap/extension-underline";
@@ -12,10 +12,10 @@ import { setDropdown } from '@/store/slices/generalSlice';
 import '@/styles/editor.css';
 import * as Icons from "./TextEditor/Icons";
 
-export default function TextEditor({ content, setContent, isSoil, type }) {
+const TextEditor = memo(function TextEditor({ dropdown = {}, content, setContent, isSoil, type }) {
   const dispatch = useDispatch();
   const linkRef = useRef(null);
-  const dropdown = useSelector(state => state.general.dropdown);
+  // const dropdown = useSelector(state => state.general.dropdown);
   const [url, setUrl] = useState("");
   const [isFocusing, setIsFocusing] = useState(false);
   const contentInserting = useRef(false)
@@ -278,4 +278,9 @@ export default function TextEditor({ content, setContent, isSoil, type }) {
       <EditorContent editor={editor} className='pointer-events-auto z-40 p-2 focus:outline-none' />
     </div>
   );
-}
+}, (prevProps, nextProps) => {
+  return prevProps.dropdown?.isActive === nextProps.dropdown?.isActive &&
+    prevProps.dropdown?.key === nextProps.dropdown?.key
+    && prevProps.content === nextProps.content
+});
+export default TextEditor;

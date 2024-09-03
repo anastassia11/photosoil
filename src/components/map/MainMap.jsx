@@ -123,7 +123,7 @@ export default function MainMap() {
     }, [selectedTerms, selectedCategories, selectedAuthors,
         soils, publications, ecosystems,
         draftIsVisible, clusterLayer,
-        filterName])
+        filterName, layersVisible])
 
     const filterById = (filteredIds, type) => {
         const layerSource = clusterLayer.getSource().getSource(); // Получаем источник кластера

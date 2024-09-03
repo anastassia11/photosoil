@@ -12,9 +12,9 @@ import modalThunkActions from '@/store/thunks/modalThunk';
 import { BASE_SERVER_URL } from '@/utils/constants';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Oval } from 'react-loader-spinner';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import uuid from 'react-uuid';
 
 export default function CreateObject({ title, onCreate, type }) {
@@ -29,6 +29,7 @@ export default function CreateObject({ title, onCreate, type }) {
     const formRef = useRef(null);
     const { locale } = useParams();
     const { t } = getTranslation(locale);
+    const dropdown = useSelector(state => state.general.dropdown);
 
     const handleChange = (e) => {
         e.preventDefault();
@@ -90,21 +91,21 @@ export default function CreateObject({ title, onCreate, type }) {
         }
     }
 
-    const handleMainPhotoChange = (newPhoto) => {
+    const handleMainPhotoChange = useCallback((newPhoto) => {
         const updatedPhotos = currentForm !== null ? photos.map((photo, index) => index === currentForm ? newPhoto : photo) : [...photos, { ...newPhoto }];
         setPhotos(updatedPhotos);
         setFormData(prevData => prevData.map((soil, index) => index === currentForm ? { ...soil, photoId: newPhoto.id } : soil));
-    }
+    }, [])
 
-    const handleOtherPhotosChange = (data) => {
+    const handleOtherPhotosChange = useCallback((data) => {
         const updatedOtherPhotos = otherPhotos.map((item, index) => index === currentForm ? data : item);
         setOtherPhotos(updatedOtherPhotos);
         setFormData(prevData => prevData.map((soil, index) => index === currentForm ? { ...soil, objectPhoto: updatedOtherPhotos[index].map(({ id }) => id) } : soil));
-    }
+    }, [])
 
-    const handleDataChange = (newData) => {
+    const handleDataChange = useCallback((newData) => {
         setFormData(prev => prev.map((data, index) => index === currentForm ? newData : data));
-    }
+    }, [])
 
     const editPhoto = async (id, data) => {
         const result = await putPhoto(id, data);
@@ -317,7 +318,8 @@ export default function CreateObject({ title, onCreate, type }) {
                     <div className='flex xl:flex-row flex-col'>
                         <div ref={formRef} className='pt-2 flex-1 xl:order-1 order-2 xl:pr-6 xl:border-r'>
                             {currentForm !== null ?
-                                <ObjectForm type={type}
+                                <ObjectForm dropdown={dropdown}
+                                    type={type}
                                     id={currentForm}
                                     item={formData.find((item, idx) => idx == currentForm)}
                                     mainObjectPhoto={photos.find((item, idx) => idx == currentForm)}

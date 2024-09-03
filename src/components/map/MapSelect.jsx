@@ -9,11 +9,11 @@ import { Icon, Style, Fill, Stroke, RegularShape } from 'ol/style';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { fromLonLat, toLonLat } from 'ol/proj';
 import { OSM, Vector as VectorSource } from 'ol/source';
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import FullScreen from './FullScreen';
 import Zoom from './Zoom';
 
-export default function MapSelect({ id, type, latitude, longtitude, onCoordinateChange }) {
+const MapSelect = memo(function MapSelect({ id, type, latitude, longtitude, onCoordinateChange }) {
     const didLogRef = useRef(false);
     const mapElement = useRef();
     const [isCoordExist, setIsCoordExist] = useState(false);
@@ -217,4 +217,5 @@ export default function MapSelect({ id, type, latitude, longtitude, onCoordinate
             </div>
         </div>
     )
-}
+})
+export default MapSelect;

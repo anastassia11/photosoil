@@ -3,10 +3,10 @@
 import { getTranslation } from '@/i18n/client';
 import { openAlert } from '@/store/slices/alertSlice';
 import { useParams } from 'next/navigation';
-import { useState } from 'react'
+import { memo, useState } from 'react'
 import { useDispatch } from 'react-redux';
 
-export default function DragAndDrop({ id, onLoadClick, isMultiple, accept }) {
+const DragAndDrop = memo(function DragAndDrop({ id, onLoadClick, isMultiple, accept }) {
     const dispatch = useDispatch();
     const [drag, setDrag] = useState(false);
     const { locale } = useParams();
@@ -82,4 +82,5 @@ export default function DragAndDrop({ id, onLoadClick, isMultiple, accept }) {
                 </label>}
         </div>
     )
-}
+})
+export default DragAndDrop;

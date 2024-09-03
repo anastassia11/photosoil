@@ -3,7 +3,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import * as Tabs from "@radix-ui/react-tabs";
 import Filter from '../soils/Filter'
-import { useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { sendPhoto } from '@/api/photo/send_photo';
 import { getAuthors } from '@/api/author/get_authors';
 import Dropdown from './ui-kit/Dropdown';
@@ -25,6 +25,7 @@ import { getClassifications } from '@/api/classification/get_classifications';
 import { useParams } from 'next/navigation';
 import { getTranslation } from '@/i18n/client';
 import TextEditor from './TextEditor';
+import { setDropdown } from '@/store/slices/generalSlice';
 
 export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, mainObjectPhoto, otherObjectPhoto,
     onItemChange, onMainPhotoChange, onOtherPhotosChange }) {
@@ -115,7 +116,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
         }
     }
 
-    const handleOtherPhotoSend = async (file, index) => {
+    const handleOtherPhotoSend = useCallback(async (file, index) => {
         setOtherPhotos(prev => [...prev, { isLoading: true }]);
         const result = await sendPhoto(file);
         if (result.success) {
@@ -129,16 +130,16 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                 return _prev;
             });
         }
-    }
+    }, [])
 
-    const handleMainPhotoSend = async (file) => {
+    const handleMainPhotoSend = useCallback(async (file) => {
         setMainPhoto(prev => ({ ...prev, isLoading: true }));
         const result = await sendPhoto(file);
         if (result.success) {
             setMainPhoto(prev => ({ ...prev, ...result.data }));
             onMainPhotoChange({ ...mainObjectPhoto, ...result.data });
         };
-    }
+    }, [])
 
     const handleInputChange = (e) => {
         const { value, name } = e.target;
@@ -175,13 +176,13 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
         onItemChange(updatedObject);
     }
 
-    const handleMainPhotoChange = (e) => {
+    const handleMainPhotoChange = useCallback((e) => {
         const updatedMainPhoto = { ...mainPhoto, [isEng ? 'titleEng' : 'titleRu']: e.target.value };
         setMainPhoto(updatedMainPhoto)
         onMainPhotoChange(updatedMainPhoto);
-    }
+    }, [])
 
-    const handleOtherPhotosChange = (e, id) => {
+    const handleOtherPhotosChange = useCallback((e, id) => {
         const updatedOtherPhotos = otherPhotos.map(item =>
             item.id === id
                 ? { ...item, [isEng ? 'titleEng' : 'titleRu']: e.target.value }
@@ -189,7 +190,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
         );
         setOtherPhotos(updatedOtherPhotos)
         onOtherPhotosChange(updatedOtherPhotos);
-    }
+    }, [])
 
     const mainPhotoDelete = async (id) => {
         const newId = uuid()
@@ -205,7 +206,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
         }
     }
 
-    const handleMainPhotoDelete = async (id) => {
+    const handleMainPhotoDelete = useCallback(async (id) => {
         dispatch(openModal({
             title: t('warning'),
             message: t('delete_photo'),
@@ -217,7 +218,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
             await mainPhotoDelete(id);
         }
         dispatch(closeModal());
-    }
+    }, [])
 
     const otherPhotoDelete = async (id) => {
         let result;
@@ -236,7 +237,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
         }
     }
 
-    const handleOtherPhotoDelete = async (id) => {
+    const handleOtherPhotoDelete = useCallback(async (id) => {
         dispatch(openModal({
             title: t('warning'),
             message: t('delete_photo'),
@@ -248,7 +249,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
             await otherPhotoDelete(id);
         }
         dispatch(closeModal());
-    }
+    }, [])
 
     const handleAddTerm = useCallback((type, newItem) => {
         setObject(prev => {
@@ -370,7 +371,8 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                             onChange: handleInputChange
                         })}
                         {type === 'soil' && <div className='mt-3'>
-                            <Dropdown name={t('objectType')} value={object?.objectType ?? null} items={SOIL_ENUM}
+                            <Dropdown dropdown={dropdown}
+                                name={t('objectType')} value={object?.objectType ?? null} items={SOIL_ENUM}
                                 onCategotyChange={handleCategotyChange} dropdownKey='category' />
                         </div>}
 
@@ -402,12 +404,12 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                             {type !== 'soil' ? <>
                                 <p className='font-medium mt-2'>{`${t('comments')} ${isEng ? '(EN)' : ''}`}</p>
                                 <div className={`${isEng ? 'hidden' : 'block'} w-full relative mt-1 mb-2`}>
-                                    <TextEditor type='comments-ru' content={object?.translations?.find(({ isEnglish }) => !isEnglish)?.comments || ''}
+                                    <TextEditor dropdown={dropdown} type='comments-ru' content={object?.translations?.find(({ isEnglish }) => !isEnglish)?.comments || ''}
                                         isSoil={true}
                                         setContent={html => handleTextContentChange(false, 'comments', html)} />
                                 </div>
                                 <div className={`${isEng ? 'block' : 'hidden'} w-full relative mt-1 mb-2`}>
-                                    <TextEditor type='comments-en' content={object?.translations?.find(({ isEnglish }) => isEnglish)?.comments || ''}
+                                    <TextEditor dropdown={dropdown} type='comments-en' content={object?.translations?.find(({ isEnglish }) => isEnglish)?.comments || ''}
                                         isSoil={true}
                                         setContent={html => handleTextContentChange(true, 'comments', html)} />
                                 </div>
@@ -466,14 +468,14 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                         <div className={`${isEng ? 'hidden' : 'block'}
                             w-full relative mt-2 duration-300 
                             ${object?.isExternal ? 'visible' : 'invisible opacity-0 max-h-0'}`}>
-                            <TextEditor type='externalSource-ru' content={object?.translations?.find(({ isEnglish }) => !isEnglish)?.externalSource || ''}
+                            <TextEditor dropdown={dropdown} type='externalSource-ru' content={object?.translations?.find(({ isEnglish }) => !isEnglish)?.externalSource || ''}
                                 isSoil={true}
                                 setContent={html => handleTextContentChange(false, 'externalSource', html)} />
                         </div>
                         <div className={`${isEng ? 'block' : 'hidden'}
                             w-full relative mt-2 duration-300 
                             ${object?.isExternal ? 'visible' : 'invisible opacity-0 max-h-0'}`}>
-                            <TextEditor type='externalSource-en' content={object?.translations?.find(({ isEnglish }) => isEnglish)?.externalSource || ''}
+                            <TextEditor dropdown={dropdown} type='externalSource-en' content={object?.translations?.find(({ isEnglish }) => isEnglish)?.externalSource || ''}
                                 isSoil={true}
                                 setContent={html => handleTextContentChange(true, 'externalSource', html)} />
                         </div>
@@ -481,12 +483,12 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                         {type === 'soil' ? <>
                             <p className='font-medium mt-8'>{`${t('comments')} ${isEng ? '(EN)' : ''}`}</p>
                             <div className={`${isEng ? 'hidden' : 'block'} w-full relative mt-1`}>
-                                <TextEditor type='comments-ru' content={object?.translations?.find(({ isEnglish }) => !isEnglish)?.comments || ''}
+                                <TextEditor dropdown={dropdown} type='comments-ru' content={object?.translations?.find(({ isEnglish }) => !isEnglish)?.comments || ''}
                                     isSoil={true}
                                     setContent={html => handleTextContentChange(false, 'comments', html)} />
                             </div>
                             <div className={`${isEng ? 'block' : 'hidden'} w-full relative mt-1`}>
-                                <TextEditor type='comments-en' content={object?.translations?.find(({ isEnglish }) => isEnglish)?.comments || ''}
+                                <TextEditor dropdown={dropdown} type='comments-en' content={object?.translations?.find(({ isEnglish }) => isEnglish)?.comments || ''}
                                     isSoil={true}
                                     setContent={html => handleTextContentChange(true, 'comments', html)} />
                             </div>

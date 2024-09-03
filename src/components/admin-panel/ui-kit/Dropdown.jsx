@@ -1,12 +1,12 @@
 'use client'
 
 import { setDropdown } from '@/store/slices/generalSlice'
-import { useEffect, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-export default function Dropdown({ name, value, items, onCategotyChange, flexRow, dropdownKey, isTransparent, noBold }) {
+const Dropdown = memo(function Dropdown({ dropdown = {}, name, value, items, onCategotyChange, flexRow, dropdownKey, isTransparent, noBold }) {
     const dispatch = useDispatch()
-    const dropdown = useSelector(state => state.general.dropdown)
+    // const dropdown = useSelector(state => state.general.dropdown)
     const [selectedValue, setSelectedValue] = useState()
 
     useEffect(() => {
@@ -76,4 +76,9 @@ export default function Dropdown({ name, value, items, onCategotyChange, flexRow
             </div>
         </div>
     )
-}
+}, (prevProps, nextProps) => {
+    return prevProps.dropdown?.isActive === nextProps.dropdown?.isActive &&
+        prevProps.dropdown?.key === nextProps.dropdown?.key
+        && prevProps.value === nextProps.value
+})
+export default Dropdown;

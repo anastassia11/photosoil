@@ -34,10 +34,6 @@ const Filter = memo(function Filter({ dropdown, type, itemId, name, items, setTa
     const _id = itemId ? `filter-${itemId}` : name;
 
     useEffect(() => {
-        items && setSelectedItems(items.filter(({ id }) => allSelectedItems?.includes(id)).map(({ id }) => id));
-    }, [items, allSelectedItems])
-
-    useEffect(() => {
         items && setFilteredItems(items.filter((item) => item.name?.toLowerCase().includes(filterName.toLowerCase()) ||
             item.codeEng?.toLowerCase().includes(filterName.toLowerCase()) || item.codeRu?.toLowerCase().includes(filterName.toLowerCase()) ||
             item.dataEng?.name?.toLowerCase().includes(filterName.toLowerCase()) || item.dataRu?.name?.toLowerCase().includes(filterName.toLowerCase()) ||
@@ -306,11 +302,10 @@ const Filter = memo(function Filter({ dropdown, type, itemId, name, items, setTa
             {formVisible.visible ? TagForm() : ''}
         </div >
     )
-}, (prevProps, nextProps) => {
-    // Проверяем, изменились ли значения ключей dropdown
-    return (
-        prevProps.dropdown?.isActive === nextProps.dropdown?.isActive &&
-        prevProps.dropdown?.key === nextProps.dropdown?.key
-    );
+    // }, (prevProps, nextProps) => {
+    //     return prevProps.dropdown?.isActive === nextProps.dropdown?.isActive &&
+    //         prevProps.dropdown?.key === nextProps.dropdown?.key
+    //         && prevProps.type === nextProps.type
 });
+
 export default Filter;
