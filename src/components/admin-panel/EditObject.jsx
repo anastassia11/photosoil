@@ -65,33 +65,14 @@ export default function EditObject({ id, type, title }) {
             setObject(dataForPut);
             setOtherPhotos(data.objectPhoto);
             setMainPhoto({ ...data.photo, createTwoLang, currentLang: searchParams.get('lang') })
-            // fetchOtherPhotos(result.data.objectPhoto);
             setOldTwoLang(createTwoLang);
-            // fetchSoilPhoto(result.data.photoId, createTwoLang);
-        }
-    }
-
-    const fetchOtherPhotos = async (photos) => {
-        const objectPhotos = await Promise.all(photos.map(async (id) => {
-            const result = await getPhoto(id);
-            return result.success ? result.data : null;
-        }));
-        setOtherPhotos(objectPhotos.filter(photo => photo !== null));
-    }
-
-    const fetchSoilPhoto = async (id, createTwoLang) => {
-        const result = await getPhoto(id)
-        if (result.success) {
-            setMainPhoto({ ...result.data, createTwoLang, currentLang: searchParams.get('lang') })
         }
     }
 
     const editObject = async (id, data) => {
         const result = type === 'soil' ? await putSoil(id, data) : await putEcosystem(id, data);
         if (result.success) {
-
         } else {
-            console.log(result)
         }
     }
 
@@ -110,6 +91,10 @@ export default function EditObject({ id, type, title }) {
         setOtherPhotos(data);
     }, [])
 
+    const handleObjectChange = useCallback((data) => {
+        setObject(data);
+    }, [])
+
     const handleSubmit = async () => {
         if (mainPhoto.id) {
             setIsLoading(true);
@@ -118,7 +103,6 @@ export default function EditObject({ id, type, title }) {
                 ...object, photoId: mainPhoto.id,
                 objectPhoto: otherPhotos.map(({ id }) => id)
             };
-            delete updatedObject.photo;
             const langObject = { ...updatedObject, translations: updatedObject.translations.filter(({ isEnglish }) => isEnglish === (searchParams.get('lang') === 'eng')) }
             setObject(updatedObject);
             try {
@@ -170,7 +154,7 @@ export default function EditObject({ id, type, title }) {
                 oldTwoLang={oldTwoLang} oldIsEng={searchParams.get('lang') === 'eng'}
                 mainObjectPhoto={mainPhoto}
                 otherObjectPhoto={otherPhotos}
-                onItemChange={setObject}
+                onItemChange={handleObjectChange}
                 onMainPhotoChange={handleMainPhotoChange}
                 onOtherPhotosChange={handleOtherPhotosChange} />
         </div>

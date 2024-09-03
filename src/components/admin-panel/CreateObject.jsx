@@ -92,20 +92,21 @@ export default function CreateObject({ title, onCreate, type }) {
     }
 
     const handleMainPhotoChange = useCallback((newPhoto) => {
-        const updatedPhotos = currentForm !== null ? photos.map((photo, index) => index === currentForm ? newPhoto : photo) : [...photos, { ...newPhoto }];
-        setPhotos(updatedPhotos);
+        setPhotos(prev => currentForm !== null ? prev.map((photo, index) => index === currentForm ? newPhoto : photo) : [...prev, { ...newPhoto }]);
         setFormData(prevData => prevData.map((soil, index) => index === currentForm ? { ...soil, photoId: newPhoto.id } : soil));
-    }, [])
+    }, [currentForm])
 
     const handleOtherPhotosChange = useCallback((data) => {
-        const updatedOtherPhotos = otherPhotos.map((item, index) => index === currentForm ? data : item);
-        setOtherPhotos(updatedOtherPhotos);
-        setFormData(prevData => prevData.map((soil, index) => index === currentForm ? { ...soil, objectPhoto: updatedOtherPhotos[index].map(({ id }) => id) } : soil));
-    }, [])
+        setOtherPhotos(prev => {
+            const _prev = prev.map((item, index) => index === currentForm ? data : item);
+            setFormData(prevData => prevData.map((soil, index) => index === currentForm ? { ...soil, objectPhoto: _prev[index].map(({ id }) => id) } : soil));
+            return _prev;
+        });
+    }, [currentForm])
 
     const handleDataChange = useCallback((newData) => {
         setFormData(prev => prev.map((data, index) => index === currentForm ? newData : data));
-    }, [])
+    }, [currentForm])
 
     const editPhoto = async (id, data) => {
         const result = await putPhoto(id, data);
@@ -318,7 +319,7 @@ export default function CreateObject({ title, onCreate, type }) {
                     <div className='flex xl:flex-row flex-col'>
                         <div ref={formRef} className='pt-2 flex-1 xl:order-1 order-2 xl:pr-6 xl:border-r'>
                             {currentForm !== null ?
-                                <ObjectForm dropdown={dropdown}
+                                <ObjectForm
                                     type={type}
                                     id={currentForm}
                                     item={formData.find((item, idx) => idx == currentForm)}

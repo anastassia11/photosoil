@@ -168,7 +168,6 @@ export default function MainMap() {
     }
 
     const getBaseLayerSourse = (layerValue) => {
-        console.log(layerValue)
         setSelectedLayer(layerValue);
         if (layerValue === "OSM") {
             return new OSM();

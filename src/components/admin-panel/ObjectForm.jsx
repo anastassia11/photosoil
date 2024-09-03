@@ -130,7 +130,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                 return _prev;
             });
         }
-    }, [])
+    }, [otherPhotos])
 
     const handleMainPhotoSend = useCallback(async (file) => {
         setMainPhoto(prev => ({ ...prev, isLoading: true }));
@@ -177,22 +177,26 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
     }
 
     const handleMainPhotoChange = useCallback((e) => {
-        const updatedMainPhoto = { ...mainPhoto, [isEng ? 'titleEng' : 'titleRu']: e.target.value };
-        setMainPhoto(updatedMainPhoto)
-        onMainPhotoChange(updatedMainPhoto);
-    }, [])
+        setMainPhoto(prev => {
+            const _prev = { ...prev, [isEng ? 'titleEng' : 'titleRu']: e.target.value };
+            onMainPhotoChange(_prev);
+            return _prev;
+        })
+    }, [onMainPhotoChange])
 
     const handleOtherPhotosChange = useCallback((e, id) => {
-        const updatedOtherPhotos = otherPhotos.map(item =>
-            item.id === id
-                ? { ...item, [isEng ? 'titleEng' : 'titleRu']: e.target.value }
-                : item
-        );
-        setOtherPhotos(updatedOtherPhotos)
-        onOtherPhotosChange(updatedOtherPhotos);
-    }, [])
+        setOtherPhotos(prev => {
+            const _prev = prev.map(item =>
+                item.id === id
+                    ? { ...item, [isEng ? 'titleEng' : 'titleRu']: e.target.value }
+                    : item
+            );
+            onOtherPhotosChange(_prev);
+            return _prev;
+        })
+    }, [onOtherPhotosChange])
 
-    const mainPhotoDelete = async (id) => {
+    const mainPhotoDelete = useCallback(async (id) => {
         const newId = uuid()
         let result;
         if (pathname !== 'edit') {
@@ -201,10 +205,9 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
         if (pathname === 'edit' || result.success) {
             setMainPhoto({});
             onMainPhotoChange({});
-            const updatedObject = { ...object, photoId: newId };
-            setObject(updatedObject);
+            setObject(prevObject => ({ ...prevObject, photoId: newId }));
         }
-    }
+    }, [onMainPhotoChange])
 
     const handleMainPhotoDelete = useCallback(async (id) => {
         dispatch(openModal({
@@ -218,24 +221,24 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
             await mainPhotoDelete(id);
         }
         dispatch(closeModal());
-    }, [])
+    }, [mainPhotoDelete])
 
-    const otherPhotoDelete = async (id) => {
+    const otherPhotoDelete = useCallback(async (id) => {
         let result;
         if (pathname !== 'edit') {
             result = await deletePhotoById(id)
         }
         if (pathname === 'edit' || result.success) {
-            const updatedOtherPhotos = otherPhotos.filter(el => el.id !== id);
-            setOtherPhotos(updatedOtherPhotos)
-            onOtherPhotosChange(updatedOtherPhotos);
-            const updatedObject = {
-                ...object,
-                objectPhoto: updatedOtherPhotos
-            };
-            setObject(updatedObject);
+            setOtherPhotos(prev => {
+                const _prevPhotos = prev.filter(el => el.id !== id);
+                onOtherPhotosChange(_prevPhotos);
+                setObject(prev => ({
+                    ...prev,
+                    objectPhoto: _prevPhotos
+                }))
+            })
         }
-    }
+    }, [onOtherPhotosChange])
 
     const handleOtherPhotoDelete = useCallback(async (id) => {
         dispatch(openModal({
@@ -249,15 +252,15 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
             await otherPhotoDelete(id);
         }
         dispatch(closeModal());
-    }, [])
+    }, [otherPhotoDelete])
 
     const handleAddTerm = useCallback((type, newItem) => {
         setObject(prev => {
             const _prev = { ...prev, [type]: prev[type] ? [...prev[type], newItem] : [newItem] };
-            // onItemChange(_prev);
+            onItemChange(_prev);
             return _prev
         })
-    }, [])
+    }, [onItemChange])
 
     const handleDeleteTerm = useCallback((type, deletedItem) => {
         setObject(prev => {
@@ -265,7 +268,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
             onItemChange(_prev);
             return _prev;
         })
-    }, [])
+    }, [onItemChange])
 
     const handleResetTerms = useCallback((type, deletedItems) => {
         setObject(prev => {
@@ -273,7 +276,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
             onItemChange(_prev);
             return _prev;
         })
-    }, [])
+    }, [onItemChange])
 
     const addTerm = useCallback((newItem) => handleAddTerm('soilTerms', newItem), [handleAddTerm]);
     const deleteTerm = useCallback((deletedItem) => handleDeleteTerm('soilTerms', deletedItem), [handleDeleteTerm]);
@@ -371,7 +374,7 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
                             onChange: handleInputChange
                         })}
                         {type === 'soil' && <div className='mt-3'>
-                            <Dropdown dropdown={dropdown}
+                            <Dropdown
                                 name={t('objectType')} value={object?.objectType ?? null} items={SOIL_ENUM}
                                 onCategotyChange={handleCategotyChange} dropdownKey='category' />
                         </div>}

@@ -25,10 +25,6 @@ export default function DictionaryForm({ _dictionary, title, onFormSubmit, isLoa
         _dictionary && setDictionary(_dictionary)
     }, [_dictionary])
 
-    useEffect(() => {
-        console.log(dictionary);
-    }, [dictionary]);
-
     const handleNameChange = (e) => {
         const { name, value } = e.target;
         setDictionary(prev => ({ ...prev, [name]: value }));

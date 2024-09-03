@@ -34,6 +34,10 @@ const Filter = memo(function Filter({ dropdown, type, itemId, name, items, setTa
     const _id = itemId ? `filter-${itemId}` : name;
 
     useEffect(() => {
+        items && setSelectedItems(items.filter(({ id }) => allSelectedItems?.includes(id)).map(({ id }) => id));
+    }, [items, allSelectedItems])
+
+    useEffect(() => {
         items && setFilteredItems(items.filter((item) => item.name?.toLowerCase().includes(filterName.toLowerCase()) ||
             item.codeEng?.toLowerCase().includes(filterName.toLowerCase()) || item.codeRu?.toLowerCase().includes(filterName.toLowerCase()) ||
             item.dataEng?.name?.toLowerCase().includes(filterName.toLowerCase()) || item.dataRu?.name?.toLowerCase().includes(filterName.toLowerCase()) ||
@@ -96,7 +100,6 @@ const Filter = memo(function Filter({ dropdown, type, itemId, name, items, setTa
         if (result.success) {
             setTags(prev => prev.filter(item => item.id !== id));
         } else {
-            console.log(result)
         }
     }
 

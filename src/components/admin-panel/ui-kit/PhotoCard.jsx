@@ -4,7 +4,7 @@ import { getTranslation } from '@/i18n/client'
 import { BASE_SERVER_URL } from '@/utils/constants'
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
-import React, { memo } from 'react'
+import React, { memo, useEffect } from 'react'
 import { Oval } from 'react-loader-spinner'
 
 const PhotoCard = memo(function PhotoCard({ id, path, titleEng, titleRu, fileName, onDelete, onChange, isLoading, isEng }) {

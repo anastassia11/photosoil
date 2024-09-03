@@ -4,9 +4,9 @@ import { setDropdown } from '@/store/slices/generalSlice'
 import { memo, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-const Dropdown = memo(function Dropdown({ dropdown = {}, name, value, items, onCategotyChange, flexRow, dropdownKey, isTransparent, noBold }) {
+const Dropdown = memo(function Dropdown({ name, value, items, onCategotyChange, flexRow, dropdownKey, isTransparent, noBold }) {
     const dispatch = useDispatch()
-    // const dropdown = useSelector(state => state.general.dropdown)
+    const dropdown = useSelector(state => state.general.dropdown)
     const [selectedValue, setSelectedValue] = useState()
 
     useEffect(() => {

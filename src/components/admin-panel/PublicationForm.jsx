@@ -14,7 +14,7 @@ import { getBaseSoils } from '@/api/soil/get_base_soils';
 import MapArraySelect from '../map/MapArraySelect';
 import { closeModal, openModal } from '@/store/slices/modalSlice';
 import modalThunkActions from '@/store/thunks/modalThunk';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Input from './ui-kit/Input';
 import MapInput from './ui-kit/MapInput';
 import Textarea from './ui-kit/Textarea';
@@ -36,6 +36,7 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
     const dropdown = useSelector(state => state.general.dropdown);
     const { locale } = useParams();
     const dispatch = useDispatch();
+
     const mapRef = useRef(null);
     const { t } = getTranslation(locale);
     const { PUBLICATION_INFO, PUBLICATION_ENUM } = useConstants();
