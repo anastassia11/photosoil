@@ -62,6 +62,10 @@ export default function Header({ locale }) {
         };
     }, [handleScroll]);
 
+    const handleClick = () => {
+        setMenuOpen(false);
+    }
+
     return (
         <header className={`fixed top-0 z-50 transition-all duration-200 
             ease-in-out px-4 2xl:px-8 w-full border-b shadow-sm h-16  bg-white/90 flex flex-row items-center justify-between`}>
@@ -93,8 +97,9 @@ export default function Header({ locale }) {
                                     </svg>
                                 </span>
                             </button>
-                        </> :
-                        <Link href={`/${locale}/${key}`}
+                        </>
+                        : <Link
+                            href={`/${locale}/${key}`}
                             prefetch={false}
                             className='duration-300 cursor-pointer hover:text-blue-600'>
                             {title}
@@ -104,9 +109,12 @@ export default function Header({ locale }) {
                     <div className={`${isDropdown && dropdown.key == key && dropdown.isActive ? 'visible translate-y-4' : 'invisible opacity-0'}
                             overflow-hidden w-[400px] absolute border shadow-md bg-white rounded-md transition-all duration-200`}>
                         <ul className='py-2'>
-                            {navs?.map(({ key: navKey, title }) => <li key={navKey} className='duration-300 cursor-pointer hover:text-blue-600 h-9 hover:bg-zinc-100 flex items-center xl:px-4 px-2'
-                                onClick={() => dispatch(setDropdown({ isActive: false, key: null }))}>
-                                <Link href={`/${locale}/${navKey}`}
+                            {navs?.map(({ key: navKey, title }) => <li key={navKey} className='duration-300 cursor-pointer hover:text-blue-600 h-9 hover:bg-zinc-100 flex items-center xl:px-4 px-2'>
+                                <Link onClick={() => {
+                                    dispatch(setDropdown({ isActive: false, key: null }))
+                                    setMenuOpen(false)
+                                }}
+                                    href={`/${locale}/${navKey}`}
                                     prefetch={false}>
                                     {title}
                                 </Link>
@@ -193,7 +201,8 @@ export default function Header({ locale }) {
                                     </span>
                                 </button>
                             </> :
-                            <Link href={`/${locale}/${key}`}
+                            <Link onClick={handleClick}
+                                href={`/${locale}/${key}`}
                                 prefetch={false}
                                 className='px-4 duration-300 cursor-pointer hover:text-blue-600'>
                                 {title}
@@ -204,8 +213,10 @@ export default function Header({ locale }) {
                                 <div className="overflow-hidden">
                                     <ul className='pt-1 pl-4'>
                                         {navs.map(({ key: navKey, title }) => <li key={navKey} className='duration-300 cursor-pointer hover:text-blue-600 py-1 hover:bg-zinc-100 flex items-center px-4'
-                                            onClick={() => dispatch(setDropdown({ isActive: false, key: null }))}>
-                                            <Link href={`/${locale}/${navKey}`} prefetch={false}>
+                                        >
+                                            <Link onClick={handleClick}
+                                                href={`/${locale}/${navKey}`}
+                                                prefetch={false}>
                                                 {title}
                                             </Link>
                                         </li>)}
