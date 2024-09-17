@@ -97,48 +97,61 @@ export default function MainMap() {
     }, [soils, ecosystems, publications])
 
     useEffect(() => {
-        const filteredIds = soils.filter(soil =>
-            (draftIsVisible ? true : soil.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible) &&
-            (soil.translations?.find(transl => transl.isEnglish === _isEng)?.name.toLowerCase().includes(filterName.toLowerCase())
-                || soil.translations?.find(transl => transl.isEnglish === _isEng)?.code?.toLowerCase().includes(filterName.toLowerCase())) &&
-            (selectedCategories.length === 0 || selectedCategories.includes(soil.objectType)) &&
-            (selectedAuthors.length === 0 || selectedAuthors.some(selectedAuthor => soil.authors?.some(author => author === selectedAuthor))) &&
-            (selectedTerms.length === 0 || selectedTerms.some(selectedTerm => soil.terms?.some(term => term === selectedTerm)))
-        ).map(({ id }) => id);
-        const filteredPublIds = publications.filter(publication =>
-            (draftIsVisible ? true : publication.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible) &&
-            (publication.translations?.find(transl => transl.isEnglish === _isEng)?.name.toLowerCase().includes(filterName.toLowerCase()))
-        ).map(({ id }) => id);
-        const filteredEcoIds = ecosystems.filter(ecosystem =>
-            (selectedAuthors.length === 0 || selectedAuthors.some(selectedAuthor => ecosystem.authors?.some(author => author === selectedAuthor))) &&
-            (draftIsVisible ? true : ecosystem.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible) &&
-            (ecosystem.translations?.find(transl => transl.isEnglish === _isEng)?.name.toLowerCase().includes(filterName.toLowerCase())
-                || ecosystem.translations?.find(transl => transl.isEnglish === _isEng)?.code?.toLowerCase().includes(filterName.toLowerCase()))
-        ).map(({ id }) => id);
-        if (clusterLayer) {
-            filterById(filteredIds, 'soil');
-            filterById(filteredPublIds, 'publication');
-            filterById(filteredEcoIds, 'ecosystem');
+        if (window.innerWidth < 640) {
+            document.addEventListener('click', handleClickOutside);
+            return () => {
+                document.removeEventListener('click', handleClickOutside);
+            };
         }
-    }, [selectedTerms, selectedCategories, selectedAuthors,
-        soils, publications, ecosystems,
-        draftIsVisible, clusterLayer,
-        filterName, layersVisible])
+    }, [])
 
-    const filterById = (filteredIds, type) => {
+    const handleClickOutside = useCallback((e) => {
+        if (!e.target.closest(".sideBar")) {
+            // setSelectedObjects([]);
+            setSideBarOpen(false);
+            // setPopupVisible(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        document.addEventListener('click', handleClickOutside);
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, [])
+
+    const filterById = useCallback((filteredIds) => {
         const layerSource = clusterLayer.getSource().getSource(); // Получаем источник кластера
-
         features.forEach(feature => {
-            if (feature.get('p_type') === type) {
+            if (feature.get('p_type')) {
                 const featureId = feature.get('p_Id');
-                if (filteredIds.includes(featureId) && layersVisible[type]) {
+                const featureType = feature.get('p_type');
+                if (filteredIds.find(obj => obj.id === featureId && obj._type === featureType) && layersVisible[featureType]) {
                     !layerSource.hasFeature(feature) && layerSource.addFeature(feature);
                 } else {
                     layerSource.removeFeature(feature);
                 }
             }
         });
-    };
+        filterName.length ? setSelectedObjects(objects.filter(item => filteredIds.find(obj => obj.id === item.id && obj._type === item._type))) : setSelectedObjects([])
+    }, [clusterLayer, features, layersVisible, objects, filterName]);
+
+    useEffect(() => {
+        const filteredAllIds = objects.filter(obj =>
+            (layersVisible[obj._type]) &&
+            (draftIsVisible ? true : obj.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible) &&
+            (filterName.length ? (obj.translations?.find(transl => transl.isEnglish === _isEng)?.name?.toLowerCase().includes(filterName.toLowerCase())
+                || obj.translations?.find(transl => transl.isEnglish === _isEng)?.code?.toLowerCase().includes(filterName.toLowerCase())) : true) &&
+            (obj.objectType ? (selectedCategories.length === 0 || selectedCategories.includes(obj.objectType)) : true) &&
+            (obj.authors ? (selectedAuthors.length === 0 || selectedAuthors.some(selectedAuthor => obj.authors?.some(author => author === selectedAuthor))) : true) &&
+            (obj.terms ? (selectedTerms.length === 0 || selectedTerms.some(selectedTerm => obj.terms?.some(term => term === selectedTerm))) : true)
+        ).map(({ id, _type }) => ({ id, _type }));
+        if (clusterLayer) {
+            filterById(filteredAllIds);
+        }
+    }, [selectedTerms, selectedCategories, selectedAuthors,
+        objects, draftIsVisible, clusterLayer,
+        filterName, layersVisible, filterById, _isEng])
 
     const init = () => {
         let startcoords = fromLonLat([85.9075867, 53.1155423]);
@@ -297,7 +310,7 @@ export default function MainMap() {
                 setFeatures(prevFeatures => [...prevFeatures, ...newFeatures]);
             });
         const clusterSource = new Cluster({
-            distance: 17, // Расстояние для кластеризации в пикселях
+            distance: 18, // Расстояние для кластеризации в пикселях
             source: layerVectorSource // Исходный источник
         });
         const _clusterLayer = new VectorLayer({
@@ -393,19 +406,23 @@ export default function MainMap() {
             const points = feature.get('features');
 
             setPopupVisible(true);
+            setSideBarOpen(true);
 
             points.forEach(point => {
                 const type = point.get("p_type");
                 const _id = point.get("p_Id");
-                _objects.push({
-                    ...objects.find(({ id, _type }) => {
-                        if (_type === 'publication') {
-                            return !_objects.some(obj => obj.id === _id) && ((id == _id) && (type == _type));
-                        }
-                        return (id == _id) && (type == _type)
+
+                const foundObject = objects.find(({ id, _type }) => {
+                    if (_type === 'publication') {
+                        return !_objects.some(obj => obj.id === _id) && ((id == _id) && (type == _type));
                     }
-                    )
+                    return (id == _id) && (type == _type);
                 });
+                if (foundObject) {
+                    _objects.push({
+                        ...foundObject
+                    });
+                }
             })
         };
         if (_objects.length) {
@@ -523,6 +540,7 @@ export default function MainMap() {
         setSelectedObjects([]);
     }
 
+    useEffect(() => { }, [])
     return (
         <div ref={mapElement} className="w-full h-full z-10">
             <div className={`z-40 absolute top-0 right-0 m-2 flex flex-row duration-300 lg:w-[500px] w-full pl-2`}>
@@ -534,12 +552,14 @@ export default function MainMap() {
             </div>
 
             <SideBar sidebarOpen={sidebarOpen}
-                filterName={filterName}
+                filterName={filterName} objects={selectedObjects}
                 setFilterName={setFilterName}
-                setSideBarOpen={setSideBarOpen} popupVisible={popupVisible} layersVisible={layersVisible}
+                setSideBarOpen={setSideBarOpen} popupVisible={popupVisible}
+                popupClose={handlePopupClose}
+                layersVisible={layersVisible}
                 onVisibleChange={handleLayerChange} onLocationHandler={selectLocationHandler}
                 draftIsVisible={draftIsVisible} setDraftIsVisible={setDraftIsVisible} />
-            <ObjectsPopup visible={popupVisible} objects={selectedObjects} onCloseClick={handlePopupClose} />
+            {/* <ObjectsPopup visible={popupVisible} objects={selectedObjects} onCloseClick={handlePopupClose} /> */}
         </div>
     )
 }

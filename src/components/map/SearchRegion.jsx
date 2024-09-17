@@ -57,6 +57,11 @@ export default function SearchRegion({ onLocationHandler }) {
         }
     }
 
+    const handleLocationChange = (item) => {
+        onLocationHandler(item);
+        setSearchTitle('');
+    }
+
     return (
         <div className="mx-2 w-full flex flex-col">
             <div className='relative overflow-visible'>
@@ -96,7 +101,7 @@ export default function SearchRegion({ onLocationHandler }) {
                     <ul className={`dropdown-menu ${location.length && 'py-2 pr-2.5'}`}>
                         {location.map((item) => (
                             <li key={item.id} className="max-w-full cursor-pointer duration-300 hover:text-blue-600 px-1 py-1.5"
-                                onClick={() => onLocationHandler(item)}>
+                                onClick={() => handleLocationChange(item)}>
                                 <div className="flex items-start pl-2">
                                     <img className="w-6 h-6 mt-[2px]" src='/search-marker.svg' alt="Logo" />
                                     <p className='pl-2'>
@@ -109,6 +114,6 @@ export default function SearchRegion({ onLocationHandler }) {
                 </div> : ''}
             </div>
 
-        </div>
+        </div >
     )
 }
