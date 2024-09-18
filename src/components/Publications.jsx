@@ -37,9 +37,10 @@ export default function Publications({ _publications }) {
     }, [])
 
     useEffect(() => {
+        const _filterName = filterName.toLowerCase().trim();
         setFilteredPublications(prev => publications.filter(publication =>
             (draftIsVisible ? true : publication.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible) &&
-            (publication.translations?.find(transl => transl.isEnglish === _isEng)?.name.toLowerCase().includes(filterName.toLowerCase())))
+            (publication.translations?.find(transl => transl.isEnglish === _isEng)?.name.toLowerCase().includes(_filterName)))
             .sort((a, b) => {
                 const dateA = new Date(a.createdDate);
                 const dateB = new Date(b.createdDate);

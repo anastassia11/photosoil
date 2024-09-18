@@ -89,10 +89,11 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
     }, [])
 
     useEffect(() => {
+        const _filterName = filterName.toLowerCase().trim();
         soils?.length && setFilteredSoils(prev => soils.filter(soil =>
             (draftIsVisible ? true : soil.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible) &&
-            (soil.translations?.find(transl => transl.isEnglish === _isEng)?.name.toLowerCase().includes(filterName.toLowerCase())
-                || soil.translations?.find(transl => transl.isEnglish === _isEng)?.code?.toLowerCase().includes(filterName.toLowerCase())) &&
+            (soil.translations?.find(transl => transl.isEnglish === _isEng)?.name.toLowerCase().includes(_filterName)
+                || soil.translations?.find(transl => transl.isEnglish === _isEng)?.code?.toLowerCase().includes(_filterName)) &&
             (selectedCategories.length === 0 || selectedCategories.includes(soil.objectType)) &&
             (selectedAuthors.length === 0 || selectedAuthors.some(selectedAuthor => soil.authors?.some(author => author === selectedAuthor))) &&
             (selectedTerms.length === 0 || selectedTerms.some(selectedTerm => soil.terms.some(term => term === selectedTerm))))

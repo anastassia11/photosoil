@@ -41,16 +41,17 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
     }, [_objects]);
 
     useEffect(() => {
+        const _filterName = filterName.toLowerCase().trim();
         setFilteredObjects(prev => objects
             .filter(object =>
-                (object?.name?.toLowerCase().includes(filterName.toLowerCase()) ||
-                    object?.code?.toLowerCase().includes(filterName.toLowerCase()) ||
-                    object?.email?.toLowerCase().includes(filterName.toLowerCase()) ||
-                    object?.title?.toLowerCase().includes(filterName.toLowerCase()) ||
-                    object?.dataEng?.name?.toLowerCase().includes(filterName.toLowerCase()) ||
-                    object?.dataRu?.name?.toLowerCase().includes(filterName.toLowerCase()) ||
-                    object?.nameRu?.toLowerCase().includes(filterName.toLowerCase()) ||
-                    object?.nameEng?.toLowerCase().includes(filterName.toLowerCase())) &&
+                (object?.name?.toLowerCase().includes(_filterName) ||
+                    object?.code?.toLowerCase().includes(_filterName) ||
+                    object?.email?.toLowerCase().includes(_filterName) ||
+                    object?.title?.toLowerCase().includes(_filterName) ||
+                    object?.dataEng?.name?.toLowerCase().includes(_filterName) ||
+                    object?.dataRu?.name?.toLowerCase().includes(_filterName) ||
+                    object?.nameRu?.toLowerCase().includes(_filterName) ||
+                    object?.nameEng?.toLowerCase().includes(_filterName)) &&
                 ((publishStatus === 'publish' && object.isVisible) ||
                     (publishStatus === 'not_publish' && (!object.isVisible && object.isVisible !== undefined)) ||
                     (publishStatus === 'all' && true)) &&

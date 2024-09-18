@@ -38,10 +38,11 @@ const Filter = memo(function Filter({ dropdown, type, itemId, name, items, setTa
     }, [items, allSelectedItems])
 
     useEffect(() => {
-        items && setFilteredItems(items.filter((item) => item.name?.toLowerCase().includes(filterName.toLowerCase()) ||
-            item.codeEng?.toLowerCase().includes(filterName.toLowerCase()) || item.codeRu?.toLowerCase().includes(filterName.toLowerCase()) ||
-            item.dataEng?.name?.toLowerCase().includes(filterName.toLowerCase()) || item.dataRu?.name?.toLowerCase().includes(filterName.toLowerCase()) ||
-            item.nameEng?.toLowerCase().includes(filterName.toLowerCase()) || item.nameRu?.toLowerCase().includes(filterName.toLowerCase()))
+        const _filterName = filterName.toLowerCase().trim();
+        items && setFilteredItems(items.filter((item) => item.name?.toLowerCase().includes(_filterName) ||
+            item.codeEng?.toLowerCase().includes(_filterName) || item.codeRu?.toLowerCase().includes(_filterName) ||
+            item.dataEng?.name?.toLowerCase().includes(_filterName) || item.dataRu?.name?.toLowerCase().includes(_filterName) ||
+            item.nameEng?.toLowerCase().includes(_filterName) || item.nameRu?.toLowerCase().includes(_filterName))
         )
     }, [filterName, items])
 

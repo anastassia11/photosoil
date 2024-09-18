@@ -43,9 +43,10 @@ export default function NewsPageComponent() {
     const _isEng = locale === 'en';
 
     const _filteredNews = useMemo(() => {
+        const _filterName = filterName.toLowerCase().trim();
         return news.filter(item =>
             (draftIsVisible ? true : item.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible)
-            && item.translations?.find(transl => transl.isEnglish === _isEng)?.title.toLowerCase().includes(filterName.toLowerCase())
+            && item.translations?.find(transl => transl.isEnglish === _isEng)?.title.toLowerCase().includes(_filterName)
             && (selectedTags.length === 0 || selectedTags.some(selectedTag => item.tags.some(({ id }) => id === selectedTag)))
         ).sort((a, b) => {
             const dateA = new Date(a.createdDate);

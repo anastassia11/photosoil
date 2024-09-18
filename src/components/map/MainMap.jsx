@@ -98,7 +98,6 @@ export default function MainMap() {
 
     useEffect(() => {
         if (window.innerWidth < 640) {
-            console.log('< 640')
             document.addEventListener('click', handleClickOutside);
             return () => {
                 document.removeEventListener('click', handleClickOutside);
@@ -108,9 +107,7 @@ export default function MainMap() {
 
     const handleClickOutside = useCallback((e) => {
         if (!e.target.closest(".sideBar")) {
-            // setSelectedObjects([]);
             setSideBarOpen(false);
-            // setPopupVisible(false);
         }
     }, []);
 
@@ -131,11 +128,12 @@ export default function MainMap() {
     }, [clusterLayer, features, layersVisible, objects, filterName]);
 
     useEffect(() => {
+        const _filterName = filterName.toLowerCase().trim();
         const filteredAllIds = objects.filter(obj =>
             (layersVisible[obj._type]) &&
             (draftIsVisible ? true : obj.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible) &&
-            (filterName.length ? (obj.translations?.find(transl => transl.isEnglish === _isEng)?.name?.toLowerCase().includes(filterName.toLowerCase())
-                || obj.translations?.find(transl => transl.isEnglish === _isEng)?.code?.toLowerCase().includes(filterName.toLowerCase())) : true) &&
+            (filterName.length ? (obj.translations?.find(transl => transl.isEnglish === _isEng)?.name?.toLowerCase().includes(_filterName)
+                || obj.translations?.find(transl => transl.isEnglish === _isEng)?.code?.toLowerCase().includes(_filterName)) : true) &&
             (obj.objectType ? (selectedCategories.length === 0 || selectedCategories.includes(obj.objectType)) : true) &&
             (obj.authors ? (selectedAuthors.length === 0 || selectedAuthors.some(selectedAuthor => obj.authors?.some(author => author === selectedAuthor))) : true) &&
             (obj.terms ? (selectedTerms.length === 0 || selectedTerms.some(selectedTerm => obj.terms?.some(term => term === selectedTerm))) : true)
@@ -531,10 +529,10 @@ export default function MainMap() {
 
     const handlePopupClose = () => {
         setPopupVisible(false);
+        setFilterName('');
         setSelectedObjects([]);
     }
 
-    useEffect(() => { }, [])
     return (
         <div ref={mapElement} className="w-full h-full z-10">
             <div className={`z-40 absolute top-0 right-0 m-2 flex flex-row duration-300 lg:w-[500px] w-full pl-2`}>
