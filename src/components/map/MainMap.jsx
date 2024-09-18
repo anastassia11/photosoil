@@ -302,7 +302,8 @@ export default function MainMap() {
                 setFeatures(prevFeatures => [...prevFeatures, ...newFeatures]);
             });
         const clusterSource = new Cluster({
-            distance: 19, // Расстояние для кластеризации в пикселях
+            distance: 18, // Расстояние для кластеризации в пикселях
+            minDistance: 18,
             source: layerVectorSource // Исходный источник
         });
         const _clusterLayer = new VectorLayer({
