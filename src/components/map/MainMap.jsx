@@ -98,6 +98,7 @@ export default function MainMap() {
 
     useEffect(() => {
         if (window.innerWidth < 640) {
+            console.log('< 640')
             document.addEventListener('click', handleClickOutside);
             return () => {
                 document.removeEventListener('click', handleClickOutside);
@@ -112,13 +113,6 @@ export default function MainMap() {
             // setPopupVisible(false);
         }
     }, []);
-
-    useEffect(() => {
-        document.addEventListener('click', handleClickOutside);
-        return () => {
-            document.removeEventListener('click', handleClickOutside);
-        };
-    }, [])
 
     const filterById = useCallback((filteredIds) => {
         const layerSource = clusterLayer.getSource().getSource(); // Получаем источник кластера
@@ -310,7 +304,7 @@ export default function MainMap() {
                 setFeatures(prevFeatures => [...prevFeatures, ...newFeatures]);
             });
         const clusterSource = new Cluster({
-            distance: 18, // Расстояние для кластеризации в пикселях
+            distance: 19, // Расстояние для кластеризации в пикселях
             source: layerVectorSource // Исходный источник
         });
         const _clusterLayer = new VectorLayer({

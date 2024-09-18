@@ -561,8 +561,8 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
                     </div>
                 </div>
             </div>
-            <div className='flex sm:flex-row flex-col self-end sm:space-x-6'>
-                <div className='flex flex-row sm:justify-center justify-end mb-2 mr-1 sm:mr-0 sm:mb-0 items-center w-[200px]'>
+            <div className='flex xl:flex-row flex-col self-end xl:space-x-6'>
+                <div className='flex flex-row xl:justify-center justify-end mb-2 mr-1 xl:mr-0 xl:mb-0 items-center'>
                     <Dropdown name={t('in_page')} value={itemsPerPage} items={PAGINATION_OPTIONS}
                         onCategotyChange={setItemsPerPage} flexRow={true} dropdownKey='in_page' />
                 </div>
