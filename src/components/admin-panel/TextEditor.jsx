@@ -12,13 +12,13 @@ import { setDropdown } from '@/store/slices/generalSlice';
 import '@/styles/editor.css';
 import * as Icons from "./TextEditor/Icons";
 
-const TextEditor = memo(function TextEditor({ dropdown = {}, content, setContent, isSoil, type }) {
+const TextEditor = memo(function TextEditor({ content, setContent, isSoil, type }) {
   const dispatch = useDispatch();
   const linkRef = useRef(null);
-  // const dropdown = useSelector(state => state.general.dropdown);
   const [url, setUrl] = useState("");
   const [isFocusing, setIsFocusing] = useState(false);
-  const contentInserting = useRef(false)
+  const contentInserting = useRef(false);
+  const dropdown = useSelector(state => state.general.dropdown);
   const HEADING = {
     0: 'Paragraph',
     // 1: 'Heading 1',
@@ -79,7 +79,7 @@ const TextEditor = memo(function TextEditor({ dropdown = {}, content, setContent
       insertHtmlContent(content);
       contentInserting.current = false;
     }
-  }, [content]);
+  }, [content, editor]);
 
   useEffect(() => {
     editor?.on('focus', () => {
@@ -171,7 +171,7 @@ const TextEditor = memo(function TextEditor({ dropdown = {}, content, setContent
             {editor.getAttributes("link").href}
           </a>
 
-          <button className={`${editor.isActive("link") ? 'block' : 'hidden'}
+          <button type='button' className={`${editor.isActive("link") ? 'block' : 'hidden'}
               linkModal text-gray-600 p-2 hover:bg-gray-100 rounded-md duration-300`}
             onClick={openModal}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
@@ -179,7 +179,7 @@ const TextEditor = memo(function TextEditor({ dropdown = {}, content, setContent
             </svg>
           </button>
 
-          <button className={`${editor.isActive("link") ? 'block' : 'hidden'}
+          <button type='button' className={`${editor.isActive("link") ? 'block' : 'hidden'}
             text-red-600 p-2 hover:bg-red-100 rounded-md duration-300`}
             onClick={removeLink}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
@@ -197,7 +197,7 @@ const TextEditor = memo(function TextEditor({ dropdown = {}, content, setContent
         </div> : ''}
 
         <div className='flex flex-row'>
-          <button
+          <button type='button'
             className={`${editor.isActive('bold') ? 'text-blue-600' : 'text-gray-700'} border border-transparent p-2
           rounded-md hover:text-blue-600 duration-300`}
             onClick={() => editor.chain().focus().toggleBold().run()}
@@ -205,7 +205,7 @@ const TextEditor = memo(function TextEditor({ dropdown = {}, content, setContent
             <Icons.Bold strokeWidth={editor.isActive('bold') ? '2.5' : '2'} />
           </button>
 
-          <button
+          <button type='button'
             className={`${editor.isActive('italic') ? 'text-blue-600' : 'text-gray-700'} relative cursor-pointer border border-transparent p-2
           rounded-md hover:text-blue-600 duration-300`}
             onClick={() => editor.chain().focus().toggleItalic().run()}
@@ -213,7 +213,7 @@ const TextEditor = memo(function TextEditor({ dropdown = {}, content, setContent
             <Icons.Italic strokeWidth={editor.isActive('italic') ? '2.5' : '2'} />
           </button>
 
-          <button
+          <button type='button'
             className={`${editor.isActive('underline') ? 'text-blue-600' : 'text-gray-700'} border border-transparent p-2
           rounded-md hover:text-blue-600 duration-300`}
             onClick={() => editor.chain().focus().toggleUnderline().run()}
@@ -223,20 +223,20 @@ const TextEditor = memo(function TextEditor({ dropdown = {}, content, setContent
         </div>
 
         <div className='flex flex-row'>
-          <button
+          <button type='button'
             className={`${editor.isActive('bulletList') ? 'text-blue-600' : 'text-gray-700'} border border-transparent p-2
           rounded-md hover:text-blue-600 duration-300`}
             onClick={() => editor.chain().focus().toggleBulletList().run()}>
             <Icons.BulletList strokeWidth={editor.isActive('bulletList') ? '2' : '1.5'} />
           </button>
 
-          <button
+          <button type='button'
             className={`${editor.isActive('orderedList') ? 'text-blue-600' : 'text-gray-700'} border border-transparent p-2
           rounded-md hover:text-blue-600 duration-300`}
             onClick={() => editor.chain().focus().toggleOrderedList().run()}>
             <Icons.NumberedList strokeWidth={editor.isActive('orderedList') ? '2' : '1.5'} />
           </button>
-          {!isSoil ? <button
+          {!isSoil ? <button type='button'
             className={`${editor.isActive('blockquote') ? 'text-blue-600' : 'text-gray-700'} disabled:text-gray-400 disabled:cursor-default border border-transparent p-2
           rounded-md hover:text-blue-600 duration-300`}
             onClick={() => editor.chain().focus().toggleBlockquote().run()}
@@ -267,11 +267,10 @@ const TextEditor = memo(function TextEditor({ dropdown = {}, content, setContent
               type="text"
               className="h-[40px] bg-white min-w-[200px] p-2 outline-none border focus:border-blue-600 shadow-sm rounded-md"
             />
-            <button className='text-blue-600 min-w-fit' onClick={saveLink}>
+            <button type='button' className='text-blue-600 min-w-fit' onClick={saveLink}>
               Set Link
             </button>
           </div>
-
         </div>
       </div>
 

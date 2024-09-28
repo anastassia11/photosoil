@@ -12,32 +12,31 @@ import modalThunkActions from '@/store/thunks/modalThunk';
 import { BASE_SERVER_URL } from '@/utils/constants';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Oval } from 'react-loader-spinner';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import uuid from 'react-uuid';
 
 export default function CreateObject({ title, onCreate, type }) {
     const dispatch = useDispatch();
     const router = useRouter();
     const [drag, setDrag] = useState(false);
-    const [photos, setPhotos] = useState([]);
-    const [otherPhotos, setOtherPhotos] = useState([]);
     const [currentForm, setCurrentForm] = useState(null);
     const [formData, setFormData] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const formRef = useRef(null);
     const { locale } = useParams();
     const { t } = getTranslation(locale);
-    const dropdown = useSelector(state => state.general.dropdown);
 
     const handleChange = (e) => {
         e.preventDefault();
         let files = [...e.target.files];
         files.forEach((file, index) => {
-            setPhotos(prev => [...prev, { createTwoLang: false, currentLang: 'ru', isLoading: true }]);
-            setFormData(prevData => [...prevData, { objectType: 1, translations: [{ isEnglish: true }, { isEnglish: false }] }]);
-            setOtherPhotos(prev => [...prev, []]);
+            setFormData(prevData => [...prevData, {
+                mainPhoto: {
+                    isLoading: true,
+                },
+            }]);
             requestSendPhoto(file, index);
         });
         setCurrentForm(0)
@@ -57,9 +56,11 @@ export default function CreateObject({ title, onCreate, type }) {
         e.preventDefault();
         let files = [...e.dataTransfer.files];
         files.forEach((file, index) => {
-            setPhotos(prev => [...prev, { createTwoLang: false, currentLang: 'ru', isLoading: true }]);
-            setFormData(prevData => [...prevData, { objectType: 1, translations: [{ isEnglish: true }, { isEnglish: false }] }]);
-            setOtherPhotos(prev => [...prev, []]);
+            setFormData(prevData => [...prevData, {
+                mainPhoto: {
+                    isLoading: true,
+                },
+            }]);
             requestSendPhoto(file, index);
         });
         setCurrentForm(0)
@@ -67,46 +68,28 @@ export default function CreateObject({ title, onCreate, type }) {
     }
 
     const handleSendPhoto = (file, index) => {
-        setPhotos(prev => [...prev, { createTwoLang: false, currentLang: 'ru', isLoading: true }]);
-        setFormData(prevData => [...prevData, { objectType: 1, translations: [{ isEnglish: true }, { isEnglish: false }] }]);
-        setOtherPhotos(prev => [...prev, []]);
-        requestSendPhoto(file, index + photos.length);
+        setFormData(prevData => [...prevData, {
+            mainPhoto: {
+                isLoading: true,
+            },
+        }]);
+        requestSendPhoto(file, index + formData.length);
     }
 
     const requestSendPhoto = async (file, index) => {
         const result = await sendPhoto(file);
         if (result.success) {
-            setPhotos(prev =>
-                prev.map((photo, idx) =>
-                    idx === index
-                        ? { ...photo, ...result.data, isLoading: false }
-                        : photo
-                ));
             setFormData(prevData =>
                 prevData.map((data, idx) =>
                     idx === index
-                        ? { ...data, photoId: result.data.id }
+                        ? {
+                            ...data,
+                            mainPhoto: { ...result.data, isLoading: false },
+                        }
                         : data
                 ));
         }
     }
-
-    const handleMainPhotoChange = useCallback((newPhoto) => {
-        setPhotos(prev => currentForm !== null ? prev.map((photo, index) => index === currentForm ? newPhoto : photo) : [...prev, { ...newPhoto }]);
-        setFormData(prevData => prevData.map((soil, index) => index === currentForm ? { ...soil, photoId: newPhoto.id } : soil));
-    }, [currentForm])
-
-    const handleOtherPhotosChange = useCallback((data) => {
-        setOtherPhotos(prev => {
-            const _prev = prev.map((item, index) => index === currentForm ? data : item);
-            setFormData(prevData => prevData.map((soil, index) => index === currentForm ? { ...soil, objectPhoto: _prev[index].map(({ id }) => id) } : soil));
-            return _prev;
-        });
-    }, [currentForm])
-
-    const handleDataChange = useCallback((newData) => {
-        setFormData(prev => prev.map((data, index) => index === currentForm ? newData : data));
-    }, [currentForm])
 
     const editPhoto = async (id, data) => {
         const result = await putPhoto(id, data);
@@ -115,29 +98,37 @@ export default function CreateObject({ title, onCreate, type }) {
         }
     }
 
-    const handleCreateClick = async () => {
+    const validateDataArray = (data) => {
+        return data.findIndex((item) => {
+            if (item.createTwoLang) {
+                const valid = item.translations?.every(translation => translation.name.length);
+                return !valid || !item.mainPhoto?.path?.length;
+            } else {
+                const valid = item.translations?.find(translation => translation.isEnglish === item.currentLang);
+                return !valid || !valid.name.length || !item.mainPhoto?.path?.length;
+            }
+        });
+    };
+
+    const submitForm = async (formData) => {
         setIsLoading(true);
         try {
             const _creationResults = await Promise.all([
                 ...formData.map(async (data, idx) => {
-                    const { createTwoLang, currentLang } = photos[idx];
-                    const isEng = currentLang === 'eng';
-                    const newData = { ...data, translations: data.translations.filter(({ isEnglish }) => isEnglish === isEng) };
+                    const { createTwoLang, currentLang, mainPhoto, objectPhoto } = data;
 
-                    if (photos[idx].createTwoLang) {
-                        editPhoto(photos[idx].id, { titleRu: photos[idx].titleRu || '', titleEng: photos[idx].titleEng || '' });
-                        otherPhotos[idx].map(photo => editPhoto(photo.id, { titleRu: photo.titleRu || '', titleEng: photo.titleEng || '' }));
-                    } else {
-                        if (photos[idx].currentLang === 'eng') {
-                            editPhoto(photos[idx].id, { titleEng: photos[idx].titleEng || '' });
-                            otherPhotos[idx].map(photo => editPhoto(photo.id, { titleEng: photo.titleEng || '' }));
-                        } else {
-                            editPhoto(photos[idx].id, { titleRu: photos[idx].titleRu || '' });
-                            otherPhotos[idx].map(photo => editPhoto(photo.id, { titleRu: photo.titleRu || '' }));
-                        }
+                    editPhoto(mainPhoto.id, createTwoLang ? { titleEng: mainPhoto.titleEng, titleRu: mainPhoto.titleRu }
+                        : (currentLang ? { titleEng: mainPhoto.titleEng } : { titleRu: mainPhoto.titleRu }));
+                    objectPhoto.map(photo => editPhoto(photo.id, createTwoLang ? { titleEng: photo.titleEng, titleRu: photo.titleRu }
+                        : (currentLang ? { titleEng: photo.titleEng } : { titleRu: photo.titleRu })));
 
+                    const dataForFetch = {
+                        ...data,
+                        photoId: mainPhoto.id,
+                        objectPhoto: objectPhoto.map(({ id }) => id),
                     }
-                    return await onCreate(createTwoLang ? data : newData);
+                    const langData = { ...dataForFetch, translations: data.translations.filter(({ isEnglish }) => isEnglish === currentLang) };
+                    return await onCreate(createTwoLang ? dataForFetch : langData);
                 }),
             ]);
             if (_creationResults.every(result => result.success === true)) {
@@ -147,13 +138,11 @@ export default function CreateObject({ title, onCreate, type }) {
                 const indicesToRemove = _creationResults.reduce((indices, result, index) => {
                     if (!result.success) {
                         indices.push(index);
-                        dispatch(openAlert({ title: t('warning'), message: t('form_required'), type: 'warning' }))
+                        dispatch(openAlert({ title: t('error'), message: t('error_objects'), type: 'error' }));
                     }
                     return indices;
                 }, []);
                 setFormData(prevData => prevData.filter((data, idx) => indicesToRemove.includes(idx)));
-                setPhotos(prevPhotos => prevPhotos.filter((data, idx) => indicesToRemove.includes(idx)));
-                setOtherPhotos(prevOther => prevOther.filter((data, idx) => indicesToRemove.includes(idx)));
             }
         } catch (error) {
             dispatch(openAlert({ title: t('error'), message: t('error_objects'), type: 'error' }));
@@ -162,20 +151,37 @@ export default function CreateObject({ title, onCreate, type }) {
         }
     }
 
+    const handleCreateClick = async () => {
+        const newValues = formRef.current.updateState();
+        let invalidIndex, updatedFormData;
+        setFormData(prevData => {
+            updatedFormData = prevData.map((soil, index) => index === currentForm ? newValues : soil);
+            invalidIndex = validateDataArray(updatedFormData);
+            return updatedFormData;
+        });
+        if (invalidIndex !== -1) {
+            // setCurrentForm(invalidIndex);
+            selectCurrentForm(invalidIndex)
+            await new Promise((resolve) => setTimeout(resolve, 100));
+            formRef.current.formCheck();
+        } else {
+            submitForm(updatedFormData);
+        }
+    }
+
     const fetchDeletePhoto = async (id, idx) => {
         const result = await deletePhotoById(id)
         if (result.success) {
-            setPhotos(prev => prev.filter((item, index) => index !== idx))
             setFormData(prev => prev.filter((item, index) => index !== idx))
             if (currentForm === idx) {
                 if (formData.length === 1) {
                     setCurrentForm(null);
                 } else {
                     const nextFormIndex = idx + 1 < formData.length ? idx + 1 : idx - 1;
-                    setCurrentForm(nextFormIndex);
+                    selectCurrentForm(nextFormIndex);
                 }
             } else if (currentForm > idx) {
-                setCurrentForm(prev => prev - 1);
+                selectCurrentForm(currentForm - 1);
             }
         }
     }
@@ -189,20 +195,19 @@ export default function CreateObject({ title, onCreate, type }) {
 
         const isConfirm = await dispatch(modalThunkActions.open());
         if (isConfirm.payload) {
-            if (Number.isInteger(photos[idx].id)) {
-                await fetchDeletePhoto(photos[idx].id, idx)
+            if (Number.isInteger(formData[idx].mainPhoto.id)) {
+                await fetchDeletePhoto(formData[idx].mainPhoto.id, idx)
             } else {
-                setPhotos(prev => prev.filter((item, index) => index !== idx))
                 setFormData(prev => prev.filter((item, index) => index !== idx))
                 if (currentForm === idx) {
                     if (formData.length === 1) {
                         setCurrentForm(null);
                     } else {
                         const nextFormIndex = idx + 1 < formData.length ? idx + 1 : idx - 1;
-                        setCurrentForm(nextFormIndex);
+                        selectCurrentForm(nextFormIndex);
                     }
                 } else if (currentForm > idx) {
-                    setCurrentForm(prev => prev - 1);
+                    selectCurrentForm(currentForm - 1);
                 }
             }
         }
@@ -212,20 +217,27 @@ export default function CreateObject({ title, onCreate, type }) {
     const handleFormClick = () => {
         const id = uuid();
         setCurrentForm(0);
-        setPhotos([{ id, isLoading: false }]);
-        setOtherPhotos([[]]);
-        setFormData([{ photoId: id, objectType: 1, translations: [{ isEnglish: true }, { isEnglish: false }] }]);
+        setFormData([{ mainPhoto: { id, isLoading: false } }]);
+    }
+
+    const selectCurrentForm = (id) => {
+        const newValues = formRef.current.updateState();
+        setCurrentForm(id);
+        setFormData(prevData => prevData.map((soil, index) => index === currentForm ? newValues : soil));
     }
 
     const PhotoCard = ({ id, path, idx, isLoading }) => {
-        const translations = formData[idx].translations;
-        const name = locale === 'en'
-            ? (translations.find(({ isEnglish }) => isEnglish)?.name || translations.find(({ isEnglish }) => !isEnglish)?.name)
-            : (translations.find(({ isEnglish }) => !isEnglish)?.name || translations.find(({ isEnglish }) => isEnglish)?.name);
+        const translations = formData[idx]?.translations;
+        let name = '';
+        if (translations) {
+            name = locale === 'en'
+                ? (translations.find(({ isEnglish }) => isEnglish)?.name || translations.find(({ isEnglish }) => !isEnglish)?.name)
+                : (translations.find(({ isEnglish }) => !isEnglish)?.name || translations.find(({ isEnglish }) => isEnglish)?.name);
+        }
 
         return <div className={`aspect-[1/1] relative bg-white rounded-lg border flex flex-row
         duration-300 cursor-pointer hover:shadow-md ${currentForm === idx ? ' ring ring-blue-700 ring-opacity-30 w-full' : 'w-[95%]'}  overflow-hidden`}
-            onClick={() => setCurrentForm(idx)}>
+            onClick={() => selectCurrentForm(idx)}>
             <div className='flex flex-col items-center w-full h-full overflow-hidden'>
                 <button className='overflow-hidden p-[6px] text-sm font-medium z-10 absolute top-0 right-0 rounded-bl-md
                                 backdrop-blur-md bg-black bg-opacity-40 text-zinc-200 hover:text-white duration-300'
@@ -279,7 +291,7 @@ export default function CreateObject({ title, onCreate, type }) {
                 {title}
             </h1>
             <div className='relative h-full'>
-                {!photos.length ? <>
+                {!formData.length ? <>
                     {drag
                         ? <div className={`h-[calc(100vh-200px)] absolute bg-black/45 top-0 w-full rounded-lg border-dashed border-[1.5px]
                 border-black/80 items-center justify-center flex z-30`}
@@ -288,7 +300,7 @@ export default function CreateObject({ title, onCreate, type }) {
                             onDragOver={e => handleDragStart(e)}
                             onDrop={e => handleDrop(e)}>
                             <p className='sm:text-2xl text-xl text-white'>
-                                Отпустите файлы
+                                {t('release_files')}
                             </p>
                         </div> : ''}
                     <div className='w-full h-full'
@@ -317,31 +329,27 @@ export default function CreateObject({ title, onCreate, type }) {
                     </div>
                 </> :
                     <div className='flex xl:flex-row flex-col'>
-                        <div ref={formRef} className='pt-2 flex-1 xl:order-1 order-2 xl:pr-6 xl:border-r'>
+                        <div className='pt-2 flex-1 xl:order-1 order-2 xl:pr-6 xl:border-r'>
                             {currentForm !== null ?
-                                <ObjectForm
+                                <ObjectForm ref={formRef}
                                     type={type}
                                     id={currentForm}
                                     item={formData.find((item, idx) => idx == currentForm)}
-                                    mainObjectPhoto={photos.find((item, idx) => idx == currentForm)}
-                                    otherObjectPhoto={otherPhotos.find((item, idx) => idx == currentForm)}
-                                    onItemChange={handleDataChange}
-                                    onMainPhotoChange={handleMainPhotoChange}
-                                    onOtherPhotosChange={handleOtherPhotosChange}
                                 /> : ""}
                         </div>
 
-                        <div className={`pt-2 xl:mb-0 flex flex-col w-full xl:w-[250px] space-y-2 xl:order-2 order-1 xl:pl-6 xl:sticky xl:top-0 
+                        <div className={`pt-2 xl:mb-0 flex flex-col xl:items-center w-full xl:w-[250px] space-y-2 xl:order-2 order-1 
+                            xl:pl-6 xl:sticky xl:top-0 
                             xl:max-h-[calc(100vh-40px)] h-[250px] xl:h-fit`}>
                             <p className="font-medium">
                                 {`${type === 'soil' ? t('soils') : type === 'ecosystem' ? t('ecosystems') : ''}`}
                             </p>
-                            {photos.length &&
+                            {formData.length &&
                                 <ul className={`h-full w-full flex xl:flex-col flex-row justify-start 
                                     xl:space-y-2 xl:pr-2 pb-2 xl:pb-0 rounded-lg overflow-y-auto overflow-x-auto xl:overflow-x-hidden scroll items-center`}>
                                     {
-                                        photos.map((photo, idx) => <li key={`${type}-${photo.id || idx}`} className='xl:w-full h-full aspect-square p-[3px] flex flex-col items-center justify-center'>
-                                            {PhotoCard({ ...photo, idx })}
+                                        formData.map(({ mainPhoto }, idx) => <li key={`${type}-${mainPhoto.id || idx}`} className='xl:w-full h-full aspect-square p-[3px] flex flex-col items-center justify-center'>
+                                            {PhotoCard({ ...mainPhoto, idx })}
                                         </li>)
                                     }
                                     <div className='xl:min-w-[95%] xl:h-auto h-[95%] p-[3px] flex w-[150px] aspect-square max-w-[150px] xl:w-auto ml-2 xl:ml-0'>
@@ -350,9 +358,10 @@ export default function CreateObject({ title, onCreate, type }) {
                                 </ul>
                             }
                             <button
+                                type='submit'
                                 onClick={handleCreateClick}
                                 disabled={isLoading}
-                                className="flex min-h-[40px] items-center justify-center self-end w-full px-8 py-2 font-medium text-center text-white transition-colors duration-300 
+                                className="self-end min-h-[40px] w-full flex items-center justify-center px-8 py-2 font-medium text-center text-white transition-colors duration-300 
                 transform bg-blue-600 disabled:bg-blue-600/70 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600 align-bottom">
                                 {isLoading ?
                                     <Oval
@@ -367,9 +376,8 @@ export default function CreateObject({ title, onCreate, type }) {
                                     : t('create_objects')}
                             </button>
                         </div>
-
                     </div>}
-            </div >
-        </div >
+            </div>
+        </div>
     )
 }

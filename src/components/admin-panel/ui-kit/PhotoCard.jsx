@@ -4,7 +4,7 @@ import { getTranslation } from '@/i18n/client'
 import { BASE_SERVER_URL } from '@/utils/constants'
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
-import React, { memo, useEffect } from 'react'
+import React, { memo } from 'react'
 import { Oval } from 'react-loader-spinner'
 
 const PhotoCard = memo(function PhotoCard({ id, path, titleEng, titleRu, fileName, onDelete, onChange, isLoading, isEng }) {
@@ -42,9 +42,7 @@ const PhotoCard = memo(function PhotoCard({ id, path, titleEng, titleRu, fileNam
         <div className='w-full flex flex-col justify-between'>
             <textarea
                 value={isEng ? (titleEng || '') : (titleRu || '')}
-                onChange={e => {
-                    onChange(e, id)
-                }}
+                onChange={e => onChange(e, id)}
                 type="text"
                 placeholder={`${t('text_toPhoto')} ${isEng ? '(EN)' : ''}`}
                 className="bg-white w-full p-2 outline-none border focus:border-blue-600 shadow-sm rounded-md max-h-full"

@@ -12,7 +12,6 @@ import { useDispatch } from 'react-redux';
 export default function AuthorEditComponent({ id }) {
     const dispatch = useDispatch();
     const [author, setAuthor] = useState({});
-    const [isLoading, setIsLoading] = useState(false);
     const { locale } = useParams();
     const { t } = getTranslation(locale);
     const router = useRouter();
@@ -39,7 +38,6 @@ export default function AuthorEditComponent({ id }) {
     }
 
     const handleEditAuthor = async (data) => {
-        setIsLoading(true);
         const result = await putAuthor(id, data);
         if (result.success) {
             router.push(`/${locale}/admin/authors`);
@@ -47,11 +45,10 @@ export default function AuthorEditComponent({ id }) {
         } else {
             dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }))
         }
-        setIsLoading(false);
     }
 
     return (
         <AuthorForm _author={author} onFormSubmit={handleEditAuthor}
-            isLoading={isLoading} btnText={t('save')} title={t('edit_author')} />
+            btnText={t('save')} title={t('edit_author')} />
     )
 }

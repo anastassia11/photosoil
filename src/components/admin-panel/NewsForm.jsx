@@ -1,11 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { BASE_SERVER_URL } from '@/utils/constants';
 import DragAndDrop from './ui-kit/DragAndDrop';
-import { Oval } from 'react-loader-spinner';
 import { sendPhoto } from '@/api/photo/send_photo';
-import * as Tabs from "@radix-ui/react-tabs";
 import TextEditor from './TextEditor';
 import { closeModal, openModal } from '@/store/slices/modalSlice';
 import modalThunkActions from '@/store/thunks/modalThunk';
@@ -19,12 +16,32 @@ import FileCard from './ui-kit/FileCard';
 import { useParams } from 'next/navigation';
 import { getTranslation } from '@/i18n/client';
 import { openAlert } from '@/store/slices/alertSlice';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import LangTabs from './ui-kit/LangTabs';
+import SubmitBtn from './ui-kit/SubmitBtn';
+import { useConstants } from '@/hooks/useConstants';
 
-export default function NewsForm({ _news, title, pathname, onNewsSubmit, isLoading, btnText, oldTwoLang, oldIsEng }) {
+export default function NewsForm({ _news, title, pathname, onNewsSubmit, btnText, oldTwoLang, oldIsEng }) {
     const dispatch = useDispatch();
-    const [news, setNews] = useState({});
-    const [newsPhotos, setNewsPhotos] = useState([]);
-    const [files, setFiles] = useState([]);
+    const { register, reset, control, watch, trigger, setValue, getValues, setFocus,
+        formState: { errors, isSubmitting } } = useForm({
+            mode: 'onChange',
+            defaultValues: {
+                translations: [{ isEnglish: false }],
+                tags: [],
+                objectPhoto: [],
+                files: []
+            }
+        });
+    const { fields: translationsFields, append: appendTranslation } = useFieldArray({
+        control,
+        name: 'translations'
+    });
+    const translations = watch('translations');
+    const objectPhoto = watch('objectPhoto')
+    const files = watch('files');
+    const [localObjectPhoto, setLocalObjectPhoto] = useState(objectPhoto);
+    const [localFiles, setLocalFiles] = useState(files);
     const [tags, setTags] = useState([]);
 
     const dropdown = useSelector(state => state.general.dropdown);
@@ -33,19 +50,16 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, isLoadi
     const { locale } = useParams();
     const { t } = getTranslation(locale);
 
+    const { NEWS_INFO } = useConstants();
+
     useEffect(() => {
         if (_news) {
-            setNews({
-                ..._news, objectPhoto: _news.objectPhoto?.map(({ id }) => id),
-                files: _news.files?.map(({ id }) => id),
+            reset({
+                ..._news,
                 tags: _news.tags?.map(({ id }) => id),
             });
             setIsEng(oldIsEng);
-            _news.objectPhoto && setNewsPhotos(_news.objectPhoto);
-            _news.files && setFiles(_news.files);
             setCreateTwoLang(_news.translations?.length > 1);
-        } else {
-            setNews({ translations: [{ isEnglish: false }] });
         }
     }, [_news])
 
@@ -60,59 +74,22 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, isLoadi
         }
     }
 
-    const handleInputChange = (e) => {
-        const { value, name } = e.target;
-        setNews(prevNews => ({
-            ...prevNews, translations: prevNews.translations.map(translation =>
-                translation.isEnglish === isEng ? { ...translation, [name]: value } : translation)
-        }));
-    }
-
-    const handleFileDelete = async (id) => {
-        dispatch(openModal({
-            title: t('warning'),
-            message: t('delete_file'),
-            buttonText: t('delete')
-        }))
-
-        const isConfirm = await dispatch(modalThunkActions.open());
-        if (isConfirm.payload) {
-            await deleteFile(id);
-        }
-        dispatch(closeModal());
-    }
-
-    const deleteFile = async (id) => {
-        let result;
-        if (pathname !== 'edit') {
-            result = await deletePhotoById(id);
-        }
-        if (pathname === 'edit' || result.success) {
-            setFiles(prevFiles => {
-                const _prevFiles = prevFiles.filter(el => el.id !== id);
-                setNews(prevNews => ({
-                    ...prevNews, files: _prevFiles.map(({ id }) => id)
-                }));
-                return _prevFiles;
-            });
-        }
-    }
-
     const handleTwoLangChange = (e) => {
+        const isChecked = e.target.checked;
         if (pathname === 'edit') {
-            if (e.target.checked) {
-                if (news.translations?.length < 2) {
-                    setNews(prevNews => ({ ...prevNews, translations: [...prevNews.translations, { isEnglish: !isEng }] }))
+            if (isChecked) {
+                if (translations?.length < 2) {
+                    appendTranslation({ isEnglish: !isEng });
                 }
             } else {
                 setIsEng(oldIsEng);
             }
         } else {
-            if (news.translations?.length < 2) {
-                setNews(prevNews => ({ ...prevNews, translations: [...prevNews.translations, { isEnglish: !isEng }] }));
+            if (translations?.length < 2) {
+                appendTranslation({ isEnglish: !isEng });
             }
         }
-        setCreateTwoLang(e.target.checked);
+        setCreateTwoLang(isChecked);
     }
 
     const handleLangChange = (value) => {
@@ -120,18 +97,48 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, isLoadi
     }
 
     const handleNewsPhotoSend = async (file, index) => {
-        setNewsPhotos(prev => [...prev, { isLoading: true }]);
+        setLocalObjectPhoto(prev => {
+            const _prev = [...prev, { isLoading: true }];
+            setValue('objectPhoto', _prev);
+            return _prev;
+        });
+
         const result = await sendPhoto(file);
         if (result.success) {
-            setNewsPhotos(prevPhotos => {
-                const _prevPhotos = prevPhotos.map((photo, idx) =>
-                    idx === index + newsPhotos.length
-                        ? { ...photo, ...result.data, isLoading: false }
+            setLocalObjectPhoto(prev => {
+                const _prev = prev.map((photo, idx) =>
+                    idx === index + localObjectPhoto.length
+                        ? { ...result.data, isLoading: false }
                         : photo
-                );
-                setNews(prevNews => ({ ...prevNews, objectPhoto: _prevPhotos.map(({ id }) => id) }));
-                return _prevPhotos;
-            });
+                )
+                setValue('objectPhoto', _prev);
+                return _prev
+            })
+        } else {
+            dispatch(openAlert({ title: t('error'), message: t('error_photo'), type: 'error' }))
+        }
+    }
+
+    const handleFilesSend = async (file, index) => {
+        setLocalFiles(prev => {
+            const _prev = [...prev, { isLoading: true, name: file.name }];
+            setValue('files', _prev);
+            return _prev;
+        });
+
+        const result = await sendPhoto(file);
+        if (result.success) {
+            setLocalFiles(prev => {
+                const _prev = prev.map((file, idx) =>
+                    idx === index + localFiles.length
+                        ? { ...result.data, isLoading: false }
+                        : file
+                )
+                setValue('files', _prev);
+                return _prev
+            })
+        } else {
+            dispatch(openAlert({ title: t('error'), message: t('error_file'), type: 'error' }))
         }
     }
 
@@ -141,11 +148,21 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, isLoadi
             result = await deletePhotoById(id)
         }
         if (pathname === 'edit' || result.success) {
-            setNewsPhotos(prevPhotos => {
-                const _prevPhotos = prevPhotos.filter(el => el.id !== id);
-                setNews(prevNews => ({ ...prevNews, objectPhoto: _prevPhotos.map(({ id }) => id) }))
-                return _prevPhotos;
+            setLocalObjectPhoto(prev => {
+                const _prev = prev.filter(photo => photo.id !== id);
+                setValue('objectPhoto', _prev);
+                return _prev;
             });
+        }
+    }
+
+    const deleteFile = async (id) => {
+        let result;
+        if (pathname !== 'edit') {
+            result = await deletePhotoById(id);
+        }
+        if (pathname === 'edit' || result.success) {
+            setValue('files', files.filter(file => file.id !== id));
         }
     }
 
@@ -163,207 +180,190 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, isLoadi
         dispatch(closeModal());
     }
 
-    const handleNewsPhotosChange = (e, id) => {
-        setNewsPhotos(prev => prev.map(item =>
-            item.id === id
-                ? { ...item, [isEng ? 'titleEng' : 'titleRu']: e.target.value }
-                : item
-        ));
+    const handleFileDelete = async (id) => {
+        dispatch(openModal({
+            title: t('warning'),
+            message: t('delete_file'),
+            buttonText: t('delete')
+        }))
+
+        const isConfirm = await dispatch(modalThunkActions.open());
+        if (isConfirm.payload) {
+            await deleteFile(id);
+        }
+        dispatch(closeModal());
     }
 
-    const handleFilesSend = async (file, index) => {
-        setFiles(prev => [...prev, { isLoading: true, name: file.name }]);
-        const result = await sendPhoto(file);
-        if (result.success) {
-            setFiles(prevFiles => {
-                const _prevFiles = prevFiles.map((file, idx) =>
-                    idx === index + files.length
-                        ? { ...file, ...result.data, isLoading: false }
-                        : file
-                );
-                setNews(prevNews => ({ ...prevNews, files: _prevFiles.map(({ id }) => id) }))
-                return _prevFiles;
-            });
-        }
+    const handleNewsPhotosChange = (e, id) => {
+        setLocalObjectPhoto(prev => {
+            const _prev = prev.map(photo => photo.id === id
+                ? { ...photo, [isEng ? 'titleEng' : 'titleRu']: e.target.value }
+                : photo);
+            setValue('objectPhoto', _prev);
+            return _prev;
+        });
     }
 
     const handleAddTag = useCallback((newItem) => {
-        setNews(prevNews => ({ ...prevNews, tags: prevNews.tags ? [...prevNews.tags, newItem] : [newItem] }));
+        const values = getValues('tags');
+        setValue('tags', [...values, newItem]);
     }, [])
 
     const handleDeleteTag = useCallback((deletedItem) => {
-        setNews(prevNews => ({ ...prevNews, tags: prevNews.tags.filter(id => id !== deletedItem) }));
+        const values = getValues('tags');
+        setValue('tags', values.filter(value => value !== deletedItem));
     }, [])
 
     const handleResetTag = useCallback(() => {
-        setNews(prevNews => ({ ...prevNews, tags: [] }));
+        setValue('tags', []);
     }, [])
 
-    const handleFormSubmit = (e) => {
+    const formSubmit = async (e) => {
         e.preventDefault();
-        const hasRequiredFields = () => {
-            if (createTwoLang) {
-                return news.translations?.some(({ isEnglish, title }) => (
-                    (isEnglish && title.length > 0) || (!isEnglish && title.length > 0)
-                ));
-            } else {
-                return news.translations?.some(({ isEnglish, title }) => (
-                    (isEng && isEnglish && title.length > 0) || (!isEng && !isEnglish && title.length > 0)
-                ));
-            }
-        };
-
-        if (hasRequiredFields()) {
-            onNewsSubmit({ createTwoLang, isEng, news, newsPhotos });
+        const result = await trigger();
+        if (result) {
+            const data = getValues();
+            const news = {
+                ...data,
+                files: data.files.map(({ id }) => id),
+                objectPhoto: data.objectPhoto.map(({ id }) => id),
+            };
+            await onNewsSubmit({ createTwoLang, isEng, news, newsPhotos: data.objectPhoto });
         } else {
-            dispatch(openAlert({ title: t('warning'), message: t('form_required'), type: 'warning' }))
+            const firstErrorField = Object.keys(errors)[0];
+            if (firstErrorField === 'translations') {
+                for (const [index, transl] of errors.translations.entries()) {
+                    if (!!transl) {
+                        setIsEng(translations[index].isEnglish);
+                        const firstErrorField = Object.keys(transl)[0];
+                        await new Promise((resolve) => setTimeout(resolve, 10));
+                        setFocus(`translations.${index}.${firstErrorField}`);
+                        break;
+                    }
+                }
+            } else {
+                setFocus(firstErrorField);
+            }
         }
     };
 
     return (
-        <form onSubmit={handleFormSubmit} className="flex flex-col w-full flex-1 pb-[250px]">
+        <form onSubmit={formSubmit} className="flex flex-col w-full flex-1 pb-[250px]">
             <div
                 className='mb-2 flex md:flex-row flex-col md:items-end md:justify-between space-y-1 md:space-y-0'>
                 <h1 className='sm:text-2xl text-xl font-semibold mb-2 md:mb-0'>
                     {title}
                 </h1>
-                <button
-                    type='submit'
-                    disabled={isLoading}
-                    className="md:min-w-[232px] w-full min-h-[40px] flex items-center justify-center self-end md:w-fit px-8 py-2 font-medium text-center text-white transition-colors duration-300 
-                transform bg-blue-600 disabled:bg-blue-600/70 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600 align-bottom">
-                    {isLoading ?
-                        <Oval
-                            height={20}
-                            width={20}
-                            color="#FFFFFF"
-                            visible={true}
-                            ariaLabel='oval-loading'
-                            secondaryColor="#FFFFFF"
-                            strokeWidth={4}
-                            strokeWidthSecondary={4} />
-                        : btnText}
-                </button>
+                <div className='md:min-w-[200px] md:w-fit'>
+                    <SubmitBtn isSubmitting={isSubmitting} btnText={btnText} />
+                </div>
             </div>
 
-
-            <div
-                className="flex flex-col w-full h-fit pb-16">
+            <div className="flex flex-col w-full h-fit pb-16">
                 <div className='flex flex-col w-full h-full'>
-                    <Tabs.Root defaultValue={false} className="pt-2 md:col-span-2 sticky top-0 z-40  bg-[#f6f7f9]" value={isEng}
-                        onValueChange={handleLangChange}>
-                        <Tabs.List className="w-full border-b flex md:items-center gap-x-4 overflow-x-auto justify-between md:flex-row flex-col">
-                            <div className='flex items-center gap-x-4 overflow-x-auto md:order-1 order-2'>
-                                <Tabs.Trigger disabled={!createTwoLang && isEng}
-                                    className="disabled:text-gray-400 group outline-none border-b-2 border-[#f6f7f9] data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
-                                    value={false}>
-                                    <div className="pb-2.5 px-2 group-disabled:text-current duration-150 group-hover:text-blue-600 font-medium">
-                                        Русскоязычная версия
+                    <LangTabs
+                        isEng={isEng}
+                        oldIsEng={oldIsEng}
+                        createTwoLang={createTwoLang}
+                        oldTwoLang={oldTwoLang}
+                        isEdit={pathname === 'edit'}
+                        onLangChange={handleLangChange}
+                        onTwoLangChange={handleTwoLangChange} />
+                    <ul className='flex flex-col w-full mt-4'>
+                        {NEWS_INFO.map(({ name, title }, idx) => {
+                            return <li key={name} className={`${idx && 'mt-3'}`}>
+                                {translationsFields.map((field, index) =>
+                                    <div key={field.id} className={`${field.isEnglish === isEng ? 'visible' : 'hidden'}`}>
+                                        {
+                                            name === 'content'
+                                                ? <Controller control={control}
+                                                    name={`translations.${index}.${name}`}
+                                                    render={({ field: { onChange, value } }) =>
+                                                        <div className='mt-4 flex flex-col'>
+                                                            <label className="font-medium min-h-fit">
+                                                                {`${t('news_text')} ${isEng ? '(EN)' : ''}`}
+                                                            </label>
+                                                            <div className={`w-full relative`}>
+                                                                <TextEditor type={`news-${field.id}`}
+                                                                    content={value}
+                                                                    setContent={html => onChange(html)} />
+                                                            </div>
+                                                        </div>
+                                                    } />
+                                                : <Textarea
+                                                    required={name === 'title'}
+                                                    error={errors.translations?.[index]?.[name]}
+                                                    {...register(`translations.${index}.${name}`,
+                                                        { required: (createTwoLang ? true : (field.isEnglish === isEng)) && name === 'title' ? t('required') : false })}
+                                                    label={title}
+                                                    isEng={isEng}
+                                                    placeholder='' />}
                                     </div>
-                                </Tabs.Trigger>
-                                <Tabs.Trigger disabled={!createTwoLang}
-                                    className="disabled:text-gray-400 group outline-none border-b-2 border-[#f6f7f9] data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
-                                    value={true}>
-                                    <div className="pb-2.5 px-2 group-disabled:text-current duration-150 group-hover:text-blue-600 font-medium">
-                                        English version
-                                    </div>
-                                </Tabs.Trigger>
-                            </div>
-                            {(!oldTwoLang || pathname !== 'edit') && <label htmlFor='createTwoLang' className={`md:order-2 order-1 pb-4 pr-1 md:pb-2.5 flex flex-row cursor-pointer items-center`}>
-                                <input type="checkbox" id='createTwoLang'
-                                    checked={createTwoLang}
-                                    onChange={handleTwoLangChange}
-                                    className="min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
-                                <span>{pathname === 'edit' ? `${oldIsEng ? t('add_ru') : t('add_en')}` : t('create_two_lang')}</span>
-                            </label>}
-                        </Tabs.List>
-                    </Tabs.Root>
-                    <div className='flex flex-col w-full mt-4'>
-                        <Textarea name='title'
-                            label={<>
-                                {`${t('heading')} ${isEng ? '(EN)' : ''}`}<span className='text-orange-600'>*</span>
-                            </>}
-                            value={news.translations?.find(({ isEnglish }) => isEng === isEnglish)?.title || ''}
-                            onChange={handleInputChange}
-                            required={true} />
-                    </div>
-                    <div className='flex flex-col w-full mt-4'>
-                        {Textarea({
-                            name: 'annotation',
-                            label: `${t('annotation')} ${isEng ? '(EN)' : ''}`,
-                            value: news.translations?.find(({ isEnglish }) => isEng === isEnglish)?.annotation || '',
-                            onChange: handleInputChange,
-                            required: false
+                                )}
+                            </li>
                         })}
-                    </div>
-                    <div className='mt-4 flex flex-col'>
-                        <label className="font-medium min-h-fit">
-                            {`${t('news_text')} ${isEng ? '(EN)' : ''}`}
-                        </label>
-                        <div className={`w-full relative ${isEng ? 'hidden' : 'block'}`}>
-                            <TextEditor type='news-ru' content={news.translations?.find(({ isEnglish }) => !isEnglish)?.content || ''}
-                                setContent={html => setNews(prevNews => ({
-                                    ...prevNews, translations: prevNews.translations?.map(translation =>
-                                        (!translation.isEnglish) ? { ...translation, content: html } : translation)
-                                }))} />
-                        </div>
-                        <div className={`w-full relative ${isEng ? 'block' : 'hidden'}`}>
-                            <TextEditor type='news-en' content={news.translations?.find(({ isEnglish }) => isEnglish)?.content || ''}
-                                setContent={html => setNews(prevNews => ({
-                                    ...prevNews, translations: prevNews.translations?.map(translation =>
-                                        (translation.isEnglish) ? { ...translation, content: html } : translation)
-                                }))} />
-                        </div>
-                    </div>
+                    </ul>
 
                     <div className='mt-6 flex flex-col'>
                         <label className="font-medium min-h-fit">
                             {`${t('gallery')}`}
                         </label>
-                        {!newsPhotos?.length ?
-                            <div className='w-full md:w-1/2 h-[150px] pr-2 mt-1'>
-                                <DragAndDrop id='news-photos' onLoadClick={handleNewsPhotoSend} isMultiple={true} accept='img' />
-                            </div>
-                            :
-                            <ul className={`grid md:grid-cols-2 grid-cols-1 gap-4 `}>
-                                {newsPhotos.map(photo => <li key={photo.id}>
-                                    <PhotoCard {...photo} isEng={isEng} onDelete={handleNewsPhotoDelete}
-                                        onChange={handleNewsPhotosChange} />
-                                </li>)}
-                                <div className='h-[150px]'>
-                                    <DragAndDrop id='news-photos' onLoadClick={handleNewsPhotoSend} isMultiple={true} accept='img' />
-                                </div>
-                            </ul>}
+                        <Controller control={control}
+                            name='objectPhoto'
+                            render={({ field: { value }, fieldState }) =>
+                                <ul className={`mt-1 grid md:grid-cols-2 grid-cols-1 gap-4 `}>
+                                    {!!value.length && value.map((photo, idx) => <li key={`photo-${idx}`}>
+                                        <PhotoCard {...photo} isEng={isEng}
+                                            onDelete={handleNewsPhotoDelete}
+                                            onChange={handleNewsPhotosChange} />
+                                    </li>)}
+                                    <div className='h-[150px]'>
+                                        <DragAndDrop id='news-photos'
+                                            error={fieldState.error}
+                                            onLoadClick={handleNewsPhotoSend}
+                                            isMultiple={true}
+                                            accept='img' />
+                                    </div>
+                                </ul>}
+                        />
                     </div>
 
                     <div className='mt-8 flex flex-col'>
                         <label className="font-medium min-h-fit">
                             {`${t('files')}`}
                         </label>
-                        {!files?.length ?
-                            <div className='w-full md:w-1/2 h-[150px] pr-2 mt-1'>
-                                <DragAndDrop id='news-files' onLoadClick={handleFilesSend} isMultiple={true} accept='pdf' />
-                            </div>
-                            :
-                            <ul className={`mt-1 flex flex-col w-full md:w-1/2`}>
-                                {files.map(file => <li key={file.id}>
-                                    {FileCard({ ...file, onDelete: () => handleFileDelete(file.id) })}
-                                </li>)}
-                                <div className='mt-2 h-[150px] w-full'>
-                                    <DragAndDrop id='news-files' onLoadClick={handleFilesSend} isMultiple={true} accept='pdf' />
-                                </div>
-                            </ul>}
+                        <Controller control={control}
+                            name='files'
+                            render={({ field: { value, id }, fieldState }) =>
+                                <ul className={`mt-1 flex flex-col w-full gap-4 `}>
+                                    {!!value.length && value.map((file, idx) => <li key={`file-${idx}`}>
+                                        <FileCard {...file} isEng={isEng}
+                                            onDelete={() => handleFileDelete(file.id)} />
+                                    </li>)}
+                                    <div className='h-[150px] md:w-[50%] w-full md:pr-2 pr-0'>
+                                        <DragAndDrop id='news-files'
+                                            error={fieldState.error}
+                                            onLoadClick={handleFilesSend}
+                                            isMultiple={true}
+                                            accept='pdf' />
+                                    </div>
+                                </ul>}
+                        />
                     </div>
 
                     <div className='mt-8 flex flex-col w-full md:w-1/2'>
-                        <Filter dropdown={dropdown}
-                            name={t('tags')} items={tags} setTags={setTags}
-                            isEng={isEng} type='news-tags'
-                            allSelectedItems={news?.tags}
-                            addItem={handleAddTag}
-                            deleteItem={handleDeleteTag}
-                            resetItems={handleResetTag}
-                        />
+                        <Controller control={control}
+                            name='tags'
+                            render={({ field: { value } }) =>
+                                <Filter dropdown={dropdown}
+                                    name={t('tags')} items={tags}
+                                    type='tags'
+                                    allSelectedItems={value} isEng={isEng}
+                                    addItem={handleAddTag}
+                                    deleteItem={handleDeleteTag}
+                                    resetItems={handleResetTag}
+                                />
+                            } />
                     </div>
                 </div>
             </div>

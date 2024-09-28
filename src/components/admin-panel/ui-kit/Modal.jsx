@@ -28,8 +28,6 @@ export default function Modal({ isOpen, title, message, buttonText }) {
                                     <button onClick={() => dispatch(closeModal())} className="modal w-full px-4 py-2 font-medium tracking-wide text-gray-700 capitalize transition-colors duration-300 transform border border-gray-200 rounded-md sm:w-1/2 sm:mx-2 focus:outline-none">
                                         {t('cancel')}
                                     </button>
-
-
                                     <button className="modal w-full px-4 py-2 mt-3 font-medium tracking-wide text-white capitalize transition-colors duration-300 transform 
                                     bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600 sm:mt-0 sm:w-1/2 sm:mx-2"
                                         onClick={() => dispatch(setConfirm())} >

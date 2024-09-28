@@ -54,6 +54,7 @@
   "email": "Email",
   "error": "Error",
   "error_author": "Error creating author",
+  "error_photo": "Error loading photo",
   "error_dictionary": "Error creating dictionary",
   "error_edit": "Error saving changes",
   "error_publication": "Error creating publication",
@@ -164,7 +165,7 @@
   "all": "All",
   "published": "Published",
   "no_published": "Not published",
-
+  "required": "This is a required field",
   "select": "Selected",
   "publish_go": "Publish",
   "no_publish_go": "Unpublish",
@@ -265,7 +266,7 @@
   "connect_publ": "Connected publications",
   "photo": "Photo",
   "add_point": "Add point",
-  "error_file": "Please upload a file in a supported format",
+  "error_file": "Error loading file",
   "map_layers": "Map layers",
   "filters": "Filters",
   "search_byRegion": "Search by region",
@@ -296,5 +297,6 @@
   "link": "Reference to publication",
   "comments": "Other comments",
   "monographs": "Monographs",
-  "other": "Other"
+  "other": "Other",
+  "invalid_email": "Invalid email adress"
 }

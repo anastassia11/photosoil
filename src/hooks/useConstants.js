@@ -39,6 +39,12 @@ export const useConstants = () => {
         { name: 'description', title: t('annotation') },
     ];
 
+    const NEWS_INFO = [
+        { name: 'title', title: t('heading') },
+        { name: 'annotation', title: t('annotation') },
+        { name: 'content', title: t('news_text') },
+    ];
+
     const MODERATOR_INFO = [
         { name: 'name', title: t('fio') },
         { name: 'email', title: 'Email' },
@@ -75,6 +81,7 @@ export const useConstants = () => {
         SOIL_INFO,
         ECOSYSTEM_INFO,
         PUBLICATION_INFO,
+        NEWS_INFO,
         MODERATOR_INFO,
         SOIL_ENUM,
         RANK_ENUM,

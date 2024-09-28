@@ -12,6 +12,7 @@ import { getAuthors } from '@/api/author/get_authors'
 import Loader from './Loader'
 import MotionWrapper from './admin-panel/ui-kit/MotionWrapper'
 import { getTranslation } from '@/i18n/client'
+import { Controller } from 'react-hook-form'
 
 export default function Authors() {
     const { locale } = useParams();

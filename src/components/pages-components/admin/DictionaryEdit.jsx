@@ -15,7 +15,6 @@ import { getTranslation } from '@/i18n/client';
 export default function DictionaryEditPageComponent({ id }) {
     const dispatch = useDispatch();
     const [dictionary, setDictionary] = useState({});
-    const [isLoading, setIsLoading] = useState(false);
     const { locale } = useParams();
     const { t } = getTranslation(locale);
     const router = useRouter();
@@ -42,7 +41,6 @@ export default function DictionaryEditPageComponent({ id }) {
     }
 
     const editDictionary = async (data) => {
-        setIsLoading(true);
         const { nameRu, nameEng, translationMode } = data;
         const _data = {
             translationMode,
@@ -88,11 +86,9 @@ export default function DictionaryEditPageComponent({ id }) {
             dispatch(openAlert({ title: t('success'), message: t('success_edit'), type: 'success' }));
         } catch (error) {
             dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }));
-        } finally {
-            setIsLoading(false);
         }
     }
 
-    return <DictionaryForm _dictionary={dictionary} isEdit={true} title={t('edit_dictionary')}
-        onFormSubmit={editDictionary} isLoading={isLoading} btnTitle={t('save')} />
+    return <DictionaryForm _dictionary={dictionary} title={t('edit_dictionary')}
+        onFormSubmit={editDictionary} btnTitle={t('save')} />
 }

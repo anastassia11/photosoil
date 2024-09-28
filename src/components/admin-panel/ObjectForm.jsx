@@ -1,9 +1,8 @@
 'use client'
 
 import { useDispatch, useSelector } from 'react-redux';
-import * as Tabs from "@radix-ui/react-tabs";
 import Filter from '../soils/Filter'
-import { memo, useCallback, useEffect, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
 import { sendPhoto } from '@/api/photo/send_photo';
 import { getAuthors } from '@/api/author/get_authors';
 import Dropdown from './ui-kit/Dropdown';
@@ -18,27 +17,59 @@ import { getBasePublications } from '@/api/publication/get_base_publications';
 import { getBaseSoils } from '@/api/soil/get_base_soils';
 import MapSelect from '../map/MapSelect';
 import Input from './ui-kit/Input';
-import MapInput from './ui-kit/MapInput';
 import Textarea from './ui-kit/Textarea';
 import PhotoCard from './ui-kit/PhotoCard';
 import { getClassifications } from '@/api/classification/get_classifications';
 import { useParams } from 'next/navigation';
 import { getTranslation } from '@/i18n/client';
 import TextEditor from './TextEditor';
-import { setDropdown } from '@/store/slices/generalSlice';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import LangTabs from './ui-kit/LangTabs';
+import { openAlert } from '@/store/slices/alertSlice';
 
-export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, mainObjectPhoto, otherObjectPhoto,
-    onItemChange, onMainPhotoChange, onOtherPhotosChange }) {
+function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
     const dispatch = useDispatch();
     const { locale } = useParams();
     const { t } = getTranslation(locale);
     const dropdown = useSelector(state => state.general.dropdown);
+
+    const { register, reset, control, watch, trigger, setValue, getValues, setFocus,
+        formState: { errors } } = useForm({
+            mode: 'onChange',
+            defaultValues: {
+                translations: [{ isEnglish: false }],
+                createTwoLang: false,
+                currentLang: false,
+                objectType: 1,
+                latitude: '',
+                longtitude: '',
+                // externalSource: '',
+                objectPhoto: [],
+                authors: [],
+                soilTerms: [],
+                ecoSystems: [],
+                publications: [],
+                soilObjects: [],
+                mainPhoto: {}
+            }
+        });
+    const { fields: translationsFields, append: appendTranslation } = useFieldArray({
+        control,
+        name: 'translations'
+    });
+
+    const formValues = watch();
+    const translations = watch('translations');
+    const isExternal = watch('isExternal');
+    const mainPhoto = watch('mainPhoto');
+
+    const createTwoLang = watch('createTwoLang');
+    const isEng = watch('currentLang');
+
+    const objectPhoto = watch('objectPhoto');
+    const [localObjectPhoto, setLocalObjectPhoto] = useState(objectPhoto);
+
     const [classifications, setClassifications] = useState([]);
-    const [object, setObject] = useState({});
-    const [createTwoLang, setCreateTwoLang] = useState(false);
-    const [isEng, setIsEng] = useState(false);
-    const [mainPhoto, setMainPhoto] = useState({});
-    const [otherPhotos, setOtherPhotos] = useState([]);
     const [authors, setAuthors] = useState([]);
     const [ecosystems, setEcosystems] = useState([]);
     const [soils, setSoils] = useState([]);
@@ -47,7 +78,9 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
 
     const INFO = type === 'soil' ? SOIL_INFO : type === 'ecosystem' ? ECOSYSTEM_INFO : {};
 
-    const currentTransl = object?.translations?.find(({ isEnglish }) => isEnglish === isEng);
+    useImperativeHandle(ref, () => ({
+        updateState, formCheck
+    }))
 
     useEffect(() => {
         fetchAuthors();
@@ -61,25 +94,14 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
     }, [])
 
     useEffect(() => {
+        reset({});
         if (item) {
-            setObject(item);
-            setMainPhoto(mainObjectPhoto);
+            reset({
+                ...getValues(),
+                ...item
+            });
         }
-    }, [item])
-
-    useEffect(() => {
-        if (mainObjectPhoto) {
-            setIsEng(mainObjectPhoto.currentLang === 'eng');
-            setCreateTwoLang(mainObjectPhoto.createTwoLang);
-            setMainPhoto(mainObjectPhoto);
-        }
-    }, [mainObjectPhoto])
-
-    useEffect(() => {
-        if (otherObjectPhoto) {
-            setOtherPhotos(otherObjectPhoto)
-        }
-    }, [otherObjectPhoto])
+    }, [item, reset, getValues])
 
     const fetchClassifications = async () => {
         const result = await getClassifications();
@@ -116,98 +138,72 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
         }
     }
 
+    const updateState = () => {
+        return formValues;
+    }
+
     const handleOtherPhotoSend = useCallback(async (file, index) => {
-        setOtherPhotos(prev => [...prev, { isLoading: true }]);
+        setLocalObjectPhoto(prev => {
+            const _prev = [...prev, { isLoading: true }];
+            setValue('objectPhoto', _prev);
+            return _prev;
+        });
+
         const result = await sendPhoto(file);
         if (result.success) {
-            setOtherPhotos(prev => {
+            setLocalObjectPhoto(prev => {
                 const _prev = prev.map((photo, idx) =>
-                    idx === index + otherPhotos.length
-                        ? { ...photo, ...result.data, isLoading: false }
+                    idx === index + localObjectPhoto.length
+                        ? { ...result.data, isLoading: false }
                         : photo
-                );
-                onOtherPhotosChange(_prev);
-                return _prev;
-            });
+                )
+                setValue('objectPhoto', _prev);
+                return _prev
+            })
+        } else {
+            dispatch(openAlert({ title: t('error'), message: t('error_photo'), type: 'error' }))
         }
-    }, [otherPhotos])
+    }, [localObjectPhoto, objectPhoto])
 
     const handleMainPhotoSend = useCallback(async (file) => {
-        setMainPhoto(prev => ({ ...prev, isLoading: true }));
+        setValue('mainPhoto', { isLoading: true, name: file.name });
         const result = await sendPhoto(file);
         if (result.success) {
-            setMainPhoto(prev => ({ ...prev, ...result.data }));
-            onMainPhotoChange({ ...mainObjectPhoto, ...result.data });
-        };
+            setValue('mainPhoto', { ...result.data, isLoading: false });
+        } else {
+            dispatch(openAlert({ title: t('error'), message: t('error_photo'), type: 'error' }))
+        }
     }, [])
 
-    const handleInputChange = (e) => {
-        const { value, name } = e.target;
-        setObject(prev => {
-            const _prev = (name === 'latitude' || name === 'longtitude') ? { ...prev, [name]: value }
-                : { ...prev, translations: prev.translations.map(translation => translation.isEnglish === isEng ? { ...translation, [name]: value } : translation) }
-            onItemChange(_prev);
-            return _prev
-        });
-    }
-
-    const handleTextContentChange = (isEng, field, html) => {
-        setObject(prev => {
-            const _prev = {
-                ...prev, translations: prev.translations?.map(translation =>
-                    translation.isEnglish === isEng ? { ...translation, [field]: html } : translation)
-            };
-            onItemChange(_prev);
-            return (_prev)
-        })
-    }
-
     const handleCoordChange = useCallback(({ latitude, longtitude }) => {
-        setObject(prev => {
-            const _prev = { ...prev, latitude, longtitude };
-            onItemChange(_prev);
-            return _prev;
-        });
-    }, [onItemChange])
+        setValue('latitude', latitude);
+        setValue('longtitude', longtitude);
+    }, [])
 
-    const handleCategotyChange = (id) => {
-        const updatedObject = { ...object, objectType: Number(id) };
-        setObject(updatedObject);
-        onItemChange(updatedObject);
+    const handleMainPhotoChange = (e) => {
+        setValue('mainPhoto', { ...mainPhoto, [isEng ? 'titleEng' : 'titleRu']: e.target.value });
     }
-
-    const handleMainPhotoChange = useCallback((e) => {
-        setMainPhoto(prev => {
-            const _prev = { ...prev, [isEng ? 'titleEng' : 'titleRu']: e.target.value };
-            onMainPhotoChange(_prev);
-            return _prev;
-        })
-    }, [onMainPhotoChange])
 
     const handleOtherPhotosChange = useCallback((e, id) => {
-        setOtherPhotos(prev => {
-            const _prev = prev.map(item =>
-                item.id === id
-                    ? { ...item, [isEng ? 'titleEng' : 'titleRu']: e.target.value }
-                    : item
-            );
-            onOtherPhotosChange(_prev);
+        setLocalObjectPhoto(prev => {
+            const _prev = prev.map(photo => photo.id === id
+                ? { ...photo, [isEng ? 'titleEng' : 'titleRu']: e.target.value }
+                : photo);
+            setValue('objectPhoto', _prev);
             return _prev;
-        })
-    }, [onOtherPhotosChange])
+        });
+    }, [isEng, setValue])
 
     const mainPhotoDelete = useCallback(async (id) => {
-        const newId = uuid()
+        const newId = uuid();
         let result;
         if (pathname !== 'edit') {
             result = await deletePhotoById(id)
         }
         if (pathname === 'edit' || result.success) {
-            setMainPhoto({});
-            onMainPhotoChange({});
-            setObject(prevObject => ({ ...prevObject, photoId: newId }));
+            setValue('mainPhoto', { id: newId })
         }
-    }, [onMainPhotoChange])
+    }, [])
 
     const handleMainPhotoDelete = useCallback(async (id) => {
         dispatch(openModal({
@@ -229,16 +225,13 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
             result = await deletePhotoById(id)
         }
         if (pathname === 'edit' || result.success) {
-            setOtherPhotos(prev => {
-                const _prevPhotos = prev.filter(el => el.id !== id);
-                onOtherPhotosChange(_prevPhotos);
-                setObject(prev => ({
-                    ...prev,
-                    objectPhoto: _prevPhotos
-                }))
-            })
+            setLocalObjectPhoto(prev => {
+                const _prev = prev.filter(photo => photo.id !== id);
+                setValue('objectPhoto', _prev);
+                return _prev;
+            });
         }
-    }, [onOtherPhotosChange])
+    }, [objectPhoto])
 
     const handleOtherPhotoDelete = useCallback(async (id) => {
         dispatch(openModal({
@@ -255,28 +248,19 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
     }, [otherPhotoDelete])
 
     const handleAddTerm = useCallback((type, newItem) => {
-        setObject(prev => {
-            const _prev = { ...prev, [type]: prev[type] ? [...prev[type], newItem] : [newItem] };
-            onItemChange(_prev);
-            return _prev
-        })
-    }, [onItemChange])
+        const values = getValues(type);
+        setValue(type, [...values, newItem]);
+    }, [])
 
     const handleDeleteTerm = useCallback((type, deletedItem) => {
-        setObject(prev => {
-            const _prev = { ...prev, [type]: prev[type]?.filter(id => id !== deletedItem) };
-            onItemChange(_prev);
-            return _prev;
-        })
-    }, [onItemChange])
+        const values = getValues(type);
+        setValue(type, values.filter(value => value !== deletedItem));
+    }, [])
 
     const handleResetTerms = useCallback((type, deletedItems) => {
-        setObject(prev => {
-            const _prev = { ...prev, [type]: prev[type].filter(id => !deletedItems.includes(id)) };
-            onItemChange(_prev);
-            return _prev;
-        })
-    }, [onItemChange])
+        const values = getValues(type);
+        setValue(type, values.filter(value => !deletedItems.includes(value)));
+    }, [])
 
     const addTerm = useCallback((newItem) => handleAddTerm('soilTerms', newItem), [handleAddTerm]);
     const deleteTerm = useCallback((deletedItem) => handleDeleteTerm('soilTerms', deletedItem), [handleDeleteTerm]);
@@ -294,300 +278,336 @@ export default function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, i
     const deletePublication = useCallback((deletedItem) => handleDeleteTerm('publications', deletedItem), [handleDeleteTerm]);
     const resetPublications = useCallback((deletedItems) => handleResetTerms('publications', deletedItems), [handleResetTerms]);
 
-    const handleIsExternalChange = (e) => {
-        setObject(prev => {
-            const _prev = { ...prev, isExternal: e.target.checked };
-            onItemChange(_prev);
-            return (_prev)
-        })
-    }
-
     const handleTwoLangChange = (e) => {
-        // setCreateTwoLang(e.target.checked);
-        const updatedMainPhoto = { ...mainPhoto, createTwoLang: e.target.checked };
-
-        // setMainPhoto(updatedMainPhoto);
-        onMainPhotoChange(updatedMainPhoto);
+        const isChecked = e.target.checked;
         if (pathname === 'edit') {
-            if (e.target.checked) {
-                if (object.translations?.length < 2) {
-                    const updatedObject = { ...object, translations: [...object.translations, { isEnglish: !isEng }] }
-                    setObject(updatedObject);
-                    onItemChange(updatedObject);
+            if (isChecked) {
+                if (translations?.length < 2) {
+                    appendTranslation({ isEnglish: !isEng });
                 }
             } else {
-                setIsEng(oldIsEng);
+                setValue('currentLang', oldIsEng);
+            }
+        } else {
+            if (translations?.length < 2) {
+                appendTranslation({ isEnglish: !isEng });
             }
         }
+        setValue('createTwoLang', isChecked);
     }
 
     const handleLangChange = (value) => {
-        const updatedMainPhoto = { ...mainPhoto, currentLang: value ? 'eng' : 'ru' };
-        setIsEng(value);
-        setMainPhoto(updatedMainPhoto);
-        onMainPhotoChange(updatedMainPhoto);
+        setValue('currentLang', value);
     }
 
+    const formCheck = async () => {
+        const result = await trigger();
+        if (!result) {
+            const firstErrorField = Object.keys(errors)[0];
+            if (firstErrorField === 'translations') {
+                for (const [index, transl] of errors.translations.entries()) {
+                    if (!!transl) {
+                        setValue('currentLang', translations[index].isEnglish);
+                        const firstErrorField = Object.keys(transl)[0];
+                        await new Promise((resolve) => setTimeout(resolve, 10));
+                        setFocus(`translations.${index}.${firstErrorField}`);
+                        break;
+                    }
+                }
+            } else {
+                setFocus(firstErrorField);
+                const element = document.getElementById(firstErrorField);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+            return { invalid: false };
+        } else {
+            return { invalid: true };
+        };
+    };
+
     return (
-        <form
-            onSubmit={(e) => e.preventDefault()}
-            className={`flex flex-col w-full h-fit max-h-full ${pathname !== 'edit' ? 'pb-[200px]' : 'pb-16'}`}>
+        <form className={`flex flex-col w-full h-fit max-h-full ${pathname !== 'edit' ? 'pb-[200px]' : 'pb-16'}`}>
             <div className='flex flex-col w-full h-full'>
                 <div className='grid md:grid-cols-2 grid-cols-1 gap-x-4 w-full'>
-                    <Tabs.Root defaultValue={false} className="pt-2 md:col-span-2 sticky top-0 z-40  bg-[#f6f7f9]" value={isEng}
-                        onValueChange={handleLangChange}>
-                        <Tabs.List className="w-full border-b flex md:items-center gap-x-4 overflow-x-auto justify-between md:flex-row flex-col">
-                            <div className='flex items-center gap-x-4 overflow-x-auto md:order-1 order-2'>
-                                <Tabs.Trigger disabled={!createTwoLang && isEng}
-                                    className="disabled:text-gray-400 group outline-none border-b-2 border-[#f6f7f9] data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
-                                    value={false}>
-                                    <div className="pb-2.5 sm:px-2 group-disabled:text-current duration-150 group-hover:text-blue-600 font-medium">
-                                        Русскоязычная версия
-                                    </div>
-                                </Tabs.Trigger>
-                                <Tabs.Trigger disabled={!createTwoLang}
-                                    className="disabled:text-gray-400 group outline-none border-b-2 border-[#f6f7f9] data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
-                                    value={true}>
-                                    <div className="pb-2.5 sm:px-2 group-disabled:text-current duration-150 group-hover:text-blue-600 font-medium">
-                                        English version
-                                    </div>
-                                </Tabs.Trigger>
-                            </div>
-                            {(!oldTwoLang || pathname !== 'edit') && <label htmlFor='createTwoLang'
-                                className={`select-none md:order-2 order-1 pb-4 pr-1 md:pb-2.5 flex flex-row cursor-pointer items-center`}>
-                                <input type="checkbox" id='createTwoLang'
-                                    checked={createTwoLang}
-                                    onChange={handleTwoLangChange}
-                                    className="cursor-pointer min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
-                                <span>{pathname === 'edit' ? `${oldIsEng ? t('add_ru') : t('add_en')}` : t('create_two_lang')}</span>
-                            </label>}
-                        </Tabs.List>
-                    </Tabs.Root>
+                    <LangTabs
+                        isEng={isEng}
+                        oldIsEng={oldIsEng}
+                        createTwoLang={createTwoLang}
+                        oldTwoLang={oldTwoLang}
+                        isEdit={pathname === 'edit'}
+                        onLangChange={handleLangChange}
+                        onTwoLangChange={handleTwoLangChange} />
 
                     <div className='flex flex-col w-full mt-4'>
-                        {Input({
-                            label: t('title'),
-                            isEng: isEng,
-                            name: 'name',
-                            value: currentTransl?.name || '',
-                            required: true,
-                            onChange: handleInputChange
-                        })}
+                        {translationsFields.map((field, index) =>
+                            <div key={field.id} className={`${field.isEnglish === isEng ? 'visible' : 'hidden'}`}>
+                                <Input
+                                    required={createTwoLang || (field.isEnglish === isEng)}
+                                    error={errors.translations?.[index]?.name}
+                                    label={t('title')}
+                                    isEng={isEng}
+                                    {...register(`translations.${index}.name`,
+                                        { required: createTwoLang || (field.isEnglish === isEng) ? t('required') : false })}
+                                />
+                            </div>
+                        )}
+
                         {type === 'soil' && <div className='mt-3'>
-                            <Dropdown
-                                name={t('objectType')} value={object?.objectType ?? null} items={SOIL_ENUM}
-                                onCategotyChange={handleCategotyChange} dropdownKey='category' />
+                            <Controller control={control}
+                                name='objectType'
+                                render={({ field: { onChange, value } }) =>
+                                    <Dropdown name={t('objectType')} value={value}
+                                        items={SOIL_ENUM} onCategotyChange={(type) => onChange(Number(type))} dropdownKey='category' />
+                                } />
                         </div>}
 
                         <ul className='flex flex-col w-full'>
-                            {INFO.map(({ name, title }) => {
-                                return <li key={name} className={`mt-3 
-                                    ${(name === 'objectType' || name === 'comments') && 'hidden'}`}>
-                                    {
-                                        name === 'soilFeatures' || name === 'description'
-                                            ? Textarea({
-                                                name: name,
-                                                label: `${title} ${isEng ? '(EN)' : ''}`,
-                                                value: currentTransl?.[name] || '',
-                                                onChange: handleInputChange,
-                                                required: false
-                                            })
-                                            : Input({
-                                                label: title,
-                                                isEng: isEng,
-                                                name: name,
-                                                value: currentTransl?.[name] || '',
-                                                required: false,
-                                                onChange: handleInputChange
-                                            })
-                                    }
+                            {INFO.map(({ name, title }) =>
+                                name !== 'objectType' && name !== 'comments'
+                                && <li key={name} className={`mt-3`}>
+                                    {translationsFields.map((field, index) =>
+                                        <div key={field.id} className={`${field.isEnglish === isEng ? 'visible' : 'hidden'}`}>
+                                            {
+                                                name === 'soilFeatures' || name === 'description'
+                                                    ? <Textarea
+                                                        required={false}
+                                                        {...register(`translations.${index}.${name}`)}
+                                                        label={title}
+                                                        isEng={isEng}
+                                                        placeholder='' />
+                                                    : <Input
+                                                        required={false}
+                                                        error={errors.translations?.[index]?.[name]}
+                                                        label={title}
+                                                        isEng={isEng}
+                                                        {...register(`translations.${index}.${name}`)}
+                                                    />
+                                            }
+                                        </div>
+                                    )}
                                 </li>
-                            })}
+                            )}
 
-                            {type !== 'soil' ? <>
-                                <p className='font-medium mt-2'>{`${t('comments')} ${isEng ? '(EN)' : ''}`}</p>
-                                <div className={`${isEng ? 'hidden' : 'block'} w-full relative mt-1 mb-2`}>
-                                    <TextEditor dropdown={dropdown} type='comments-ru' content={object?.translations?.find(({ isEnglish }) => !isEnglish)?.comments || ''}
-                                        isSoil={true}
-                                        setContent={html => handleTextContentChange(false, 'comments', html)} />
-                                </div>
-                                <div className={`${isEng ? 'block' : 'hidden'} w-full relative mt-1 mb-2`}>
-                                    <TextEditor dropdown={dropdown} type='comments-en' content={object?.translations?.find(({ isEnglish }) => isEnglish)?.comments || ''}
-                                        isSoil={true}
-                                        setContent={html => handleTextContentChange(true, 'comments', html)} />
-                                </div>
-                            </> : ''}
-
-                            <li key='authors' className={`mt-3 ${object?.isExternal ? 'opacity-50 pointer-events-none' : ''}`}>
-                                <Filter dropdown={dropdown}
-                                    itemId={`author`} name={t('authors')} items={authors}
-                                    type='authors'
-                                    allSelectedItems={object?.authors} isEng={isEng}
-                                    addItem={newItem => handleAddTerm('authors', newItem)}
-                                    deleteItem={deletedItem => handleDeleteTerm('authors', deletedItem)}
-                                    resetItems={deletedItems => handleResetTerms('authors', deletedItems)}
-                                />
+                            <li key='authors' className={`mt-3 ${isExternal ? 'opacity-50 pointer-events-none' : ''}`}>
+                                <Controller control={control}
+                                    name='authors'
+                                    render={({ field: { value } }) =>
+                                        <Filter dropdown={dropdown}
+                                            name={t('authors')} items={authors}
+                                            type='authors' itemId={`author`}
+                                            allSelectedItems={value} isEng={isEng}
+                                            addItem={newItem => handleAddTerm('authors', newItem)}
+                                            deleteItem={deletedItem => handleDeleteTerm('authors', deletedItem)}
+                                            resetItems={deletedItems => handleResetTerms('authors', deletedItems)}
+                                        />
+                                    } />
                             </li>
+                            <label htmlFor='isExternal'
+                                className={`font-medium select-none mt-3 flex flex-row cursor-pointer items-center`}>
+                                <input type="checkbox" id='isExternal'
+                                    {...register(`isExternal`)}
+                                    className="cursor-pointer min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
+                                <span>{`${t('isExternal')} ${isEng ? '(EN)' : ''}`}</span>
+                            </label>
+                            <div className={`${isExternal ? 'visible' : 'invisible opacity-0 max-h-0 overflow-hidden'} duration-300
+                            w-full relative mt-2 `}>
+                                {translationsFields.map((field, index) =>
+                                    <div key={field.id} className={`${field.isEnglish === isEng ? 'visible' : 'hidden'}`}>
+                                        <Controller control={control}
+                                            name={`translations.${index}.externalSource`}
+                                            render={({ field: { onChange, value } }) =>
+                                                <TextEditor
+                                                    type={`externalSource`}
+                                                    content={value}
+                                                    isSoil={true}
+                                                    setContent={html => onChange(html)} />} />
+                                    </div>)}
+                            </div>
                         </ul>
-
-
                     </div>
+
                     <div className='flex flex-col w-full xl:h-[528px] md:h-[500px] h-[400px] mt-4'>
                         <label className="font-medium">
                             {t('in_map')}
                         </label>
-                        <div className='flex flex-row mt-1 mb-2 w-full space-x-3'>
-                            {MapInput({
-                                name: 'latitude',
-                                label: 'Latitude',
-                                value: object?.latitude || '',
-                                onChange: handleInputChange,
-                            })}
-                            {MapInput({
-                                name: 'longtitude',
-                                label: 'Longtitude',
-                                value: object?.longtitude || '',
-                                onChange: handleInputChange,
-                            })}
-                        </div>
+                        <ul className='flex flex-row mb-2 w-full space-x-3'>
+                            {
+                                ['latitude', 'longtitude'].map(param => <li key={param}>
+                                    <Input
+                                        required={false}
+                                        error={errors[param]}
+                                        placeholder={param.charAt(0).toUpperCase() + param.slice(1)}
+                                        isEng={isEng}
+                                        type='number'
+                                        {...register(param)}
+                                    />
+                                </li>)
+                            }
+                        </ul>
 
                         <div id='map-section' className='border rounded-lg overflow-hidden mt-1 w-full h-full'>
-                            <MapSelect id={id} type={type} latitude={object?.latitude} longtitude={object?.longtitude}
+                            <MapSelect id={id} type={type} latitude={watch('latitude')} longtitude={watch('longtitude')}
                                 onCoordinateChange={handleCoordChange} />
                         </div>
                     </div>
 
 
                     <div className='md:col-span-2'>
-                        <label htmlFor='isExternal'
-                            className={`font-medium select-none mt-3 flex flex-row cursor-pointer items-center`}>
-                            <input type="checkbox" id='isExternal'
-                                checked={object?.isExternal}
-                                onChange={handleIsExternalChange}
-                                className="cursor-pointer min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
-                            <span>{`${t('isExternal')} ${isEng ? '(EN)' : ''}`}</span>
-                        </label>
-
-                        <div className={`${isEng ? 'hidden' : 'block'}
-                            w-full relative mt-2 duration-300 
-                            ${object?.isExternal ? 'visible' : 'invisible opacity-0 max-h-0'}`}>
-                            <TextEditor dropdown={dropdown} type='externalSource-ru' content={object?.translations?.find(({ isEnglish }) => !isEnglish)?.externalSource || ''}
-                                isSoil={true}
-                                setContent={html => handleTextContentChange(false, 'externalSource', html)} />
-                        </div>
-                        <div className={`${isEng ? 'block' : 'hidden'}
-                            w-full relative mt-2 duration-300 
-                            ${object?.isExternal ? 'visible' : 'invisible opacity-0 max-h-0'}`}>
-                            <TextEditor dropdown={dropdown} type='externalSource-en' content={object?.translations?.find(({ isEnglish }) => isEnglish)?.externalSource || ''}
-                                isSoil={true}
-                                setContent={html => handleTextContentChange(true, 'externalSource', html)} />
-                        </div>
-
-                        {type === 'soil' ? <>
+                        <>
                             <p className='font-medium mt-8'>{`${t('comments')} ${isEng ? '(EN)' : ''}`}</p>
-                            <div className={`${isEng ? 'hidden' : 'block'} w-full relative mt-1`}>
-                                <TextEditor dropdown={dropdown} type='comments-ru' content={object?.translations?.find(({ isEnglish }) => !isEnglish)?.comments || ''}
-                                    isSoil={true}
-                                    setContent={html => handleTextContentChange(false, 'comments', html)} />
-                            </div>
-                            <div className={`${isEng ? 'block' : 'hidden'} w-full relative mt-1`}>
-                                <TextEditor dropdown={dropdown} type='comments-en' content={object?.translations?.find(({ isEnglish }) => isEnglish)?.comments || ''}
-                                    isSoil={true}
-                                    setContent={html => handleTextContentChange(true, 'comments', html)} />
-                            </div>
-                        </> : ''}
+                            {
+                                translationsFields.map((field, index) =>
+                                    <div key={field.id} className={`${field.isEnglish === isEng ? 'visible' : 'hidden'}`}>
+                                        <Controller control={control}
+                                            name={`translations.${index}.comments`}
+                                            render={({ field: { onChange, value } }) =>
+                                                <div className={`w-full relative mt-1 mb-2`}>
+                                                    <TextEditor type={`comments-${field.id}`}
+                                                        content={value}
+                                                        isSoil={true}
+                                                        setContent={html => onChange(html)} />
+                                                </div>
+                                            } />
+                                    </div>)
+                            }
+                        </>
 
-                        <p className='font-medium mt-8'>{t('main_photo')}<span className='text-orange-500'>*</span></p>
-                        {mainPhoto.isLoading || mainPhoto.path ?
-                            <div className='grid md:grid-cols-2 grid-cols-1 gap-4 mt-1'>
-                                <PhotoCard {...mainPhoto} isEng={isEng} onDelete={handleMainPhotoDelete}
-                                    onChange={handleMainPhotoChange} />
-                            </div>
-                            : <div className='md:w-[50%] w-full h-[150px] pr-2 mt-1'>
-                                <DragAndDrop id='main-photo' onLoadClick={handleMainPhotoSend} isMultiple={false} accept='img' />
-                            </div>}
+                        <div id='mainPhoto'>
+                            <p className='font-medium mt-8'>{t('main_photo')}<span className='text-orange-500'>*</span></p>
+                            <Controller control={control}
+                                name='mainPhoto'
+                                rules={{
+                                    required: "Это обязательное поле",
+                                    validate: {
+                                        hasPath: value => value?.path || t('required')
+                                    }
+                                }}
+                                render={({ field: { value }, fieldState }) =>
+                                    <div className='md:w-[50%] w-full pr-2 mt-1'>
+                                        {value?.isLoading || value?.path
+                                            ? <PhotoCard {...value} isEng={isEng}
+                                                onDelete={handleMainPhotoDelete}
+                                                onChange={handleMainPhotoChange} />
+                                            : <div className='h-[150px]'>
+                                                <DragAndDrop id='mainPhoto'
+                                                    error={fieldState.error}
+                                                    onLoadClick={handleMainPhotoSend}
+                                                    isMultiple={false}
+                                                    accept='img' />
+                                            </div>}
+                                    </div>}
+                            />
+                        </div>
 
 
-                        <p className='font-medium mt-8'>{t('other_photos')}</p>
-                        {!otherPhotos?.length ?
-                            <div className='md:w-[50%] w-full h-[150px] pr-2 mt-1'>
-                                <DragAndDrop id='other-photos' onLoadClick={handleOtherPhotoSend} isMultiple={true} accept='img' />
-                            </div>
-                            :
-                            <ul className={`grid md:grid-cols-2 grid-cols-1 gap-4 `}>
-                                {otherPhotos.map((otherPhoto, index) => <li key={`otherPhoto-${index}`}>
-                                    <PhotoCard {...otherPhoto} isEng={isEng} onDelete={handleOtherPhotoDelete}
-                                        onChange={handleOtherPhotosChange} />
-                                </li>)}
-                                <div key='otherPhoto-dragAndDrop' className='h-[150px]'>
-                                    <DragAndDrop id='other-photos' onLoadClick={handleOtherPhotoSend} isMultiple={true} accept='img' />
-                                </div>
-                            </ul>}
+                        <div className='mt-8 flex flex-col'>
+                            <p className='font-medium'>{t('other_photos')}</p>
+                            <Controller control={control}
+                                name='objectPhoto'
+                                render={({ field: { value }, fieldState }) =>
+                                    <ul className={`mt-1 grid md:grid-cols-2 grid-cols-1 gap-4 `}>
+                                        {!!value.length && value.map((photo, idx) => <li key={`photo-${idx}`}>
+                                            <PhotoCard {...photo} isEng={isEng}
+                                                onDelete={handleOtherPhotoDelete}
+                                                onChange={handleOtherPhotosChange} />
+                                        </li>)}
+                                        <div className='h-[150px]'>
+                                            <DragAndDrop id='objectPhoto'
+                                                error={fieldState.error}
+                                                onLoadClick={handleOtherPhotoSend}
+                                                isMultiple={true}
+                                                accept='img' />
+                                        </div>
+                                    </ul>}
+                            />
+                        </div>
 
 
-                        {type === 'soil' ? <>
+                        {type === 'soil' && <>
                             <p className='font-medium mt-8'>{t('classifications')}</p>
                             <ul className='grid md:grid-cols-2 grid-cols-1 gap-4 w-full mt-1'>
                                 {classifications?.map(item => {
                                     const isVisible = item.translationMode == 0 || (isEng ? (item.translationMode == 1) : (item.translationMode == 2))
                                     if (isVisible) return <li key={`classification-${item.id}`}>
-                                        <Filter dropdown={dropdown}
-                                            type='classif'
-                                            itemId={`classif-${item.id}`} name={isEng ? item.nameEng : item.nameRu}
-                                            items={item.terms} isEng={isEng}
-                                            allSelectedItems={object?.soilTerms}
-                                            addItem={addTerm}
-                                            deleteItem={deleteTerm}
-                                            resetItems={resetTerms}
-                                        />
+                                        <Controller control={control}
+                                            name='soilTerms'
+                                            render={({ field: { value } }) =>
+                                                <Filter dropdown={dropdown}
+                                                    name={isEng ? item.nameEng : item.nameRu} items={item.terms}
+                                                    type='classif'
+                                                    allSelectedItems={value} isEng={isEng}
+                                                    addItem={addTerm}
+                                                    deleteItem={deleteTerm}
+                                                    resetItems={resetTerms}
+                                                />
+                                            } />
                                     </li>
                                 })}
                             </ul>
-                        </> : ''}
+                        </>}
 
                         <p className='font-medium mt-8'>{t('connection')}</p>
                         <div className='grid md:grid-cols-2 grid-cols-1 gap-4 w-full mt-1'>
-                            {type !== 'ecosystem' && <Filter dropdown={dropdown}
-                                name={t('ecosystems')} items={ecosystems}
-                                type='ecosystem'
-                                allSelectedItems={object?.ecoSystems} isEng={isEng}
-                                addItem={addEcosystem}
-                                deleteItem={deleteEcosystem}
-                                resetItems={resetEcosystems}
-                            />}
+                            {type !== 'ecosystem' && <Controller control={control}
+                                name='ecoSystems'
+                                render={({ field: { value } }) =>
+                                    <Filter dropdown={dropdown}
+                                        name={t('ecosystems')} items={ecosystems}
+                                        type='ecosystem'
+                                        allSelectedItems={value} isEng={isEng}
+                                        addItem={addEcosystem}
+                                        deleteItem={deleteEcosystem}
+                                        resetItems={resetEcosystems}
+                                    />
+                                } />
+                            }
 
-                            {type !== 'soil' && <Filter dropdown={dropdown}
-                                name={t('soils')} items={soils}
-                                type='soil'
-                                allSelectedItems={object?.soilObjects} isEng={isEng}
-                                addItem={addSoil}
-                                deleteItem={deleteSoil}
-                                resetItems={resetSoils}
-                            />}
+                            {type !== 'soil' && <Controller control={control}
+                                name='soilObjects'
+                                render={({ field: { value } }) =>
+                                    <Filter dropdown={dropdown}
+                                        name={t('soils')} items={soils}
+                                        type='soil'
+                                        allSelectedItems={value} isEng={isEng}
+                                        addItem={addSoil}
+                                        deleteItem={deleteSoil}
+                                        resetItems={resetSoils}
+                                    />
+                                } />
+                            }
 
-                            <Filter dropdown={dropdown}
-                                name={t('publications')} items={publications}
-                                type='publications'
-                                allSelectedItems={object?.publications} isEng={isEng}
-                                addItem={addPublication}
-                                deleteItem={deletePublication}
-                                resetItems={resetPublications}
-                            />
+                            <Controller control={control}
+                                name='publications'
+                                render={({ field: { value } }) =>
+                                    <Filter dropdown={dropdown}
+                                        name={t('publications')} items={publications}
+                                        type='publications'
+                                        allSelectedItems={value} isEng={isEng}
+                                        addItem={addPublication}
+                                        deleteItem={deletePublication}
+                                        resetItems={resetPublications}
+                                    />
+                                } />
                         </div>
 
-                        <div className='mt-8 md:w-[50%] w-full md:pr-2 pr-0'>  {
-                            Input({
-                                label: t('code'),
-                                name: 'code',
-                                value: currentTransl?.code || '',
-                                required: false,
-                                onChange: handleInputChange
-                            })
-                        }
-                        </div>
+                        {translationsFields.map((field, index) =>
+                            <div key={field.id} className={`mt-8 md:w-[50%] w-full md:pr-2 pr-0
+                                        ${field.isEnglish === isEng ? 'visible' : 'hidden'}`}>
+                                <Input
+                                    required={false}
+                                    error={errors.translations?.[index]?.code}
+                                    label={t('code')}
+                                    isEng={isEng}
+                                    {...register(`translations.${index}.code`)}
+                                />
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
         </form >
     )
 }
+export default forwardRef(ObjectForm);

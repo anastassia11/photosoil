@@ -7,6 +7,7 @@ import { getQuantity } from '@/api/enums/get_quantity';
 import { getAllNews } from '@/api/news/get_allNews';
 import { getTranslation } from '@/i18n/client';
 import { BASE_SERVER_URL } from '@/utils/constants';
+import axios from 'axios';
 import moment from 'moment';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -134,7 +135,6 @@ export default function AdminPageComponent() {
     return (
         <div className='px-4 sm:py-4 sm:px-6 md:py-8 lg:px-8'>
             <section className="max-w-screen-2xl mx-auto">
-
                 <div className="mx-auto max-w-3xl text-center">
                     <h2 className="sm:text-4xl text-2xl font-semibold text-center">{t('admin_h1')}</h2>
 

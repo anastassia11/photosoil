@@ -77,7 +77,7 @@ export default function Header({ locale }) {
                 </Link>
             </div>
 
-            <ul className='hidden xl:flex flex-row items-center space-x-7 2xl:space-x-8'>
+            <ul className='hidden xl:flex flex-row items-center space-x-5 xl:space-x-7 2xl:space-x-8'>
                 {navigation.map(({ key, title, isDropdown, navs }) => <li key={key}>
                     {isDropdown ?
                         <>

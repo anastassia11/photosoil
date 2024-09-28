@@ -13,7 +13,6 @@ import { useDispatch } from 'react-redux';
 export default function NewsEditComponent({ id }) {
     const dispatch = useDispatch();
     const searchParams = useSearchParams();
-    const [isLoading, setIsLoading] = useState(false);
     const [news, setNews] = useState({});
     const [oldTwoLang, setOldTwoLang] = useState(false);
     const { locale } = useParams();
@@ -51,7 +50,6 @@ export default function NewsEditComponent({ id }) {
         } else {
             dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }));
         }
-        setIsLoading(false);
     }
 
     const editPhoto = async (id, data) => {
@@ -62,7 +60,6 @@ export default function NewsEditComponent({ id }) {
     }
 
     const handleSubmit = async ({ createTwoLang, isEng, news, newsPhotos }) => {
-        setIsLoading(true)
         try {
             const langNews = { ...news, translations: news.translations.filter(({ isEnglish }) => isEnglish === isEng) };
             if (createTwoLang) {
@@ -77,14 +74,12 @@ export default function NewsEditComponent({ id }) {
             await fetchEditNews(createTwoLang ? news : langNews);
         } catch (error) {
             dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }));
-        } finally {
-            setIsLoading(false);
         }
     }
 
     return (
         <>
-            {news && <NewsForm _news={news} isLoading={isLoading}
+            {news && <NewsForm _news={news}
                 pathname='edit'
                 oldTwoLang={oldTwoLang} oldIsEng={searchParams.get('lang') === 'eng'}
                 onNewsSubmit={handleSubmit} btnText={t('save')} title={t('edit_news')} />}

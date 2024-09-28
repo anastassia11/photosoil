@@ -2,11 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Dropdown from './ui-kit/Dropdown';
-import { BASE_SERVER_URL } from '@/utils/constants';
 import DragAndDrop from './ui-kit/DragAndDrop';
-import { Oval } from 'react-loader-spinner';
 import { sendPhoto } from '@/api/photo/send_photo';
-import * as Tabs from "@radix-ui/react-tabs";
 import { useConstants } from '@/hooks/useConstants';
 import Filter from '../soils/Filter';
 import { getBaseEcosystems } from '@/api/ecosystem/get_base_ecosystems';
@@ -22,16 +19,39 @@ import FileCard from './ui-kit/FileCard';
 import { openAlert } from '@/store/slices/alertSlice';
 import { getTranslation } from '@/i18n/client';
 import { useParams } from 'next/navigation';
+import LangTabs from './ui-kit/LangTabs';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import SubmitBtn from './ui-kit/SubmitBtn';
 
-export default function PublicationForm({ _publication, pathname, onPublicationSubmit, isLoading, btnText, title, oldTwoLang, oldIsEng }) {
-    const [publication, setPublication] = useState({});
-    const [file, setFile] = useState({});
+export default function PublicationForm({ _publication, pathname, onPublicationSubmit, btnText, title, oldTwoLang, oldIsEng }) {
+    const { register, reset, control, watch, trigger, setValue, getValues, setFocus,
+        formState: { errors, isSubmitting } } = useForm({
+            mode: 'onChange',
+            defaultValues: {
+                type: 1,
+                translations: [{ isEnglish: false }],
+                file: {},
+                soilObjects: [],
+                ecoSystems: [],
+                coordinates: []
+            }
+        });
+    const { fields: translationsFields, append: appendTranslation } = useFieldArray({
+        control,
+        name: 'translations'
+    });
+
+    const coordinates = watch('coordinates');
+    const translations = watch('translations');
+
     const [isEng, setIsEng] = useState(false);
     const [createTwoLang, setCreateTwoLang] = useState(false);
     const [ecosystems, setEcosystems] = useState([]);
     const [soils, setSoils] = useState([]);
-    const [coordinates, setCoordinates] = useState([]);
-    const [currentCoord, setCurrentCoord] = useState({});
+    const [currentCoord, setCurrentCoord] = useState({
+        latitude: '',
+        longtitude: ''
+    });
 
     const dropdown = useSelector(state => state.general.dropdown);
     const { locale } = useParams();
@@ -47,24 +67,16 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
     }, [])
 
     useEffect(() => {
-        fetchEcosystems();
-        fetchSoils();
-    }, [])
-
-    useEffect(() => {
         if (_publication) {
-            setPublication({
+            reset({
+                ...getValues(),
                 ..._publication,
-                fileId: _publication.file?.id,
                 soilObjects: _publication.soilObjects?.map(({ id }) => id),
                 ecoSystems: _publication.ecoSystems?.map(({ id }) => id),
+                coordinates: _publication.coordinates ? JSON.parse(_publication.coordinates) : [],
             });
-            setCoordinates(_publication.coordinates ? JSON.parse(_publication.coordinates) : []);
-            _publication.file && setFile(_publication.file);
             setIsEng(oldIsEng);
             setCreateTwoLang(_publication.translations?.length > 1);
-        } else {
-            setPublication({ translations: [{ isEnglish: false }] });
         }
     }, [_publication])
 
@@ -82,27 +94,13 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
         }
     }
 
-    const handleInputChange = (e) => {
-        const { value, name } = e.target;
-        setPublication(prevPubl => {
-            const _prevPubl = name === 'doi' ? { ...prevPubl, [name]: value } : {
-                ...prevPubl, translations: prevPubl.translations.map(translation =>
-                    translation.isEnglish === isEng ? { ...translation, [name]: value } : translation)
-            }
-            return _prevPubl;
-        });
-    }
-
-    const handleTypeChange = (id) => {
-        setPublication(prev => ({ ...prev, type: Number(id) }));
-    }
-
     const handleFileLoad = async (file) => {
-        setFile({ isLoading: true, name: file.name });
+        setValue('file', { isLoading: true, name: file.name });
         const result = await sendPhoto(file);
         if (result.success) {
-            setPublication(prev => ({ ...prev, fileId: result.data.id }));
-            setFile({ ...result.data, isLoading: false });
+            setValue('file', { ...result.data, isLoading: false });
+        } else {
+            dispatch(openAlert({ title: t('error'), message: t('error_file'), type: 'error' }))
         }
     }
 
@@ -116,30 +114,27 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
 
         const isConfirm = await dispatch(modalThunkActions.open());
         if (isConfirm.payload) {
-            const _publication = { ...publication };
-            delete _publication.fileId;
-            delete _publication.file;
-            setPublication(_publication);
-            setFile({});
+            setValue('file', '');
         }
         dispatch(closeModal());
     }
 
     const handleTwoLangChange = (e) => {
+        const isChecked = e.target.checked;
         if (pathname === 'edit') {
-            if (e.target.checked) {
-                if (publication.translations?.length < 2) {
-                    setPublication(prevPubl => ({ ...prevPubl, translations: [...prevPubl.translations, { isEnglish: !isEng }] }));
+            if (isChecked) {
+                if (translations?.length < 2) {
+                    appendTranslation({ isEnglish: !isEng });
                 }
             } else {
                 setIsEng(oldIsEng);
             }
         } else {
-            if (publication.translations?.length < 2) {
-                setPublication(prevPubl => ({ ...prevPubl, translations: [...prevPubl.translations, { isEnglish: !isEng }] }));
+            if (translations?.length < 2) {
+                appendTranslation({ isEnglish: !isEng });
             }
         }
-        setCreateTwoLang(e.target.checked);
+        setCreateTwoLang(isChecked);
     }
 
     const handleLangChange = (value) => {
@@ -147,138 +142,151 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
     }
 
     const handleAddTerm = useCallback((type, newItem) => {
-        setPublication(prevPubl => ({ ...prevPubl, [type]: prevPubl[type] ? [...prevPubl[type], newItem] : [newItem] }));
+        const values = getValues(type);
+        setValue(type, [...values, newItem]);
     }, [])
 
     const handleDeleteTerm = useCallback((type, deletedItem) => {
-        setPublication(prevPubl => ({ ...prevPubl, [type]: prevPubl[type]?.filter(id => id !== deletedItem) }));
+        const values = getValues(type);
+        setValue(type, values.filter(value => value !== deletedItem));
     }, [])
 
     const handleResetTerms = useCallback((type, deletedItems) => {
-        setPublication(prevPubl => ({ ...prevPubl, [type]: prevPubl[type].filter(id => !deletedItems.includes(id)) }));
+        const values = getValues(type);
+        setValue(type, values.filter(value => !deletedItems.includes(value)));
     }, [])
 
     const handleCoordChange = ({ latitude, longtitude }) => {
         setCurrentCoord({ latitude, longtitude });
     }
 
+    const handleCoordInputChange = (e) => {
+        const { value, name } = e.target;
+        setCurrentCoord(prev => {
+            const _prev = { ...prev, [name]: Number(value) };
+            mapRef.current.currentCoordChange([Number(_prev.longtitude), Number(_prev.latitude)]);
+            return _prev;
+        })
+    }
+
     const handleCoordArrayChange = (newCoordArray) => {
-        setCoordinates(newCoordArray);
-        setPublication(prevPubl => ({ ...prevPubl, coordinates: JSON.stringify(newCoordArray) }));
+        setValue('coordinates', newCoordArray);
     }
 
     const handleCoordDelete = (e) => {
         e.stopPropagation();
         mapRef.current.deleteCurrentPoint();
+        setValue('coordinates',
+            coordinates.filter(({ latitude, longtitude }) =>
+                (latitude !== currentCoord.latitude) && (longtitude !== currentCoord.longtitude)));
+        setCurrentCoord({
+            latitude: '',
+            longtitude: ''
+        });
     }
 
-    const handleSubmit = (e) => {
+    const formSubmit = async (e) => {
         e.preventDefault();
-        if (createTwoLang ? (publication.translations?.every(({ name }) => name?.length))
-            : publication.translations?.find(({ isEnglish }) => isEng === isEnglish).name) {
-            onPublicationSubmit({ createTwoLang, isEng, publication });
+        const result = await trigger();
+        if (result) {
+            const data = getValues();
+            const publication = {
+                ...data,
+                coordinates: JSON.stringify(data.coordinates),
+                fileId: data.file.id,
+            };
+            await onPublicationSubmit({ createTwoLang, isEng, publication });
         } else {
-            dispatch(openAlert({ title: t('warning'), message: t('form_required'), type: 'warning' }))
+            const firstErrorField = Object.keys(errors)[0];
+            if (firstErrorField === 'translations') {
+                for (const [index, transl] of errors.translations.entries()) {
+                    if (!!transl) {
+                        setIsEng(translations[index].isEnglish);
+                        const firstErrorField = Object.keys(transl)[0];
+                        await new Promise((resolve) => setTimeout(resolve, 10));
+                        setFocus(`translations.${index}.${firstErrorField}`);
+                        break;
+                    }
+                }
+            } else {
+                setFocus(firstErrorField);
+            }
         }
     }
 
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col w-full flex-1 pb-[150px]">
+        <form onSubmit={formSubmit} className="flex flex-col w-full flex-1 pb-[150px]">
             <div
                 className='mb-2 flex md:flex-row flex-col md:items-end md:justify-between space-y-1 md:space-y-0'>
                 <h1 className='sm:text-2xl text-xl font-semibold mb-2 md:mb-0'>
                     {title}
                 </h1>
-                <button
-                    type='submit'
-                    disabled={isLoading}
-                    className="md:min-w-[232px] w-full min-h-[40px] flex items-center justify-center self-end md:w-fit px-8 py-2 font-medium text-center text-white transition-colors duration-300 
-                transform bg-blue-600 disabled:bg-blue-600/70 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600 align-bottom">
-                    {isLoading ?
-                        <Oval
-                            height={20}
-                            width={20}
-                            color="#FFFFFF"
-                            visible={true}
-                            ariaLabel='oval-loading'
-                            secondaryColor="#FFFFFF"
-                            strokeWidth={4}
-                            strokeWidthSecondary={4} />
-                        : btnText}
-                </button>
+                <div className='md:min-w-[200px] md:w-fit'>
+                    <SubmitBtn isSubmitting={isSubmitting} btnText={btnText} />
+                </div>
             </div>
             <div className="flex flex-col w-full h-fit pb-16">
                 <div className='flex flex-col w-full h-full pb-16'>
                     <div className='grid md:grid-cols-2 grid-cols-1 gap-4 w-full'>
-                        <Tabs.Root defaultValue={false} className="pt-2 md:col-span-2 sticky top-0 z-40  bg-[#f6f7f9]" value={isEng}
-                            onValueChange={handleLangChange}>
-                            <Tabs.List className="w-full border-b flex md:items-center gap-x-4 overflow-x-auto justify-between md:flex-row flex-col">
-                                <div className='flex items-center gap-x-4 overflow-x-auto md:order-1 order-2'>
-                                    <Tabs.Trigger disabled={!createTwoLang && isEng}
-                                        className="disabled:text-gray-400 group outline-none border-b-2 border-[#f6f7f9] data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
-                                        value={false}>
-                                        <div className="pb-2.5 px-2 group-disabled:text-current duration-150 group-hover:text-blue-600 font-medium">
-                                            Русскоязычная версия
-                                        </div>
-                                    </Tabs.Trigger>
-                                    <Tabs.Trigger disabled={!createTwoLang}
-                                        className="disabled:text-gray-400 group outline-none border-b-2 border-[#f6f7f9] data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
-                                        value={true}>
-                                        <div className="pb-2.5 px-2 group-disabled:text-current duration-150 group-hover:text-blue-600 font-medium">
-                                            English version
-                                        </div>
-                                    </Tabs.Trigger>
-                                </div>
-                                {(!oldTwoLang || pathname !== 'edit') && <label htmlFor='createTwoLang' className={`md:order-2 order-1 pb-4 pr-1 md:pb-2.5 flex flex-row cursor-pointer items-center`}>
-                                    <input type="checkbox" id='createTwoLang'
-                                        checked={createTwoLang}
-                                        onChange={handleTwoLangChange}
-                                        className="min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
-                                    <span>{pathname === 'edit' ? `${oldIsEng ? t('add_ru') : t('add_en')}` : t('create_two_lang')}</span>
-                                </label>}
-                            </Tabs.List>
-                        </Tabs.Root>
-                        <div className='flex flex-col w-full'>
-                            <ul className='flex flex-col w-full'>
-                                {PUBLICATION_INFO.map(({ name, title }, idx) => {
-                                    return <li key={name} className={`${idx && 'mt-3'}`}>
-                                        {name === 'description' ? Textarea({
-                                            name,
-                                            label: `${title} ${isEng ? '(EN)' : ''}`,
-                                            value: publication.translations?.find(({ isEnglish }) => isEng === isEnglish)?.[name] || '',
-                                            onChange: handleInputChange
-                                        }) :
-                                            name === 'type' ? <Dropdown name={title} value={publication.type} items={PUBLICATION_ENUM}
-                                                onCategotyChange={handleTypeChange} dropdownKey='category' /> :
-                                                Input({
-                                                    name: name,
-                                                    label: title,
-                                                    isEng: name !== 'doi' && isEng,
-                                                    value: name === 'doi' ? publication.doi : publication.translations?.find(({ isEnglish }) => isEng === isEnglish)?.[name] || '',
-                                                    onChange: handleInputChange,
-                                                    required: name === 'name'
-                                                })}
-                                    </li>
-                                })}
-                            </ul>
-                        </div>
+                        <LangTabs
+                            isEng={isEng}
+                            oldIsEng={oldIsEng}
+                            createTwoLang={createTwoLang}
+                            oldTwoLang={oldTwoLang}
+                            isEdit={pathname === 'edit'}
+                            onLangChange={handleLangChange}
+                            onTwoLangChange={handleTwoLangChange} />
+                        <ul className='flex flex-col w-full'>
+                            {PUBLICATION_INFO.map(({ name, title }, idx) => {
+                                return <li key={name} className={`${idx && 'mt-3'}`}>
+                                    {name === 'type' ? <Controller control={control}
+                                        name='type'
+                                        render={({ field: { onChange, value } }) =>
+                                            <Dropdown name={title} value={value}
+                                                items={PUBLICATION_ENUM} onCategotyChange={(type) => onChange(Number(type))} dropdownKey='category' />
+                                        } />
+                                        : name === 'doi' ? <Input required={false}
+                                            label={title}
+                                            {...register(`doi`,
+                                                { required: false })}
+                                        /> :
+                                            translationsFields.map((field, index) =>
+                                                <div key={field.id} className={`${field.isEnglish === isEng ? 'visible' : 'hidden'}`}>
+                                                    {name === 'description'
+                                                        ? <Textarea
+                                                            required={false}
+                                                            {...register(`translations.${index}.${name}`)}
+                                                            label={title}
+                                                            isEng={isEng}
+                                                            placeholder='' />
+                                                        : <Input
+                                                            required={name === 'name'}
+                                                            error={errors.translations?.[index]?.[name]}
+                                                            label={title}
+                                                            isEng={isEng}
+                                                            {...register(`translations.${index}.${name}`,
+                                                                { required: name === 'name' ? t('required') : false })}
+                                                        />}
+                                                </div>
+                                            )}
+                                </li>
+                            })}
+                        </ul>
                         <div className='flex flex-col w-full xl:h-[528px] md:h-[500px] h-[400px]'>
                             <label className="font-medium">
                                 {t('in_map')}
                             </label>
                             <div className='flex flex-row space-x-2 pr-2'>
-                                {MapInput({
-                                    name: 'latitude',
-                                    label: 'Latitude',
-                                    value: currentCoord.latitude || '',
-                                    onChange: handleInputChange,
-                                })}
-                                {MapInput({
-                                    name: 'longtitude',
-                                    label: 'Longtitude',
-                                    value: currentCoord.longtitude || '',
-                                    onChange: handleInputChange,
-                                })}
+                                <MapInput name='latitude'
+                                    label='Latitude'
+                                    value={currentCoord.latitude}
+                                    onChange={handleCoordInputChange}
+                                />
+                                <MapInput name='longtitude'
+                                    label='Longtitude'
+                                    value={currentCoord.longtitude}
+                                    onChange={handleCoordInputChange}
+                                />
                                 <button onClick={handleCoordDelete} type='button'
                                     className='text-gray-500 hover:text-red-700 duration-300'>
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
@@ -297,31 +305,48 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
                     </div>
 
                     <p className='font-medium mt-3 w-full'>{t('file')}</p>
-                    {file.name || file.fileName ? FileCard({
-                        ...file,
-                        onDelete: handleFileDelete,
-                    }) : <div className='md:w-[50%] w-full h-[150px] pr-2 mt-1'>
-                        <DragAndDrop id='publ-files' onLoadClick={handleFileLoad} isMultiple={false} accept='pdf' />
-                    </div>}
+                    <Controller control={control}
+                        name='file'
+                        render={({ field: { value }, fieldState }) =>
+                            <>
+                                {!!value?.length
+                                    ? <FileCard {...value} onDelete={handleFileDelete} />
+                                    : <div className='md:w-[50%] w-full h-[150px] pr-2 mt-1'>
+                                        <DragAndDrop id='publ-files'
+                                            error={fieldState.error}
+                                            onLoadClick={handleFileLoad}
+                                            isMultiple={false}
+                                            accept='pdf' />
+                                    </div>}
+                            </>}
+                    />
 
                     <p className='font-medium mt-5'>{t('connection')}</p>
                     <div className='md:w-[50%] w-full mt-1 flex flex-col space-y-4'>
-                        <Filter dropdown={dropdown}
-                            name={t('soils')} items={soils}
-                            type='soil'
-                            allSelectedItems={publication?.soilObjects} isEng={isEng}
-                            addItem={newItem => handleAddTerm('soilObjects', newItem)}
-                            deleteItem={deletedItem => handleDeleteTerm('soilObjects', deletedItem)}
-                            resetItems={deletedItems => handleResetTerms('soilObjects', deletedItems)}
-                        />
-                        <Filter dropdown={dropdown}
-                            name={t('ecosystems')} items={ecosystems}
-                            type='ecosystem'
-                            allSelectedItems={publication?.ecoSystems} isEng={isEng}
-                            addItem={newItem => handleAddTerm('ecoSystems', newItem)}
-                            deleteItem={deletedItem => handleDeleteTerm('ecoSystems', deletedItem)}
-                            resetItems={deletedItems => handleResetTerms('ecoSystems', deletedItems)}
-                        />
+                        <Controller control={control}
+                            name='soilObjects'
+                            render={({ field: { value } }) =>
+                                <Filter dropdown={dropdown}
+                                    name={t('soils')} items={soils}
+                                    type='soil'
+                                    allSelectedItems={value} isEng={isEng}
+                                    addItem={newItem => handleAddTerm('soilObjects', newItem)}
+                                    deleteItem={deletedItem => handleDeleteTerm('soilObjects', deletedItem)}
+                                    resetItems={deletedItems => handleResetTerms('soilObjects', deletedItems)}
+                                />
+                            } />
+                        <Controller control={control}
+                            name='ecoSystems'
+                            render={({ field: { value } }) =>
+                                <Filter dropdown={dropdown}
+                                    name={t('ecosystems')} items={ecosystems}
+                                    type='ecosystem'
+                                    allSelectedItems={value} isEng={isEng}
+                                    addItem={newItem => handleAddTerm('ecoSystems', newItem)}
+                                    deleteItem={deletedItem => handleDeleteTerm('ecoSystems', deletedItem)}
+                                    resetItems={deletedItems => handleResetTerms('ecoSystems', deletedItems)}
+                                />
+                            } />
                     </div>
                 </div>
             </div >

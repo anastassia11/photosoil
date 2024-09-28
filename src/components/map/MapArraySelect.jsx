@@ -5,14 +5,13 @@ import Feature from 'ol/Feature';
 import Map from 'ol/Map';
 import { LineString, Point } from 'ol/geom';
 import View from 'ol/View';
-import { Icon, Style, Fill, Stroke, RegularShape } from 'ol/style';
-import { Draw, Modify, Snap } from 'ol/interaction';
+import { Style, Fill, Stroke, RegularShape } from 'ol/style';
+import { Modify, Snap } from 'ol/interaction';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { fromLonLat, toLonLat } from 'ol/proj';
 import { OSM, Vector as VectorSource } from 'ol/source';
 
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import FullScreen from './FullScreen';
 import Zoom from './Zoom';
 
 function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref) {
@@ -80,7 +79,7 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref
     }, [coordinates])
 
     useImperativeHandle(ref, () => ({
-        deleteCurrentPoint
+        deleteCurrentPoint, currentCoordChange
     }))
 
     const init = () => {
@@ -181,6 +180,15 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref
         onSelectedPointFeatureChenged();
     }
 
+    const currentCoordChange = (coordinates) => {
+        // const newCord = fromLonLat(coordinates);
+        // const newPointFeature = new Feature({
+        //     geometry: new Point(newCord)
+        // });
+        // newPointFeature.setStyle(selectedPointStyle);
+        // selectedPointFeature.current = newPointFeature;
+    }
+
     const handleModifyend = (e) => {
         //сбрасываем старое выделение
         if (selectedPointFeature.current) {
@@ -236,7 +244,7 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref
         }
         if (coordinates.length > 0) {
             const routLineVectorSource = new VectorSource();
-            var coords = pointVectorSource.getFeatures().map(function (item) {
+            let coords = pointVectorSource.getFeatures().map(function (item) {
                 return item.getGeometry().getCoordinates();
             });
             const routLineFeature = new Feature(
@@ -264,23 +272,8 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref
         }
     }
 
-    const handleFullClick = () => {
-        if (mapElement.current.requestFullscreen) {
-            mapElement.current.requestFullscreen();
-        } else if (mapElement.current.mozRequestFullScreen) {
-            mapElement.current.mozRequestFullScreen();
-        } else if (mapElement.current.webkitRequestFullscreen) {
-            mapElement.current.webkitRequestFullscreen();
-        } else if (mapElement.current.msRequestFullscreen) {
-            mapElement.current.msRequestFullscreen();
-        }
-    }
-
     return (
         <div ref={mapElement} className="w-full h-full z-10 relative">
-            {/* <div className='z-20 absolute top-0 right-0 m-2 sm:block hidden'>
-                <FullScreen onClick={handleFullClick} />
-            </div> */}
             <div className='z-20 absolute top-[calc(50%-50px)] right-0 m-2 '>
                 <Zoom onClick={handleZoomClick} />
             </div>

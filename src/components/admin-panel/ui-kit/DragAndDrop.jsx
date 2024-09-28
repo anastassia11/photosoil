@@ -3,10 +3,10 @@
 import { getTranslation } from '@/i18n/client';
 import { openAlert } from '@/store/slices/alertSlice';
 import { useParams } from 'next/navigation';
-import { memo, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux';
 
-const DragAndDrop = memo(function DragAndDrop({ id, onLoadClick, isMultiple, accept }) {
+const DragAndDrop = memo(function DragAndDrop({ id, onLoadClick, isMultiple, accept, error }) {
     const dispatch = useDispatch();
     const [drag, setDrag] = useState(false);
     const { locale } = useParams();
@@ -54,7 +54,7 @@ const DragAndDrop = memo(function DragAndDrop({ id, onLoadClick, isMultiple, acc
     }
 
     return (
-        <div className='min-h-full min-w-full flex flex-1'>
+        <div className='min-h-full min-w-full flex flex-1 flex-col'>
             {drag
                 ? <div className="flex flex-col justify-center items-center rounded border-black/80 bg-black/45
                         border-dashed border-[1.5px] duration-300 flex-1 text-center"
@@ -67,9 +67,10 @@ const DragAndDrop = memo(function DragAndDrop({ id, onLoadClick, isMultiple, acc
                     </p>
                 </div>
                 : <label htmlFor={id}
-                    className="px-4 flex flex-col justify-center items-center space-y-2 
-                     hover:border-zinc-600 flex-1 rounded border-dashed border-[1px] 
-                    border-zinc-400 duration-300 cursor-pointer w-full"
+                    className={`px-4 flex flex-col justify-center items-center space-y-2 
+                     flex-1 rounded border-dashed border-[1px] 
+                     ${error ? 'border-red-600 bg-red-50/30' : 'border-zinc-400 hover:border-zinc-600'}
+                     duration-300 cursor-pointer w-full`}
                     onDragStart={e => handleDragStart(e)}
                     onDragLeave={e => handleDragLeave(e)}
                     onDragOver={e => handleDragStart(e)}>
@@ -80,6 +81,7 @@ const DragAndDrop = memo(function DragAndDrop({ id, onLoadClick, isMultiple, acc
                         accept={`${accept === 'img' ? "image/*" : accept === 'pdf' ? '.pdf' : ''} `}
                         onChange={handleChange} />
                 </label>}
+            {error && <p className='text-red-500 text-sm mt-[2px]'>{error.message}</p>}
         </div>
     )
 })

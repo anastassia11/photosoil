@@ -33,7 +33,7 @@ export default function FileCard({ name, fileName, path, isLoading, onDelete }) 
         </p>
     </div>
 
-    return <div className='flex flex-row justify-between max-w-full overflow-hidden'>
+    return <div className='flex flex-row max-w-full overflow-hidden justify-start space-x-2 items-center'>
         {!isLoading ? <a className='flex flex-row text-blue-700 hover:underline cursor-pointer duration-300 overflow-hidden'
             href={`${BASE_SERVER_URL}${path}`}>
             {fileTitle}

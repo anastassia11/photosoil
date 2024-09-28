@@ -11,12 +11,11 @@ import { useDispatch } from 'react-redux';
 export default function PublicationCreateComponent() {
     const dispatch = useDispatch();
     const router = useRouter();
-    const [isLoading, setIsLoading] = useState(false);
     const [createTwoLang, setCreateTwoLang] = useState(false);
     const { locale } = useParams();
     const { t } = getTranslation(locale);
 
-    const fetchCreateNews = async (data) => {
+    const fetchCreatePublication = async (data) => {
         const result = await createPublication(data);
         if (result.success) {
             router.push(`/admin/publications`)
@@ -26,20 +25,17 @@ export default function PublicationCreateComponent() {
         }
     }
 
-    const fetchCreatePublication = async ({ createTwoLang, isEng, publication }) => {
-        setIsLoading(true)
+    const handleCreatePublication = async ({ createTwoLang, isEng, publication }) => {
         try {
             const langPublication = { ...publication, translations: publication.translations.filter(({ isEnglish }) => isEnglish === isEng) };
-            await fetchCreateNews(createTwoLang ? publication : langPublication);
+            await fetchCreatePublication(createTwoLang ? publication : langPublication);
         } catch (error) {
             dispatch(openAlert({ title: t('error'), message: t('error_publication'), type: 'error' }));
-        } finally {
-            setIsLoading(false);
         }
     }
 
     return (
-        <PublicationForm isLoading={isLoading} onPublicationSubmit={fetchCreatePublication}
+        <PublicationForm onPublicationSubmit={handleCreatePublication}
             createTwoLang={createTwoLang} setCreateTwoLang={setCreateTwoLang}
             btnText={t('create_publication')} title={t('creation_publication')} />
     )

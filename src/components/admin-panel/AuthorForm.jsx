@@ -16,11 +16,28 @@ import modalThunkActions from '@/store/thunks/modalThunk';
 import { getTranslation } from '@/i18n/client';
 import { useParams } from 'next/navigation';
 import Textarea from './ui-kit/Textarea';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import SubmitBtn from './ui-kit/SubmitBtn';
+import ArrayInput from './ui-kit/ArrayInput';
 
-export default function AuthorForm({ _author, title, onFormSubmit, isLoading, btnText }) {
+export default function AuthorForm({ _author, title, onFormSubmit, btnText }) {
     const dispatch = useDispatch();
-    const [author, setAuthor] = useState({ authorType: 3 });
-    const [photo, setPhoto] = useState({});
+    const [photoLoading, setPhotoLoading] = useState(false);
+    const { register, handleSubmit, reset, control, setValue, getValues, formState: { errors, isSubmitting } } = useForm({
+        defaultValues: {
+            authorType: 3
+        },
+        mode: 'onChange'
+    });
+    const { fields: contactFields, append: appendContact, remove: removeContact } = useFieldArray({
+        control,
+        name: 'contacts'
+    });
+    const { fields: profileFields, append: appendProfile, remove: removeProfile } = useFieldArray({
+        control,
+        name: 'otherProfiles'
+    });
+
     const [role, setRole] = useState(null);
     const { locale } = useParams();
     const { t } = getTranslation(locale);
@@ -32,42 +49,15 @@ export default function AuthorForm({ _author, title, onFormSubmit, isLoading, bt
 
     useEffect(() => {
         if (_author) {
-            setAuthor(_author);
-            setPhoto(_author.photo);
+            reset({
+                ...getValues(),
+                ..._author
+            });
         }
     }, [_author]);
 
-    const handleCreateAuthor = async (e) => {
-        e.preventDefault();
-        if (author.dataEng?.name?.length && author.dataRu?.name?.length && author.photoId) {
-            onFormSubmit(author);
-        } else {
-            dispatch(openAlert({ title: t('warning'), message: t('form_required'), type: 'warning' }))
-        }
-    }
-
-    const handleInputChange = (e, lang) => {
-        const { name, value } = e.target;
-        let data = lang === 'ru' ? 'dataRu' : 'dataEng'
-        setAuthor(prev => ({ ...prev, [data]: { ...prev[data], [name]: value } }));
-    }
-
-    const handleFieldChange = (e, index) => {
-        const { name, value } = e.target;
-        setAuthor(prev => ({ ...prev, [name]: prev[name].map((item, idx) => index === idx ? value : item) }));
-    }
-
-    const handleDeleteField = (name, index) => {
-        const updatedArray = author[name] ? [...author[name]] : [];
-        updatedArray.splice(index, 1);
-        setAuthor(prev => ({ ...prev, [name]: updatedArray }))
-    }
-
-    const handleAddField = (name) => {
-        setAuthor(prev => ({
-            ...prev,
-            [name]: prev[name] ? [...prev[name], ''] : ['']
-        }))
+    const onCreateAuthor = async (author) => {
+        await onFormSubmit(author);
     }
 
     const handlePhotoDelete = async () => {
@@ -79,89 +69,34 @@ export default function AuthorForm({ _author, title, onFormSubmit, isLoading, bt
 
         const isConfirm = await dispatch(modalThunkActions.open());
         if (isConfirm.payload) {
-            const updatedAuthor = JSON.parse(JSON.stringify(author));
-            delete updatedAuthor.photoId;
-            delete updatedAuthor.photo;
-
-            setAuthor(updatedAuthor);
-            setPhoto({});
+            setValue('photo', '');
+            setValue('photoId', '');
         }
         dispatch(closeModal());
     }
 
     const fetchSendPhoto = async (file) => {
+        setPhotoLoading(true);
         const result = await sendPhoto(file);
         if (result.success) {
-            setAuthor(prev => ({
-                ...prev,
-                'photoId': result.data.id
-            }));
-            setPhoto(result.data);
+            setValue('photoId', result.data.id);
+            setValue('photo', result.data);
+        } else {
+            dispatch(openAlert({ title: t('error'), message: t('error_photo'), type: 'error' }))
         }
-    }
-
-    const handleRankChange = (newRank) => {
-        setAuthor(prev => ({ ...prev, authorType: Number(newRank) }));
-    }
-
-    const ArrayInput = ({ title, name }) => {
-        return <div className='flex flex-col w-full '>
-            <p className="font-medium">
-                {title}
-            </p>
-            <ul>
-                {author[name]?.map((item, index) => <li className='flex flex-row mb-1' key={`${name}_${index}`}>
-                    <input
-                        value={author[name][index] || ''}
-                        onChange={(e) => handleFieldChange(e, index)}
-                        name={name}
-                        type="text"
-                        className="bg-white w-full mt-1 p-2 outline-none border focus:border-blue-600 shadow-sm rounded-md"
-                    />
-                    <button type='button'
-                        className='p-2'
-                        onClick={() => handleDeleteField(name, index)}>
-                        <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className='w-[10px] h-[10px]'>
-                            <g id="Menu / Close_LG">
-                                <path id="Vector" d="M21 21L12 12M12 12L3 3M12 12L21.0001 3M12 12L3 21.0001" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                            </g>
-                        </svg>
-                    </button>
-                </li>
-                )}
-            </ul>
-            <button type='button' className='font-medium text-blue-600 w-fit'
-                onClick={() => handleAddField(name)}>
-                <span className='text-2xl pr-2'>+</span>
-                {t('add')}
-            </button>
-        </div>
+        setPhotoLoading(false);
     }
 
     return (
-        <form onSubmit={handleCreateAuthor} className="flex flex-col w-full flex-1">
+        <form onSubmit={handleSubmit(onCreateAuthor)} className="flex flex-col w-full flex-1">
             <div
                 className='mb-2 flex md:flex-row flex-col md:items-end md:justify-between space-y-1 md:space-y-0'>
                 <h1 className='sm:text-2xl text-xl font-semibold mb-2 md:mb-0'>
                     {title}
                 </h1>
-                <button
-                    type='submit'
-                    disabled={isLoading}
-                    className="self-end md:min-w-[200px] min-h-[40px] w-full md:w-fit flex items-center justify-center px-8 py-2 font-medium text-center text-white transition-colors duration-300 
-                transform bg-blue-600 disabled:bg-blue-600/70 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600 align-bottom">
-                    {isLoading ?
-                        <Oval
-                            height={20}
-                            width={20}
-                            color="#FFFFFF"
-                            visible={true}
-                            ariaLabel='oval-loading'
-                            secondaryColor="#FFFFFF"
-                            strokeWidth={4}
-                            strokeWidthSecondary={4} />
-                        : btnText}
-                </button>
+                <div className='md:min-w-[200px] md:w-fit'>
+                    <SubmitBtn isSubmitting={isSubmitting} btnText={btnText} />
+                </div>
             </div>
             <div className="flex flex-col items-start pb-16">
                 <div className='flex sm:flex-row flex-col w-full 3xl:w-[50%]'>
@@ -170,32 +105,58 @@ export default function AuthorForm({ _author, title, onFormSubmit, isLoading, bt
                             <p className="font-medium mb-1">
                                 {t('photo')}<span className='text-orange-500'>*</span>
                             </p>
-                            {photo?.path ? <div className='relative max-h-full rounded-md overflow-hidden'>
-                                <button type='button' className='overflow-hidden p-[6px] text-sm font-medium z-10 absolute top-0 right-0 rounded-bl-md
+                            <Controller control={control}
+                                name='photo'
+                                rules={{ required: t('required') }}
+                                render={({ field: { value }, fieldState }) =>
+                                    <div className='p-0.5 relative max-h-[370px] min-h-[370px] aspect-[3/4] rounded-md overflow-hidden'>
+                                        {photoLoading ? <span className='w-full h-full bg-black/10 rounded-md flex items-center justify-center'>
+                                            <Oval
+                                                height={30}
+                                                width={30}
+                                                color="#FFFFFF"
+                                                visible={true}
+                                                ariaLabel='oval-loading'
+                                                secondaryColor="#FFFFFF"
+                                                strokeWidth={4}
+                                                strokeWidthSecondary={4} />
+                                        </span> : <>
+                                            {(value && value.path) ? <div className='relative max-h-full rounded-md overflow-hidden'>
+                                                <button type='button' className='overflow-hidden p-[6px] text-sm font-medium z-10 absolute top-0 right-0 rounded-bl-md
                                 backdrop-blur-md bg-black bg-opacity-40 text-zinc-200 hover:text-white duration-300'
-                                    onClick={handlePhotoDelete}>
-                                    <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className='w-4 h-4'>
-                                        <g id="Menu / Close_LG">
-                                            <path id="Vector" d="M21 21L12 12M12 12L3 3M12 12L21.0001 3M12 12L3 21.0001" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                                        </g>
-                                    </svg>
-                                </button>
-                                <Image src={`${BASE_SERVER_URL}${photo.path}`} height={370} width={370} alt='author photo'
-                                    className='object-cover rounded-md max-h-[370px] min-h-[370px] aspect-[3/4] overflow-hidden' />
-                            </div> :
-                                <div className='max-h-[370px] min-h-[370px] aspect-[3/4] overflow-hidden'>
-                                    <DragAndDrop id='author-photo' onLoadClick={fetchSendPhoto} isMultiple={false} accept='img' />
-                                </div>
-                            }
+                                                    onClick={handlePhotoDelete}>
+                                                    <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className='w-4 h-4'>
+                                                        <g id="Menu / Close_LG">
+                                                            <path id="Vector" d="M21 21L12 12M12 12L3 3M12 12L21.0001 3M12 12L3 21.0001" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                                                        </g>
+                                                    </svg>
+                                                </button>
+                                                <Image src={`${BASE_SERVER_URL}${value.path}`} height={370} width={370} alt='author photo'
+                                                    className='bg-black/10 object-cover rounded-md max-h-[370px] min-h-[370px] aspect-[3/4] overflow-hidden' />
+                                            </div>
+                                                : <DragAndDrop id='author-photo' error={fieldState.error}
+                                                    onLoadClick={fetchSendPhoto}
+                                                    isMultiple={false}
+                                                    accept='img' />}
+                                        </>}
+                                    </div>
+                                } />
                         </div>
                     </div>
                     <ul className='sm:pl-6 w-full space-y-4'>
                         {role === 'Admin' && <li key='rang' className='w-[285px] mt-4'>
-                            <Dropdown name={t('rank')} value={(author.authorType !== undefined) ? author.authorType : 3} items={RANK_ENUM} onCategotyChange={handleRankChange} dropdownKey='rang' />
+                            <Controller control={control}
+                                name='authorType'
+                                render={({ field: { onChange, value } }) =>
+                                    <Dropdown name={t('rank')} value={value}
+                                        items={RANK_ENUM} onCategotyChange={(rank) => onChange(Number(rank))} dropdownKey='rang' />
+                                } />
                         </li>}
-                        {AUTHOR_INFO.map(item => <li key={item.name}>
-                            {item.isArray && ArrayInput({ ...item })}
-                        </li>)}
+
+                        <ArrayInput title={t('contacts')} name='contacts' fields={contactFields}
+                            onRemove={removeContact} onAppend={appendContact} register={register} />
+                        <ArrayInput title={t('otherProfiles')} name='otherProfiles' fields={profileFields}
+                            onRemove={removeProfile} onAppend={appendProfile} register={register} />
                     </ul>
                 </div>
 
@@ -204,15 +165,17 @@ export default function AuthorForm({ _author, title, onFormSubmit, isLoading, bt
                         <p className='text-blue-700 font-semibold'>Русская версия</p>
                         {AUTHOR_INFO.map(({ name, isArray, title }) => <li key={name}>
                             {!isArray &&
-                                (name === 'description' ? <Textarea name={name} label={title}
-                                    value={author.dataRu?.[name] || ''}
-                                    onChange={e => handleInputChange(e, 'ru')}
+                                (name === 'description' ? <Textarea
                                     required={false}
+                                    {...register(`dataRu.${name}`)}
+                                    label={title}
                                     placeholder='' />
-                                    : <Input required={name === 'name'}
-                                        label={title} name={name}
-                                        value={author.dataRu?.[name] || ''}
-                                        onChange={e => handleInputChange(e, 'ru')}
+                                    : <Input
+                                        required={name === 'name'}
+                                        error={errors.dataRu?.[name]}
+                                        label={title}
+                                        {...register(`dataRu.${name}`,
+                                            { required: name === 'name' ? t('required') : false })}
                                     />)
                             }
                         </li>)}
@@ -221,17 +184,18 @@ export default function AuthorForm({ _author, title, onFormSubmit, isLoading, bt
                         <p className='text-blue-700 font-semibold'>English version</p>
                         {AUTHOR_INFO.map(({ name, isArray, title }) => <li key={name}>
                             {!isArray &&
-                                (name === 'description' ? <Textarea name={name} label={title}
-                                    value={author.dataEng?.[name] || ''}
-                                    onChange={e => handleInputChange(e, 'eng')}
+                                (name === 'description' ? <Textarea
                                     required={false}
+                                    {...register(`dataEng.${name}`)}
+                                    label={title}
                                     placeholder='' />
-                                    : <Input required={name === 'name'}
-                                        label={title} name={name}
-                                        value={author.dataEng?.[name] || ''}
-                                        onChange={e => handleInputChange(e, 'eng')}
-                                    />)
-                            }
+                                    : <Input
+                                        required={name === 'name'}
+                                        error={errors.dataEng?.[name]}
+                                        label={title}
+                                        {...register(`dataEng.${name}`,
+                                            { required: name === 'name' ? t('required') : false })}
+                                    />)}
                         </li>)}
                     </ul>
                 </div>
