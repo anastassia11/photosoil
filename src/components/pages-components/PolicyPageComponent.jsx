@@ -33,11 +33,13 @@ export default function PolicyPageComponent() {
             <h1 className='sm:text-2xl text-xl font-semibold'>
                 {t('rules_service')}
             </h1>
-            {!!rules[_isEng ? 'contentEng' : 'contentRu'] && <div className='w-full bg-white md:pl-16 px-4 md:pr-32 md:pb-8 pb-4 md:mt-6 mt-2'>
-                <div className='tiptap sm:mt-8 mt-4'
-                    dangerouslySetInnerHTML={{ __html: parser?.parseFromString(rules[_isEng ? 'contentEng' : 'contentRu'] || '', 'text/html').body.innerHTML }}>
-                </div>
-            </div>}
+            {!!rules[_isEng ? 'contentEng' : 'contentRu'].length
+                && rules[_isEng ? 'contentEng' : 'contentRu'] !== '<p></p>'
+                && <div className='w-full bg-white md:pl-16 px-4 md:pr-32 md:pb-8 pb-4 md:mt-6 mt-2'>
+                    <div className='tiptap sm:mt-8 mt-4'
+                        dangerouslySetInnerHTML={{ __html: parser?.parseFromString(rules[_isEng ? 'contentEng' : 'contentRu'] || '', 'text/html').body.innerHTML }}>
+                    </div>
+                </div>}
             {!!rules.files?.length && <div id='files-section' className='mt-8 flex flex-col'>
                 <label className="font-medium min-h-fit mb-2">
                     {`${t('files')}`}
