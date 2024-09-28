@@ -10,6 +10,7 @@ const modalSlice = createSlice({
             title: null,
             message: null,
             buttonText: null,
+            type: null
         },
     },
 

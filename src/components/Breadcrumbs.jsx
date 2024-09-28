@@ -18,7 +18,7 @@ export default function Breadcrumbs() {
         },
         'soil': {
             title: t('soil'),
-            isRef: true,
+            isRef: false,
         },
         'dynamics': {
             title: t('dynamics'),
@@ -38,7 +38,7 @@ export default function Breadcrumbs() {
         },
         'author': {
             title: t('author_page'),
-            isRef: true,
+            isRef: false,
         },
         'news': {
             title: t('news'),
@@ -87,7 +87,24 @@ export default function Breadcrumbs() {
         'view': {
             title: t('user_page'),
             isRef: false
-        }
+        },
+        'policy': {
+            title: t('rules'),
+            isRef: true
+        },
+        'ecosystem': {
+            title: t('ecosystem'),
+            isRef: false
+        },
+        'publication': {
+            title: t('publication'),
+            isRef: false
+        },
+        'news_one': {
+            title: t('news_one'),
+            isRef: false
+        },
+
     };
 
     const separator =
@@ -97,21 +114,34 @@ export default function Breadcrumbs() {
             </svg>
         </span>
 
+    const titleMapping = {
+        soils: 'soil',
+        profiles: 'soil',
+        dynamics: 'soil',
+        morphological: 'soil',
+        ecosystems: 'ecosystem',
+        publications: 'publication',
+        authors: 'author',
+        news: 'news_one',
+        users: 'view'
+    };
 
     const breadcrumbs = pathNames.map((link, index) => {
         let itemTitle
         let href = `/${pathNames.slice(0, index + 1).join('/')}`;
         let isRef = linkTexts[link] ? linkTexts[link].isRef : false;
-        if (index === 1 && (pathNames[0] === 'soils' || pathNames[0] === 'profiles' ||
-            pathNames[0] === 'dynamics' || pathNames[0] === 'morphological')) {
-            itemTitle = linkTexts['soil'].title;
-        } else if (index === 1 && pathNames[0] === 'authors') {
-            itemTitle = linkTexts['author'].title;
-        } else if (index === 2 && pathNames[1] === 'users') {
-            itemTitle = linkTexts['view'].title;
+
+        if (linkTexts[link]) {
+            itemTitle = linkTexts[link].title
         } else {
-            itemTitle = linkTexts[link] ? linkTexts[link].title : null;
+            if (index === 2) {
+                const mappedKey = titleMapping[pathNames[1]];
+                itemTitle = mappedKey ? linkTexts[mappedKey].title : null;
+            } else {
+                itemTitle = linkTexts[link] ? linkTexts[link].title : null;
+            }
         }
+
         return (
             {
                 href,
