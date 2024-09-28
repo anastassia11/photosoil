@@ -6,7 +6,6 @@ export default function SubmitBtn({ isSubmitting, btnText, onClick }) {
         !!onClick && onClick(e);
     }
 
-    // md:min-w-[200px] md:w-fit 
     return (
         <button
             type='submit'

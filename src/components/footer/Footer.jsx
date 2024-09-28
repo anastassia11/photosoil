@@ -1,5 +1,6 @@
 import { getTranslation } from '@/i18n';
 import Image from 'next/image'
+import Link from 'next/link';
 
 export default async function Footer({ locale }) {
     const { t } = await getTranslation(locale);
@@ -12,7 +13,6 @@ export default async function Footer({ locale }) {
                     <p className='text-zinc-600 ml-2 text-3xl font-semibold'>Photo<span className='pl-[2px] text-[#226eaf] font-bold'>SOIL</span></p>
                 </div>
             </div>
-
 
             <div className='flex-1 flex flex-col sm:flex-row xl:justify-evenly justify-between w-full space-y-4 sm:space-y-0'>
                 <span className='flex flex-col space-y-1 items-center sm:items-start'>
@@ -59,7 +59,7 @@ export default async function Footer({ locale }) {
                         <span>s.loyko@yandex.ru</span>
                     </a>
                 </span>
-                <div className='md:flex hidden xl:hidden flex-col sm:items-center md:items-end space-y-2 xl:mt-0 mt-4'>
+                <div className='md:flex hidden xl:hidden flex-col sm:items-center md:items-end xl:mt-0 mt-4'>
                     <p className='text-lg text-blue-700'>{t('social_media')}</p>
                     <div className='flex flex-row items-center text-zinc-600 space-x-4'>
                         <a className="flex items-center gap-1.5"
@@ -69,7 +69,7 @@ export default async function Footer({ locale }) {
                                 width={800}
                                 height={800}
                                 viewBox="0 0 32 32"
-                                className='w-8 h-8'
+                                className='w-7 h-7'
                                 fill="currentColor"
                             >
                                 <path d="M16 .5C7.437.5.5 7.438.5 16S7.438 31.5 16 31.5c8.563 0 15.5-6.938 15.5-15.5S24.562.5 16 .5zm7.613 10.619-2.544 11.988c-.188.85-.694 1.056-1.4.656l-3.875-2.856-1.869 1.8c-.206.206-.381.381-.781.381l.275-3.944 7.181-6.488c.313-.275-.069-.431-.482-.156l-8.875 5.587-3.825-1.194c-.831-.262-.85-.831.175-1.231l14.944-5.763c.694-.25 1.3.169 1.075 1.219z" />
@@ -84,7 +84,7 @@ export default async function Footer({ locale }) {
                                 height={800}
                                 fill="none"
                                 viewBox="0 0 48 48"
-                                className='w-9 h-9'
+                                className='w-8 h-8'
                             >
                                 <circle cx={24} cy={24} r={20} fill="currentColor" />
                                 <path
@@ -96,22 +96,20 @@ export default async function Footer({ locale }) {
                             </svg>
                         </a>
                     </div>
+                    <Link href={`/${locale}/policy`}
+                        prefetch={false}>{t('rules')}</Link>
                 </div>
-
-
             </div>
 
-            <div className='flex md:hidden xl:flex flex-col justify-between xl:items-end items-center space-y-2 xl:mt-0 mt-4'>
+            <div className='flex md:hidden xl:flex flex-col justify-between xl:items-end items-center xl:mt-0 mt-4'>
                 <p className='text-lg text-blue-700'>{t('social_media')}</p>
                 <div className='flex flex-row items-center text-zinc-600 space-x-4'>
                     <a className="flex items-center gap-1.5"
                         href="https://t.me/Photosoil" target="_blank">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            width={800}
-                            height={800}
                             viewBox="0 0 32 32"
-                            className='w-8 h-8'
+                            className='w-7 h-7'
                             fill="currentColor"
                         >
                             <path d="M16 .5C7.437.5.5 7.438.5 16S7.438 31.5 16 31.5c8.563 0 15.5-6.938 15.5-15.5S24.562.5 16 .5zm7.613 10.619-2.544 11.988c-.188.85-.694 1.056-1.4.656l-3.875-2.856-1.869 1.8c-.206.206-.381.381-.781.381l.275-3.944 7.181-6.488c.313-.275-.069-.431-.482-.156l-8.875 5.587-3.825-1.194c-.831-.262-.85-.831.175-1.231l14.944-5.763c.694-.25 1.3.169 1.075 1.219z" />
@@ -122,11 +120,9 @@ export default async function Footer({ locale }) {
                         href="https://www.youtube.com/@photosoil" target="_blank">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            width={800}
-                            height={800}
                             fill="none"
                             viewBox="0 0 48 48"
-                            className='w-9 h-9'
+                            className='w-8 h-8'
                         >
                             <circle cx={24} cy={24} r={20} fill="currentColor" />
                             <path
@@ -138,8 +134,9 @@ export default async function Footer({ locale }) {
                         </svg>
                     </a>
                 </div>
+                <Link href={`/${locale}/policy`}
+                    prefetch={false}>{t('rules')}</Link>
             </div>
-
         </footer>
     )
 }

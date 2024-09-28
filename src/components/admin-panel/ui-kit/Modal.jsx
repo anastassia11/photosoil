@@ -5,7 +5,7 @@ import { closeModal, setConfirm } from '@/store/slices/modalSlice';
 import { useParams } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 
-export default function Modal({ isOpen, title, message, buttonText }) {
+export default function Modal({ isOpen, title, message, buttonText, type }) {
     const dispatch = useDispatch();
     const { locale } = useParams();
     const { t } = getTranslation(locale);
@@ -28,8 +28,8 @@ export default function Modal({ isOpen, title, message, buttonText }) {
                                     <button onClick={() => dispatch(closeModal())} className="modal w-full px-4 py-2 font-medium tracking-wide text-gray-700 capitalize transition-colors duration-300 transform border border-gray-200 rounded-md sm:w-1/2 sm:mx-2 focus:outline-none">
                                         {t('cancel')}
                                     </button>
-                                    <button className="modal w-full px-4 py-2 mt-3 font-medium tracking-wide text-white capitalize transition-colors duration-300 transform 
-                                    bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600 sm:mt-0 sm:w-1/2 sm:mx-2"
+                                    <button className={`modal w-full px-4 py-2 mt-3 font-medium tracking-wide text-white capitalize transition-colors duration-300 transform 
+                                    ${type === 'delete' ? 'bg-red-600 hover:bg-red-500 active:bg-red-600' : 'bg-blue-600 hover:bg-blue-500 active:bg-blue-600'}  rounded-lg  focus:outline-none sm:mt-0 sm:w-1/2 sm:mx-2`}
                                         onClick={() => dispatch(setConfirm())} >
                                         {buttonText}
                                     </button>

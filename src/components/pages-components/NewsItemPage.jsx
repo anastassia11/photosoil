@@ -108,7 +108,7 @@ export default function NewsItemPageComponent({ id }) {
                 <NewGallery objectPhoto={news?.objectPhoto} />
             </div>
 
-            {news.files?.length ? <div id='files-section' className='mt-8 flex flex-col'>
+            {!!news.files?.length && <div id='files-section' className='mt-8 flex flex-col'>
                 <label className="font-medium min-h-fit mb-2">
                     {`${t('files')}`}
                 </label>
@@ -132,7 +132,7 @@ export default function NewsItemPageComponent({ id }) {
                         {/* <PdfGallery path={file?.path} title={file?.fileName} /> */}
                     </li>)}
                 </ul>
-            </div> : ''}
+            </div>}
         </div >
     )
 }

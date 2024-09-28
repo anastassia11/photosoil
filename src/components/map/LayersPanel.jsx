@@ -28,7 +28,7 @@ export default function LayersPanel({ onLayerChange, currentLayer }) {
     return (
         <div className='layer-menu'>
             <div className='relative'>
-                <button className='duration-300 bg-white rounded-md p-1 shadow-md text-zinc-600 hover:text-zinc-800 hover:shadow-lg'
+                <button type='button' className='duration-300 bg-white rounded-md p-1 shadow-md text-zinc-600 hover:text-zinc-800 hover:shadow-lg'
                     onClick={() => setDrapdownState({ key: 'layer', isActive: !drapdownState.isActive })}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="currentColor">
                         <path d="M9.06 13L16 16.856 22.94 13 16 9.144 9.06 13zM16 19.144L4.94 13 16 6.856 27.06 13 16 19.144zm0 3.712l9-5L27.06 19 16 25.144 4.94 19 7 17.856l9 5z">

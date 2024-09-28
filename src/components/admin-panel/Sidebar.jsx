@@ -66,6 +66,16 @@ export default function Sidebar() {
         },
     ]
 
+    const policy = [
+        {
+            url: 'policy',
+            title: t('rules'),
+            svg: <svg fill="currentColor" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 -translate-x-[2px]">
+                <g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round"
+                    strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <title></title> <g id="Layer_12"> <path d="M25.41,7.09l-9-4a1,1,0,0,0-.82,0l-9,4A1,1,0,0,0,6,8v8.56A8.69,8.69,0,0,0,8.91,23l6.43,5.71a1,1,0,0,0,1.32,0L23.09,23A8.69,8.69,0,0,0,26,16.56V8A1,1,0,0,0,25.41,7.09ZM24,16.56a6.67,6.67,0,0,1-2.24,5L16,26.66l-5.76-5.12a6.67,6.67,0,0,1-2.24-5V8.65l8-3.56,8,3.56Z"></path> <path d="M13,14.29a1,1,0,0,0-1.42,1.42l2.5,2.5a1,1,0,0,0,1.42,0l5-5A1,1,0,0,0,19,11.79l-4.29,4.3Z"></path> </g> </g></svg>
+        },
+    ]
+
     const users = [
         {
             url: 'users',
@@ -82,7 +92,7 @@ export default function Sidebar() {
             className="cursor-pointer flex items-center px-3 py-2 transition-colors duration-300 
             transform rounded-lg hover:bg-gray-100 hover:text-gray-700">
             {svg && <div className='text-zinc-500'>{svg}</div>}
-            <span className="mx-2 font-medium">{title}</span>
+            <span className={`${url !== 'policy' ? 'ml-2' : "ml-1"} mr-2 font-medium`}>{title}</span>
         </Link>
 
 
@@ -110,6 +120,13 @@ export default function Sidebar() {
                             <ul className="space-y-3 ">
                                 <label className="w-full px-3 text-sm text-gray-500 uppercase">{t('taxonomy')}</label>
                                 {taxonomy.map(item => <li key={`sidebar_${item.url}`}>
+                                    <LinkItem {...item} />
+                                </li>)}
+                            </ul>
+
+                            <ul className="space-y-3 ">
+                                <label className="w-full px-3 text-sm text-gray-500 uppercase">{t('policy')}</label>
+                                {policy.map(item => <li key={`sidebar_${item.url}`}>
                                     <LinkItem {...item} />
                                 </li>)}
                             </ul>
