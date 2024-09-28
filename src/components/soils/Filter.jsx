@@ -10,7 +10,7 @@ import modalThunkActions from '@/store/thunks/modalThunk';
 import { useParams, usePathname } from 'next/navigation';
 import { memo, useEffect, useRef, useState } from 'react'
 import { Oval } from 'react-loader-spinner';
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { Tooltip } from 'react-tooltip';
 
 const Filter = memo(function Filter({ dropdown, type, itemId, name, items, setTags, allSelectedItems, addItem, deleteItem, resetItems, isMapFilter, isEng }) {
@@ -32,6 +32,7 @@ const Filter = memo(function Filter({ dropdown, type, itemId, name, items, setTa
     const { t } = getTranslation(locale);
 
     const _id = itemId ? `filter-${itemId}` : name;
+    let _isEng = locale === 'en';
 
     useEffect(() => {
         items && setSelectedItems(items.filter(({ id }) => allSelectedItems?.includes(id)).map(({ id }) => id));
@@ -39,10 +40,23 @@ const Filter = memo(function Filter({ dropdown, type, itemId, name, items, setTa
 
     useEffect(() => {
         const _filterName = filterName.toLowerCase().trim();
-        items && setFilteredItems(items.filter((item) => item.name?.toLowerCase().includes(_filterName) ||
+        items && setFilteredItems(items.filter((item) =>
+            item.name?.toLowerCase().includes(_filterName) ||
             item.codeEng?.toLowerCase().includes(_filterName) || item.codeRu?.toLowerCase().includes(_filterName) ||
             item.dataEng?.name?.toLowerCase().includes(_filterName) || item.dataRu?.name?.toLowerCase().includes(_filterName) ||
             item.nameEng?.toLowerCase().includes(_filterName) || item.nameRu?.toLowerCase().includes(_filterName))
+            .sort((a, b) => {
+                if (name === "Природная зона" || name === 'Natural zone') return 0;
+                if (a.name < b.name
+                    || (_isEng ? (a.dataEng?.name < b.dataEng?.name) : (a.dataRu?.name < b.dataRu?.name))
+                    || (_isEng ? (a.nameEng < b.nameEng) : (a.nameRu < b.nameRu))
+                ) return -1;
+                if (a.name > b.name
+                    || (_isEng ? (a.dataEng?.name > b.dataEng?.name) : (a.dataRu?.name > b.dataRu?.name))
+                    || (_isEng ? (a.nameEng > b.nameEng) : (a.nameRu > b.nameRu))
+                ) return 1;
+                return 0;
+            })
         )
     }, [filterName, items])
 
@@ -108,7 +122,8 @@ const Filter = memo(function Filter({ dropdown, type, itemId, name, items, setTa
         dispatch(openModal({
             title: t('warning'),
             message: t('delete_tag'),
-            buttonText: t('delete')
+            buttonText: t('delete'),
+            type: 'delete'
         }))
 
         const isConfirm = await dispatch(modalThunkActions.open());
