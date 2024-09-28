@@ -6,12 +6,11 @@ import Feature from 'ol/Feature';
 import OLMap from 'ol/Map';
 import { Point } from 'ol/geom';
 import View from 'ol/View';
-import { Icon, Style, Fill, Stroke, RegularShape } from 'ol/style';
+import { Style, Fill, Stroke, RegularShape } from 'ol/style';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
-import { fromLonLat, toLonLat } from 'ol/proj';
+import { fromLonLat } from 'ol/proj';
 import { OSM, Cluster, XYZ, BingMaps, Vector as VectorSource } from 'ol/source';
 import {
-    Circle as CircleStyle,
     Text,
 } from 'ol/style.js';
 
@@ -22,9 +21,9 @@ import { getEcosystems } from '@/api/ecosystem/get_ecosystems';
 import SideBar from './SideBar';
 import { useSelector } from 'react-redux';
 import { getPublications } from '@/api/publication/get_publications';
-import ObjectsPopup from './ObjectsPopup';
 import { useParams } from 'next/navigation';
 import SearchRegion from './SearchRegion';
+import { getMapLayers } from '@/hooks/getMapLayers';
 
 export default function MainMap() {
     const [baseLayer, setBaseLayer] = useState(null);
@@ -160,7 +159,8 @@ export default function MainMap() {
         // Базовый слой карты
         const baseLayer = new TileLayer();
 
-        baseLayer.setSource(getBaseLayerSourse("OSM"));
+        baseLayer.setSource(getMapLayers("OSM", locale));
+        setSelectedLayer("OSM");
         mapRef.current = new OLMap({
             layers: [baseLayer],
             target: mapElement.current,
@@ -170,55 +170,6 @@ export default function MainMap() {
             // renderers: ['Canvas', 'VML']
         });
         setBaseLayer(baseLayer);
-    }
-
-    const getBaseLayerSourse = (layerValue) => {
-        setSelectedLayer(layerValue);
-        if (layerValue === "OSM") {
-            return new OSM();
-        }
-        if (layerValue === "BingRoud") {
-            return new BingMaps({
-                key: 'Ap9BYST6-nbFhg-aHFXmWRfqd0Tsq5a7aEPxHs_b7E5tBAb4cFTvj7td6SorYRdu',
-                imagerySet: 'RoadOnDemand',
-                culture: locale
-            });
-        }
-        if (layerValue === "BingSat") {
-            return new BingMaps({
-                key: 'Ap9BYST6-nbFhg-aHFXmWRfqd0Tsq5a7aEPxHs_b7E5tBAb4cFTvj7td6SorYRdu',
-                imagerySet: 'Aerial',
-                culture: locale
-            });
-        }
-        if (layerValue === "BingHibrid") {
-            return new BingMaps({
-                key: 'Ap9BYST6-nbFhg-aHFXmWRfqd0Tsq5a7aEPxHs_b7E5tBAb4cFTvj7td6SorYRdu',
-                imagerySet: 'AerialWithLabelsOnDemand',
-                culture: locale
-            });
-        }
-        if (layerValue === "ArcGis_World_Topo_Map") {
-            return new XYZ({
-                attributions:
-                    'Tiles © <a href="https://services.arcgisonline.com/ArcGIS/' +
-                    'rest/services/World_Topo_Map/MapServer">ArcGIS</a>',
-                url:
-                    'https://server.arcgisonline.com/ArcGIS/rest/services/' +
-                    'World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
-            });
-        }
-        if (layerValue === "ArcGis_World_Imagery") {
-            return new XYZ({
-                attributions:
-                    'Tiles © <a href="https://services.arcgisonline.com/ArcGIS/' +
-                    'rest/services/World_Imagery/MapServer">ArcGIS</a>',
-                url:
-                    'https://server.arcgisonline.com/ArcGIS/rest/services/' +
-                    'World_Imagery/MapServer/tile/{z}/{y}/{x}',
-            });
-        }
-        return new OSM();
     }
 
     const handleZoomClick = (zoomType) => {
@@ -235,7 +186,8 @@ export default function MainMap() {
     }
 
     const handleBaseLayerChange = (layer) => {
-        baseLayer.setSource(getBaseLayerSourse(layer))
+        baseLayer.setSource(getMapLayers(layer, locale));
+        setSelectedLayer(layer);
     }
 
     const typeConfig = [
@@ -552,7 +504,6 @@ export default function MainMap() {
                 layersVisible={layersVisible}
                 onVisibleChange={handleLayerChange} onLocationHandler={selectLocationHandler}
                 draftIsVisible={draftIsVisible} setDraftIsVisible={setDraftIsVisible} />
-            {/* <ObjectsPopup visible={popupVisible} objects={selectedObjects} onCloseClick={handlePopupClose} /> */}
         </div>
     )
 }

@@ -2,7 +2,7 @@
 
 import 'ol/ol.css';
 import Feature from 'ol/Feature';
-import Map from 'ol/Map';
+import OLMap from 'ol/Map';
 import { LineString, Point } from 'ol/geom';
 import View from 'ol/View';
 import { Style, Fill, Stroke, RegularShape } from 'ol/style';
@@ -13,14 +13,19 @@ import { OSM, Vector as VectorSource } from 'ol/source';
 
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import Zoom from './Zoom';
+import { getMapLayers } from '@/hooks/getMapLayers';
+import { useParams } from 'next/navigation';
+import LayersPanel from './LayersPanel';
 
 function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref) {
     const didLogRef = useRef(false);
     const mapElement = useRef();
-
+    const { locale } = useParams();
     const selectedPointFeature = useRef(null);
     const mapRef = useRef(null);
     const modifyRef = useRef(null);
+    const [baseLayer, setBaseLayer] = useState(null);
+    const [selectedLayer, setSelectedLayer] = useState('');
 
     const [isDataLoaded, setIsDataLoaded] = useState(false);
 
@@ -91,16 +96,18 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref
             zoom: 6.5
         });
 
-        mapRef.current = new Map({
-            layers: [
-                new TileLayer({
-                    source: new OSM(),
-                })
-            ],
+        const baseLayer = new TileLayer();
+
+        baseLayer.setSource(getMapLayers("ArcGis_World_Topo_Map", locale));
+        setSelectedLayer("ArcGis_World_Topo_Map");
+
+        mapRef.current = new OLMap({
+            layers: [baseLayer],
             target: mapElement.current,
             view: view,
             controls: []
         });
+        setBaseLayer(baseLayer);
 
         if (onInputChange) {
             modifyRef.current = new Modify({ source: pointVectorSource });
@@ -140,7 +147,11 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref
         if (features.includes(selectedPointFeature.current)) {
             pointVectorSource.removeFeature(selectedPointFeature.current);
         }
+    }
 
+    const handleBaseLayerChange = (layer) => {
+        baseLayer.setSource(getMapLayers(layer, locale));
+        setSelectedLayer(layer);
     }
 
     const handleMapClick = (e) => {
@@ -274,6 +285,9 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref
 
     return (
         <div ref={mapElement} className="w-full h-full z-10 relative">
+            <div className='z-30 absolute top-0 right-0 m-2 sm:block hidden'>
+                <LayersPanel onLayerChange={handleBaseLayerChange} currentLayer={selectedLayer} />
+            </div>
             <div className='z-20 absolute top-[calc(50%-50px)] right-0 m-2 '>
                 <Zoom onClick={handleZoomClick} />
             </div>

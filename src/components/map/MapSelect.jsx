@@ -2,23 +2,28 @@
 
 import 'ol/ol.css';
 import Feature from 'ol/Feature';
-import Map from 'ol/Map';
+import OLMap from 'ol/Map';
 import Point from 'ol/geom/Point';
 import View from 'ol/View';
-import { Icon, Style, Fill, Stroke, RegularShape } from 'ol/style';
+import { Style, Fill, Stroke, RegularShape } from 'ol/style';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { fromLonLat, toLonLat } from 'ol/proj';
-import { OSM, Vector as VectorSource } from 'ol/source';
+import { Vector as VectorSource } from 'ol/source';
 import { memo, useEffect, useRef, useState } from 'react';
-import FullScreen from './FullScreen';
 import Zoom from './Zoom';
+import { getMapLayers } from '@/hooks/getMapLayers';
+import { useParams } from 'next/navigation';
+import LayersPanel from './LayersPanel';
 
 const MapSelect = memo(function MapSelect({ id, type, latitude, longtitude, onCoordinateChange }) {
     const didLogRef = useRef(false);
     const mapElement = useRef();
+    const { locale } = useParams();
     const [isCoordExist, setIsCoordExist] = useState(false);
     const [vectorLayer, setVectorLayer] = useState(null);
     const [selectedPointGeom, setSelectedPointGeom] = useState(null);
+    const [baseLayer, setBaseLayer] = useState(null);
+    const [selectedLayer, setSelectedLayer] = useState('');
 
     const mapRef = useRef(null);
 
@@ -61,17 +66,19 @@ const MapSelect = memo(function MapSelect({ id, type, latitude, longtitude, onCo
             zoom: 10
         });
 
-        mapRef.current = new Map({
-            layers: [
-                new TileLayer({
-                    source: new OSM(),
-                })
-            ],
+        // Базовый слой карты
+        const baseLayer = new TileLayer();
+
+        baseLayer.setSource(getMapLayers("ArcGis_World_Topo_Map", locale));
+        setSelectedLayer("ArcGis_World_Topo_Map");
+
+        mapRef.current = new OLMap({
+            layers: [baseLayer],
             target: mapElement.current,
             view: view,
             controls: []
         });
-
+        setBaseLayer(baseLayer);
         //Геометрия метки
         const selectedPointGeom = new Point(startcoords);
         setSelectedPointGeom(selectedPointGeom);
@@ -143,6 +150,10 @@ const MapSelect = memo(function MapSelect({ id, type, latitude, longtitude, onCo
         return createIconStyle(type)
     }
 
+    const handleBaseLayerChange = (layer) => {
+        baseLayer.setSource(getMapLayers(layer, locale));
+        setSelectedLayer(layer);
+    }
 
     //Создает стиль иконки по Url
     const createIconStyle = (layerName) => {
@@ -209,9 +220,10 @@ const MapSelect = memo(function MapSelect({ id, type, latitude, longtitude, onCo
 
     return (
         <div ref={mapElement} className="w-full h-full z-10 relative">
-            {/* <div className='z-20 absolute top-0 right-0 m-2 sm:block hidden'>
-                <FullScreen onClick={handleFullClick} />
-            </div> */}
+            <div className='z-30 absolute top-0 right-0 m-2 sm:block hidden'>
+                {/* <FullScreen onClick={handleFullClick} /> */}
+                <LayersPanel onLayerChange={handleBaseLayerChange} currentLayer={selectedLayer} />
+            </div>
             <div className='z-20 absolute top-[calc(50%-50px)] right-0 m-2 '>
                 <Zoom onClick={handleZoomClick} />
             </div>
