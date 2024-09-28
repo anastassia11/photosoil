@@ -128,7 +128,8 @@ export default function AccountPageComponent({ id }) {
         dispatch(openModal({
             title: t('warning'),
             message: isMulti ? t('delete_objects') : t('delete_object'),
-            buttonText: t('delete')
+            buttonText: t('delete'),
+            type: 'delete'
         }))
 
         const isConfirm = await dispatch(modalThunkActions.open());

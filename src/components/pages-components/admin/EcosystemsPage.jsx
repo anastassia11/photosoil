@@ -47,7 +47,8 @@ export default function EcosystemsAdminComponent() {
         dispatch(openModal({
             title: t('warning'),
             message: isMulti ? t('delete_ecosystems') : t('delete_ecosystem'),
-            buttonText: t('delete')
+            buttonText: t('delete'),
+            type: 'delete'
         }))
 
         const isConfirm = await dispatch(modalThunkActions.open());

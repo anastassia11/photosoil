@@ -190,7 +190,8 @@ export default function CreateObject({ title, onCreate, type }) {
         dispatch(openModal({
             title: t('warning'),
             message: t('delete_soil'),
-            buttonText: t('delete')
+            buttonText: t('delete'),
+            type: 'delete'
         }))
 
         const isConfirm = await dispatch(modalThunkActions.open());

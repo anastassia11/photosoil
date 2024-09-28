@@ -109,7 +109,8 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
         dispatch(openModal({
             title: t('warning'),
             message: t('delete_file'),
-            buttonText: t('delete')
+            buttonText: t('delete'),
+            type: 'delete'
         }))
 
         const isConfirm = await dispatch(modalThunkActions.open());

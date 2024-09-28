@@ -65,7 +65,8 @@ export default function UsersPageComponent() {
         dispatch(openModal({
             title: t('warning'),
             message: isMulti ? t('delete_accounts') : t('delete_account'),
-            buttonText: t('delete')
+            buttonText: t('delete'),
+            type: 'delete'
         }))
 
         const isConfirm = await dispatch(modalThunkActions.open());

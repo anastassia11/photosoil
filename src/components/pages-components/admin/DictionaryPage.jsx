@@ -39,7 +39,8 @@ export default function DictionaryAdminPageComponent() {
         dispatch(openModal({
             title: t('warning'),
             message: t('delete_dictionary'),
-            buttonText: t('delete')
+            buttonText: t('delete'),
+            type: 'delete'
         }))
 
         const isConfirm = await dispatch(modalThunkActions.open());

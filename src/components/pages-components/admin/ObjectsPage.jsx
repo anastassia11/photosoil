@@ -47,7 +47,8 @@ export default function ObjectsPageComponent() {
         dispatch(openModal({
             title: t('warning'),
             message: isMulti ? t('delete_soils') : t('delete_soil'),
-            buttonText: t('delete')
+            buttonText: t('delete'),
+            type: 'delete'
         }))
 
         const isConfirm = await dispatch(modalThunkActions.open());

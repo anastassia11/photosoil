@@ -47,7 +47,8 @@ export default function PublicationsAdminComponent() {
         dispatch(openModal({
             title: t('warning'),
             message: isMulti ? t('delete_publications') : t('delete_publication'),
-            buttonText: t('delete')
+            buttonText: t('delete'),
+            type: 'delete'
         }))
 
         const isConfirm = await dispatch(modalThunkActions.open());

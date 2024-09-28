@@ -209,7 +209,8 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
         dispatch(openModal({
             title: t('warning'),
             message: t('delete_photo'),
-            buttonText: t('delete')
+            buttonText: t('delete'),
+            type: 'delete'
         }))
 
         const isConfirm = await dispatch(modalThunkActions.open());
@@ -237,7 +238,8 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
         dispatch(openModal({
             title: t('warning'),
             message: t('delete_photo'),
-            buttonText: t('delete')
+            buttonText: t('delete'),
+            type: 'delete'
         }))
 
         const isConfirm = await dispatch(modalThunkActions.open());

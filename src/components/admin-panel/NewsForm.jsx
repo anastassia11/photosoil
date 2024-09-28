@@ -170,7 +170,8 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, btnText
         dispatch(openModal({
             title: t('warning'),
             message: t('delete_photo'),
-            buttonText: t('delete')
+            buttonText: t('delete'),
+            type: 'delete'
         }))
 
         const isConfirm = await dispatch(modalThunkActions.open());
@@ -184,7 +185,8 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, btnText
         dispatch(openModal({
             title: t('warning'),
             message: t('delete_file'),
-            buttonText: t('delete')
+            buttonText: t('delete'),
+            type: 'delete'
         }))
 
         const isConfirm = await dispatch(modalThunkActions.open());
@@ -335,12 +337,12 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, btnText
                         <Controller control={control}
                             name='files'
                             render={({ field: { value, id }, fieldState }) =>
-                                <ul className={`mt-1 flex flex-col w-full gap-4 `}>
+                                <ul className={`mt-1 flex flex-col w-full`}>
                                     {!!value.length && value.map((file, idx) => <li key={`file-${idx}`}>
                                         <FileCard {...file} isEng={isEng}
                                             onDelete={() => handleFileDelete(file.id)} />
                                     </li>)}
-                                    <div className='h-[150px] md:w-[50%] w-full md:pr-2 pr-0'>
+                                    <div className={`h-[150px] md:w-[50%] w-full md:pr-2 pr-0 ${!!value.length && 'mt-4'}`}>
                                         <DragAndDrop id='news-files'
                                             error={fieldState.error}
                                             onLoadClick={handleFilesSend}

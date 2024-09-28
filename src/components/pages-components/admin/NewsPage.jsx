@@ -47,7 +47,8 @@ export default function NewsAdminComponent() {
         dispatch(openModal({
             title: t('warning'),
             message: isMulti ? t('delete_manyNews') : t('delete_news'),
-            buttonText: t('delete')
+            buttonText: t('delete'),
+            type: 'delete'
         }))
 
         const isConfirm = await dispatch(modalThunkActions.open());

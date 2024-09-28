@@ -40,7 +40,8 @@ export default function AuthorsAdminPageComponent() {
         dispatch(openModal({
             title: t('warning'),
             message: isMulti ? t('delete_authors') : t('delete_author'),
-            buttonText: t('delete')
+            buttonText: t('delete'),
+            type: 'delete'
         }))
 
         const isConfirm = await dispatch(modalThunkActions.open());

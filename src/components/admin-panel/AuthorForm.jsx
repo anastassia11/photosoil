@@ -64,7 +64,8 @@ export default function AuthorForm({ _author, title, onFormSubmit, btnText }) {
         dispatch(openModal({
             title: t('warning'),
             message: t('delete_photo'),
-            buttonText: t('delete')
+            buttonText: t('delete'),
+            type: 'delete'
         }))
 
         const isConfirm = await dispatch(modalThunkActions.open());
