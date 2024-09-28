@@ -4,13 +4,13 @@ const nextConfig = {
         remotePatterns: [
             {
                 protocol: 'https',
-                hostname: 'cloudcfd.ru',
+                hostname: 'ares.ftf.tsu.ru',
                 port: '',
                 pathname: '/**',
             },
             {
                 protocol: 'http',
-                hostname: 'cloudcfd.ru',
+                hostname: 'ares.ftf.tsu.ru',
                 port: '1515',
                 pathname: '/**',
             },
