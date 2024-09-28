@@ -277,12 +277,13 @@
   "BingHibrid": "Bing hybrid",
   "ArcGis_World_Imagery": "ArcGis World Imagery",
   "ArcGis_World_Topo_Map": "ArcGis World Topo Map",
-
+  "rules": "Rules for using",
+  "rules_service": "Rules for using the platform",
   "authorization": "Authorization",
   "no_account": "No account yet?",
   "_login": "Login",
   "text_toPhoto": "Text to the photo",
-
+  "policy": "Politics",
   "admin_h1": "Basic platform statistics",
   "admin_p": "PhotoSoil platform provides unique opportunities for analyzing and managing data on soil objects and ecosystems",
   "soils_rod": "Soils",
