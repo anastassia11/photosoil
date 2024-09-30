@@ -98,8 +98,9 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref
 
         const baseLayer = new TileLayer();
 
-        baseLayer.setSource(getMapLayers("ArcGis_World_Topo_Map", locale));
-        setSelectedLayer("ArcGis_World_Topo_Map");
+        const _default = onCoordinatesChange ? "ArcGis_World_Topo_Map" : "OSM";
+        baseLayer.setSource(getMapLayers(_default, locale));
+        setSelectedLayer(_default);
 
         mapRef.current = new OLMap({
             layers: [baseLayer],
