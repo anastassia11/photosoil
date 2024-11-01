@@ -160,8 +160,7 @@ export default function CreateObject({ title, onCreate, type }) {
             return updatedFormData;
         });
         if (invalidIndex !== -1) {
-            // setCurrentForm(invalidIndex);
-            selectCurrentForm(invalidIndex)
+            setCurrentForm(invalidIndex)
             await new Promise((resolve) => setTimeout(resolve, 100));
             formRef.current.formCheck();
         } else {
@@ -177,11 +176,10 @@ export default function CreateObject({ title, onCreate, type }) {
                 if (formData.length === 1) {
                     setCurrentForm(null);
                 } else {
-                    const nextFormIndex = idx + 1 < formData.length ? idx + 1 : idx - 1;
-                    selectCurrentForm(nextFormIndex);
+                    setCurrentForm(currentForm === formData.length - 1 ? idx - 1 : idx);
                 }
             } else if (currentForm > idx) {
-                selectCurrentForm(currentForm - 1);
+                setCurrentForm(currentForm - 1)
             }
         }
     }
@@ -204,11 +202,10 @@ export default function CreateObject({ title, onCreate, type }) {
                     if (formData.length === 1) {
                         setCurrentForm(null);
                     } else {
-                        const nextFormIndex = idx + 1 < formData.length ? idx + 1 : idx - 1;
-                        selectCurrentForm(nextFormIndex);
+                        setCurrentForm(idx);
                     }
                 } else if (currentForm > idx) {
-                    selectCurrentForm(currentForm - 1);
+                    setCurrentForm(currentForm - 1)
                 }
             }
         }

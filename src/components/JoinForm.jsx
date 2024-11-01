@@ -17,7 +17,6 @@ export default function JoinForm() {
     const [submitting, setSubmitting] = useState(false);
 
     const handleFormSubmit = (data) => {
-        console.log(data);
         setSubmitting(true);
     }
 
