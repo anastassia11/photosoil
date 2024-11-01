@@ -15,6 +15,7 @@ import { useDispatch } from 'react-redux';
 export default function NewsAdminComponent() {
     const dispatch = useDispatch();
     const [news, setNews] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     const { locale } = useParams();
     const { t } = getTranslation(locale);
 
@@ -26,6 +27,7 @@ export default function NewsAdminComponent() {
         const result = await getNewsForAdmin();
         if (result.success) {
             setNews(result.data);
+            setIsLoading(false);
         }
     }
 
@@ -88,7 +90,7 @@ export default function NewsAdminComponent() {
             </div>
             <ObjectsView _objects={news} onDeleteClick={handleDeleteClick} objectType='news'
                 pathname='' visibilityControl={true} languageChanger={true}
-                onVisibleChange={handleVisibleClick} />
+                onVisibleChange={handleVisibleClick} isLoading={isLoading} />
         </div >
     );
 }

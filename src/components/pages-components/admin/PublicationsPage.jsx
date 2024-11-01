@@ -15,6 +15,7 @@ import { useDispatch } from 'react-redux';
 export default function PublicationsAdminComponent() {
     const dispatch = useDispatch();
     const [publications, setPublications] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     const { locale } = useParams();
     const { t } = getTranslation(locale);
 
@@ -26,6 +27,7 @@ export default function PublicationsAdminComponent() {
         const result = await getPublicationsForAdmin()
         if (result.success) {
             setPublications(result.data)
+            setIsLoading(false)
         }
     }
 
@@ -88,7 +90,7 @@ export default function PublicationsAdminComponent() {
             </div>
             <ObjectsView _objects={publications} onDeleteClick={handleDeleteClick} objectType='publications'
                 pathname='' visibilityControl={true} languageChanger={true}
-                onVisibleChange={handleVisibleChange} />
+                onVisibleChange={handleVisibleChange} isLoading={isLoading} />
         </div>
     )
 }

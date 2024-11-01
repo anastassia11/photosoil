@@ -301,5 +301,6 @@
   "other": "Other",
   "invalid_email": "Invalid email adress",
   "error_location": "Error getting location",
-  "not_supported_location": "Geolocation is not supported by your browser"
+  "not_supported_location": "Geolocation is not supported by your browser",
+  "loading": "Loading.."
 }

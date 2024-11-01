@@ -8,7 +8,6 @@ import ObjectsView from '@/components/admin-panel/ObjectsView';
 import { openAlert } from '@/store/slices/alertSlice';
 import { closeModal, openModal } from '@/store/slices/modalSlice';
 import { useEffect, useState } from 'react';
-import { Oval } from 'react-loader-spinner';
 import { useDispatch } from 'react-redux';
 import { useConstants } from '@/hooks/useConstants';
 import modalThunkActions from '@/store/thunks/modalThunk';
@@ -21,6 +20,7 @@ import SubmitBtn from '@/components/admin-panel/ui-kit/SubmitBtn';
 export default function UsersPageComponent() {
     const dispatch = useDispatch();
     const [accounts, setAccounts] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [formVisible, setFormVisible] = useState(false);
 
     const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({
@@ -39,7 +39,8 @@ export default function UsersPageComponent() {
     const fetchAccounts = async () => {
         const result = await getAccounts()
         if (result.success) {
-            setAccounts(result.data)
+            setAccounts(result.data);
+            setIsLoading(false);
         }
     }
 
@@ -186,7 +187,7 @@ export default function UsersPageComponent() {
                 </button>
             </div>
             <ObjectsView _objects={accounts} onDeleteClick={handleDeleteClick}
-                pathname='' onRoleChange={handleRoleChange} objectType='users' />
+                pathname='' onRoleChange={handleRoleChange} objectType='users' isLoading={isLoading} />
         </div>
     );
 }

@@ -14,6 +14,7 @@ import { useDispatch } from 'react-redux';
 export default function DictionaryAdminPageComponent() {
     const dispatch = useDispatch();
     const [disconaries, setDisconaries] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     const { locale } = useParams();
     const { t } = getTranslation(locale);
 
@@ -25,6 +26,7 @@ export default function DictionaryAdminPageComponent() {
         const result = await getClassifications()
         if (result.success) {
             setDisconaries(result.data)
+            setIsLoading(false);
         }
     }
 
@@ -64,7 +66,7 @@ export default function DictionaryAdminPageComponent() {
                 </Link>
             </div>
             <ObjectsView _objects={disconaries} onDeleteClick={handleDeleteClick} objectType='dictionary'
-                pathname='' visibilityControl={false} languageChanger={true} />
+                pathname='' visibilityControl={false} languageChanger={true} isLoading={isLoading} />
         </div >
     );
 }

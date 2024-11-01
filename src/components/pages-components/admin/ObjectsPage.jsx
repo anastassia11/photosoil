@@ -15,6 +15,7 @@ import { getTranslation } from '@/i18n/client';
 export default function ObjectsPageComponent() {
     const dispatch = useDispatch();
     const [soils, setSoils] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     const { locale } = useParams();
     const { t } = getTranslation(locale);
 
@@ -25,7 +26,8 @@ export default function ObjectsPageComponent() {
     const fetchSoils = async () => {
         const result = await getSoilsForAdmin()
         if (result.success) {
-            setSoils(result.data)
+            setSoils(result.data);
+            setIsLoading(false);
         }
     }
 
@@ -87,7 +89,7 @@ export default function ObjectsPageComponent() {
                 </Link>
             </div>
             <ObjectsView _objects={soils} onDeleteClick={handleDeleteClick} objectType='objects'
-                visibilityControl={true} languageChanger={true}
+                visibilityControl={true} languageChanger={true} isLoading={isLoading}
                 pathname='' onVisibleChange={handleVisibleChange} />
         </div >
     );

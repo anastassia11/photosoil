@@ -19,6 +19,7 @@ export default function AccountPageComponent({ id }) {
     const dispatch = useDispatch();
     const [user, setUser] = useState({});
     const [userObjects, setUserObjects] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [selectedFilters, setSelectedFilters] = useState([]);
     const [filteredObjects, setFilteredObjects] = useState([]);
     const { locale } = useParams();
@@ -72,7 +73,8 @@ export default function AccountPageComponent({ id }) {
             ]
             setUser(userData);
             setUserObjects(_userObjects);
-            setSelectedFilters(FILTERS.map(({ name }) => name))
+            setSelectedFilters(FILTERS.map(({ name }) => name));
+            setIsLoading(false);
         }
     }
 
@@ -182,7 +184,7 @@ export default function AccountPageComponent({ id }) {
             <ObjectsView _objects={filteredObjects} pathname='' onVisibleChange={handleVisibleChange}
                 visibilityControl={true} languageChanger={true}
                 onDeleteClick={handleDeleteClick}
-                objectType='userPage' />
+                objectType='userPage' isLoading={isLoading} />
         </div>
     )
 }

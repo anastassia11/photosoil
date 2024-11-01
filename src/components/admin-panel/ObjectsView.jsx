@@ -10,8 +10,9 @@ import { useParams } from 'next/navigation';
 import { PAGINATION_OPTIONS } from '@/utils/constants';
 import moment from 'moment';
 import { getTranslation } from '@/i18n/client';
+import { Oval } from 'react-loader-spinner';
 
-export default function ObjectsView({ _objects, onDeleteClick, objectType, visibilityControl, languageChanger, onVisibleChange, onRoleChange }) {
+export default function ObjectsView({ _objects, isLoading, onDeleteClick, objectType, visibilityControl, languageChanger, onVisibleChange, onRoleChange }) {
     const dispatch = useDispatch();
     const [objects, setObjects] = useState([]);
     const [selectedObjects, setSelectedObjects] = useState([]);
@@ -549,7 +550,17 @@ export default function ObjectsView({ _objects, onDeleteClick, objectType, visib
                                 })}
                                 {!filteredObjects.length && <tr className='bg-white'>
                                     <td className="px-4 py-[18px] text-sm font-medium text-zinc-700 whitespace-nowrap ">
-                                        {t('no_objects')}
+                                        {isLoading ? <div className='flex flex-row items-center space-x-2'>
+                                            <Oval
+                                                height={20}
+                                                width={20}
+                                                color="#111827"
+                                                visible={true}
+                                                ariaLabel='oval-loading'
+                                                secondaryColor="#111827"
+                                                strokeWidth={4}
+                                                strokeWidthSecondary={4} />
+                                            <p className='text-sm text-zinc-700'>{t('loading')}</p></div> : t('no_objects')}
                                     </td>
                                     <td className="px-4 py-[18px] text-sm text-zinc-500 whitespace-nowrap"></td>
                                     <td className="px-4 py-[18px] text-sm text-zinc-500 whitespace-nowrap"></td>

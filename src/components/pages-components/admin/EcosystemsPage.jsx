@@ -15,6 +15,7 @@ import { getTranslation } from '@/i18n/client';
 export default function EcosystemsAdminComponent() {
     const dispatch = useDispatch();
     const [ecosystems, setEcosystems] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     const { locale } = useParams();
     const { t } = getTranslation(locale);
 
@@ -26,6 +27,7 @@ export default function EcosystemsAdminComponent() {
         const result = await getEcosystemsForAdmin()
         if (result.success) {
             setEcosystems(result.data)
+            setIsLoading(false)
         }
     }
 
@@ -88,7 +90,7 @@ export default function EcosystemsAdminComponent() {
             </div>
             <ObjectsView _objects={ecosystems} onDeleteClick={handleDeleteClick} objectType='ecosystems'
                 pathname='' visibilityControl={true} languageChanger={true}
-                onVisibleChange={handleVisibleChange} />
+                onVisibleChange={handleVisibleChange} isLoading={isLoading} />
         </div >
     );
 }

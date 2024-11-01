@@ -14,6 +14,7 @@ import { useDispatch } from 'react-redux';
 export default function AuthorsAdminPageComponent() {
     const dispatch = useDispatch();
     const [authors, setAuthors] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     const { locale } = useParams();
     const { t } = getTranslation(locale);
 
@@ -25,6 +26,7 @@ export default function AuthorsAdminPageComponent() {
         const result = await getAuthors()
         if (result.success) {
             setAuthors(result.data)
+            setIsLoading(false)
         }
     }
 
@@ -64,7 +66,7 @@ export default function AuthorsAdminPageComponent() {
                 </Link>
             </div>
             <ObjectsView _objects={authors} onDeleteClick={handleDeleteClick} objectType='authors'
-                pathname='' visibilityControl={false} languageChanger={false} />
+                pathname='' visibilityControl={false} languageChanger={false} isLoading={isLoading} />
         </div >
     );
 }
