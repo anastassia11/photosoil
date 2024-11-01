@@ -16,11 +16,16 @@ import Zoom from './Zoom';
 import { getMapLayers } from '@/hooks/getMapLayers';
 import { useParams } from 'next/navigation';
 import LayersPanel from './LayersPanel';
+import { useDispatch } from 'react-redux';
+import { openAlert } from '@/store/slices/alertSlice';
+import { getTranslation } from '@/i18n/client';
 
 function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref) {
+    const dispatch = useDispatch();
     const didLogRef = useRef(false);
     const mapElement = useRef();
     const { locale } = useParams();
+    const { t } = getTranslation(locale);
     const selectedPointFeature = useRef(null);
     const mapRef = useRef(null);
     const modifyRef = useRef(null);
@@ -156,23 +161,16 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref
         setSelectedLayer(layer);
     }
 
-    const handleMapClick = (e) => {
+    const resetStyle = () => {
         //сбрасываем стиль прошлого выделения
         if (selectedPointFeature.current) {
             selectedPointFeature.current.setStyle(basePointStyle);
             //сбрасываем прошлое выделение
             selectedPointFeature.current = null;
         }
+    }
 
-        //проверяем кликнули ли мы по существующей точке
-        mapRef.current.forEachFeatureAtPixel(e.pixel, function (f) {
-            //выделяем точку и устанавливаем стиль выделения
-            f.setStyle(selectedPointStyle);
-            selectedPointFeature.current = f;
-            selectedPointFeature.current.setStyle(selectedPointStyle);
-            return true;
-        });
-
+    const createPoint = () => {
         //создаем новую точку
         if (selectedPointFeature.current == null) {
             setIsDataLoaded(true);
@@ -188,6 +186,21 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref
             //делаем точку выделенной
             selectedPointFeature.current = newPointFeature;
         }
+    }
+
+    const handleMapClick = (e) => {
+        resetStyle();
+
+        //проверяем кликнули ли мы по существующей точке
+        mapRef.current.forEachFeatureAtPixel(e.pixel, function (f) {
+            //выделяем точку и устанавливаем стиль выделения
+            f.setStyle(selectedPointStyle);
+            selectedPointFeature.current = f;
+            selectedPointFeature.current.setStyle(selectedPointStyle);
+            return true;
+        });
+
+        createPoint();
 
         //обновляем текстбоксы
         onSelectedPointFeatureChenged();
@@ -285,12 +298,40 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref
         }
     }
 
+    // Функция для получения координат пользователя
+    const getUserLocation = (e) => {
+        e.preventDefault();
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const coords = fromLonLat([position.coords.longitude, position.coords.latitude]);
+                    resetStyle();
+                    createPoint();
+                    //обновляем текстбоксы
+                    onSelectedPointFeatureChenged();
+                    mapRef.current.getView().animate({ duration: 500 }, { center: coords, zoom: 12 });
+                },
+                (error) => {
+                    dispatch(openAlert({ title: t('error'), message: t('error_location'), type: 'error' }));
+                },
+                { enableHighAccuracy: true }
+            );
+        } else {
+            dispatch(openAlert({ title: t('warning'), message: t('not_supported_location'), type: 'warning' }));
+        }
+    }
+
     return (
         <div ref={mapElement} className="w-full h-full z-10 relative">
-            <div className='z-30 absolute top-0 right-0 m-2 sm:block hidden'>
+            <div className='z-30 absolute top-0 right-0 m-2'>
                 <LayersPanel onLayerChange={handleBaseLayerChange} currentLayer={selectedLayer} />
             </div>
-            <div className='z-20 absolute top-[calc(50%-50px)] right-0 m-2 '>
+
+            <div className='z-20 absolute top-[calc(50%-88px)] right-0 m-2'>
+                <button className='mb-2 duration-300 bg-white rounded-md p-1 shadow-md text-zinc-600 hover:text-zinc-800 hover:shadow-lg'
+                    onClick={getUserLocation} type='button'>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M17.89 26.27l-2.7-9.46-9.46-2.7 18.92-6.76zm-5.62-12.38l4.54 1.3 1.3 4.54 3.24-9.08z"></path></svg>
+                </button>
                 <Zoom onClick={handleZoomClick} />
             </div>
         </div>

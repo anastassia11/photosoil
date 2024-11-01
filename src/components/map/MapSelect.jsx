@@ -14,11 +14,17 @@ import Zoom from './Zoom';
 import { getMapLayers } from '@/hooks/getMapLayers';
 import { useParams } from 'next/navigation';
 import LayersPanel from './LayersPanel';
+import { useDispatch } from 'react-redux';
+import { openAlert } from '@/store/slices/alertSlice';
+import { getTranslation } from '@/i18n/client';
 
 const MapSelect = memo(function MapSelect({ id, type, latitude, longtitude, onCoordinateChange }) {
+    const dispatch = useDispatch();
+
     const didLogRef = useRef(false);
     const mapElement = useRef();
     const { locale } = useParams();
+    const { t } = getTranslation(locale);
     const [isCoordExist, setIsCoordExist] = useState(false);
     const [vectorLayer, setVectorLayer] = useState(null);
     const [selectedPointGeom, setSelectedPointGeom] = useState(null);
@@ -140,7 +146,7 @@ const MapSelect = memo(function MapSelect({ id, type, latitude, longtitude, onCo
         selectedPointGeom?.setCoordinates(newCord);
 
         //Удаляем все запущенные анимации
-        mapRef.current.getView().cancelAnimations();
+        // mapRef.current.getView().cancelAnimations();
 
         //Запускаем анимацию перемещения к метки
         mapRef.current.getView().animate({ duration: 500 }, { center: newCord });
@@ -219,13 +225,38 @@ const MapSelect = memo(function MapSelect({ id, type, latitude, longtitude, onCo
         }
     }
 
+    // Функция для получения координат пользователя
+    const getUserLocation = (e) => {
+        e.preventDefault();
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const coords = [position.coords.longitude, position.coords.latitude];
+                    onCoordinateChange({ latitude: coords[1], longtitude: coords[0] });
+                    mapRef.current.getView().animate({ duration: 500 }, { zoom: 12 });
+                },
+                (error) => {
+                    dispatch(openAlert({ title: t('error'), message: t('error_location'), type: 'error' }));
+                },
+                { enableHighAccuracy: true }
+            );
+        } else {
+            dispatch(openAlert({ title: t('warning'), message: t('not_supported_location'), type: 'warning' }));
+        }
+    }
+
     return (
         <div ref={mapElement} className="w-full h-full z-10 relative">
-            <div className='z-30 absolute top-0 right-0 m-2 sm:block hidden'>
+            <div className='z-30 absolute top-0 right-0 m-2'>
                 {/* <FullScreen onClick={handleFullClick} /> */}
                 <LayersPanel onLayerChange={handleBaseLayerChange} currentLayer={selectedLayer} />
             </div>
-            <div className='z-20 absolute top-[calc(50%-50px)] right-0 m-2 '>
+
+            <div className='z-20 absolute top-[calc(50%-88px)] right-0 m-2'>
+                <button className='mb-2 duration-300 bg-white rounded-md p-1 shadow-md text-zinc-600 hover:text-zinc-800 hover:shadow-lg'
+                    onClick={getUserLocation} type='button'>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M17.89 26.27l-2.7-9.46-9.46-2.7 18.92-6.76zm-5.62-12.38l4.54 1.3 1.3 4.54 3.24-9.08z"></path></svg>
+                </button>
                 <Zoom onClick={handleZoomClick} />
             </div>
         </div>

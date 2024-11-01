@@ -299,5 +299,7 @@
   "comments": "Other comments",
   "monographs": "Monographs",
   "other": "Other",
-  "invalid_email": "Invalid email adress"
+  "invalid_email": "Invalid email adress",
+  "error_location": "Error getting location",
+  "not_supported_location": "Geolocation is not supported by your browser"
 }
