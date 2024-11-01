@@ -89,13 +89,14 @@ export default function EditObject({ id, type, title }) {
             await Promise.all([
                 editPhoto(mainPhoto.id, createTwoLang ? { titleEng: mainPhoto.titleEng, titleRu: mainPhoto.titleRu }
                     : (currentLang ? { titleEng: mainPhoto.titleEng } : { titleRu: mainPhoto.titleRu })),
-                ...otherPhotos.map(photo => editPhoto(photo.id, createTwoLang ? { titleEng: photo.titleEng, titleRu: photo.titleRu }
+                ...objectPhoto.map(photo => editPhoto(photo.id, createTwoLang ? { titleEng: photo.titleEng, titleRu: photo.titleRu }
                     : (currentLang ? { titleEng: photo.titleEng } : { titleRu: photo.titleRu }))),
                 editObject(createTwoLang ? dataForFetch : langData)
             ]);
             router.push(`/${locale}/admin/${type === 'soil' ? 'objects' : 'ecosystems'}`);
             dispatch(openAlert({ title: t('success'), message: t('success_edit'), type: 'success' }));
         } catch (error) {
+            console.log(error)
             dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }));
         } finally {
             setIsLoading(false);
