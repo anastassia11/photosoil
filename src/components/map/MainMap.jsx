@@ -38,11 +38,7 @@ export default function MainMap() {
     const [selectedLayer, setSelectedLayer] = useState('');
 
     const [selectedObjects, setSelectedObjects] = useState([]);
-    const [layersVisible, setLayersVisible] = useState({
-        soil: true,
-        ecosystem: false,
-        publication: false,
-    })
+    const [layersVisible, setLayersVisible] = useState(null);
     const [objects, setObjects] = useState([]);
     const [soils, setSoils] = useState([]);
     const [ecosystems, setEcosystems] = useState([]);
@@ -66,7 +62,12 @@ export default function MainMap() {
                 loadLayers();
             }
         }
-
+        localStorage.getItem('layersVisible') ? setLayersVisible(JSON.parse(localStorage.getItem('layersVisible')))
+            : setLayersVisible({
+                soil: true,
+                ecosystem: false,
+                publication: false,
+            });
         if (mapElement.current) {
             initializeMap();
         } else {
@@ -76,6 +77,10 @@ export default function MainMap() {
             document.removeEventListener('DOMContentLoaded', initializeMap);
         }
     }, [])
+
+    useEffect(() => {
+        layersVisible && localStorage.setItem('layersVisible', JSON.stringify(layersVisible));
+    }, [layersVisible])
 
     useEffect(() => {
         if (clusterLayer) {
@@ -246,7 +251,7 @@ export default function MainMap() {
                             newPointFeature.set("p_Id", item.id);
                             newPointFeature.set("p_type", item._type);
                             newPointFeature.setStyle(getIconStyleByLayerName(item._type));
-                            layersVisible[item._type] && layerVectorSource.addFeature(newPointFeature);
+                            layersVisible?.[item._type] && layerVectorSource.addFeature(newPointFeature);
                             newFeatures.push(newPointFeature);
                         }
                     })

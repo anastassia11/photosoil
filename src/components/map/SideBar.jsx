@@ -314,9 +314,9 @@ const SideBar = memo(function SideBar({ sidebarOpen, setSideBarOpen, filterName,
                     {t('map_layers')}
                   </p>
                   <div x-show="show" x-transition className="sm:space-y-2.5 space-y-1 px-1">
-                    <LayerSwitch title={t('soils')} type='soil' visible={layersVisible.soil} onVisibleChange={handleVisibleChange} />
-                    <LayerSwitch title={t('ecosystems')} type='ecosystem' visible={layersVisible.ecosystem} onVisibleChange={handleVisibleChange} />
-                    <LayerSwitch title={t('publications')} type='publication' visible={layersVisible.publication} onVisibleChange={handleVisibleChange} />
+                    <LayerSwitch title={t('soils')} type='soil' visible={layersVisible?.soil} onVisibleChange={handleVisibleChange} />
+                    <LayerSwitch title={t('ecosystems')} type='ecosystem' visible={layersVisible?.ecosystem} onVisibleChange={handleVisibleChange} />
+                    <LayerSwitch title={t('publications')} type='publication' visible={layersVisible?.publication} onVisibleChange={handleVisibleChange} />
                   </div>
                 </div>
 
