@@ -58,12 +58,13 @@ const MapSelect = memo(function MapSelect({ id, type, latitude, longtitude, onCo
     }, [latitude, longtitude, vectorLayer])
 
     const init = () => {
-        let startcoords = fromLonLat([85.9075867, 53.1155423]);
+        // let startcoords = fromLonLat([85.9075867, 53.1155423]);
+        let startcoords = fromLonLat([93.36224004774232, 63.11575949726813]);
 
         //Создаем вид
         let view = new View({
             center: startcoords,
-            zoom: 10
+            zoom: onCoordinateChange ? 3 : 6.5,
         });
 
         // Базовый слой карты
