@@ -486,13 +486,36 @@ export default function MainMap() {
         setSelectedObjects([]);
     }
 
+    const getUserLocation = (e) => {
+        e.preventDefault();
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const coords = fromLonLat([position.coords.longitude, position.coords.latitude]);
+                    mapRef.current.getView().animate({ duration: 500 }, { center: coords, zoom: 12 });
+                },
+                (error) => {
+                    dispatch(openAlert({ title: t('error'), message: t('error_location'), type: 'error' }));
+                },
+                { enableHighAccuracy: true }
+            );
+        } else {
+            dispatch(openAlert({ title: t('warning'), message: t('not_supported_location'), type: 'warning' }));
+        }
+    }
+
     return (
         <div ref={mapElement} className="w-full h-full z-10">
             <div className={`z-40 absolute top-0 right-0 m-2 flex flex-row duration-300 lg:w-[500px] w-full pl-2`}>
                 <SearchRegion onLocationHandler={selectLocationHandler} />
                 <LayersPanel onLayerChange={handleBaseLayerChange} currentLayer={selectedLayer} />
             </div>
-            <div className='z-20 absolute top-[calc(50%-100px)] right-0 m-2 '>
+            <div className='z-20 absolute top-[calc(50%-120px)] right-0 m-2'>
+                <button className='mb-2 duration-300 bg-white rounded-md p-1 shadow-md text-zinc-600 hover:text-zinc-800 hover:shadow-lg'
+                    type='button'
+                    onClick={getUserLocation}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M17.89 26.27l-2.7-9.46-9.46-2.7 18.92-6.76zm-5.62-12.38l4.54 1.3 1.3 4.54 3.24-9.08z"></path></svg>
+                </button>
                 <Zoom onClick={handleZoomClick} />
             </div>
 
