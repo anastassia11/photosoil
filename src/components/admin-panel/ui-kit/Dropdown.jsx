@@ -80,5 +80,6 @@ const Dropdown = memo(function Dropdown({ name, value, items, onCategotyChange, 
     return prevProps.dropdown?.isActive === nextProps.dropdown?.isActive &&
         prevProps.dropdown?.key === nextProps.dropdown?.key
         && prevProps.value === nextProps.value
+        && prevProps.name === nextProps.name
 })
 export default Dropdown;
