@@ -19,13 +19,14 @@ import LayersPanel from './LayersPanel';
 import { getSoils } from '@/api/soil/get_soils';
 import { getEcosystems } from '@/api/ecosystem/get_ecosystems';
 import SideBar from './SideBar';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getPublications } from '@/api/publication/get_publications';
 import { useParams } from 'next/navigation';
 import SearchRegion from './SearchRegion';
 import { getMapLayers } from '@/hooks/getMapLayers';
 
 export default function MainMap() {
+    const dispatch = useDispatch();
     const [baseLayer, setBaseLayer] = useState(null);
 
     const [clusterLayer, setClusterLayer] = useState(null);
