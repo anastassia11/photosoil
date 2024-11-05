@@ -1,28 +1,24 @@
-import { useRouter } from 'next/navigation';
-import { usePathname } from 'next/navigation';
+'use client'
+
 import Dropdown from '../admin-panel/ui-kit/Dropdown';
+import { getTranslation } from '@/i18n/client';
 
 export default function LanguageChanger({ isTransparent, locale }) {
     const currentLocale = locale;
-    const router = useRouter();
-    const currentPathname = usePathname();
-
+    const { i18n } = getTranslation(locale);
     const LANGUAGES = {
         ru: 'RU',
         en: 'EN'
     }
 
-    const handleChange = (newLocale) => {
-        router.push(
-            currentPathname.replace(`/${currentLocale}`, `/${newLocale}`)
-        );
-        router.refresh();
+    const handleLanguageChange = (lang) => {
+        i18n.changeLanguage(lang); // меняет язык без перезагрузки
     };
 
     return (
         <div className='sm:w-[80px] w-full h-full flex justify-center items-center -mt-1'>
             <Dropdown value={currentLocale} items={LANGUAGES} isTransparent={isTransparent}
-                onCategotyChange={handleChange} dropdownKey='languageChanger' />
+                onCategotyChange={handleLanguageChange} dropdownKey='languageChanger' />
         </div>
     );
 }
