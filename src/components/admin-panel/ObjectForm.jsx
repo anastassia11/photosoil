@@ -441,7 +441,7 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
                         </label>
                         <ul className='flex flex-row mb-2 w-full space-x-3'>
                             {
-                                ['latitude', 'longtitude'].map(param => <li key={param}>
+                                ['latitude', 'longtitude'].map(param => <li key={param} className='w-full'>
                                     <Input
                                         required={false}
                                         error={errors[param]}
