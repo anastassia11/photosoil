@@ -224,7 +224,7 @@ export default function CreateObject({ title, onCreate, type }) {
         setFormData(prevData => prevData.map((soil, index) => index === currentForm ? newValues : soil));
     }
 
-    const PhotoCard = ({ id, path, idx, isLoading }) => {
+    const PhotoCard = ({ id, path, pathResize, idx, isLoading }) => {
         const translations = formData[idx]?.translations;
         let name = '';
         if (translations) {
@@ -237,7 +237,7 @@ export default function CreateObject({ title, onCreate, type }) {
         duration-300 cursor-pointer hover:shadow-md ${currentForm === idx ? ' ring ring-blue-700 ring-opacity-30 w-full' : 'w-[95%]'}  overflow-hidden`}
             onClick={() => selectCurrentForm(idx)}>
             <div className='flex flex-col items-center w-full h-full overflow-hidden'>
-                <button className='overflow-hidden p-[6px] text-sm font-medium z-10 absolute top-0 right-0 rounded-bl-md
+                <button className='overflow-hidden p-[6px] text-sm font-medium z-10 absolute top-0 right-0 rounded-tr-md rounded-bl-md
                                 backdrop-blur-md bg-black bg-opacity-40 text-zinc-200 hover:text-white duration-300'
                     onClick={(e) => {
                         e.stopPropagation();
@@ -260,8 +260,8 @@ export default function CreateObject({ title, onCreate, type }) {
                         strokeWidth={4}
                         strokeWidthSecondary={4} />
                 </div> : (
-                    path ? <>
-                        <Image src={`${BASE_SERVER_URL}${path}`} height={150} width={150} alt={id}
+                    (path || pathResize) ? <>
+                        <Image src={`${BASE_SERVER_URL}${pathResize.length ? pathResize : path}`} height={500} width={500} alt={id}
                             className='w-full h-full object-cover bg-black/10' />
                     </> :
                         <div className='ackdrop-blur-md bg-black/10 flex items-center justify-center w-full h-full'>

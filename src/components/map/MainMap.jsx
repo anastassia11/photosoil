@@ -24,6 +24,8 @@ import { getPublications } from '@/api/publication/get_publications';
 import { useParams } from 'next/navigation';
 import SearchRegion from './SearchRegion';
 import { getMapLayers } from '@/hooks/getMapLayers';
+import { openAlert } from '@/store/slices/alertSlice';
+import { getTranslation } from '@/i18n/client';
 
 export default function MainMap() {
     const dispatch = useDispatch();
@@ -34,7 +36,7 @@ export default function MainMap() {
 
     const [sidebarOpen, setSideBarOpen] = useState(false);
     const { locale } = useParams();
-
+    const { t } = getTranslation(locale);
     const { selectedTerms, selectedCategories, selectedAuthors } = useSelector(state => state.data);
     const [selectedLayer, setSelectedLayer] = useState('');
 

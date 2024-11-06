@@ -189,7 +189,7 @@ const SideBar = memo(function SideBar({ sidebarOpen, setSideBarOpen, filterName,
         </p>
       </div> : <div className='flex flex-row w-full'>
         {object?.photo?.path
-          ? <div className='max-w-[40%] w-[40%]'><Image src={`${BASE_SERVER_URL}${object.photo?.path}`}
+          ? <div className='max-w-[40%] w-[40%]'><Image src={`${BASE_SERVER_URL}${object.photo?.pathResize?.length ? object.photo.pathResize : object.photo.path}`}
             className="aspect-[3/4] object-cover object-top border border-blue-600 shadow-md rounded-xl overflow-hidden"
             alt={object?.name}
             width={500}

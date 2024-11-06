@@ -7,7 +7,7 @@ import { useParams } from 'next/navigation'
 import React, { memo } from 'react'
 import { Oval } from 'react-loader-spinner'
 
-const PhotoCard = memo(function PhotoCard({ id, path, titleEng, titleRu, fileName, onDelete, onChange, isLoading, isEng }) {
+const PhotoCard = memo(function PhotoCard({ id, path, pathResize, titleEng, titleRu, fileName, onDelete, onChange, isLoading, isEng }) {
     const { locale } = useParams();
     const { t } = getTranslation(locale);
 
@@ -23,12 +23,12 @@ const PhotoCard = memo(function PhotoCard({ id, path, titleEng, titleRu, fileNam
                 secondaryColor="#FFFFFF"
                 strokeWidth={4}
                 strokeWidthSecondary={4} />
-                : <Image src={`${BASE_SERVER_URL}${path}`} height={150} width={150} alt={id}
+                : <Image src={`${BASE_SERVER_URL}${pathResize.length ? pathResize : path}`} height={150} width={150} alt={id}
                     className='object-cover w-[150px] aspect-[1/1]' />}
             {!isLoading && <p className='overflow-hidden whitespace-nowrap overflow-ellipsis py-1 px-2 text-sm font-medium z-10 absolute bottom-0 backdrop-blur-md bg-black bg-opacity-40 text-white w-full'>
                 {fileName}
             </p>}
-            {!isLoading && <button type='button' className='overflow-hidden p-[6px] text-sm font-medium z-10 absolute top-0 right-0 rounded-bl-md
+            {!isLoading && <button type='button' className='overflow-hidden p-[6px] text-sm font-medium z-10 absolute top-0 right-0 rounded-tr-md rounded-bl-md
                                 backdrop-blur-md bg-black bg-opacity-40 text-zinc-200 hover:text-white duration-300'
                 onClick={() => onDelete(id)}>
                 <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className='w-4 h-4'>

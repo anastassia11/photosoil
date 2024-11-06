@@ -36,19 +36,19 @@ export default function NewGallery({ mainPhoto, objectPhoto }) {
             {elements.length ? <FancyBox length={elements.length}
                 setFancyboxIsActive={setFancyboxIsActive}>
                 <Carousel>
-                    {elements?.map(({ id, path, titleEng, titleRu, lastUpdated }) =>
+                    {elements?.map(({ id, path, pathResize, titleEng, titleRu, lastUpdated }) =>
                         <figure key={id}
                             className="f-carousel__slide flex flex-col items-center justify-center min-h-full"
-                            data-thumb-src={`${BASE_SERVER_URL}${path}`}
+                            data-thumb-src={`${BASE_SERVER_URL}${pathResize.length ? pathResize : path}`}
                             data-fancybox="gallery"
-                            data-src={`${BASE_SERVER_URL}${path}`}
+                            data-src={`${BASE_SERVER_URL}${pathResize.length ? pathResize : path}`}
                             data-caption={`<div class='flex flex-col h-full'>
                           <p class="text-base font-medium mb-3">${moment(lastUpdated).format('DD.MM.YYYY HH:mm')}</p>
                                 <p class='font-light'>${locale === 'en' ? (titleEng || '') : locale === 'ru' ? (titleRu || '') : ''}</p>
                       </div>`}
                         >
                             <div className="absolute inset-0 z-[-1] overflow-hidden">
-                                <Image priority src={`${BASE_SERVER_URL}${path}`} width={500} height={500} alt='soil'
+                                <Image priority src={`${BASE_SERVER_URL}${pathResize.length ? pathResize : path}`} width={500} height={500} alt='soil'
                                     className="w-full h-full object-cover blur-[7px] scale-150 opacity-70" />
                             </div>
                             <Image priority src={`${BASE_SERVER_URL}${path}`} width={500} height={500} alt='soil' />

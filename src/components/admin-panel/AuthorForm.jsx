@@ -123,7 +123,7 @@ export default function AuthorForm({ _author, title, onFormSubmit, btnText }) {
                                                 strokeWidthSecondary={4} />
                                         </span> : <>
                                             {(value && value.path) ? <div className='relative max-h-full rounded-md overflow-hidden'>
-                                                <button type='button' className='overflow-hidden p-[6px] text-sm font-medium z-10 absolute top-0 right-0 rounded-bl-md
+                                                <button type='button' className='overflow-hidden rounded-tr-md rounded-bl-md p-[6px] text-sm font-medium z-10 absolute top-0 right-0 
                                 backdrop-blur-md bg-black bg-opacity-40 text-zinc-200 hover:text-white duration-300'
                                                     onClick={handlePhotoDelete}>
                                                     <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className='w-4 h-4'>
@@ -132,7 +132,7 @@ export default function AuthorForm({ _author, title, onFormSubmit, btnText }) {
                                                         </g>
                                                     </svg>
                                                 </button>
-                                                <Image src={`${BASE_SERVER_URL}${value.path}`} height={370} width={370} alt='author photo'
+                                                <Image src={`${BASE_SERVER_URL}${value.pathResize.length ? value.pathResize : value.path}`} height={500} width={500} alt='author photo'
                                                     className='bg-black/10 object-cover rounded-md max-h-[370px] min-h-[370px] aspect-[3/4] overflow-hidden' />
                                             </div>
                                                 : <DragAndDrop id='author-photo' error={fieldState.error}
