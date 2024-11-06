@@ -106,7 +106,7 @@ export default function CreateObject({ title, onCreate, type }) {
                 return !valid || !item.mainPhoto?.path?.length;
             } else {
                 const valid = item.translations?.find(translation => translation.isEnglish === item.currentLang);
-                return !valid || !valid.name.length || !item.mainPhoto?.path?.length;
+                return !valid || !valid?.name.length || !item.mainPhoto?.path?.length;
             }
         });
     };
@@ -155,19 +155,21 @@ export default function CreateObject({ title, onCreate, type }) {
 
     const handleCreateClick = async () => {
         const newValues = formRef.current.updateState();
-        let invalidIndex, updatedFormData;
         setFormData(prevData => {
-            updatedFormData = prevData.map((soil, index) => index === currentForm ? newValues : soil);
-            invalidIndex = validateDataArray(updatedFormData);
+            const updatedFormData = prevData.map((soil, index) =>
+                index === currentForm ? newValues : soil
+            );
+            const invalidIndex = validateDataArray(updatedFormData);
+            if (invalidIndex !== -1) {
+                setCurrentForm(invalidIndex);
+                setTimeout(() => {
+                    formRef.current.formCheck();
+                }, 100);
+            } else {
+                submitForm(updatedFormData);
+            }
             return updatedFormData;
         });
-        if (invalidIndex !== -1) {
-            setCurrentForm(invalidIndex)
-            await new Promise((resolve) => setTimeout(resolve, 100));
-            formRef.current.formCheck();
-        } else {
-            submitForm(updatedFormData);
-        }
     }
 
     const fetchDeletePhoto = async (id, idx) => {
