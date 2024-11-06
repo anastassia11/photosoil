@@ -302,5 +302,6 @@
   "invalid_email": "Invalid email adress",
   "error_location": "Error getting location",
   "not_supported_location": "Geolocation is not supported by your browser",
-  "loading": "Loading.."
+  "loading": "Loading..",
+  "form_confirm": "Are you sure you want to leave this page? The data you entered may not be saved."
 }

@@ -12,6 +12,7 @@ import { getSoil } from '@/api/soil/get_soil';
 import { getEcosystem } from '@/api/ecosystem/get_ecosystem';
 import { getTranslation } from '@/i18n/client';
 import SubmitBtn from './ui-kit/SubmitBtn';
+import { setDirty } from '@/store/slices/formSlice';
 
 export default function EditObject({ id, type, title }) {
     const dispatch = useDispatch();
@@ -94,6 +95,7 @@ export default function EditObject({ id, type, title }) {
                 editObject(createTwoLang ? dataForFetch : langData)
             ]);
             router.push(`/${locale}/admin/${type === 'soil' ? 'objects' : 'ecosystems'}`);
+            dispatch(setDirty(false));
             dispatch(openAlert({ title: t('success'), message: t('success_edit'), type: 'success' }));
         } catch (error) {
             console.log(error)

@@ -5,6 +5,7 @@ import { putPhoto } from '@/api/photo/put_photo';
 import NewsForm from '@/components/admin-panel/NewsForm';
 import { getTranslation } from '@/i18n/client';
 import { openAlert } from '@/store/slices/alertSlice';
+import { setDirty } from '@/store/slices/formSlice';
 import { useParams, useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 
@@ -17,7 +18,8 @@ export default function CreateNewsComponent() {
     const fetchCreateNews = async (news) => {
         const result = await createNews(news);
         if (result.success) {
-            router.push(`/admin/news`)
+            router.push(`/admin/news`);
+            dispatch(setDirty(false));
             dispatch(openAlert({ title: t('success'), message: t('created_news'), type: 'success' }));
         } else {
             dispatch(openAlert({ title: t('error'), message: t('error_news'), type: 'error' }));

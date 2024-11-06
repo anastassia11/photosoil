@@ -1,12 +1,17 @@
 'use client'
 
 import { getTranslation } from '@/i18n/client';
+import { setDirty } from '@/store/slices/formSlice';
 import Link from 'next/link'
-import { useParams, usePathname } from 'next/navigation'
+import { useParams, usePathname, useRouter } from 'next/navigation'
 import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function Breadcrumbs() {
     const paths = usePathname();
+    const dispatch = useDispatch();
+    const router = useRouter();
+    const { isDirty } = useSelector(state => state.form);
     const pathNames = paths.split('/').filter(path => path)
     const { locale } = useParams();
     const { t } = getTranslation(locale);
@@ -151,11 +156,25 @@ export default function Breadcrumbs() {
         )
     }).filter(({ itemTitle }) => itemTitle !== null)
 
+    const handleLinkClick = (e, href) => {
+        if (pathNames.includes('admin') && isDirty) {
+            e.preventDefault(); // Отменяем переход по умолчанию
+            const confirmLeave = window.confirm(t('form_confirm'));
+            if (confirmLeave) {
+                dispatch(setDirty(false));
+                router.push(href); // Переход к новому URL
+            }
+        }
+    };
+
     return (
         <ul className='flex items-center py-4 whitespace-nowrap flex-wrap w-full'>
             <li className='hover:underline mb-1 2xl:mb-0 flex flex-row items-center '>
                 <Link href={`/${locale}`}
-                    prefetch={false}>PhotoSOIL</Link>
+                    prefetch={false}
+                    onClick={e => handleLinkClick(e, `/${locale}`)}>
+                    PhotoSOIL
+                </Link>
                 {separator}
             </li>
 
@@ -163,7 +182,9 @@ export default function Breadcrumbs() {
                 <li key={href} className='flex flex-row items-center mb-1 2xl:mb-0'>
                     <div className={`${breadcrumbs.length === index + 1 ? 'text-blue-600' : ''}
                     ${isRef ? 'hover:underline' : ''}`}>
-                        {isRef ? <Link href={href} prefetch={false}>{itemTitle}</Link> : itemTitle}
+                        {isRef ? <Link href={href}
+                            onClick={e => handleLinkClick(e, href)}
+                            prefetch={false}>{itemTitle}</Link> : itemTitle}
                     </div>
                     {breadcrumbs.length !== index + 1 && separator}
                 </li>)}

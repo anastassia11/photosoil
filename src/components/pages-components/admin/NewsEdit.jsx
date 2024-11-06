@@ -6,6 +6,7 @@ import { putPhoto } from '@/api/photo/put_photo';
 import NewsForm from '@/components/admin-panel/NewsForm'
 import { getTranslation } from '@/i18n/client';
 import { openAlert } from '@/store/slices/alertSlice';
+import { setDirty } from '@/store/slices/formSlice';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -46,6 +47,7 @@ export default function NewsEditComponent({ id }) {
         const result = await putNews(id, data);
         if (result.success) {
             router.push(`/${locale}/admin/news`);
+            dispatch(setDirty(false));
             dispatch(openAlert({ title: t('success'), message: t('success_edit'), type: 'success' }));
         } else {
             dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }));

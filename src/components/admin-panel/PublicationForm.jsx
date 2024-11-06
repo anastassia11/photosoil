@@ -22,14 +22,22 @@ import { useParams } from 'next/navigation';
 import LangTabs from './ui-kit/LangTabs';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import SubmitBtn from './ui-kit/SubmitBtn';
+import { setDirty } from '@/store/slices/formSlice';
 
 export default function PublicationForm({ _publication, pathname, onPublicationSubmit, btnText, title, oldTwoLang, oldIsEng }) {
     const { register, reset, control, watch, trigger, setValue, getValues, setFocus,
-        formState: { errors, isSubmitting } } = useForm({
+        formState: { errors, isSubmitting, isDirty } } = useForm({
             mode: 'onChange',
             defaultValues: {
                 type: 1,
-                translations: [{ isEnglish: false }],
+                doi: "",
+                translations: [{
+                    isEnglish: false,
+                    authors: '',
+                    description: '',
+                    edition: '',
+                    name: '',
+                }],
                 file: {},
                 soilObjects: [],
                 ecoSystems: [],
@@ -65,6 +73,10 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
         fetchEcosystems();
         fetchSoils();
     }, [])
+
+    useEffect(() => {
+        dispatch(setDirty(isDirty));
+    }, [isDirty]);
 
     useEffect(() => {
         if (_publication) {

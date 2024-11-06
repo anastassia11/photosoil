@@ -20,14 +20,20 @@ import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import LangTabs from './ui-kit/LangTabs';
 import SubmitBtn from './ui-kit/SubmitBtn';
 import { useConstants } from '@/hooks/useConstants';
+import { setDirty } from '@/store/slices/formSlice';
 
 export default function NewsForm({ _news, title, pathname, onNewsSubmit, btnText, oldTwoLang, oldIsEng }) {
     const dispatch = useDispatch();
     const { register, reset, control, watch, trigger, setValue, getValues, setFocus,
-        formState: { errors, isSubmitting } } = useForm({
+        formState: { errors, isSubmitting, isDirty } } = useForm({
             mode: 'onChange',
             defaultValues: {
-                translations: [{ isEnglish: false }],
+                translations: [{
+                    isEnglish: false,
+                    annotation: '',
+                    content: '',
+                    title: '',
+                }],
                 tags: [],
                 objectPhoto: [],
                 files: []
@@ -66,6 +72,10 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, btnText
     useEffect(() => {
         fetchTags();
     }, [])
+
+    useEffect(() => {
+        dispatch(setDirty(isDirty));
+    }, [isDirty]);
 
     const fetchTags = async () => {
         const result = await getTags();
@@ -138,7 +148,12 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, btnText
                 return _prev
             })
         } else {
-            dispatch(openAlert({ title: t('error'), message: t('error_file'), type: 'error' }))
+            dispatch(openAlert({ title: t('error'), message: t('error_file'), type: 'error' }));
+            setLocalFiles(prev => {
+                const _prev = prev.filter((file, idx) => idx !== index);
+                setValue('files', _prev);
+                return _prev;
+            });
         }
     }
 

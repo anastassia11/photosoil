@@ -5,6 +5,7 @@ import { putPublication } from '@/api/publication/put_publication';
 import PublicationForm from '@/components/admin-panel/PublicationForm'
 import { getTranslation } from '@/i18n/client';
 import { openAlert } from '@/store/slices/alertSlice';
+import { setDirty } from '@/store/slices/formSlice';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -46,6 +47,7 @@ export default function PublicationEditComponent({ id }) {
         const result = await putPublication(id, data);
         if (result.success) {
             router.push(`/${locale}/admin/publications`);
+            dispatch(setDirty(false));
             dispatch(openAlert({ title: t('success'), message: t('success_edit'), type: 'success' }));
         } else {
             dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }));

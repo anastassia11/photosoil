@@ -11,6 +11,7 @@ import LangTabs from '@/components/admin-panel/ui-kit/LangTabs';
 import SubmitBtn from '@/components/admin-panel/ui-kit/SubmitBtn'
 import { getTranslation } from '@/i18n/client'
 import { openAlert } from '@/store/slices/alertSlice';
+import { setDirty } from '@/store/slices/formSlice';
 import { closeModal, openModal } from '@/store/slices/modalSlice';
 import modalThunkActions from '@/store/thunks/modalThunk';
 import { useParams } from 'next/navigation';
@@ -24,7 +25,7 @@ export default function PolicyAdminComponent() {
     const { t } = getTranslation(locale);
     const [isEng, setIsEng] = useState(false);
 
-    const { control, handleSubmit, setValue, reset, watch, formState: { isSubmitting } } = useForm({
+    const { control, handleSubmit, setValue, reset, watch, formState: { isSubmitting, isDirty } } = useForm({
         mode: 'onChange', defaultValues: {
             contentRu: '',
             contentEng: '',
@@ -37,6 +38,10 @@ export default function PolicyAdminComponent() {
     useEffect(() => {
         fetchRules();
     }, [])
+
+    useEffect(() => {
+        dispatch(setDirty(isDirty));
+    }, [isDirty]);
 
     const fetchRules = async () => {
         const result = await getRules();
@@ -56,7 +61,8 @@ export default function PolicyAdminComponent() {
         }
         const result = await putRules(dataForSubmit);
         if (result.success) {
-            dispatch(openAlert({ title: t('success'), message: t('success_edit'), type: 'success' }))
+            dispatch(setDirty(false));
+            dispatch(openAlert({ title: t('success'), message: t('success_edit'), type: 'success' }));
         } else {
             dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }))
         }

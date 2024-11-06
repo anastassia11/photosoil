@@ -9,14 +9,20 @@ import { getTranslation } from '@/i18n/client';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import SubmitBtn from './ui-kit/SubmitBtn';
 import ArrayInput from './ui-kit/ArrayInput';
+import { setDirty } from '@/store/slices/formSlice';
+import { useDispatch } from 'react-redux';
 
 export default function DictionaryForm({ _dictionary, title, onFormSubmit, btnTitle }) {
+    const dispatch = useDispatch();
     const { locale } = useParams();
     const { t } = getTranslation(locale);
 
-    const { register, handleSubmit, reset, control, watch, getValues, formState: { errors, isSubmitting } } = useForm({
+    const { register, handleSubmit, reset, control, watch, getValues, formState: { errors, isSubmitting, isDirty } } = useForm({
         defaultValues: {
-            translationMode: 0
+            translationMode: 0,
+            nameEng: '',
+            nameRu: '',
+            terms: []
         },
         mode: 'onChange'
     });
@@ -34,6 +40,10 @@ export default function DictionaryForm({ _dictionary, title, onFormSubmit, btnTi
             ..._dictionary
         });
     }, [_dictionary])
+
+    useEffect(() => {
+        dispatch(setDirty(isDirty));
+    }, [isDirty]);
 
     const submitForm = async (dictionary) => {
         await onFormSubmit(dictionary);

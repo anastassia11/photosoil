@@ -1,15 +1,19 @@
 'use client'
 
 import { getTranslation } from '@/i18n/client';
+import { setDirty } from '@/store/slices/formSlice';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function Sidebar() {
+    const dispatch = useDispatch();
     const [role, setRole] = useState(null);
     const { locale } = useParams();
     const { t } = getTranslation(locale);
+    const { isDirty } = useSelector(state => state.form);
     const router = useRouter();
 
     useEffect(() => {
@@ -86,9 +90,22 @@ export default function Sidebar() {
         },
     ]
 
+    const handleLinkClick = (e, href) => {
+        if (isDirty) {
+            e.preventDefault(); // Отменяем переход по умолчанию
+            const confirmLeave = window.confirm(t('form_confirm'));
+            if (confirmLeave) {
+                dispatch(setDirty(false));
+                router.push(href); // Переход к новому URL
+            }
+        }
+    };
+
     const LinkItem = ({ url, title, svg }) =>
-        <Link href={`/${locale}/admin/${url}`}
+        <Link
+            href={`/${locale}/admin/${url}`}
             prefetch={false}
+            onClick={(e) => handleLinkClick(e, `/${locale}/admin/${url}`)}
             className="cursor-pointer flex items-center px-3 py-2 transition-colors duration-300 
             transform rounded-lg hover:bg-gray-100 hover:text-gray-700">
             {svg && <div className='text-zinc-500'>{svg}</div>}

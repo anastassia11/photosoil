@@ -26,6 +26,7 @@ import TextEditor from './TextEditor';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import LangTabs from './ui-kit/LangTabs';
 import { openAlert } from '@/store/slices/alertSlice';
+import { setDirty } from '@/store/slices/formSlice';
 
 function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
     const dispatch = useDispatch();
@@ -34,7 +35,7 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
     const dropdown = useSelector(state => state.general.dropdown);
 
     const { register, reset, control, watch, trigger, setValue, getValues, setFocus,
-        formState: { errors } } = useForm({
+        formState: { errors, isDirty } } = useForm({
             mode: 'onChange',
             defaultValues: {
                 translations: [{ isEnglish: false }],
@@ -102,6 +103,10 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
             });
         }
     }, [item, reset, getValues])
+
+    useEffect(() => {
+        dispatch(setDirty(isDirty));
+    }, [isDirty]);
 
     const fetchClassifications = async () => {
         const result = await getClassifications();

@@ -19,13 +19,33 @@ import Textarea from './ui-kit/Textarea';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import SubmitBtn from './ui-kit/SubmitBtn';
 import ArrayInput from './ui-kit/ArrayInput';
+import { setDirty } from '@/store/slices/formSlice';
 
 export default function AuthorForm({ _author, title, onFormSubmit, btnText }) {
     const dispatch = useDispatch();
     const [photoLoading, setPhotoLoading] = useState(false);
-    const { register, handleSubmit, reset, control, setValue, getValues, formState: { errors, isSubmitting } } = useForm({
+    const { register, handleSubmit, reset, watch, control, setValue, getValues, formState: { errors, isSubmitting, isDirty } } = useForm({
         defaultValues: {
-            authorType: 3
+            authorType: 3,
+            photo: {},
+            dataEng: {
+                degree: '',
+                description: '',
+                name: '',
+                organization: '',
+                position: '',
+                specialization: '',
+            },
+            dataRu: {
+                degree: '',
+                description: '',
+                name: '',
+                organization: '',
+                position: '',
+                specialization: '',
+            },
+            contacts: [],
+            otherProfiles: []
         },
         mode: 'onChange'
     });
@@ -55,6 +75,10 @@ export default function AuthorForm({ _author, title, onFormSubmit, btnText }) {
             });
         }
     }, [_author]);
+
+    useEffect(() => {
+        dispatch(setDirty(isDirty));
+    }, [isDirty]);
 
     const onCreateAuthor = async (author) => {
         await onFormSubmit(author);

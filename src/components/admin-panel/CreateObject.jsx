@@ -7,6 +7,7 @@ import ObjectForm from '@/components/admin-panel/ObjectForm';
 import DragAndDrop from '@/components/admin-panel/ui-kit/DragAndDrop';
 import { getTranslation } from '@/i18n/client';
 import { openAlert } from '@/store/slices/alertSlice';
+import { setDirty } from '@/store/slices/formSlice';
 import { closeModal, openModal } from '@/store/slices/modalSlice';
 import modalThunkActions from '@/store/thunks/modalThunk';
 import { BASE_SERVER_URL } from '@/utils/constants';
@@ -134,6 +135,7 @@ export default function CreateObject({ title, onCreate, type }) {
             if (_creationResults.every(result => result.success === true)) {
                 router.push(`/admin/${type === 'soil' ? 'objects' : 'ecosystems'}`);
                 dispatch(openAlert({ title: t('success'), message: t('created_objects'), type: 'success' }));
+                dispatch(setDirty(false));
             } else {
                 const indicesToRemove = _creationResults.reduce((indices, result, index) => {
                     if (!result.success) {

@@ -5,7 +5,7 @@ import "./globals.css";
 import { Provider } from 'react-redux';
 import store from '@/store';
 import { usePathname } from 'next/navigation';
-import { BarLoader } from 'react-spinners';
+import GlobalFormWarning from '@/components/GlobalFormWarning';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,6 +19,7 @@ export default function RootLayout({ params: { locale }, children }) {
           {/* <div className='fixed top-0 left-0 w-full z-50'>
             <BarLoader color="#60a5fa" width='100%' speedMultiplier={0.3} height={4} loading={true} />
           </div> */}
+          <GlobalFormWarning />
           {children}
         </body>
       </html>

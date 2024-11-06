@@ -11,6 +11,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useParams, useRouter } from 'next/navigation';
 import { getTranslation } from '@/i18n/client';
+import { setDirty } from '@/store/slices/formSlice';
 
 export default function DictionaryEditPageComponent({ id }) {
     const dispatch = useDispatch();
@@ -83,6 +84,7 @@ export default function DictionaryEditPageComponent({ id }) {
                 })
             ]);
             router.push(`/${locale}/admin/dictionary`);
+            dispatch(setDirty(false));
             dispatch(openAlert({ title: t('success'), message: t('success_edit'), type: 'success' }));
         } catch (error) {
             dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }));
