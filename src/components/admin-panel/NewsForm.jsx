@@ -360,6 +360,7 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, btnText
                                 <Filter dropdown={dropdown}
                                     name={t('tags')} items={tags}
                                     type='tags'
+                                    setTags={setTags}
                                     allSelectedItems={value} isEng={isEng}
                                     addItem={handleAddTag}
                                     deleteItem={handleDeleteTag}
