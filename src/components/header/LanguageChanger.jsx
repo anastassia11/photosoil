@@ -21,7 +21,7 @@ export default function LanguageChanger({ isTransparent }) {
 
     const handleLanguageChange = (lang) => {
         const newPathname = redirectedPathname(lang);
-        router.push(newPathname);
+        router.replace(newPathname);
     };
 
     const redirectedPathname = (locale) => {
