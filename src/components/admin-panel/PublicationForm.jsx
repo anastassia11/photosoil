@@ -107,8 +107,10 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
     }
 
     const handleFileLoad = async (file) => {
+        console.log(file)
         setValue('file', { isLoading: true, name: file.name });
         const result = await sendPhoto(file);
+        console.log(result)
         if (result.success) {
             setValue('file', { ...result.data, isLoading: false });
         } else {
@@ -322,8 +324,10 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
                         name='file'
                         render={({ field: { value }, fieldState }) =>
                             <>
-                                {!!value?.length
-                                    ? <FileCard {...value} onDelete={handleFileDelete} />
+                                {!!value.length
+                                    ? <div className='md:w-[50%] w-full pr-2'>
+                                        <FileCard {...value} onDelete={handleFileDelete} />
+                                    </div>
                                     : <div className='md:w-[50%] w-full h-[150px] pr-2 mt-1'>
                                         <DragAndDrop id='publ-files'
                                             error={fieldState.error}
@@ -335,7 +339,7 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
                     />
 
                     <p className='font-medium mt-5'>{t('connection')}</p>
-                    <div className='md:w-[50%] w-full mt-1 flex flex-col space-y-4'>
+                    <div className='md:w-[50%] w-full mt-1 flex flex-col space-y-4 pr-2'>
                         <Controller control={control}
                             name='soilObjects'
                             render={({ field: { value } }) =>

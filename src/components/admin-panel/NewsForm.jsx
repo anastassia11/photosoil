@@ -206,7 +206,14 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, btnText
 
         const isConfirm = await dispatch(modalThunkActions.open());
         if (isConfirm.payload) {
-            await deleteFile(id);
+            setLocalFiles(prev => {
+                const _prev = prev.filter(file => file.id !== id);
+                setValue('files', _prev);
+                return _prev;
+            });
+
+            // await deleteFile(id);
+            await deletePhotoById(id);
         }
         dispatch(closeModal());
     }
@@ -352,17 +359,16 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, btnText
                         <Controller control={control}
                             name='files'
                             render={({ field: { value, id }, fieldState }) =>
-                                <ul className={`mt-1 flex flex-col w-full`}>
+                                <ul className={`mt-1 flex flex-col w-full md:w-[50%] md:pr-2 pr-0`}>
                                     {!!value.length && value.map((file, idx) => <li key={`file-${idx}`}>
                                         <FileCard {...file} isEng={isEng}
                                             onDelete={() => handleFileDelete(file.id)} />
                                     </li>)}
-                                    <div className={`h-[150px] md:w-[50%] w-full md:pr-2 pr-0 ${!!value.length && 'mt-4'}`}>
+                                    <div className={`h-[150px] ${!!value.length && 'mt-4'}`}>
                                         <DragAndDrop id='news-files'
                                             error={fieldState.error}
                                             onLoadClick={handleFilesSend}
-                                            isMultiple={true}
-                                            accept='pdf' />
+                                            isMultiple={true} />
                                     </div>
                                 </ul>}
                         />
