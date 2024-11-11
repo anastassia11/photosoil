@@ -16,15 +16,14 @@ export default function DictionaryForm({ _dictionary, title, onFormSubmit, btnTi
     const dispatch = useDispatch();
     const { locale } = useParams();
     const { t } = getTranslation(locale);
-
-    const { register, handleSubmit, reset, control, watch, getValues, formState: { errors, isSubmitting, isDirty } } = useForm({
-        defaultValues: {
-            translationMode: 0,
-            nameEng: '',
-            nameRu: '',
-            terms: []
-        },
-        mode: 'onChange'
+    const defaultValues = {
+        translationMode: 0,
+        nameEng: '',
+        nameRu: '',
+        terms: []
+    };
+    const { register, handleSubmit, reset, control, watch, formState: { errors, isSubmitting, isDirty } } = useForm({
+        defaultValues, mode: 'onChange'
     });
     const { fields: termsFields, append: appendTerms, remove: removeTerms } = useFieldArray({
         control,
@@ -36,7 +35,7 @@ export default function DictionaryForm({ _dictionary, title, onFormSubmit, btnTi
 
     useEffect(() => {
         _dictionary && reset({
-            ...getValues(),
+            ...defaultValues,
             ..._dictionary
         });
     }, [_dictionary])

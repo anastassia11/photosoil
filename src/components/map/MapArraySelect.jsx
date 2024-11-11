@@ -174,7 +174,6 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref
         //создаем новую точку
         if (selectedPointFeature.current == null) {
             setIsDataLoaded(true);
-            console.log(clickCoordinate)
             // const newCord = toLonLat(clickCoordinate);
             const newPointFeature = new Feature({
                 geometry: new Point(clickCoordinate)

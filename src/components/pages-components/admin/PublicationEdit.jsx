@@ -48,7 +48,7 @@ export default function PublicationEditComponent({ id }) {
             const langPublication = { ...updatedPublication, translations: updatedPublication.translations.filter(({ isEnglish }) => isEnglish === isEng) };
             const result = await putPublication(id, createTwoLang ? updatedPublication : langPublication);
             if (result.success) {
-                if (publication.file.id !== updatedPublication.fileId) {
+                if (publication.file?.id !== updatedPublication.fileId) {
                     await deletePhotoById(publication.file.id);
                 }
                 dispatch(setDirty(false));

@@ -34,26 +34,24 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
     const { t } = getTranslation(locale);
     const dropdown = useSelector(state => state.general.dropdown);
 
-    const { register, reset, control, watch, trigger, setValue, getValues, setFocus,
-        formState: { errors, isDirty } } = useForm({
-            mode: 'onChange',
-            defaultValues: {
-                translations: [{ isEnglish: false }],
-                createTwoLang: false,
-                currentLang: false,
-                objectType: 1,
-                latitude: '',
-                longtitude: '',
-                // externalSource: '',
-                objectPhoto: [],
-                authors: [],
-                soilTerms: [],
-                ecoSystems: [],
-                publications: [],
-                soilObjects: [],
-                mainPhoto: {}
-            }
-        });
+    const defaultValues = {
+        translations: [{ isEnglish: false }],
+        createTwoLang: false,
+        currentLang: false,
+        objectType: 1,
+        latitude: '',
+        longtitude: '',
+        // externalSource: '',
+        objectPhoto: [],
+        authors: [],
+        soilTerms: [],
+        ecoSystems: [],
+        publications: [],
+        soilObjects: [],
+        mainPhoto: {}
+    }
+    const { register, reset, control, watch, trigger, setValue, setFocus,
+        formState: { errors, isDirty } } = useForm({ mode: 'onChange', defaultValues });
     const { fields: translationsFields, append: appendTranslation } = useFieldArray({
         control,
         name: 'translations'
@@ -65,8 +63,8 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 
     const createTwoLang = watch('createTwoLang');
     const isEng = watch('currentLang');
-
     const objectPhoto = watch('objectPhoto');
+
     const [localObjectPhoto, setLocalObjectPhoto] = useState([]);
 
     const [classifications, setClassifications] = useState([]);
@@ -94,15 +92,14 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
     }, [])
 
     useEffect(() => {
-        reset({});
         if (item) {
             reset({
-                ...getValues(),
+                ...defaultValues,
                 ...item
             });
-            setLocalObjectPhoto(item.objectPhoto);
+            item.objectPhoto ? setLocalObjectPhoto(item.objectPhoto) : setLocalObjectPhoto([]);
         }
-    }, [item, reset, getValues])
+    }, [item, reset])
 
     useEffect(() => {
         dispatch(setDirty(isDirty));
@@ -227,7 +224,6 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
             if (pathname !== 'edit') {
                 await deletePhotoById(id);
             }
-            console.log(localObjectPhoto)
             setLocalObjectPhoto(prev => {
                 const _prev = prev.filter(photo => photo.id !== id);
                 field.onChange(_prev);

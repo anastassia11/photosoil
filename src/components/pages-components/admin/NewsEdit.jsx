@@ -2,6 +2,7 @@
 
 import { getNewsById } from '@/api/news/get_news';
 import { putNews } from '@/api/news/put_news';
+import { deletePhotoById } from '@/api/photo/delete_photo';
 import { putPhoto } from '@/api/photo/put_photo';
 import NewsForm from '@/components/admin-panel/NewsForm'
 import { getTranslation } from '@/i18n/client';
@@ -82,6 +83,7 @@ export default function NewsEditComponent({ id }) {
                 dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }));
             }
         } catch (error) {
+            console.log(error)
             dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }));
         }
     }

@@ -377,8 +377,8 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
                 <th scope="col" className="py-3.5 px-4 text-sm font-normal text-left text-zinc-500">
                     <div className="flex items-center gap-x-3">
                         <input type="checkbox"
-                            checked={currentItems.every(object => selectedObjects.includes(object.id)
-                                || selectedObjects.find(obj => obj.id === object.id && obj.type === object.type.name))}
+                            checked={(currentItems.every(object => selectedObjects.includes(object.id)
+                                || selectedObjects.find(obj => obj.id === object.id && obj.type === object.type.name))) && selectedObjects.length}
                             onChange={e => handleAllCheked(e.target.checked)}
                             className="cursor-pointer text-blue-500 border-zinc-300 rounded w-4 h-4" />
                         <span>{t('title')}</span>
@@ -409,7 +409,7 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
                 <th scope="col" className="py-3.5 px-4 text-sm font-normal text-left text-zinc-500">
                     <div className="flex items-center gap-x-3">
                         <input type="checkbox"
-                            checked={currentItems.every(object => selectedObjects.includes(object.id))}
+                            checked={currentItems.every(object => selectedObjects.includes(object.id)) && selectedObjects.length}
                             onChange={e => handleAllCheked(e.target.checked)}
                             className="cursor-pointer text-blue-500 border-zinc-300 rounded w-4 h-4" />
                         <span>{t('title')}</span>
@@ -428,7 +428,7 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
                 <th scope="col" className="py-3.5 px-4 text-sm font-normal text-left text-zinc-500">
                     <div className="flex items-center gap-x-3">
                         <input type="checkbox"
-                            checked={currentItems.every(object => selectedObjects.includes(object.id))}
+                            checked={currentItems.every(object => selectedObjects.includes(object.id)) && selectedObjects.length}
                             onChange={e => handleAllCheked(e.target.checked)}
                             className="cursor-pointer text-blue-500 border-zinc-300 rounded w-4 h-4" />
                         <span>{t('name')}</span>
@@ -448,7 +448,7 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
                 <th scope="col" className="py-3.5 px-4 text-sm font-normal text-left text-zinc-500">
                     <div className="flex items-center gap-x-3">
                         <input type="checkbox"
-                            checked={currentItems.every(object => selectedObjects.includes(object.id))}
+                            checked={currentItems.every(object => selectedObjects.includes(object.id)) && selectedObjects.length}
                             onChange={e => handleAllCheked(e.target.checked)}
                             className="cursor-pointer text-blue-500 border-zinc-300 rounded w-4 h-4" />
                         <span>Email</span>

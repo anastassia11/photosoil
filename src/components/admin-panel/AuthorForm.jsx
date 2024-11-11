@@ -24,30 +24,31 @@ import { setDirty } from '@/store/slices/formSlice';
 export default function AuthorForm({ _author, purpose, title, onFormSubmit, btnText }) {
     const dispatch = useDispatch();
     const [photoLoading, setPhotoLoading] = useState(false);
-    const { register, handleSubmit, reset, watch, control, setValue, getValues, formState: { errors, isSubmitting, isDirty } } = useForm({
-        defaultValues: {
-            authorType: 3,
-            photo: {},
-            dataEng: {
-                degree: '',
-                description: '',
-                name: '',
-                organization: '',
-                position: '',
-                specialization: '',
-            },
-            dataRu: {
-                degree: '',
-                description: '',
-                name: '',
-                organization: '',
-                position: '',
-                specialization: '',
-            },
-            contacts: [],
-            otherProfiles: []
+
+    const defaultValues = {
+        authorType: 3,
+        photo: {},
+        dataEng: {
+            degree: '',
+            description: '',
+            name: '',
+            organization: '',
+            position: '',
+            specialization: '',
         },
-        mode: 'onChange'
+        dataRu: {
+            degree: '',
+            description: '',
+            name: '',
+            organization: '',
+            position: '',
+            specialization: '',
+        },
+        contacts: [],
+        otherProfiles: []
+    }
+    const { register, handleSubmit, reset, control, setValue, formState: { errors, isSubmitting, isDirty } } = useForm({
+        defaultValues, mode: 'onChange'
     });
     const { fields: contactFields, append: appendContact, remove: removeContact } = useFieldArray({
         control,
@@ -70,7 +71,7 @@ export default function AuthorForm({ _author, purpose, title, onFormSubmit, btnT
     useEffect(() => {
         if (_author) {
             reset({
-                ...getValues(),
+                ...defaultValues,
                 ..._author
             });
         }
