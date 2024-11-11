@@ -25,5 +25,5 @@ export default function AuthorCreateComponent() {
         }
     }
 
-    return <AuthorForm title={t('creation_author')} onFormSubmit={handleCreateAuthor} btnText={t('create_author')} />
+    return <AuthorForm purpose='create' title={t('creation_author')} onFormSubmit={handleCreateAuthor} btnText={t('create_author')} />
 }

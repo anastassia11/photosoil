@@ -62,13 +62,12 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
     const formValues = watch();
     const translations = watch('translations');
     const isExternal = watch('isExternal');
-    const mainPhoto = watch('mainPhoto');
 
     const createTwoLang = watch('createTwoLang');
     const isEng = watch('currentLang');
 
     const objectPhoto = watch('objectPhoto');
-    const [localObjectPhoto, setLocalObjectPhoto] = useState(objectPhoto);
+    const [localObjectPhoto, setLocalObjectPhoto] = useState([]);
 
     const [classifications, setClassifications] = useState([]);
     const [authors, setAuthors] = useState([]);
@@ -101,6 +100,7 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
                 ...getValues(),
                 ...item
             });
+            setLocalObjectPhoto(item.objectPhoto);
         }
     }, [item, reset, getValues])
 
@@ -147,10 +147,10 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
         return formValues;
     }
 
-    const handleOtherPhotoSend = useCallback(async (file, index) => {
+    const handleOtherPhotoSend = useCallback(async (file, index, field) => {
         setLocalObjectPhoto(prev => {
             const _prev = [...prev, { isLoading: true }];
-            setValue('objectPhoto', _prev);
+            field.onChange(_prev);
             return _prev;
         });
 
@@ -162,19 +162,19 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
                         ? { ...result.data, isLoading: false }
                         : photo
                 )
-                setValue('objectPhoto', _prev);
+                field.onChange(_prev);
                 return _prev
             })
         } else {
             dispatch(openAlert({ title: t('error'), message: t('error_photo'), type: 'error' }))
         }
-    }, [localObjectPhoto, objectPhoto])
+    }, [localObjectPhoto, dispatch, t])
 
-    const handleMainPhotoSend = useCallback(async (file) => {
-        setValue('mainPhoto', { isLoading: true, name: file.name });
+    const handleMainPhotoSend = useCallback(async (file, field) => {
+        field.onChange({ isLoading: true, name: file.name });
         const result = await sendPhoto(file);
         if (result.success) {
-            setValue('mainPhoto', { ...result.data, isLoading: false });
+            field.onChange({ ...result.data, isLoading: false });
         } else {
             dispatch(openAlert({ title: t('error'), message: t('error_photo'), type: 'error' }))
         }
@@ -185,32 +185,17 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
         setValue('longtitude', longtitude);
     }, [])
 
-    const handleMainPhotoChange = (e) => {
-        setValue('mainPhoto', { ...mainPhoto, [isEng ? 'titleEng' : 'titleRu']: e.target.value });
-    }
-
-    const handleOtherPhotosChange = useCallback((e, id) => {
+    const handleOtherPhotosChange = useCallback((e, id, field) => {
         setLocalObjectPhoto(prev => {
             const _prev = prev.map(photo => photo.id === id
                 ? { ...photo, [isEng ? 'titleEng' : 'titleRu']: e.target.value }
                 : photo);
-            setValue('objectPhoto', _prev);
+            field.onChange(_prev);
             return _prev;
         });
-    }, [isEng, setValue])
+    }, [isEng])
 
-    const mainPhotoDelete = useCallback(async (id) => {
-        const newId = uuid();
-        let result;
-        if (pathname !== 'edit') {
-            result = await deletePhotoById(id)
-        }
-        if (pathname === 'edit' || result.success) {
-            setValue('mainPhoto', { id: newId })
-        }
-    }, [])
-
-    const handleMainPhotoDelete = useCallback(async (id) => {
+    const handleMainPhotoDelete = useCallback(async (id, field) => {
         dispatch(openModal({
             title: t('warning'),
             message: t('delete_photo'),
@@ -220,70 +205,37 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 
         const isConfirm = await dispatch(modalThunkActions.open());
         if (isConfirm.payload) {
-            await mainPhotoDelete(id);
+            const newId = uuid();
+            field.onChange({ id: newId });
+            if (pathname !== 'edit') {
+                await deletePhotoById(id);
+            }
         }
         dispatch(closeModal());
-    }, [mainPhotoDelete])
+    }, [dispatch, t])
 
-    const otherPhotoDelete = useCallback(async (id) => {
-        let result;
-        if (pathname !== 'edit') {
-            result = await deletePhotoById(id)
-        }
-        if (pathname === 'edit' || result.success) {
+    const handleOtherPhotoDelete = useCallback(async (id, field) => {
+        dispatch(openModal({
+            title: t('warning'),
+            message: t('delete_photo'),
+            buttonText: t('delete'),
+            type: 'delete'
+        }))
+
+        const isConfirm = await dispatch(modalThunkActions.open());
+        if (isConfirm.payload) {
+            if (pathname !== 'edit') {
+                await deletePhotoById(id);
+            }
+            console.log(localObjectPhoto)
             setLocalObjectPhoto(prev => {
                 const _prev = prev.filter(photo => photo.id !== id);
-                setValue('objectPhoto', _prev);
+                field.onChange(_prev);
                 return _prev;
             });
         }
-    }, [objectPhoto])
-
-    const handleOtherPhotoDelete = useCallback(async (id) => {
-        dispatch(openModal({
-            title: t('warning'),
-            message: t('delete_photo'),
-            buttonText: t('delete'),
-            type: 'delete'
-        }))
-
-        const isConfirm = await dispatch(modalThunkActions.open());
-        if (isConfirm.payload) {
-            await otherPhotoDelete(id);
-        }
         dispatch(closeModal());
-    }, [otherPhotoDelete])
-
-    const handleAddTerm = useCallback((type, newItem) => {
-        const values = getValues(type);
-        setValue(type, [...values, newItem]);
-    }, [])
-
-    const handleDeleteTerm = useCallback((type, deletedItem) => {
-        const values = getValues(type);
-        setValue(type, values.filter(value => value !== deletedItem));
-    }, [])
-
-    const handleResetTerms = useCallback((type, deletedItems) => {
-        const values = getValues(type);
-        setValue(type, values.filter(value => !deletedItems.includes(value)));
-    }, [])
-
-    const addTerm = useCallback((newItem) => handleAddTerm('soilTerms', newItem), [handleAddTerm]);
-    const deleteTerm = useCallback((deletedItem) => handleDeleteTerm('soilTerms', deletedItem), [handleDeleteTerm]);
-    const resetTerms = useCallback((deletedItems) => handleResetTerms('soilTerms', deletedItems), [handleResetTerms]);
-
-    const addEcosystem = useCallback((newItem) => handleAddTerm('ecoSystems', newItem), [handleAddTerm]);
-    const deleteEcosystem = useCallback((deletedItem) => handleDeleteTerm('ecoSystems', deletedItem), [handleDeleteTerm]);
-    const resetEcosystems = useCallback((deletedItems) => handleResetTerms('ecoSystems', deletedItems), [handleResetTerms]);
-
-    const addSoil = useCallback((newItem) => handleAddTerm('soilObjects', newItem), [handleAddTerm]);
-    const deleteSoil = useCallback((deletedItem) => handleDeleteTerm('soilObjects', deletedItem), [handleDeleteTerm]);
-    const resetSoils = useCallback((deletedItems) => handleResetTerms('soilObjects', deletedItems), [handleResetTerms]);
-
-    const addPublication = useCallback((newItem) => handleAddTerm('publications', newItem), [handleAddTerm]);
-    const deletePublication = useCallback((deletedItem) => handleDeleteTerm('publications', deletedItem), [handleDeleteTerm]);
-    const resetPublications = useCallback((deletedItems) => handleResetTerms('publications', deletedItems), [handleResetTerms]);
+    }, [pathname, dispatch, t, localObjectPhoto])
 
     const handleTwoLangChange = (e) => {
         const isChecked = e.target.checked;
@@ -328,9 +280,9 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
                     element.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             }
-            return { invalid: false };
+            return { valid: false };
         } else {
-            return { invalid: true };
+            return { valid: true };
         };
     };
 
@@ -400,14 +352,14 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
                             <li key='authors' className={`mt-3 ${isExternal ? 'opacity-50 pointer-events-none' : ''}`}>
                                 <Controller control={control}
                                     name='authors'
-                                    render={({ field: { value } }) =>
+                                    render={({ field: { value, onChange } }) =>
                                         <Filter dropdown={dropdown}
                                             name={t('authors')} items={authors}
                                             type='authors' itemId={`author`}
                                             allSelectedItems={value} isEng={isEng}
-                                            addItem={newItem => handleAddTerm('authors', newItem)}
-                                            deleteItem={deletedItem => handleDeleteTerm('authors', deletedItem)}
-                                            resetItems={deletedItems => handleResetTerms('authors', deletedItems)}
+                                            addItem={newItem => onChange([...value, newItem])}
+                                            deleteItem={deletedItem => onChange(value.filter(item => item !== deletedItem))}
+                                            resetItems={deletedItems => value.filter(item => !deletedItems.includes(item))}
                                         />
                                     } />
                             </li>
@@ -486,21 +438,21 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
                             <Controller control={control}
                                 name='mainPhoto'
                                 rules={{
-                                    required: "Это обязательное поле",
+                                    required: t('required'),
                                     validate: {
-                                        hasPath: value => value?.path || t('required')
+                                        hasPath: value => value?.path ? true : t('required')
                                     }
                                 }}
-                                render={({ field: { value }, fieldState }) =>
+                                render={({ field, fieldState }) =>
                                     <div className='md:w-[50%] w-full pr-2 mt-1'>
-                                        {value?.isLoading || value?.path
-                                            ? <PhotoCard {...value} isEng={isEng}
-                                                onDelete={handleMainPhotoDelete}
-                                                onChange={handleMainPhotoChange} />
+                                        {field.value?.isLoading || field.value?.path
+                                            ? <PhotoCard {...field.value} isEng={isEng}
+                                                onDelete={id => handleMainPhotoDelete(id, field)}
+                                                onChange={e => field.onChange({ ...field.value, [isEng ? 'titleEng' : 'titleRu']: e.target.value })} />
                                             : <div className='h-[150px]'>
                                                 <DragAndDrop id='mainPhoto'
                                                     error={fieldState.error}
-                                                    onLoadClick={handleMainPhotoSend}
+                                                    onLoadClick={file => handleMainPhotoSend(file, field)}
                                                     isMultiple={false}
                                                     accept='img' />
                                             </div>}
@@ -513,17 +465,17 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
                             <p className='font-medium'>{t('other_photos')}</p>
                             <Controller control={control}
                                 name='objectPhoto'
-                                render={({ field: { value }, fieldState }) =>
+                                render={({ field, fieldState }) =>
                                     <ul className={`mt-1 grid md:grid-cols-2 grid-cols-1 gap-4 `}>
-                                        {!!value.length && value.map((photo, idx) => <li key={`photo-${idx}`}>
+                                        {!!Object.keys(field.value).length && field.value.map((photo, idx) => <li key={`photo-${idx}`}>
                                             <PhotoCard {...photo} isEng={isEng}
-                                                onDelete={handleOtherPhotoDelete}
-                                                onChange={handleOtherPhotosChange} />
+                                                onDelete={id => handleOtherPhotoDelete(id, field)}
+                                                onChange={(e, id) => handleOtherPhotosChange(e, id, field)} />
                                         </li>)}
                                         <div className='h-[150px]'>
                                             <DragAndDrop id='objectPhoto'
                                                 error={fieldState.error}
-                                                onLoadClick={handleOtherPhotoSend}
+                                                onLoadClick={(file, index) => handleOtherPhotoSend(file, index, field)}
                                                 isMultiple={true}
                                                 accept='img' />
                                         </div>
@@ -540,14 +492,14 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
                                     if (isVisible) return <li key={`classification-${item.id}`}>
                                         <Controller control={control}
                                             name='soilTerms'
-                                            render={({ field: { value } }) =>
+                                            render={({ field: { value, onChange } }) =>
                                                 <Filter dropdown={dropdown}
                                                     name={isEng ? item.nameEng : item.nameRu} items={item.terms}
                                                     type='classif'
                                                     allSelectedItems={value} isEng={isEng}
-                                                    addItem={addTerm}
-                                                    deleteItem={deleteTerm}
-                                                    resetItems={resetTerms}
+                                                    addItem={newItem => onChange([...value, newItem])}
+                                                    deleteItem={deletedItem => onChange(value.filter(item => item !== deletedItem))}
+                                                    resetItems={deletedItems => value.filter(item => !deletedItems.includes(item))}
                                                 />
                                             } />
                                     </li>
@@ -559,42 +511,42 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
                         <div className='grid md:grid-cols-2 grid-cols-1 gap-4 w-full mt-1'>
                             {type !== 'ecosystem' && <Controller control={control}
                                 name='ecoSystems'
-                                render={({ field: { value } }) =>
+                                render={({ field: { value, onChange } }) =>
                                     <Filter dropdown={dropdown}
                                         name={t('ecosystems')} items={ecosystems}
                                         type='ecosystem'
                                         allSelectedItems={value} isEng={isEng}
-                                        addItem={addEcosystem}
-                                        deleteItem={deleteEcosystem}
-                                        resetItems={resetEcosystems}
+                                        addItem={newItem => onChange([...value, newItem])}
+                                        deleteItem={deletedItem => onChange(value.filter(item => item !== deletedItem))}
+                                        resetItems={() => onChange([])}
                                     />
                                 } />
                             }
 
                             {type !== 'soil' && <Controller control={control}
                                 name='soilObjects'
-                                render={({ field: { value } }) =>
+                                render={({ field: { value, onChange } }) =>
                                     <Filter dropdown={dropdown}
                                         name={t('soils')} items={soils}
                                         type='soil'
                                         allSelectedItems={value} isEng={isEng}
-                                        addItem={addSoil}
-                                        deleteItem={deleteSoil}
-                                        resetItems={resetSoils}
+                                        addItem={newItem => onChange([...value, newItem])}
+                                        deleteItem={deletedItem => onChange(value.filter(item => item !== deletedItem))}
+                                        resetItems={() => onChange([])}
                                     />
                                 } />
                             }
 
                             <Controller control={control}
                                 name='publications'
-                                render={({ field: { value } }) =>
+                                render={({ field: { value, onChange } }) =>
                                     <Filter dropdown={dropdown}
                                         name={t('publications')} items={publications}
                                         type='publications'
                                         allSelectedItems={value} isEng={isEng}
-                                        addItem={addPublication}
-                                        deleteItem={deletePublication}
-                                        resetItems={resetPublications}
+                                        addItem={newItem => onChange([...value, newItem])}
+                                        deleteItem={deletedItem => onChange(value.filter(item => item !== deletedItem))}
+                                        resetItems={() => onChange([])}
                                     />
                                 } />
                         </div>

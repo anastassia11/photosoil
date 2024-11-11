@@ -43,17 +43,6 @@ export default function NewsEditComponent({ id }) {
         }
     }
 
-    const fetchEditNews = async (data) => {
-        const result = await putNews(id, data);
-        if (result.success) {
-            router.push(`/${locale}/admin/news`);
-            dispatch(setDirty(false));
-            dispatch(openAlert({ title: t('success'), message: t('success_edit'), type: 'success' }));
-        } else {
-            dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }));
-        }
-    }
-
     const editPhoto = async (id, data) => {
         const result = await putPhoto(id, data);
         if (result.success) {
@@ -61,7 +50,7 @@ export default function NewsEditComponent({ id }) {
         }
     }
 
-    const handleSubmit = async ({ createTwoLang, isEng, news, newsPhotos }) => {
+    const handleSubmit = async ({ createTwoLang, isEng, news, newsPhotos, initialPhotos, initialFiles }) => {
         try {
             const langNews = { ...news, translations: news.translations.filter(({ isEnglish }) => isEnglish === isEng) };
             if (createTwoLang) {
@@ -73,7 +62,25 @@ export default function NewsEditComponent({ id }) {
                     newsPhotos.map(photo => editPhoto(photo.id, { titleRu: photo.titleRu || '' }));
                 }
             }
-            await fetchEditNews(createTwoLang ? news : langNews);
+
+            const result = await putNews(id, createTwoLang ? news : langNews);
+            if (result.success) {
+                dispatch(setDirty(false));
+                dispatch(openAlert({ title: t('success'), message: t('success_edit'), type: 'success' }));
+                for (const id of initialPhotos) {
+                    if (!news.objectPhoto.includes(id)) {
+                        await deletePhotoById(id);
+                    }
+                }
+                for (const id of initialFiles) {
+                    if (!news.files.includes(id)) {
+                        await deletePhotoById(id);
+                    }
+                }
+                router.push(`/${locale}/admin/news`);
+            } else {
+                dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }));
+            }
         } catch (error) {
             dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }));
         }

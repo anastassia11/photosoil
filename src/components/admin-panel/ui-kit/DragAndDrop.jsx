@@ -3,7 +3,7 @@
 import { getTranslation } from '@/i18n/client';
 import { openAlert } from '@/store/slices/alertSlice';
 import { useParams } from 'next/navigation';
-import { memo, useEffect, useState } from 'react'
+import { memo, useState } from 'react'
 import { useDispatch } from 'react-redux';
 
 const DragAndDrop = memo(function DragAndDrop({ id, onLoadClick, isMultiple, accept, error }) {

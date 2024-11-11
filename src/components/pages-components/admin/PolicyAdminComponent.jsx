@@ -25,15 +25,15 @@ export default function PolicyAdminComponent() {
     const { t } = getTranslation(locale);
     const [isEng, setIsEng] = useState(false);
 
-    const { control, handleSubmit, setValue, reset, watch, formState: { isSubmitting, isDirty } } = useForm({
+    const { control, handleSubmit, reset, formState: { isSubmitting, isDirty } } = useForm({
         mode: 'onChange', defaultValues: {
             contentRu: '',
             contentEng: '',
             files: []
         }
     });
-    const files = watch('files');
-    const [localFiles, setLocalFiles] = useState(files);
+    const [localFiles, setLocalFiles] = useState([]);
+    const [initialFilesIds, setInitialFilesIds] = useState([]);
 
     useEffect(() => {
         fetchRules();
@@ -47,6 +47,8 @@ export default function PolicyAdminComponent() {
         const result = await getRules();
         if (result.success) {
             reset(result.data);
+            setLocalFiles(result.data.files);
+            setInitialFilesIds(result.data.files.map(({ id }) => id));
         }
     }
 
@@ -61,6 +63,11 @@ export default function PolicyAdminComponent() {
         }
         const result = await putRules(dataForSubmit);
         if (result.success) {
+            for (const id of initialFilesIds) {
+                if (!dataForSubmit.files.includes(id)) {
+                    await deletePhotoById(id);
+                }
+            }
             dispatch(setDirty(false));
             dispatch(openAlert({ title: t('success'), message: t('success_edit'), type: 'success' }));
         } else {
@@ -68,14 +75,7 @@ export default function PolicyAdminComponent() {
         }
     }
 
-    const deleteFile = async (id) => {
-        const result = await deletePhotoById(id);
-        if (result.success) {
-            setValue('files', files.filter(file => file.id !== id));
-        }
-    }
-
-    const handleFileDelete = async (id) => {
+    const handleFileDelete = async (id, field) => {
         dispatch(openModal({
             title: t('warning'),
             message: t('delete_file'),
@@ -85,15 +85,15 @@ export default function PolicyAdminComponent() {
 
         const isConfirm = await dispatch(modalThunkActions.open());
         if (isConfirm.payload) {
-            await deleteFile(id);
+            field.onChange(field.value.filter(file => file.id !== id));
         }
         dispatch(closeModal());
     }
 
-    const handleFilesSend = async (file, index) => {
+    const handleFilesSend = async (file, index, field) => {
         setLocalFiles(prev => {
             const _prev = [...prev, { isLoading: true, name: file.name }];
-            setValue('files', _prev);
+            field.onChange(_prev);
             return _prev;
         });
 
@@ -105,7 +105,7 @@ export default function PolicyAdminComponent() {
                         ? { ...result.data, isLoading: false }
                         : file
                 )
-                setValue('files', _prev);
+                field.onChange(_prev);
                 return _prev
             })
         } else {
@@ -152,16 +152,16 @@ export default function PolicyAdminComponent() {
                     </label>
                     <Controller control={control}
                         name='files'
-                        render={({ field: { value, id }, fieldState }) =>
+                        render={({ field, fieldState }) =>
                             <ul className={`mt-1 flex flex-col w-full`}>
-                                {!!value.length && value.map((file, idx) => <li key={`file-${idx}`}>
+                                {!!Object.keys(field.value).length && field.value.map((file, idx) => <li key={`file-${idx}`}>
                                     <FileCard {...file} isEng={isEng}
-                                        onDelete={() => handleFileDelete(file.id)} />
+                                        onDelete={() => handleFileDelete(file.id, field)} />
                                 </li>)}
-                                <div className={`h-[150px] md:w-[50%] w-full md:pr-2 pr-0 ${!!value.length && 'mt-4'}`}>
+                                <div className={`h-[150px] md:w-[50%] w-full md:pr-2 pr-0 ${!!Object.keys(field.value).length && 'mt-4'}`}>
                                     <DragAndDrop id='policy-files'
                                         error={fieldState.error}
-                                        onLoadClick={handleFilesSend}
+                                        onLoadClick={(file, index) => handleFilesSend(file, index, field)}
                                         isMultiple={true}
                                         accept='pdf' />
                                 </div>

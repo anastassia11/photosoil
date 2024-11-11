@@ -170,12 +170,12 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref
         }
     }
 
-    const createPoint = () => {
+    const createPoint = (clickCoordinate) => {
         //создаем новую точку
         if (selectedPointFeature.current == null) {
             setIsDataLoaded(true);
-            const clickCoordinate = e.coordinate;
-            const newCord = toLonLat(clickCoordinate);
+            console.log(clickCoordinate)
+            // const newCord = toLonLat(clickCoordinate);
             const newPointFeature = new Feature({
                 geometry: new Point(clickCoordinate)
             });
@@ -200,7 +200,7 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref
             return true;
         });
 
-        createPoint();
+        createPoint(e.coordinate);
 
         //обновляем текстбоксы
         onSelectedPointFeatureChenged();
@@ -306,7 +306,7 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref
                 (position) => {
                     const coords = fromLonLat([position.coords.longitude, position.coords.latitude]);
                     resetStyle();
-                    createPoint();
+                    createPoint(coords);
                     //обновляем текстбоксы
                     onSelectedPointFeatureChenged();
                     mapRef.current.getView().animate({ duration: 500 }, { center: coords, zoom: 12 });

@@ -27,11 +27,12 @@ export default function PublicationCreateComponent() {
         }
     }
 
-    const handleCreatePublication = async ({ createTwoLang, isEng, publication }) => {
+    const handleCreatePublication = async ({ createTwoLang, isEng, updatedPublication }) => {
         try {
-            const langPublication = { ...publication, translations: publication.translations.filter(({ isEnglish }) => isEnglish === isEng) };
-            await fetchCreatePublication(createTwoLang ? publication : langPublication);
+            const langPublication = { ...updatedPublication, translations: updatedPublication.translations.filter(({ isEnglish }) => isEnglish === isEng) };
+            await fetchCreatePublication(createTwoLang ? updatedPublication : langPublication);
         } catch (error) {
+            console.log(error)
             dispatch(openAlert({ title: t('error'), message: t('error_publication'), type: 'error' }));
         }
     }

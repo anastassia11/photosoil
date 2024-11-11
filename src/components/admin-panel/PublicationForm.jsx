@@ -23,6 +23,7 @@ import LangTabs from './ui-kit/LangTabs';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import SubmitBtn from './ui-kit/SubmitBtn';
 import { setDirty } from '@/store/slices/formSlice';
+import { deletePhotoById } from '@/api/photo/delete_photo';
 
 export default function PublicationForm({ _publication, pathname, onPublicationSubmit, btnText, title, oldTwoLang, oldIsEng }) {
     const { register, reset, control, watch, trigger, setValue, getValues, setFocus,
@@ -51,7 +52,6 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
 
     const coordinates = watch('coordinates');
     const translations = watch('translations');
-
     const [isEng, setIsEng] = useState(false);
     const [createTwoLang, setCreateTwoLang] = useState(false);
     const [ecosystems, setEcosystems] = useState([]);
@@ -106,19 +106,17 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
         }
     }
 
-    const handleFileLoad = async (file) => {
-        console.log(file)
-        setValue('file', { isLoading: true, name: file.name });
+    const handleFileLoad = async (file, field) => {
+        field.onChange({ isLoading: true, name: file.name });
         const result = await sendPhoto(file);
-        console.log(result)
         if (result.success) {
-            setValue('file', { ...result.data, isLoading: false });
+            field.onChange({ ...result.data, isLoading: false });
         } else {
             dispatch(openAlert({ title: t('error'), message: t('error_file'), type: 'error' }))
         }
     }
 
-    const handleFileDelete = async (e) => {
+    const handleFileDelete = async (e, field) => {
         e.stopPropagation();
         dispatch(openModal({
             title: t('warning'),
@@ -129,7 +127,10 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
 
         const isConfirm = await dispatch(modalThunkActions.open());
         if (isConfirm.payload) {
-            setValue('file', '');
+            if (pathname !== 'edit') {
+                await deletePhotoById(field.value.id);
+            }
+            field.onChange({});
         }
         dispatch(closeModal());
     }
@@ -155,21 +156,6 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
     const handleLangChange = (value) => {
         setIsEng(value);
     }
-
-    const handleAddTerm = useCallback((type, newItem) => {
-        const values = getValues(type);
-        setValue(type, [...values, newItem]);
-    }, [])
-
-    const handleDeleteTerm = useCallback((type, deletedItem) => {
-        const values = getValues(type);
-        setValue(type, values.filter(value => value !== deletedItem));
-    }, [])
-
-    const handleResetTerms = useCallback((type, deletedItems) => {
-        const values = getValues(type);
-        setValue(type, values.filter(value => !deletedItems.includes(value)));
-    }, [])
 
     const handleCoordChange = ({ latitude, longtitude }) => {
         setCurrentCoord({ latitude, longtitude });
@@ -205,12 +191,12 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
         const result = await trigger();
         if (result) {
             const data = getValues();
-            const publication = {
+            const updatedPublication = {
                 ...data,
                 coordinates: JSON.stringify(data.coordinates),
                 fileId: data.file.id,
             };
-            await onPublicationSubmit({ createTwoLang, isEng, publication });
+            await onPublicationSubmit({ createTwoLang, isEng, updatedPublication });
         } else {
             const firstErrorField = Object.keys(errors)[0];
             if (firstErrorField === 'translations') {
@@ -322,16 +308,16 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
                     <p className='font-medium mt-3 w-full'>{t('file')}</p>
                     <Controller control={control}
                         name='file'
-                        render={({ field: { value }, fieldState }) =>
+                        render={({ field, fieldState }) =>
                             <>
-                                {!!value.length
+                                {!!Object.keys(field.value).length
                                     ? <div className='md:w-[50%] w-full pr-2'>
-                                        <FileCard {...value} onDelete={handleFileDelete} />
+                                        <FileCard {...field.value} onDelete={(e) => handleFileDelete(e, field)} />
                                     </div>
                                     : <div className='md:w-[50%] w-full h-[150px] pr-2 mt-1'>
                                         <DragAndDrop id='publ-files'
                                             error={fieldState.error}
-                                            onLoadClick={handleFileLoad}
+                                            onLoadClick={(file) => handleFileLoad(file, field)}
                                             isMultiple={false}
                                             accept='pdf' />
                                     </div>}
@@ -342,26 +328,26 @@ export default function PublicationForm({ _publication, pathname, onPublicationS
                     <div className='md:w-[50%] w-full mt-1 flex flex-col space-y-4 pr-2'>
                         <Controller control={control}
                             name='soilObjects'
-                            render={({ field: { value } }) =>
+                            render={({ field: { value, onChange } }) =>
                                 <Filter dropdown={dropdown}
                                     name={t('soils')} items={soils}
                                     type='soil'
                                     allSelectedItems={value} isEng={isEng}
-                                    addItem={newItem => handleAddTerm('soilObjects', newItem)}
-                                    deleteItem={deletedItem => handleDeleteTerm('soilObjects', deletedItem)}
-                                    resetItems={deletedItems => handleResetTerms('soilObjects', deletedItems)}
+                                    addItem={newItem => onChange([...value, newItem])}
+                                    deleteItem={deletedItem => onChange(value.filter(item => item !== deletedItem))}
+                                    resetItems={deletedItems => onChange(value.filter(item => !deletedItems.includes(item)))}
                                 />
                             } />
                         <Controller control={control}
                             name='ecoSystems'
-                            render={({ field: { value } }) =>
+                            render={({ field: { value, onChange } }) =>
                                 <Filter dropdown={dropdown}
                                     name={t('ecosystems')} items={ecosystems}
                                     type='ecosystem'
                                     allSelectedItems={value} isEng={isEng}
-                                    addItem={newItem => handleAddTerm('ecoSystems', newItem)}
-                                    deleteItem={deletedItem => handleDeleteTerm('ecoSystems', deletedItem)}
-                                    resetItems={deletedItems => handleResetTerms('ecoSystems', deletedItems)}
+                                    addItem={newItem => onChange([...value, newItem])}
+                                    deleteItem={deletedItem => onChange(value.filter(item => item !== deletedItem))}
+                                    resetItems={deletedItems => onChange(value.filter(item => !deletedItems.includes(item)))}
                                 />
                             } />
                     </div>

@@ -21,7 +21,7 @@ import SubmitBtn from './ui-kit/SubmitBtn';
 import ArrayInput from './ui-kit/ArrayInput';
 import { setDirty } from '@/store/slices/formSlice';
 
-export default function AuthorForm({ _author, title, onFormSubmit, btnText }) {
+export default function AuthorForm({ _author, purpose, title, onFormSubmit, btnText }) {
     const dispatch = useDispatch();
     const [photoLoading, setPhotoLoading] = useState(false);
     const { register, handleSubmit, reset, watch, control, setValue, getValues, formState: { errors, isSubmitting, isDirty } } = useForm({
@@ -84,7 +84,7 @@ export default function AuthorForm({ _author, title, onFormSubmit, btnText }) {
         await onFormSubmit(author);
     }
 
-    const handlePhotoDelete = async () => {
+    const handlePhotoDelete = async (field) => {
         dispatch(openModal({
             title: t('warning'),
             message: t('delete_photo'),
@@ -94,18 +94,21 @@ export default function AuthorForm({ _author, title, onFormSubmit, btnText }) {
 
         const isConfirm = await dispatch(modalThunkActions.open());
         if (isConfirm.payload) {
-            setValue('photo', '');
+            if (purpose === 'create') {
+                await deletePhotoById(field.value.id);
+            }
+            field.onChange({});
             setValue('photoId', '');
         }
         dispatch(closeModal());
     }
 
-    const fetchSendPhoto = async (file) => {
+    const fetchSendPhoto = async (file, field) => {
         setPhotoLoading(true);
         const result = await sendPhoto(file);
         if (result.success) {
+            field.onChange(result.data);
             setValue('photoId', result.data.id);
-            setValue('photo', result.data);
         } else {
             dispatch(openAlert({ title: t('error'), message: t('error_photo'), type: 'error' }))
         }
@@ -133,7 +136,7 @@ export default function AuthorForm({ _author, title, onFormSubmit, btnText }) {
                             <Controller control={control}
                                 name='photo'
                                 rules={{ required: t('required') }}
-                                render={({ field: { value }, fieldState }) =>
+                                render={({ field, fieldState }) =>
                                     <div className='p-0.5 relative max-h-[370px] min-h-[370px] aspect-[3/4] rounded-md overflow-hidden'>
                                         {photoLoading ? <span className='w-full h-full bg-black/10 rounded-md flex items-center justify-center'>
                                             <Oval
@@ -146,21 +149,21 @@ export default function AuthorForm({ _author, title, onFormSubmit, btnText }) {
                                                 strokeWidth={4}
                                                 strokeWidthSecondary={4} />
                                         </span> : <>
-                                            {(value && value.path) ? <div className='relative max-h-full rounded-md overflow-hidden'>
+                                            {(field.value && field.value.path) ? <div className='relative max-h-full rounded-md overflow-hidden'>
                                                 <button type='button' className='overflow-hidden rounded-tr-md rounded-bl-md p-[6px] text-sm font-medium z-10 absolute top-0 right-0 
                                 backdrop-blur-md bg-black bg-opacity-40 text-zinc-200 hover:text-white duration-300'
-                                                    onClick={handlePhotoDelete}>
+                                                    onClick={() => handlePhotoDelete(field)}>
                                                     <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className='w-4 h-4'>
                                                         <g id="Menu / Close_LG">
                                                             <path id="Vector" d="M21 21L12 12M12 12L3 3M12 12L21.0001 3M12 12L3 21.0001" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
                                                         </g>
                                                     </svg>
                                                 </button>
-                                                <Image src={`${BASE_SERVER_URL}${value.pathResize.length ? value.pathResize : value.path}`} height={500} width={500} alt='author photo'
+                                                <Image src={`${BASE_SERVER_URL}${field.value.pathResize.length ? field.value.pathResize : field.value.path}`} height={500} width={500} alt='author photo'
                                                     className='bg-black/10 object-cover rounded-md max-h-[370px] min-h-[370px] aspect-[3/4] overflow-hidden' />
                                             </div>
                                                 : <DragAndDrop id='author-photo' error={fieldState.error}
-                                                    onLoadClick={fetchSendPhoto}
+                                                    onLoadClick={file => fetchSendPhoto(file, field)}
                                                     isMultiple={false}
                                                     accept='img' />}
                                         </>}

@@ -1,6 +1,7 @@
 'use client'
 
 import { createNews } from '@/api/news/create_news';
+import { deletePhotoById } from '@/api/photo/delete_photo';
 import { putPhoto } from '@/api/photo/put_photo';
 import NewsForm from '@/components/admin-panel/NewsForm';
 import { getTranslation } from '@/i18n/client';

@@ -1,5 +1,6 @@
 'use client'
 
+import { deletePhotoById } from '@/api/photo/delete_photo';
 import { getPublication } from '@/api/publication/get_publication';
 import { putPublication } from '@/api/publication/put_publication';
 import PublicationForm from '@/components/admin-panel/PublicationForm'
@@ -13,7 +14,6 @@ import { useDispatch } from 'react-redux';
 export default function PublicationEditComponent({ id }) {
     const dispatch = useDispatch();
     const searchParams = useSearchParams();
-    const [isLoading, setIsLoading] = useState(false);
     const [publication, setPublication] = useState({});
     const [oldTwoLang, setOldTwoLang] = useState(false);
     const { locale } = useParams();
@@ -43,23 +43,22 @@ export default function PublicationEditComponent({ id }) {
         }
     }
 
-    const fetchEditPublication = async (data) => {
-        const result = await putPublication(id, data);
-        if (result.success) {
-            router.push(`/${locale}/admin/publications`);
-            dispatch(setDirty(false));
-            dispatch(openAlert({ title: t('success'), message: t('success_edit'), type: 'success' }));
-        } else {
-            dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }));
-        }
-        setIsLoading(false);
-    }
-
-    const handleSubmit = async ({ createTwoLang, isEng, publication }) => {
+    const handleSubmit = async ({ createTwoLang, isEng, updatedPublication }) => {
         try {
-            const langPublication = { ...publication, translations: publication.translations.filter(({ isEnglish }) => isEnglish === isEng) };
-            await fetchEditPublication(createTwoLang ? publication : langPublication);
+            const langPublication = { ...updatedPublication, translations: updatedPublication.translations.filter(({ isEnglish }) => isEnglish === isEng) };
+            const result = await putPublication(id, createTwoLang ? updatedPublication : langPublication);
+            if (result.success) {
+                if (publication.file.id !== updatedPublication.fileId) {
+                    await deletePhotoById(publication.file.id);
+                }
+                dispatch(setDirty(false));
+                dispatch(openAlert({ title: t('success'), message: t('success_edit'), type: 'success' }));
+                router.push(`/${locale}/admin/publications`);
+            } else {
+                dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }));
+            }
         } catch (error) {
+            console.log(error)
             dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }));
         }
     }

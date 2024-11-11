@@ -24,7 +24,7 @@ import { setDirty } from '@/store/slices/formSlice';
 
 export default function NewsForm({ _news, title, pathname, onNewsSubmit, btnText, oldTwoLang, oldIsEng }) {
     const dispatch = useDispatch();
-    const { register, reset, control, watch, trigger, setValue, getValues, setFocus,
+    const { register, reset, control, watch, trigger, getValues, setFocus,
         formState: { errors, isSubmitting, isDirty } } = useForm({
             mode: 'onChange',
             defaultValues: {
@@ -44,10 +44,8 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, btnText
         name: 'translations'
     });
     const translations = watch('translations');
-    const objectPhoto = watch('objectPhoto')
-    const files = watch('files');
-    const [localObjectPhoto, setLocalObjectPhoto] = useState(objectPhoto);
-    const [localFiles, setLocalFiles] = useState(files);
+    const [localObjectPhoto, setLocalObjectPhoto] = useState([]);
+    const [localFiles, setLocalFiles] = useState([]);
     const [tags, setTags] = useState([]);
 
     const dropdown = useSelector(state => state.general.dropdown);
@@ -65,6 +63,8 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, btnText
                 tags: _news.tags?.map(({ id }) => id),
             });
             setIsEng(oldIsEng);
+            setLocalFiles(_news.files);
+            setLocalObjectPhoto(_news.objectPhoto);
             setCreateTwoLang(_news.translations?.length > 1);
         }
     }, [_news])
@@ -106,10 +106,10 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, btnText
         setIsEng(value);
     }
 
-    const handleNewsPhotoSend = async (file, index) => {
+    const handleNewsPhotoSend = async (field, file, index) => {
         setLocalObjectPhoto(prev => {
             const _prev = [...prev, { isLoading: true }];
-            setValue('objectPhoto', _prev);
+            field.onChange(_prev);
             return _prev;
         });
 
@@ -121,7 +121,7 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, btnText
                         ? { ...result.data, isLoading: false }
                         : photo
                 )
-                setValue('objectPhoto', _prev);
+                field.onChange(_prev);
                 return _prev
             })
         } else {
@@ -129,10 +129,10 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, btnText
         }
     }
 
-    const handleFilesSend = async (file, index) => {
+    const handleFilesSend = async (file, index, field) => {
         setLocalFiles(prev => {
             const _prev = [...prev, { isLoading: true, name: file.name }];
-            setValue('files', _prev);
+            field.onChange(_prev);
             return _prev;
         });
 
@@ -144,44 +144,20 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, btnText
                         ? { ...result.data, isLoading: false }
                         : file
                 )
-                setValue('files', _prev);
+                field.onChange(_prev);
                 return _prev
             })
         } else {
             dispatch(openAlert({ title: t('error'), message: t('error_file'), type: 'error' }));
             setLocalFiles(prev => {
                 const _prev = prev.filter((file, idx) => idx !== index);
-                setValue('files', _prev);
+                field.onChange(_prev);
                 return _prev;
             });
         }
     }
 
-    const newsPhotoDelete = async (id) => {
-        let result;
-        if (pathname !== 'edit') {
-            result = await deletePhotoById(id)
-        }
-        if (pathname === 'edit' || result.success) {
-            setLocalObjectPhoto(prev => {
-                const _prev = prev.filter(photo => photo.id !== id);
-                setValue('objectPhoto', _prev);
-                return _prev;
-            });
-        }
-    }
-
-    const deleteFile = async (id) => {
-        let result;
-        if (pathname !== 'edit') {
-            result = await deletePhotoById(id);
-        }
-        if (pathname === 'edit' || result.success) {
-            setValue('files', files.filter(file => file.id !== id));
-        }
-    }
-
-    const handleNewsPhotoDelete = async (id) => {
+    const handleNewsPhotoDelete = async (id, field) => {
         dispatch(openModal({
             title: t('warning'),
             message: t('delete_photo'),
@@ -191,12 +167,19 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, btnText
 
         const isConfirm = await dispatch(modalThunkActions.open());
         if (isConfirm.payload) {
-            await newsPhotoDelete(id);
+            if (pathname !== 'edit') {
+                await deletePhotoById(id);
+            }
+            setLocalObjectPhoto(prev => {
+                const _prev = prev.filter(photo => photo.id !== id);
+                field.onChange(_prev);
+                return _prev;
+            });
         }
         dispatch(closeModal());
     }
 
-    const handleFileDelete = async (id) => {
+    const handleFileDelete = async (id, field) => {
         dispatch(openModal({
             title: t('warning'),
             message: t('delete_file'),
@@ -206,41 +189,27 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, btnText
 
         const isConfirm = await dispatch(modalThunkActions.open());
         if (isConfirm.payload) {
+            if (pathname !== 'edit') {
+                await deletePhotoById(id);
+            }
             setLocalFiles(prev => {
                 const _prev = prev.filter(file => file.id !== id);
-                setValue('files', _prev);
+                field.onChange(_prev);
                 return _prev;
             });
-
-            // await deleteFile(id);
-            await deletePhotoById(id);
         }
         dispatch(closeModal());
     }
 
-    const handleNewsPhotosChange = (e, id) => {
+    const handleNewsPhotosChange = (e, id, field) => {
         setLocalObjectPhoto(prev => {
             const _prev = prev.map(photo => photo.id === id
                 ? { ...photo, [isEng ? 'titleEng' : 'titleRu']: e.target.value }
                 : photo);
-            setValue('objectPhoto', _prev);
+            field.onChange(_prev);
             return _prev;
         });
     }
-
-    const handleAddTag = useCallback((newItem) => {
-        const values = getValues('tags');
-        setValue('tags', [...values, newItem]);
-    }, [])
-
-    const handleDeleteTag = useCallback((deletedItem) => {
-        const values = getValues('tags');
-        setValue('tags', values.filter(value => value !== deletedItem));
-    }, [])
-
-    const handleResetTag = useCallback(() => {
-        setValue('tags', []);
-    }, [])
 
     const formSubmit = async (e) => {
         e.preventDefault();
@@ -252,7 +221,9 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, btnText
                 files: data.files.map(({ id }) => id),
                 objectPhoto: data.objectPhoto.map(({ id }) => id),
             };
-            await onNewsSubmit({ createTwoLang, isEng, news, newsPhotos: data.objectPhoto });
+            const initialPhotos = _news?.objectPhoto?.map(({ id }) => id);
+            const initialFiles = _news?.files?.map(({ id }) => id);
+            await onNewsSubmit({ createTwoLang, isEng, news, newsPhotos: data.objectPhoto, initialPhotos, initialFiles });
         } else {
             const firstErrorField = Object.keys(errors)[0];
             if (firstErrorField === 'translations') {
@@ -334,17 +305,17 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, btnText
                         </label>
                         <Controller control={control}
                             name='objectPhoto'
-                            render={({ field: { value }, fieldState }) =>
+                            render={({ field, fieldState }) =>
                                 <ul className={`mt-1 grid md:grid-cols-2 grid-cols-1 gap-4 `}>
-                                    {!!value.length && value.map((photo, idx) => <li key={`photo-${idx}`}>
+                                    {!!Object.keys(field.value).length && field.value.map((photo, idx) => <li key={`photo-${idx}`}>
                                         <PhotoCard {...photo} isEng={isEng}
-                                            onDelete={handleNewsPhotoDelete}
-                                            onChange={handleNewsPhotosChange} />
+                                            onDelete={id => handleNewsPhotoDelete(id, field)}
+                                            onChange={(e, id) => handleNewsPhotosChange(e, id, field)} />
                                     </li>)}
                                     <div className='h-[150px]'>
                                         <DragAndDrop id='news-photos'
                                             error={fieldState.error}
-                                            onLoadClick={handleNewsPhotoSend}
+                                            onLoadClick={(file, index) => handleNewsPhotoSend(field, file, index)}
                                             isMultiple={true}
                                             accept='img' />
                                     </div>
@@ -358,16 +329,16 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, btnText
                         </label>
                         <Controller control={control}
                             name='files'
-                            render={({ field: { value, id }, fieldState }) =>
+                            render={({ field, fieldState }) =>
                                 <ul className={`mt-1 flex flex-col w-full md:w-[50%] md:pr-2 pr-0`}>
-                                    {!!value.length && value.map((file, idx) => <li key={`file-${idx}`}>
+                                    {!!Object.keys(field.value).length && field.value.map((file, idx) => <li key={`file-${idx}`}>
                                         <FileCard {...file} isEng={isEng}
-                                            onDelete={() => handleFileDelete(file.id)} />
+                                            onDelete={() => handleFileDelete(file.id, field)} />
                                     </li>)}
-                                    <div className={`h-[150px] ${!!value.length && 'mt-4'}`}>
+                                    <div className={`h-[150px] ${!!Object.keys(field.value).length && 'mt-4'}`}>
                                         <DragAndDrop id='news-files'
                                             error={fieldState.error}
-                                            onLoadClick={handleFilesSend}
+                                            onLoadClick={(file, index) => handleFilesSend(file, index, field)}
                                             isMultiple={true} />
                                     </div>
                                 </ul>}
@@ -377,15 +348,15 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, btnText
                     <div className='mt-8 flex flex-col w-full md:w-1/2'>
                         <Controller control={control}
                             name='tags'
-                            render={({ field: { value } }) =>
+                            render={({ field: { value, onChange } }) =>
                                 <Filter dropdown={dropdown}
                                     name={t('tags')} items={tags}
                                     type='tags'
                                     setTags={setTags}
                                     allSelectedItems={value} isEng={isEng}
-                                    addItem={handleAddTag}
-                                    deleteItem={handleDeleteTag}
-                                    resetItems={handleResetTag}
+                                    addItem={newItem => onChange([...value, newItem])}
+                                    deleteItem={deletedItem => onChange(value.filter(item => item !== deletedItem))}
+                                    resetItems={() => onChange([])}
                                 />
                             } />
                     </div>

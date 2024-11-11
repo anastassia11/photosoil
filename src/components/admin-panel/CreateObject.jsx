@@ -118,10 +118,10 @@ export default function CreateObject({ title, onCreate, type }) {
                 ...formData.map(async (data, idx) => {
                     const { createTwoLang, currentLang, mainPhoto, objectPhoto } = data;
 
-                    editPhoto(mainPhoto.id, createTwoLang ? { titleEng: mainPhoto.titleEng, titleRu: mainPhoto.titleRu }
-                        : (currentLang ? { titleEng: mainPhoto.titleEng } : { titleRu: mainPhoto.titleRu }));
-                    objectPhoto.map(photo => editPhoto(photo.id, createTwoLang ? { titleEng: photo.titleEng, titleRu: photo.titleRu }
-                        : (currentLang ? { titleEng: photo.titleEng } : { titleRu: photo.titleRu })));
+                    editPhoto(mainPhoto.id, createTwoLang ? { titleEng: mainPhoto.titleEng || '', titleRu: mainPhoto.titleRu || '' }
+                        : (currentLang ? { titleEng: mainPhoto.titleEng || '' } : { titleRu: mainPhoto.titleRu || '' }));
+                    objectPhoto.map(photo => editPhoto(photo.id, createTwoLang ? { titleEng: photo.titleEng || '', titleRu: photo.titleRu || '' }
+                        : (currentLang ? { titleEng: photo.titleEng || '' } : { titleRu: photo.titleRu || '' })));
 
                     const dataForFetch = {
                         ...data,
@@ -155,21 +155,18 @@ export default function CreateObject({ title, onCreate, type }) {
 
     const handleCreateClick = async () => {
         const newValues = formRef.current.updateState();
-        setFormData(prevData => {
-            const updatedFormData = prevData.map((soil, index) =>
-                index === currentForm ? newValues : soil
-            );
-            const invalidIndex = validateDataArray(updatedFormData);
-            if (invalidIndex !== -1) {
-                setCurrentForm(invalidIndex);
-                setTimeout(() => {
-                    formRef.current.formCheck();
-                }, 100);
-            } else {
-                submitForm(updatedFormData);
+        const updatedFormData = formData.map((soil, index) => index === currentForm ? newValues : soil);
+        const invalidIndex = validateDataArray(updatedFormData);
+        if (invalidIndex !== -1) {
+            if (invalidIndex !== currentForm) {
+                selectCurrentForm(invalidIndex);
             }
-            return updatedFormData;
-        });
+            setTimeout(() => {
+                formRef.current.formCheck();
+            }, 100);
+        } else {
+            submitForm(updatedFormData);
+        }
     }
 
     const fetchDeletePhoto = async (id, idx) => {

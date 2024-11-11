@@ -13,6 +13,7 @@ import { getEcosystem } from '@/api/ecosystem/get_ecosystem';
 import { getTranslation } from '@/i18n/client';
 import SubmitBtn from './ui-kit/SubmitBtn';
 import { setDirty } from '@/store/slices/formSlice';
+import { deletePhotoById } from '@/api/photo/delete_photo';
 
 export default function EditObject({ id, type, title }) {
     const dispatch = useDispatch();
@@ -78,7 +79,6 @@ export default function EditObject({ id, type, title }) {
 
     const submitForm = async (data) => {
         setIsLoading(true);
-        setObject(data);
         const { createTwoLang, currentLang, mainPhoto, objectPhoto } = data;
         const dataForFetch = {
             ...data,
@@ -88,12 +88,21 @@ export default function EditObject({ id, type, title }) {
         const langData = { ...dataForFetch, translations: data.translations.filter(({ isEnglish }) => isEnglish === currentLang) };
         try {
             await Promise.all([
-                editPhoto(mainPhoto.id, createTwoLang ? { titleEng: mainPhoto.titleEng, titleRu: mainPhoto.titleRu }
-                    : (currentLang ? { titleEng: mainPhoto.titleEng } : { titleRu: mainPhoto.titleRu })),
-                ...objectPhoto.map(photo => editPhoto(photo.id, createTwoLang ? { titleEng: photo.titleEng, titleRu: photo.titleRu }
-                    : (currentLang ? { titleEng: photo.titleEng } : { titleRu: photo.titleRu }))),
+                editPhoto(mainPhoto.id, createTwoLang ? { titleEng: mainPhoto.titleEng || '', titleRu: mainPhoto.titleRu || '' }
+                    : (currentLang ? { titleEng: mainPhoto.titleEng || '' } : { titleRu: mainPhoto.titleRu || '' })),
+                ...objectPhoto.map(photo => editPhoto(photo.id, createTwoLang ? { titleEng: photo.titleEng || '', titleRu: photo.titleRu || '' }
+                    : (currentLang ? { titleEng: photo.titleEng || '' } : { titleRu: photo.titleRu || '' }))),
                 editObject(createTwoLang ? dataForFetch : langData)
             ]);
+            const initialObjPhotos = object.objectPhoto.map(({ id }) => id);
+            for (const id of initialObjPhotos) {
+                if (!dataForFetch.objectPhoto.includes(id)) {
+                    await deletePhotoById(id);
+                }
+            }
+            if (object.photoId !== dataForFetch.photoId) {
+                await deletePhotoById(object.photoId);
+            }
             router.push(`/${locale}/admin/${type === 'soil' ? 'objects' : 'ecosystems'}`);
             dispatch(setDirty(false));
             dispatch(openAlert({ title: t('success'), message: t('success_edit'), type: 'success' }));
@@ -107,8 +116,8 @@ export default function EditObject({ id, type, title }) {
 
     const handleEditClick = async (e) => {
         e.preventDefault();
-        const { invalid } = formRef.current.formCheck();
-        if (!invalid) {
+        const { valid } = await formRef.current.formCheck();
+        if (valid) {
             const newValues = formRef.current.updateState();
             submitForm(newValues);
         }

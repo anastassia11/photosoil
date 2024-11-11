@@ -2,6 +2,7 @@
 
 import { getAuthor } from '@/api/author/get_author';
 import { putAuthor } from '@/api/author/put_author';
+import { deletePhotoById } from '@/api/photo/delete_photo';
 import AuthorForm from '@/components/admin-panel/AuthorForm';
 import { getTranslation } from '@/i18n/client';
 import { openAlert } from '@/store/slices/alertSlice';
@@ -41,16 +42,19 @@ export default function AuthorEditComponent({ id }) {
     const handleEditAuthor = async (data) => {
         const result = await putAuthor(id, data);
         if (result.success) {
-            router.push(`/${locale}/admin/authors`);
+            if (author.photoId !== data.photoId) {
+                await deletePhotoById(author.photoId);
+            }
             dispatch(setDirty(false));
-            dispatch(openAlert({ title: t('success'), message: t('success_edit'), type: 'success' }))
+            dispatch(openAlert({ title: t('success'), message: t('success_edit'), type: 'success' }));
+            router.push(`/${locale}/admin/authors`);
         } else {
             dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }))
         }
     }
 
     return (
-        <AuthorForm _author={author} onFormSubmit={handleEditAuthor}
+        <AuthorForm _author={author} purpose='edit' onFormSubmit={handleEditAuthor}
             btnText={t('save')} title={t('edit_author')} />
     )
 }
