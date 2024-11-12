@@ -162,8 +162,7 @@ export default function PolicyAdminComponent() {
                                     <DragAndDrop id='policy-files'
                                         error={fieldState.error}
                                         onLoadClick={(file, index) => handleFilesSend(file, index, field)}
-                                        isMultiple={true}
-                                        accept='pdf' />
+                                        isMultiple={true} />
                                 </div>
                             </ul>}
                     />
