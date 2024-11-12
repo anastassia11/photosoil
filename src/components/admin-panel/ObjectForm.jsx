@@ -429,7 +429,7 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
                             }
                         </>
 
-                        <div id='mainPhoto'>
+                        <div>
                             <p className='font-medium mt-8'>{t('main_photo')}<span className='text-orange-500'>*</span></p>
                             <Controller control={control}
                                 name='mainPhoto'
