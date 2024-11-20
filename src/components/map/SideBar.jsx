@@ -87,7 +87,7 @@ const SideBar = memo(function SideBar({ sidebarOpen, setSideBarOpen, filterName,
   const fetchClassifications = async () => {
     const result = await getClassifications();
     if (result.success) {
-      setClassifications(result.data);
+      setClassifications(result.data.sort((a, b) => a.order - b.order));
     }
   }
 

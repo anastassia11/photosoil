@@ -20,6 +20,19 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
     const [currentLang, setCurrentLang] = useState('any');
     const [publishStatus, setPublichStatus] = useState('all')
 
+    // true: по возрастанию, false: по убыванию
+    const [sortedTypes, setSortedTypes] = useState({
+        name: true,
+        title: true,
+        email: true,
+        role: true,
+        authorType: true,
+        creator: true,
+        lastUpdated: true,
+        isVisible: true,
+    })
+    const [lastSorted, setLastSorted] = useState('lastUpdated')
+
     const [currentItems, setCurrentItems] = useState([]);
     const [itemsPerPage, setItemsPerPage] = useState(0);
     const [filteredObjects, setFilteredObjects] = useState([]);
@@ -37,7 +50,11 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
     }
 
     useEffect(() => {
-        setObjects(_objects);
+        setObjects(_objects.sort((a, b) => {
+            const dateA = new Date(a.lastUpdated);
+            const dateB = new Date(b.lastUpdated);
+            return dateB.getTime() - dateA.getTime();
+        }));
         setSelectedObjects([]);
     }, [_objects]);
 
@@ -63,11 +80,7 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
                         (currentLang === 'ru' && object.translationMode !== undefined && (object.translationMode == 2 || object.translationMode == 0)) ||
                         (currentLang === 'any' && true)))
             )
-            .sort((a, b) => {
-                const dateA = new Date(a.lastUpdated);
-                const dateB = new Date(b.lastUpdated);
-                return dateB.getTime() - dateA.getTime();
-            }))
+        )
     }, [objects, filterName, publishStatus, currentLang]);
 
     const handleObjectSelect = (checked, id, type) => {
@@ -113,6 +126,77 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
 
     const handleLangChange = (lang) => {
         setCurrentLang(lang);
+    }
+
+    const sortedBy = (fieldName) => {
+        setLastSorted(fieldName);
+        const isAscending = sortedTypes[fieldName];
+        let parentName
+        switch (objectType) {
+            case 'objects':
+                parentName = 'soilObject';
+                break;
+            case 'ecosystems':
+                parentName = 'ecoSystem';
+                break;
+            case 'publications':
+                parentName = 'publication';
+                break;
+            case 'news':
+                parentName = 'news';
+                break;
+        }
+
+        const compareFn = (a, b) => {
+            let fieldA, fieldB;
+
+            if (fieldName === 'name' && objectType === 'authors') {
+                fieldA = a[_isEng ? 'dataEng' : 'dataRu'][fieldName];
+                fieldB = b[_isEng ? 'dataEng' : 'dataRu'][fieldName];
+            } else if (fieldName === 'name' && objectType === 'dictionary') {
+                fieldA = _isEng ? (a.nameEng || a.nameRu) : (a.nameRu || a.nameEng);
+                fieldB = _isEng ? (b.nameEng || b.nameRu) : (b.nameRu || b.nameEng);
+            } else {
+                fieldA = a[fieldName];
+                fieldB = b[fieldName];
+            }
+
+            if (fieldName === 'lastUpdated') {
+                const dateA = new Date(fieldA);
+                const dateB = new Date(fieldB);
+                return isAscending ? dateA.getTime() - dateB.getTime() : dateB.getTime() - dateA.getTime();
+            }
+
+            if (fieldName === 'creator') {
+                const emailA = a[parentName].user.email;
+                const emailB = b[parentName].user.email;
+                return isAscending ? emailA.localeCompare(emailB) : emailB.localeCompare(emailA);
+            }
+
+            if (fieldName === 'isVisible') {
+                return (fieldA === fieldB) ? 0 : (isAscending ? (fieldA ? 1 : -1) : (fieldA ? -1 : 1));
+            }
+
+            const valueA = fieldA.toString();
+            const valueB = fieldB.toString();
+            return isAscending ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
+        }
+        // const [objects, setObjects] = useState([]);
+        setObjects(prev => [...prev].sort(compareFn));
+        setFilteredObjects(prev => [...prev].sort(compareFn));
+        setSortedTypes(prev => ({ ...prev, [fieldName]: !prev[fieldName] }));
+    }
+
+    const ThItem = ({ name, fieldName }) => {
+        return <th scope="col" className="px-4 py-3.5 text-sm font-normal text-left text-zinc-500">
+            <button className='flex items-center' onClick={() => sortedBy(fieldName)}>
+                <span>{t(name)}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"
+                    className={`ml-1 size-4 ${!sortedTypes[fieldName] && 'rotate-180'} ${lastSorted === fieldName && 'text-blue-700'}`}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
+                </svg>
+            </button>
+        </th >
     }
 
     const TableRow = ({ name, dataEng, dataRu, soilObject, ecoSystem, publication, news,
@@ -190,7 +274,6 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
             </td>
         </tr >
     }
-
 
     const DictionaryTableRow = ({ nameRu, nameEng, id, translationMode }) => <tr className={`${selectedObjects.includes(id) ? 'bg-yellow-100/50' : ''}`}>
         <td key={`tableRow_dictionary_${id}`}
@@ -302,8 +385,6 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
         </td>
     </tr>
 
-
-
     const ModeratorTableRow = ({ name, email, id, role }) => {
         return <tr className={`cursor-pointer 
     ${selectedObjects.includes(id) ? 'bg-yellow-100/50' : ''}`}
@@ -371,31 +452,32 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
         </tr>
     }
 
-    const TableHead = ({ }) => {
+    const TableHead = () => {
+        const name = objectType === 'news' ? 'title' : 'name';
         return <thead className="bg-zinc-100">
             <tr>
                 <th scope="col" className="py-3.5 px-4 text-sm font-normal text-left text-zinc-500">
-                    <div className="flex items-center gap-x-3">
+                    <div className="flex items-center">
                         <input type="checkbox"
                             checked={(currentItems.every(object => selectedObjects.includes(object.id)
                                 || selectedObjects.find(obj => obj.id === object.id && obj.type === object.type.name))) && selectedObjects.length}
                             onChange={e => handleAllCheked(e.target.checked)}
-                            className="cursor-pointer text-blue-500 border-zinc-300 rounded w-4 h-4" />
-                        <span>{t('title')}</span>
+                            className="cursor-pointer text-blue-500 border-zinc-300 rounded w-4 h-4 mr-3" />
+
+                        <button className='flex items-center'
+                            onClick={() => sortedBy(name)}>
+                            <span>{t('title')}</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"
+                                className={`ml-1 size-4 ${!sortedTypes[name] && 'rotate-180'} ${lastSorted === name && 'text-blue-700'}`}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
+                            </svg>
+                        </button>
                     </div>
                 </th>
-                {objectType === 'userPage' && <th scope="col" className="px-4 py-3.5 text-sm font-normal text-left text-zinc-500">
-                    <button className="flex items-center gap-x-2">
-                        <span>{t('type')}</span>
-                    </button>
-                </th>}
-                {objectType !== 'users' && objectType !== 'userPage' && <th scope="col" className="px-4 py-3.5 text-sm font-normal text-left text-zinc-500">
-                    <button className="flex items-center gap-x-2">
-                        <span>{t('creator')}</span>
-                    </button>
-                </th>}
-                <th scope="col" className="px-4 py-3.5 text-sm font-normal text-left text-zinc-500">{t('updated')}</th>
-                <th scope="col" className="px-4 py-3.5 text-sm font-normal text-left text-zinc-500">{t('status')}</th>
+                {objectType === 'userPage' && <ThItem name='type' />}
+                {objectType !== 'users' && objectType !== 'userPage' && <ThItem name='creator' fieldName='creator' />}
+                <ThItem name='updated' fieldName='lastUpdated' />
+                <ThItem name='status' fieldName='isVisible' />
                 <th scope="col" className="xl:block hidden relative py-3.5 px-4">
                     <span className="sr-only">Edit</span>
                 </th>
@@ -412,7 +494,14 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
                             checked={currentItems.every(object => selectedObjects.includes(object.id)) && selectedObjects.length}
                             onChange={e => handleAllCheked(e.target.checked)}
                             className="cursor-pointer text-blue-500 border-zinc-300 rounded w-4 h-4" />
-                        <span>{t('title')}</span>
+                        <button className='flex items-center'
+                            onClick={() => sortedBy('name')}>
+                            <span>{t('title')}</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"
+                                className={`ml-1 size-4 ${!sortedTypes['name'] && 'rotate-180'} ${lastSorted === 'name' && 'text-blue-700'}`}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
+                            </svg>
+                        </button>
                     </div>
                 </th>
                 <th scope="col" className="xl:block hidden relative py-3.5 px-4">
@@ -431,10 +520,17 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
                             checked={currentItems.every(object => selectedObjects.includes(object.id)) && selectedObjects.length}
                             onChange={e => handleAllCheked(e.target.checked)}
                             className="cursor-pointer text-blue-500 border-zinc-300 rounded w-4 h-4" />
-                        <span>{t('name')}</span>
+                        <button className='flex items-center'
+                            onClick={() => sortedBy('name')}>
+                            <span>{t('name')}</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"
+                                className={`ml-1 size-4 ${!sortedTypes['name'] && 'rotate-180'} ${lastSorted === 'name' && 'text-blue-700'}`}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
+                            </svg>
+                        </button>
                     </div>
                 </th>
-                <th scope="col" className="px-4 py-3.5 text-sm font-normal text-left text-zinc-500">{t('rank')}</th>
+                <ThItem name='rank' fieldName='authorType' />
                 <th scope="col" className="xl:block hidden relative py-3.5 px-4">
                     <span className="sr-only">Edit</span>
                 </th>
@@ -451,11 +547,19 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
                             checked={currentItems.every(object => selectedObjects.includes(object.id)) && selectedObjects.length}
                             onChange={e => handleAllCheked(e.target.checked)}
                             className="cursor-pointer text-blue-500 border-zinc-300 rounded w-4 h-4" />
-                        <span>Email</span>
+                        <button className='flex items-center'
+                            onClick={() => sortedBy('email')}>
+                            <span>Email</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"
+                                className={`ml-1 size-4 ${!sortedTypes['email'] && 'rotate-180'} ${lastSorted === 'email' && 'text-blue-700'}`}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
+                            </svg>
+                        </button>
                     </div>
                 </th>
-                <th scope="col" className="px-4 py-3.5 text-sm font-normal text-left text-zinc-500">{t('fio')}</th>
-                <th scope="col" className="px-4 py-3.5 text-sm font-normal text-left text-zinc-500">{t('role')}</th>
+
+                <ThItem name='fio' fieldName='name' />
+                <ThItem name='role' fieldName='role' />
                 <th scope="col" className="xl:block hidden relative py-3.5 px-4">
                     <span className="sr-only">Edit</span>
                 </th>

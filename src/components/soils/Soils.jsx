@@ -112,7 +112,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
     const fetchClassifications = async () => {
         const result = await getClassifications();
         if (result.success) {
-            setClassifications(result.data);
+            setClassifications(result.data.sort((a, b) => a.order - b.order));
         }
         setIsLoading(prev => ({ ...prev, classifications: false }))
     }
