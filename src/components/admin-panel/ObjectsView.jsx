@@ -204,7 +204,7 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
         return <tr key={`tableRow_${type?.name}_${id}`}
             onClick={() => handleObjectSelect(!(selectedObjects.includes(id) || selectedObjects.find(obj => obj.id === id && obj.type === type.name)), id, type?.name)}
             className={`overflow-hidden cursor-pointer ${(!type ? selectedObjects.includes(id) : selectedObjects.find(obj => obj.id === id && obj.type === type.name)) ? 'bg-yellow-100/50' : ''}`}>
-            <td className="px-4 py-3 text-sm font-medium text-zinc-700 whitespace-nowrap overflow-hidden">
+            <td className="px-4 py-3 text-sm font-medium text-zinc-700 whitespace-nowrap overflow-hidden w-full">
                 <div className="max-w-full md:w-fit w-[300px] flex flex-row items-center gap-x-3 overflow-hidden">
                     <input type="checkbox"
                         checked={!!(selectedObjects.includes(id) || selectedObjects.find(obj => obj.id === id && obj.type === type.name))}
@@ -224,13 +224,13 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
             {objectType === 'userPage' ? <td className="px-4 py-3 text-sm text-zinc-500 whitespace-nowrap">{type?.title}</td>
                 : <td className="px-4 py-3 text-sm text-zinc-500 whitespace-nowrap">{soilObject?.user?.email || ecoSystem?.user?.email || publication?.user?.email || news?.user?.email}</td>}
             <td className="px-4 py-3 text-sm text-zinc-500 whitespace-nowrap">{moment(lastUpdated).format('DD.MM.YYYY HH:mm')}</td>
-            <td className="px-4 py-3 text-sm whitespace-nowrap">
+            <td className="px-4 py-3 text-sm whitespace-nowrap min-w-[175px]">
                 {isVisible !== undefined && <div className="flex items-center gap-x-2">
                     {isVisible ? <p className="px-3 py-1 text-sm text-emerald-500 rounded-full bg-emerald-100/60">{t('publish')}</p> :
                         <p className="px-3 py-1 text-sm rounded-full text-zinc-500 bg-zinc-100">{t('no_publish')}</p>}
                 </div>}
             </td>
-            <td className="xl:flex hidden px-4 py-3 text-sm whitespace-nowrap flex-row justify-end">
+            <td className="xl:flex hidden px-4 py-3 text-sm whitespace-nowrap items-center my-1">
                 <div className="relative inline-block">
                     <button onClick={(e) => {
                         e.stopPropagation();
@@ -240,7 +240,7 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
                                 && dropdown.key !== `${objectType === 'userPage' ? `${type?.name}_${id}` : id}`
                                 ? true : !dropdown.isActive
                         }))
-                    }} className="dropdown px-1 py-1 text-gray-500 transition-colors duration-200 rounded-lg hover:bg-gray-100">
+                    }} className="dropdown px-1 py-1 text-gray-500 transition-colors duration-200 rounded-lg hover:bg-gray-100 flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" />
                         </svg>
@@ -278,7 +278,7 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
     const DictionaryTableRow = ({ nameRu, nameEng, id, translationMode }) => <tr className={`${selectedObjects.includes(id) ? 'bg-yellow-100/50' : ''}`}>
         <td key={`tableRow_dictionary_${id}`}
             onClick={() => handleObjectSelect(!selectedObjects.includes(id), id)}
-            className="cursor-pointer px-4 py-3 text-sm font-medium text-zinc-700 whitespace-nowrap ">
+            className="w-full cursor-pointer px-4 py-3 text-sm font-medium text-zinc-700 whitespace-nowrap ">
             <div className="flex flex-row items-center gap-x-3">
                 <input type="checkbox"
                     checked={selectedObjects.includes(id)}
@@ -329,7 +329,7 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
         className={`cursor-pointer ${selectedObjects.includes(id) ? 'bg-yellow-100/50' : ''}`}
         onClick={() => handleObjectSelect(!selectedObjects.includes(id), id)}>
         <td key={`tableRow_author_${id}`}
-            className="px-4 py-3 text-sm font-medium text-zinc-700 whitespace-nowrap">
+            className="w-full px-4 py-3 text-sm font-medium text-zinc-700 whitespace-nowrap">
             <div className="flex flex-row items-center gap-x-3">
                 <input type="checkbox"
                     checked={selectedObjects.includes(id)}
