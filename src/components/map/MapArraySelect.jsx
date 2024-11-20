@@ -206,13 +206,12 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref
     }
 
     const currentCoordChange = (coordinates) => {
-        // const newCord = fromLonLat(coordinates);
-        // const newPointFeature = new Feature({
-        //     geometry: new Point(newCord)
-        // });
-        // newPointFeature.setStyle(selectedPointStyle);
-        // selectedPointFeature.current = newPointFeature;
-    }
+        if (selectedPointFeature.current) {
+            const newCord = fromLonLat(coordinates);
+            selectedPointFeature.current.setGeometry(new Point(newCord));
+            generateJson();
+        }
+    };
 
     const handleModifyend = (e) => {
         //сбрасываем старое выделение
