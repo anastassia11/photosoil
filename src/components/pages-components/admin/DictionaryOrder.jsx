@@ -79,7 +79,7 @@ export default function DictionaryOrderComponent() {
                 <h1 className='sm:text-2xl text-xl font-semibold mb-2 md:mb-0'>
                     {t('setting_order')}
                 </h1>
-                <div className='md:min-w-[200px] md:w-fit'>
+                <div className='md:min-w-[220px] md:max-w-[220px] md:w-fit'>
                     <SubmitBtn isSubmitting={isSubmitting} btnText={t('save')} />
                 </div>
             </div>

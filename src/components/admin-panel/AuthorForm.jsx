@@ -123,7 +123,7 @@ export default function AuthorForm({ _author, purpose, title, onFormSubmit, btnT
                 <h1 className='sm:text-2xl text-xl font-semibold mb-2 md:mb-0'>
                     {title}
                 </h1>
-                <div className='md:min-w-[200px] md:w-fit'>
+                <div className='md:min-w-[220px] md:max-w-[220px] md:w-fit'>
                     <SubmitBtn isSubmitting={isSubmitting} btnText={btnText} />
                 </div>
             </div>

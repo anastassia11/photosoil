@@ -119,7 +119,7 @@ export default function PolicyAdminComponent() {
                 <h1 className='sm:text-2xl text-xl font-semibold'>
                     {t('rules_service')}
                 </h1>
-                <div className='md:min-w-[200px] md:w-fit'>
+                <div className='md:min-w-[220px] md:max-w-[220px] md:w-fit'>
                     <SubmitBtn isSubmitting={isSubmitting} btnText={t('save')} />
                 </div>
             </div>

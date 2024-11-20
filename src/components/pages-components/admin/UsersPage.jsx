@@ -164,7 +164,7 @@ export default function UsersPageComponent() {
                         <button type='button' onClick={handleCloseForm} className="w-full px-4 py-2 font-medium tracking-wide text-gray-700 capitalize transition-colors duration-300 transform border border-gray-200 rounded-md sm:w-1/2 sm:mx-2 focus:outline-none">
                             {t('cancel')}
                         </button>
-                        <div className='md:min-w-[200px] md:w-fit'>
+                        <div className='md:min-w-[200px] md:max-w-[200px] md:w-fit'>
                             <SubmitBtn isSubmitting={isSubmitting} btnText={t('register_go')} />
                         </div>
                     </div>
