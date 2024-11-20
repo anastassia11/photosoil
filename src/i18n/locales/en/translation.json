@@ -149,7 +149,8 @@
   "eng": "English",
   "publish": "Published",
   "no_publish": "Not published",
-
+  "setup_order": "Setup order",
+  "setting_order": "Setting order",
   "edit_go": "Edit",
   "view": "View",
   "make_admin": "Make admin",

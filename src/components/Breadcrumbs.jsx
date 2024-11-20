@@ -109,7 +109,10 @@ export default function Breadcrumbs() {
             title: t('news_one'),
             isRef: false
         },
-
+        'order': {
+            title: t('setting_order'),
+            isRef: false
+        },
     };
 
     const separator =
