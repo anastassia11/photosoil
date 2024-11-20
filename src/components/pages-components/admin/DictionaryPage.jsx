@@ -27,7 +27,7 @@ export default function DictionaryAdminPageComponent() {
     const fetchDisconaries = async () => {
         const result = await getClassifications()
         if (result.success) {
-            setDisconaries(result.data)
+            setDisconaries(result.data.sort((a, b) => a.order - b.order))
             setIsLoading(false);
         }
     }
