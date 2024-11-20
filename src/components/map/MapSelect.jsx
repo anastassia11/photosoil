@@ -170,7 +170,7 @@ const MapSelect = memo(function MapSelect({ id, type, latitude, longtitude, onCo
                     stroke: new Stroke({ color: 'rgba(153, 51, 0, 1)', width: 1.7 }),
                     fill: new Fill({ color: 'rgba(153, 51, 0, 0.7)' }),
                     points: 4, // Количество углов (4 для квадрата)
-                    radius: 20, // Радиус квадрата
+                    radius: window.innerWidth < 640 ? 12 : 20, // Радиус квадрата
                     angle: Math.PI / 4, // Угол поворота
                 }),
                 zIndex: 1
@@ -181,7 +181,7 @@ const MapSelect = memo(function MapSelect({ id, type, latitude, longtitude, onCo
                     stroke: new Stroke({ color: 'rgba(115, 172, 19, 1)', width: 1.7 }),
                     fill: new Fill({ color: 'rgba(115, 172, 19, 0.7)' }),
                     points: 4, // Количество углов (4 для квадрата)
-                    radius: 20, // Радиус квадрата
+                    radius: window.innerWidth < 640 ? 12 : 20, // Радиус квадрата
                     angle: Math.PI / 4, // Угол поворота
                 }),
                 zIndex: 1
@@ -192,7 +192,7 @@ const MapSelect = memo(function MapSelect({ id, type, latitude, longtitude, onCo
                     stroke: new Stroke({ color: 'rgba(139, 0, 139, 1)', width: 1.7 }),
                     fill: new Fill({ color: 'rgba(139, 0, 139, 0.7)' }),
                     points: 4, // Количество углов (4 для квадрата)
-                    radius: 20, // Радиус квадрата
+                    radius: window.innerWidth < 640 ? 12 : 20, // Радиус квадрата
                     angle: Math.PI / 4, // Угол поворота
                 }),
                 zIndex: 1

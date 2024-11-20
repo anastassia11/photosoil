@@ -40,7 +40,7 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref
             stroke: new Stroke({ color: 'rgba(139, 0, 139, 1)', width: 1.7 }),
             fill: new Fill({ color: 'rgba(139, 0, 139, 0.5)' }),
             points: 4, // Количество углов (4 для квадрата)
-            radius: 20, // Радиус квадрата
+            radius: window.innerWidth < 640 ? 12 : 20, // Радиус квадрата
             angle: Math.PI / 4, // Угол поворота
         }),
         zIndex: 1
@@ -52,7 +52,7 @@ function MapArraySelect({ coordinates, onInputChange, onCoordinatesChange }, ref
             stroke: new Stroke({ color: 'rgba(139, 0, 139, 1)', width: 1.7 }),
             fill: new Fill({ color: 'rgba(139, 0, 139, 0.9)' }),
             points: 4, // Количество углов (4 для квадрата)
-            radius: 20, // Радиус квадрата
+            radius: window.innerWidth < 640 ? 12 : 20, // Радиус квадрата
             angle: Math.PI / 4, // Угол поворота
         }),
         zIndex: 1
