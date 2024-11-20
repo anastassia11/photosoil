@@ -13,7 +13,8 @@ export default function ArrayInput({ title, name, fields, onRemove, onAppend, re
                 </label> : ''}
             </p>
             <ul>
-                {fields.map((field, index) => <li className='flex flex-row mb-1' key={`${name}_${field.id}`}>
+                {fields.map((field, index) => <li className='flex flex-row items-center mb-1' key={`${name}_${field.id}`}>
+                    <p className='w-[40px] pt-1'>{index + 1}.</p>
                     <input
                         ref={ref}
                         {...register(`${name}.${index}${subName ? `.${subName}` : ''}`)}
