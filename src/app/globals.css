@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --row-height: 40px; /* Определяем переменную для высоты строк */
+}
+
 body {
   color: rgb(var(--foreground-rgb));
 }
@@ -44,7 +48,7 @@ input[type="file"]::-webkit-file-upload-button {
 .filters-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 6px 20px;
+  gap: 6px 18px;
 }
 
 .expert-grid {

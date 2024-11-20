@@ -108,7 +108,7 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
     const fetchClassifications = async () => {
         const result = await getClassifications();
         if (result.success) {
-            setClassifications(result.data);
+            setClassifications(result.data.sort((a, b) => a.order - b.order));
         }
     }
 
@@ -482,7 +482,11 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 
                         {type === 'soil' && <>
                             <p className='font-medium mt-8'>{t('classifications')}</p>
-                            <ul className='grid md:grid-cols-2 grid-cols-1 gap-4 w-full mt-1'>
+                            <ul style={{
+                                gridTemplateRows: `repeat(${classifications.length / 2}, minmax(0, 1fr))`
+                            }}
+                                className={`grid md:grid-cols-2 grid-cols-1 md:grid-flow-col
+                                gap-4 w-full mt-1`}>
                                 {classifications?.map(item => {
                                     const isVisible = item.translationMode == 0 || (isEng ? (item.translationMode == 1) : (item.translationMode == 2))
                                     if (isVisible) return <li key={`classification-${item.id}`}>
