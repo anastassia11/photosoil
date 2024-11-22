@@ -483,7 +483,7 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
                         {type === 'soil' && <>
                             <p className='font-medium mt-8'>{t('classifications')}</p>
                             <ul style={{
-                                gridTemplateRows: `repeat(${classifications.length / 2}, minmax(0, 1fr))`
+                                gridTemplateRows: `repeat(${Math.ceil(classifications.length / 2)}, minmax(0, 1fr))`
                             }}
                                 className={`grid md:grid-cols-2 grid-cols-1 md:grid-flow-col
                                 gap-4 w-full mt-1`}>
