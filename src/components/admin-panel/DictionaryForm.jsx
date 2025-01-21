@@ -25,7 +25,7 @@ export default function DictionaryForm({ _dictionary, title, onFormSubmit, btnTi
     const { register, handleSubmit, reset, control, watch, formState: { errors, isSubmitting, isDirty } } = useForm({
         defaultValues, mode: 'onChange'
     });
-    const { fields: termsFields, append: appendTerms, remove: removeTerms } = useFieldArray({
+    const { fields: termsFields, append: appendTerms, remove: removeTerms, move: moveTerms } = useFieldArray({
         control,
         name: 'terms'
     });
@@ -45,7 +45,10 @@ export default function DictionaryForm({ _dictionary, title, onFormSubmit, btnTi
     }, [isDirty]);
 
     const submitForm = async (dictionary) => {
-        await onFormSubmit(dictionary);
+        await onFormSubmit({
+            ...dictionary,
+            terms: dictionary.terms.map((term, index) => ({ ...term, order: index + 1 }))
+        });
     }
 
     return (
@@ -87,7 +90,9 @@ export default function DictionaryForm({ _dictionary, title, onFormSubmit, btnTi
                             />
                         </div>
                         <ArrayInput title={t('terms')} name='terms' subName='nameRu' fields={termsFields}
-                            onRemove={removeTerms} onAppend={appendTerms} register={register} />
+                            onRemove={removeTerms} onAppend={appendTerms}
+                            onMove={moveTerms}
+                            register={register} />
                     </ul> : ''}
 
                     {translationMode == 0 || translationMode == 1 ? <ul className={`space-y-3 xl:mt-0 mt-6
@@ -107,7 +112,9 @@ export default function DictionaryForm({ _dictionary, title, onFormSubmit, btnTi
                             />
                         </div>
                         <ArrayInput title={t('terms')} name='terms' subName='nameEng' fields={termsFields}
-                            onRemove={removeTerms} onAppend={appendTerms} register={register} />
+                            onRemove={removeTerms} onAppend={appendTerms}
+                            onMove={moveTerms}
+                            register={register} />
                     </ul> : ''}
                 </div>
             </div>

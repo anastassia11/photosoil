@@ -14,6 +14,18 @@ const nextConfig = {
                 port: '1515',
                 pathname: '/**',
             },
+            {
+                protocol: 'http',
+                hostname: '80.78.243.185',
+                port: '1515',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: '80.78.243.185',
+                port: '1515',
+                pathname: '/**',
+            },
         ],
     },
 };
