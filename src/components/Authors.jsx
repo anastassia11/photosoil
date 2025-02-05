@@ -55,7 +55,10 @@ export default function Authors() {
             className='relative aspect-[2/3] overflow-hidden
     rounded-md hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] transition-all duration-300 flex flex-col  cursor-pointer'>
             <div className='w-full h-full relative'>
-                {photo && <Image src={`${BASE_SERVER_URL}${photo.pathResize.length ? photo.pathResize : photo.path}`} width={500} height={500} alt='soil' className='m-auto w-full h-full object-cover self-start' />}
+                {photo && <Image src={`${BASE_SERVER_URL}${
+                    // photo.pathResize.length 
+                    false
+                        ? photo.pathResize : photo.path}`} width={500} height={500} alt='soil' className='m-auto w-full h-full object-cover self-start' />}
             </div>
             <div className='absolute right-4 top-4'>
                 {authorType !== undefined && <div className="flex items-center gap-x-2">
