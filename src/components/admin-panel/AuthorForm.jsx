@@ -20,6 +20,7 @@ import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import SubmitBtn from './ui-kit/SubmitBtn';
 import ArrayInput from './ui-kit/ArrayInput';
 import { setDirty } from '@/store/slices/formSlice';
+import TextEditor from './TextEditor';
 
 export default function AuthorForm({ _author, purpose, title, onFormSubmit, btnText }) {
     const dispatch = useDispatch();
@@ -194,11 +195,25 @@ export default function AuthorForm({ _author, purpose, title, onFormSubmit, btnT
                         <p className='text-blue-700 font-semibold'>Русская версия</p>
                         {AUTHOR_INFO.map(({ name, isArray, title }) => <li key={name}>
                             {!isArray &&
-                                (name === 'description' ? <Textarea
-                                    required={false}
-                                    {...register(`dataRu.${name}`)}
-                                    label={title}
-                                    placeholder='' />
+                                (name === 'description' ?
+                                    <Controller control={control}
+                                        name={`dataRu.${name}`}
+                                        render={({ field: { onChange, value } }) =>
+                                            <div className='mt-4 flex flex-col'>
+                                                <label className="font-medium min-h-fit">
+                                                    {title}
+                                                </label>
+                                                <div className={`w-full relative`}>
+                                                    <TextEditor type={`about-ru`}
+                                                        content={value}
+                                                        setContent={html => onChange(html)} />
+                                                </div>
+                                            </div>} />
+                                    // <Textarea
+                                    //     required={false}
+                                    //     {...register(`dataRu.${name}`)}
+                                    //     label={title}
+                                    //     placeholder='' />
                                     : <Input
                                         required={name === 'name'}
                                         error={errors.dataRu?.[name]}
@@ -213,11 +228,25 @@ export default function AuthorForm({ _author, purpose, title, onFormSubmit, btnT
                         <p className='text-blue-700 font-semibold'>English version</p>
                         {AUTHOR_INFO.map(({ name, isArray, title }) => <li key={name}>
                             {!isArray &&
-                                (name === 'description' ? <Textarea
-                                    required={false}
-                                    {...register(`dataEng.${name}`)}
-                                    label={title}
-                                    placeholder='' />
+                                (name === 'description' ?
+                                    <Controller control={control}
+                                        name={`dataEng.${name}`}
+                                        render={({ field: { onChange, value } }) =>
+                                            <div className='mt-4 flex flex-col'>
+                                                <label className="font-medium min-h-fit">
+                                                    {title}
+                                                </label>
+                                                <div className={`w-full relative`}>
+                                                    <TextEditor type={`about-en`}
+                                                        content={value}
+                                                        setContent={html => onChange(html)} />
+                                                </div>
+                                            </div>} />
+                                    // <Textarea
+                                    //     required={false}
+                                    //     {...register(`dataEng.${name}`)}
+                                    //     label={title}
+                                    //     placeholder='' />
                                     : <Input
                                         required={name === 'name'}
                                         error={errors.dataEng?.[name]}

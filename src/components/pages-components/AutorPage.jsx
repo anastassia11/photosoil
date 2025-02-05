@@ -9,12 +9,14 @@ import { BASE_SERVER_URL } from '@/utils/constants'
 import { isAbsoluteUrl } from 'next/dist/shared/lib/utils'
 import { useConstants } from '@/hooks/useConstants'
 import { getTranslation } from '@/i18n/client'
+import '@/styles/editor.css';
 
 export default function AuthorPageComponent({ id }) {
     const [author, setAuthor] = useState({});
     const { locale } = useParams();
     const { t } = getTranslation(locale);
     const { AUTHOR_INFO } = useConstants();
+    const [parser, setParser] = useState();
 
     const authorLang = useMemo(() => {
         return locale === 'en' ? author.dataEng : locale === 'ru' ? author.dataRu : {};
@@ -30,6 +32,7 @@ export default function AuthorPageComponent({ id }) {
             if (title) {
                 document.title = `${title} | PhotoSOIL`;
             }
+            setParser(new DOMParser());
         }
     }, [authorLang])
 
@@ -110,9 +113,9 @@ export default function AuthorPageComponent({ id }) {
                                             </a> : item}
                                         </li>)}
                                     </ul>
-                                    : <span className=''>
-                                        {authorLang[name]}
-                                    </span>}
+                                    : <div className='tiptap'
+                                        dangerouslySetInnerHTML={{ __html: parser?.parseFromString(authorLang[name] || '', 'text/html').body.innerHTML }}>
+                                    </div>}
                             </li> : '')}
                     </ul>
                 </div>
