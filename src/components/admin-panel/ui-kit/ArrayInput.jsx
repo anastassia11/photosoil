@@ -4,8 +4,9 @@ import { closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, us
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useParams } from 'next/navigation';
+import { useEffect } from 'react';
 
-export default function ArrayInput({ title, name, fields, onRemove, onAppend, onMove, register, subName, isEng, required }, ref) {
+export default function ArrayInput({ title, name, fields, sortable, onRemove, onAppend, onMove, register, subName, isEng, required }, ref) {
     const { locale } = useParams();
     const { t } = getTranslation(locale);
 
@@ -43,7 +44,7 @@ export default function ArrayInput({ title, name, fields, onRemove, onAppend, on
                         items={fields}
                         strategy={verticalListSortingStrategy}>
                         {fields.map((field, index) => (
-                            <TermItem key={field.id} id={field.id}>
+                            <TermItem sortable={sortable} key={field.id} id={field.id}>
                                 <input
                                     ref={ref}
                                     {...register(`${name}.${index}${subName ? `.${subName}` : ''}`)}

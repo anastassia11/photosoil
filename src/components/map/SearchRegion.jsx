@@ -68,7 +68,7 @@ export default function SearchRegion({ onLocationHandler }) {
                 setLocation(result.slice(0, 5));
             }
         } catch (err) {
-            console.log(err);
+
         }
     }
 

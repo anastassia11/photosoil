@@ -1,7 +1,7 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-export default function TermItem({ id, children }) {
+export default function TermItem({ id, sortable, children }) {
     const { attributes, listeners, isDragging, setNodeRef, setActivatorNodeRef, transform, transition } =
         useSortable({ id });
 
@@ -19,10 +19,11 @@ export default function TermItem({ id, children }) {
             style={style}
         >
             <button type='button'
+                disabled={sortable}
                 ref={setActivatorNodeRef}
                 {...attributes}
                 {...listeners}
-                className='pr-2 pt-1 cursor-move'>
+                className='pr-2 pt-1 cursor-move disabled:opacity-50 disabled:cursor-default disabled:pointer-events-none'>
                 <svg viewBox="0 0 20 20" width="12" >
                     <path d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z"></path>
                 </svg>

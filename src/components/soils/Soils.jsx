@@ -292,6 +292,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
                                                         isEng={locale === 'en'} itemId={item.id}
                                                         type='classif'
                                                         name={isEnglish ? item.nameEng : item.nameRu}
+                                                        sortByOrder={!item.isAlphabeticallOrder}
                                                         items={item.terms}
                                                         allSelectedItems={selectedTerms}
                                                         addItem={handleAddTerm}

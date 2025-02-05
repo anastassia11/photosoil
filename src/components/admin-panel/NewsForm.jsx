@@ -350,7 +350,8 @@ export default function NewsForm({ _news, title, pathname, onNewsSubmit, btnText
                             name='tags'
                             render={({ field: { value, onChange } }) =>
                                 <Filter dropdown={dropdown}
-                                    name={t('tags')} items={tags}
+                                    name={t('tags')}
+                                    items={tags}
                                     type='tags'
                                     setTags={setTags}
                                     allSelectedItems={value} isEng={isEng}

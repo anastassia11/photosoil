@@ -192,8 +192,8 @@ const SideBar = memo(function SideBar({ sidebarOpen, setSideBarOpen, filterName,
           ? <div className='max-w-[40%] w-[40%]'><Image src={`${BASE_SERVER_URL}${object.photo?.pathResize?.length ? object.photo.pathResize : object.photo.path}`}
             className="aspect-[3/4] object-cover object-top border border-blue-600 shadow-md rounded-xl overflow-hidden"
             alt={object?.name}
-            width={500}
-            height={500} /></div> : ''}
+            width={200}
+            height={200} /></div> : ''}
         <div className='flex flex-col ml-2 max-w-[60%] w-[60%]'>
           <p className='text-blue-700 text-sm sm:text-base'>
             {object._type === 'soil' ? (SOIL_ENUM[object.objectType] || '') : t(object._type)}
@@ -362,6 +362,7 @@ const SideBar = memo(function SideBar({ sidebarOpen, setSideBarOpen, filterName,
                                 type='classif'
                                 isMapFilter={true}
                                 name={isEnglish ? item.nameEng : item.nameRu}
+                                sortByOrder={!item.isAlphabeticallOrder}
                                 items={item.terms}
                                 allSelectedItems={selectedTerms}
                                 addItem={handleAddTerm}

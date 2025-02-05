@@ -83,7 +83,6 @@ export default function NewsEditComponent({ id }) {
                 dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }));
             }
         } catch (error) {
-            console.log(error)
             dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }));
         }
     }

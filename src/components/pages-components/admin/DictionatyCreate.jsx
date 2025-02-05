@@ -17,7 +17,7 @@ export default function DictionatyCreatePageComponent() {
     const createDictionary = async (data) => {
         const result = await createClassification(data);
         if (result.success) {
-            router.push('/admin/dictionary');
+            router.push(`/${locale}/admin/dictionary`);
             dispatch(setDirty(false));
             dispatch(openAlert({ title: t('success'), message: t('created_dictionary'), type: 'success' }))
         } else {

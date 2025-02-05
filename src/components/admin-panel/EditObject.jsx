@@ -107,7 +107,6 @@ export default function EditObject({ id, type, title }) {
             dispatch(setDirty(false));
             dispatch(openAlert({ title: t('success'), message: t('success_edit'), type: 'success' }));
         } catch (error) {
-            console.log(error)
             dispatch(openAlert({ title: t('error'), message: t('error_edit'), type: 'error' }));
         } finally {
             setIsLoading(false);

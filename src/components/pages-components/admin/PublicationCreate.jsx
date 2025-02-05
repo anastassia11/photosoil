@@ -32,7 +32,6 @@ export default function PublicationCreateComponent() {
             const langPublication = { ...updatedPublication, translations: updatedPublication.translations.filter(({ isEnglish }) => isEnglish === isEng) };
             await fetchCreatePublication(createTwoLang ? updatedPublication : langPublication);
         } catch (error) {
-            console.log(error)
             dispatch(openAlert({ title: t('error'), message: t('error_publication'), type: 'error' }));
         }
     }

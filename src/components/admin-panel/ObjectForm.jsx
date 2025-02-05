@@ -350,7 +350,8 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
                                     name='authors'
                                     render={({ field: { value, onChange } }) =>
                                         <Filter dropdown={dropdown}
-                                            name={t('authors')} items={authors}
+                                            name={t('authors')}
+                                            items={authors}
                                             type='authors' itemId={`author`}
                                             allSelectedItems={value} isEng={isEng}
                                             addItem={newItem => onChange([...value, newItem])}
@@ -494,7 +495,8 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
                                             name='soilTerms'
                                             render={({ field: { value, onChange } }) =>
                                                 <Filter dropdown={dropdown}
-                                                    name={isEng ? item.nameEng : item.nameRu} items={item.terms}
+                                                    name={isEng ? item.nameEng : item.nameRu}
+                                                    items={item.terms}
                                                     type='classif'
                                                     allSelectedItems={value} isEng={isEng}
                                                     addItem={newItem => onChange([...value, newItem])}

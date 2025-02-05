@@ -18,6 +18,7 @@ export default function DictionaryForm({ _dictionary, title, onFormSubmit, btnTi
     const { t } = getTranslation(locale);
     const defaultValues = {
         translationMode: 0,
+        isAlphabeticallOrder: true,
         nameEng: '',
         nameRu: '',
         terms: []
@@ -31,6 +32,7 @@ export default function DictionaryForm({ _dictionary, title, onFormSubmit, btnTi
     });
 
     const translationMode = watch('translationMode');
+    const sortByAlpha = watch('isAlphabeticallOrder');
     const { TRANSLATION_ENUM } = useConstants();
 
     useEffect(() => {
@@ -42,7 +44,7 @@ export default function DictionaryForm({ _dictionary, title, onFormSubmit, btnTi
 
     useEffect(() => {
         dispatch(setDirty(isDirty));
-    }, [isDirty]);
+    }, [isDirty])
 
     const submitForm = async (dictionary) => {
         await onFormSubmit({
@@ -73,6 +75,14 @@ export default function DictionaryForm({ _dictionary, title, onFormSubmit, btnTi
                         } />
                 </div>
 
+                <label htmlFor='isAlphabeticallOrder'
+                    className={`ml-1 font-medium select-none mt-3 flex flex-row cursor-pointer items-center`}>
+                    <input type="checkbox" id='isAlphabeticallOrder'
+                        {...register(`isAlphabeticallOrder`)}
+                        className="cursor-pointer min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
+                    <span>{t('sortByAlpha')}</span>
+                </label>
+
                 <div className='flex xl:flex-row flex-col w-full mt-8'>
                     {translationMode == 0 || translationMode == 2 ? <ul className={`space-y-3 
                     ${translationMode == 0 ? 'xl:w-[50%] xl:pr-6 xl:border-r' : 'w-full'}`}>
@@ -90,6 +100,7 @@ export default function DictionaryForm({ _dictionary, title, onFormSubmit, btnTi
                             />
                         </div>
                         <ArrayInput title={t('terms')} name='terms' subName='nameRu' fields={termsFields}
+                            sortable={sortByAlpha}
                             onRemove={removeTerms} onAppend={appendTerms}
                             onMove={moveTerms}
                             register={register} />
@@ -112,6 +123,7 @@ export default function DictionaryForm({ _dictionary, title, onFormSubmit, btnTi
                             />
                         </div>
                         <ArrayInput title={t('terms')} name='terms' subName='nameEng' fields={termsFields}
+                            sortable={sortByAlpha}
                             onRemove={removeTerms} onAppend={appendTerms}
                             onMove={moveTerms}
                             register={register} />

@@ -190,7 +190,7 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
     const ThItem = ({ name, fieldName }) => {
         return <th scope="col" className="px-4 py-3.5 text-sm font-normal text-left text-zinc-500">
             <button className='flex items-center' onClick={() => sortedBy(fieldName)}>
-                <span>{t(name)}</span>
+                <span className='min-w-fit text-nowrap'>{t(name)}</span>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"
                     className={`ml-1 size-4 ${!sortedTypes[fieldName] && 'rotate-180'} ${lastSorted === fieldName && 'text-blue-700'}`}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />

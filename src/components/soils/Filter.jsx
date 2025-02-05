@@ -13,7 +13,7 @@ import { Oval } from 'react-loader-spinner';
 import { useDispatch } from 'react-redux'
 import { Tooltip } from 'react-tooltip';
 
-const Filter = memo(function Filter({ dropdown, type, itemId, name, items, setTags, allSelectedItems, addItem, deleteItem, resetItems, isMapFilter, isEng }) {
+const Filter = memo(function Filter({ dropdown, type, itemId, name, sortByOrder, items, setTags, allSelectedItems, addItem, deleteItem, resetItems, isMapFilter, isEng }) {
     const dispatch = useDispatch();
     const [filterOpen, setFilterOpen] = useState(false)
     const paths = usePathname();
@@ -46,7 +46,7 @@ const Filter = memo(function Filter({ dropdown, type, itemId, name, items, setTa
             item.dataEng?.name?.toLowerCase().includes(_filterName) || item.dataRu?.name?.toLowerCase().includes(_filterName) ||
             item.nameEng?.toLowerCase().includes(_filterName) || item.nameRu?.toLowerCase().includes(_filterName))
             .sort((a, b) => {
-                if (name === "Природная зона" || name === 'Natural zone') return 0;
+                if (sortByOrder) return a.order - b.order
                 if (a.name < b.name
                     || (_isEng ? (a.dataEng?.name < b.dataEng?.name) : (a.dataRu?.name < b.dataRu?.name))
                     || (_isEng ? (a.nameEng < b.nameEng) : (a.nameRu < b.nameRu))

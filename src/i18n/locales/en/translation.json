@@ -304,5 +304,7 @@
   "error_location": "Error getting location",
   "not_supported_location": "Geolocation is not supported by your browser",
   "loading": "Loading..",
-  "form_confirm": "Are you sure you want to leave this page? The data you entered may not be saved."
+  "form_confirm": "Are you sure you want to leave this page? The data you entered may not be saved.",
+
+  "sortByAlpha": "Sort alphabetically when displaying"
 }
