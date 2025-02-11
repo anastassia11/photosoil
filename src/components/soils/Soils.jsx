@@ -90,7 +90,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 
     useEffect(() => {
         const _filterName = filterName.toLowerCase().trim();
-        soils?.length && setFilteredSoils(prev => soils.filter(soil =>
+        soils?.length && setFilteredSoils(soils.filter(soil =>
             (draftIsVisible ? true : soil.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible) &&
             (soil.translations?.find(transl => transl.isEnglish === _isEng)?.name.toLowerCase().includes(_filterName)
                 || soil.translations?.find(transl => transl.isEnglish === _isEng)?.code?.toLowerCase().includes(_filterName)) &&
@@ -98,11 +98,13 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
             (selectedAuthors.length === 0 || selectedAuthors.some(selectedAuthor => soil.authors?.some(author => author === selectedAuthor))) &&
             (selectedTerms.length === 0 || selectedTerms.some(selectedTerm => soil.terms.some(term => term === selectedTerm))))
             .sort((a, b) => {
-                const dateA = new Date(a.createdDate);
-                const dateB = new Date(b.createdDate);
-                return dateB.getTime() - dateA.getTime();
+                // const dateA = new Date(a.createdDate);
+                // const dateB = new Date(b.createdDate);
+                return b.createdDate - a.createdDate;
             })
         )
+        const dateA = new Date('02/07/2025 12:00:26')
+        console.log(dateA.getTime())
     }, [filterName, selectedCategories, selectedTerms, selectedAuthors, soils, draftIsVisible])
 
     // useEffect(() => {

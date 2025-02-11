@@ -42,9 +42,9 @@ export default function Publications({ _publications }) {
             (draftIsVisible ? true : publication.translations?.find(transl => transl.isEnglish === _isEng)?.isVisible) &&
             (publication.translations?.find(transl => transl.isEnglish === _isEng)?.name.toLowerCase().includes(_filterName)))
             .sort((a, b) => {
-                const dateA = new Date(a.createdDate);
-                const dateB = new Date(b.createdDate);
-                return dateB.getTime() - dateA.getTime();
+                // const dateA = new Date(a.createdDate);
+                // const dateB = new Date(b.createdDate);
+                return b.createdDate - a.createdDate;
             }))
     }, [filterName, publications, draftIsVisible])
 

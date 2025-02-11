@@ -21,6 +21,7 @@ export default function NewsItemPageComponent({ id }) {
     let _isEng = locale === 'en';
 
     const currentTransl = news?.translations?.find(({ isEnglish }) => isEnglish === _isEng);
+    const date = new Date(currentTransl?.lastUpdated * 1000).toLocaleString()
 
     useEffect(() => {
         localStorage.getItem('tokenData') && setTokenData(JSON.parse(localStorage.getItem('tokenData')));
@@ -86,7 +87,7 @@ export default function NewsItemPageComponent({ id }) {
                 </button>
             </div>
             <div className='flex sm:flex-row flex-col justify-between mt-4'>
-                <p className='text-gray-500 font-medium'>{moment(currentTransl?.lastUpdated).format('DD.MM.YYYY HH:mm') || ''}</p>
+                <p className='text-gray-500 font-medium'>{date}</p>
                 <ul className="flex items-center flex-row">
                     {news?.tags?.map(({ id, nameRu, nameEng }, index) =>
                         <li key={`tag-${id}`} className='mr-2 min-w-fit h-fit'>

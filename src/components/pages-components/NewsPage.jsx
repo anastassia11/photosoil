@@ -49,9 +49,9 @@ export default function NewsPageComponent() {
             && item.translations?.find(transl => transl.isEnglish === _isEng)?.title.toLowerCase().includes(_filterName)
             && (selectedTags.length === 0 || selectedTags.some(selectedTag => item.tags.some(({ id }) => id === selectedTag)))
         ).sort((a, b) => {
-            const dateA = new Date(a.createdDate);
-            const dateB = new Date(b.createdDate);
-            return dateB.getTime() - dateA.getTime();
+            // const dateA = new Date(a.createdDate);
+            // const dateB = new Date(b.createdDate);
+            return b.createdDate - a.createdDate
         });
     }, [filterName, news, draftIsVisible, selectedTags]);
 
@@ -115,12 +115,13 @@ export default function NewsPageComponent() {
 
     const NewsCard = ({ id, tags, translations }) => {
         const currentTransl = translations?.find(({ isEnglish }) => isEnglish === _isEng) || {};
+        const date = new Date(currentTransl?.lastUpdated * 1000).toLocaleString()
         return <Link href={`/${locale}/news/${id}`}
             prefetch={false}
             className="sm:px-8 px-4 py-4 bg-white rounded-md hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] transition-all duration-300
              w-full h-full flex flex-col justify-between">
             <div className='flex flex-col'>
-                <span className="text-sm font-light text-gray-600">{moment(currentTransl?.lastUpdated).format('DD.MM.YYYY HH:mm') || ''}</span>
+                <span className="text-sm font-light text-gray-600">{date || ''}</span>
 
                 <div className="mt-2">
                     <h3 className="sm:text-xl text-base font-medium text-gray-700 hover:text-gray-600">{currentTransl?.title || ''}</h3>

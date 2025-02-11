@@ -1,7 +1,7 @@
 'use client'
 
 import { deleteAuthor } from '@/api/author/delete_author';
-import { getAuthors } from '@/api/author/get_authors';
+import { getAuthorsForAdmin } from '@/api/author/get_authors_forAdmin';
 import ObjectsView from '@/components/admin-panel/ObjectsView';
 import { getTranslation } from '@/i18n/client';
 import { openModal } from '@/store/slices/modalSlice';
@@ -23,7 +23,7 @@ export default function AuthorsAdminPageComponent() {
     }, []);
 
     const fetchAuthors = async () => {
-        const result = await getAuthors()
+        const result = await getAuthorsForAdmin()
         if (result.success) {
             setAuthors(result.data)
             setIsLoading(false)

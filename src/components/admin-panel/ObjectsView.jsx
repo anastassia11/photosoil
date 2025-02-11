@@ -50,10 +50,12 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
     }
 
     useEffect(() => {
+        console.log(_objects)
         setObjects(_objects.sort((a, b) => {
-            const dateA = new Date(a.lastUpdated);
-            const dateB = new Date(b.lastUpdated);
-            return dateB.getTime() - dateA.getTime();
+            // const dateA = new Date(a.lastUpdated);
+            // const dateB = new Date(b.lastUpdated);
+            // return dateB.getTime() - dateA.getTime();
+            return b.lastUpdated - a.lastUpdated
         }));
         setSelectedObjects([]);
     }, [_objects]);
@@ -162,9 +164,10 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
             }
 
             if (fieldName === 'lastUpdated') {
-                const dateA = new Date(fieldA);
-                const dateB = new Date(fieldB);
-                return isAscending ? dateA.getTime() - dateB.getTime() : dateB.getTime() - dateA.getTime();
+                // const dateA = new Date(fieldA);
+                // const dateB = new Date(fieldB);
+                // return isAscending ? dateA.getTime() - dateB.getTime() : dateB.getTime() - dateA.getTime();
+                return isAscending ? fieldA - fieldB : fieldB - fieldA;
             }
 
             if (fieldName === 'creator') {
@@ -201,6 +204,8 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
 
     const TableRow = ({ name, dataEng, dataRu, soilObject, ecoSystem, publication, news,
         lastUpdated, isVisible, id, soilId, ecoSystemId, publicationId, newsId, type, isEnglish, title }) => {
+        const date = new Date(lastUpdated * 1000).toLocaleString()
+
         return <tr key={`tableRow_${type?.name}_${id}`}
             onClick={() => handleObjectSelect(!(selectedObjects.includes(id) || selectedObjects.find(obj => obj.id === id && obj.type === type.name)), id, type?.name)}
             className={`overflow-hidden cursor-pointer ${(!type ? selectedObjects.includes(id) : selectedObjects.find(obj => obj.id === id && obj.type === type.name)) ? 'bg-yellow-100/50' : ''}`}>
@@ -223,7 +228,7 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
 
             {objectType === 'userPage' ? <td className="px-4 py-3 text-sm text-zinc-500 whitespace-nowrap">{type?.title}</td>
                 : <td className="px-4 py-3 text-sm text-zinc-500 whitespace-nowrap">{soilObject?.user?.email || ecoSystem?.user?.email || publication?.user?.email || news?.user?.email}</td>}
-            <td className="px-4 py-3 text-sm text-zinc-500 whitespace-nowrap">{moment(lastUpdated).format('DD.MM.YYYY HH:mm')}</td>
+            <td className="px-4 py-3 text-sm text-zinc-500 whitespace-nowrap">{date}</td>
             <td className="px-4 py-3 text-sm whitespace-nowrap min-w-[175px]">
                 {isVisible !== undefined && <div className="flex items-center gap-x-2">
                     {isVisible ? <p className="px-3 py-1 text-sm text-emerald-500 rounded-full bg-emerald-100/60">{t('publish')}</p> :

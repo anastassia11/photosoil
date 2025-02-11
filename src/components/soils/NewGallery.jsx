@@ -36,14 +36,15 @@ export default function NewGallery({ mainPhoto, objectPhoto }) {
             {elements.length ? <FancyBox length={elements.length}
                 setFancyboxIsActive={setFancyboxIsActive}>
                 <Carousel>
-                    {elements?.map(({ id, path, pathResize, titleEng, titleRu, lastUpdated }) =>
-                        <figure key={id}
+                    {elements?.map(({ id, path, pathResize, titleEng, titleRu, lastUpdated }) => {
+                        const date = new Date(lastUpdated * 1000).toLocaleString()
+                        return <figure key={id}
                             className="f-carousel__slide flex flex-col items-center justify-center min-h-full"
                             data-thumb-src={`${BASE_SERVER_URL}${pathResize.length ? pathResize : path}`}
                             data-fancybox="gallery"
                             data-src={`${BASE_SERVER_URL}${path}`}
                             data-caption={`<div class='flex flex-col h-full'>
-                          <p class="text-base font-medium mb-3">${moment(lastUpdated).format('DD.MM.YYYY HH:mm')}</p>
+                          <p class="text-base font-medium mb-3">${date}</p>
                                 <p class='font-light'>${locale === 'en' ? (titleEng || '') : locale === 'ru' ? (titleRu || '') : ''}</p>
                       </div>`}
                         >
@@ -57,7 +58,8 @@ export default function NewGallery({ mainPhoto, objectPhoto }) {
                                 <p className="text-base font-medium">{lastUpdated}</p>
                                 <p className='text-sm'>{locale === 'en' ? (titleEng || '') : locale === 'ru' ? (titleRu || '') : ''}</p>
                             </figcaption> */}
-                        </figure>)}
+                        </figure>
+                    })}
                 </Carousel>
             </FancyBox> : ''}
         </>
