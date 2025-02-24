@@ -77,15 +77,16 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
         } else fetchItems();
 
         // if (didLogRef.current && isFilters) {
-        //     didLogRef.current = false
-        //     const categoriesParam = searchParams.get('categories');
-        //     const termsParam = searchParams.get('terms');
-        //     const authorsParam = searchParams.get('authors');
+        if (isFilters) {
+            // didLogRef.current = false
+            const categoriesParam = searchParams.get('categories');
+            const termsParam = searchParams.get('terms');
+            const authorsParam = searchParams.get('authors');
 
-        //     categoriesParam && categoriesParam.split(',').forEach((param) => dispatch(addCategory(Number(param))));
-        //     termsParam && termsParam.split(',').forEach((param) => dispatch(addTerm(Number(param))));
-        //     authorsParam && authorsParam.split(',').forEach((param) => dispatch(addAuthor(Number(param))));
-        // }
+            categoriesParam && categoriesParam.split(',').forEach((param) => dispatch(addCategory(Number(param))));
+            termsParam && termsParam.split(',').forEach((param) => dispatch(addTerm(Number(param))));
+            authorsParam && authorsParam.split(',').forEach((param) => dispatch(addAuthor(Number(param))));
+        }
     }, [])
 
     useEffect(() => {
@@ -98,18 +99,14 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
             (selectedAuthors.length === 0 || selectedAuthors.some(selectedAuthor => soil.authors?.some(author => author === selectedAuthor))) &&
             (selectedTerms.length === 0 || selectedTerms.some(selectedTerm => soil.terms.some(term => term === selectedTerm))))
             .sort((a, b) => {
-                // const dateA = new Date(a.createdDate);
-                // const dateB = new Date(b.createdDate);
                 return b.createdDate - a.createdDate;
             })
         )
-        const dateA = new Date('02/07/2025 12:00:26')
-        console.log(dateA.getTime())
     }, [filterName, selectedCategories, selectedTerms, selectedAuthors, soils, draftIsVisible])
 
-    // useEffect(() => {
-    //     isFilters && updateFiltersInHistory();
-    // }, [selectedCategories, selectedTerms, selectedAuthors])
+    useEffect(() => {
+        isFilters && updateFiltersInHistory();
+    }, [selectedCategories, selectedTerms, selectedAuthors])
 
     const fetchClassifications = async () => {
         const result = await getClassifications();

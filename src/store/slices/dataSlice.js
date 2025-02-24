@@ -36,7 +36,7 @@ const dataSlice = createSlice({
         addCategory(state, action) {
             const existingId = state.selectedCategories.find(id => id === action.payload);
             if (existingId === undefined) {
-                state.selectedCategories.push(action.payload);
+                state.selectedCategories = [...state.selectedCategories, action.payload]
             }
         },
         deleteCategory(state, action) {
