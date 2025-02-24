@@ -3,78 +3,78 @@
 @tailwind utilities;
 
 :root {
-  --row-height: 40px; /* Определяем переменную для высоты строк */
+	--row-height: 40px; /* Определяем переменную для высоты строк */
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
+	color: rgb(var(--foreground-rgb));
 }
 
 * {
-  margin: 0;
-  padding: 0;
+	margin: 0;
+	padding: 0;
 }
 
 .backface {
-  -webkit-backface-visibility: hidden;
+	-webkit-backface-visibility: hidden;
 }
 
-input[type="file"]::-webkit-file-upload-button {
-  display: none; /* Скрыть встроенную кнопку */
+input[type='file']::-webkit-file-upload-button {
+	display: none; /* Скрыть встроенную кнопку */
 }
 
 .scroll::-webkit-scrollbar {
-  width: 10px;
-  height: 5px;
+	width: 10px;
+	height: 5px;
 }
 
 .scroll::-webkit-scrollbar-thumb {
-  background-color: #ddd;
-  border-radius: 5px;
+	background-color: #ddd;
+	border-radius: 5px;
 }
 
 .soils-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+	gap: 20px;
 }
 
 .authors-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+	gap: 20px;
 }
 
 .filters-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 6px 18px;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+	gap: 6px 18px;
 }
 
 .expert-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-  gap: 20px;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+	gap: 20px;
 }
 
 .news-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+	gap: 20px;
 }
 
 @media screen and (min-width: 1024px) {
-  .expert-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
-    gap: 20px;
-  }
+	.expert-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+		gap: 20px;
+	}
 }
 
 @media screen and (min-width: 640px) {
-  .news-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
-    gap: 20px;
-  }
+	.news-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+		gap: 20px;
+	}
 }

@@ -1,33 +1,32 @@
-import { configureStore } from '@reduxjs/toolkit';
-import dataReducer from './slices/dataSlice';
-import generalReducer from './slices/generalSlice';
-import modalReducer from './slices/modalSlice';
+import { configureStore } from '@reduxjs/toolkit'
+
 import alertReducer from './slices/alertSlice'
+import dataReducer from './slices/dataSlice'
 import formReducer from './slices/formSlice'
+import generalReducer from './slices/generalSlice'
+import modalReducer from './slices/modalSlice'
 
 function createStore() {
-    const thunkArguments = {};
+	const thunkArguments = {}
 
-    const store = configureStore({
-        reducer: {
-            data: dataReducer,
-            general: generalReducer,
-            modal: modalReducer,
-            alert: alertReducer,
-            form: formReducer
-        },
-        middleware: (getDefaultMiddleware) =>
-            getDefaultMiddleware({
-                thunk: {
-                    extraArgument: thunkArguments,
-                },
-            }),
-    });
+	const store = configureStore({
+		reducer: {
+			data: dataReducer,
+			general: generalReducer,
+			modal: modalReducer,
+			alert: alertReducer,
+			form: formReducer
+		},
+		middleware: getDefaultMiddleware =>
+			getDefaultMiddleware({
+				thunk: {
+					extraArgument: thunkArguments
+				}
+			})
+	})
 
-    thunkArguments.store = store;
+	thunkArguments.store = store
 
-    return store;
+	return store
 }
-export default createStore();
-
-
+export default createStore()
