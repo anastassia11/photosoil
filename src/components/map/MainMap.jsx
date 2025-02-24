@@ -21,11 +21,12 @@ import { getEcosystems } from '@/api/ecosystem/get_ecosystems';
 import SideBar from './SideBar';
 import { useDispatch, useSelector } from 'react-redux';
 import { getPublications } from '@/api/publication/get_publications';
-import { useParams } from 'next/navigation';
+import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import SearchRegion from './SearchRegion';
 import { getMapLayers } from '@/hooks/getMapLayers';
 import { openAlert } from '@/store/slices/alertSlice';
 import { getTranslation } from '@/i18n/client';
+import { addAuthor, addCategory, addTerm } from '@/store/slices/dataSlice';
 
 export default function MainMap() {
     const dispatch = useDispatch();
@@ -36,6 +37,10 @@ export default function MainMap() {
 
     const [sidebarOpen, setSideBarOpen] = useState(false);
     const { locale } = useParams();
+    const searchParams = useSearchParams();
+
+    const router = useRouter();
+    const pathname = usePathname();
     const { t } = getTranslation(locale);
     const { selectedTerms, selectedCategories, selectedAuthors } = useSelector(state => state.data);
     const [selectedLayer, setSelectedLayer] = useState('');
@@ -51,32 +56,49 @@ export default function MainMap() {
 
     const [filterName, setFilterName] = useState('');
 
-    const didLogRef = useRef(false);
+    const didLogRef = useRef(true);
+    const didLogSearchParamsRef = useRef(true);
     const mapElement = useRef();
 
     const mapRef = useRef(null);
     const _isEng = locale === 'en';
 
     useLayoutEffect(() => {
+        let timeoutId
         const initializeMap = () => {
-            if (didLogRef.current === false) {
-                didLogRef.current = true;
-                init();
-                loadLayers();
-            }
+            init();
+            loadLayers();
         }
+
         localStorage.getItem('layersVisible') ? setLayersVisible(JSON.parse(localStorage.getItem('layersVisible')))
             : setLayersVisible({
                 soil: true,
                 ecosystem: false,
                 publication: false,
             });
+        if (didLogSearchParamsRef.current) {
+            timeoutId = setTimeout(() => {
+                didLogSearchParamsRef.current = false
+                const categoriesParam = searchParams.get('categories');
+                const termsParam = searchParams.get('terms');
+                const authorsParam = searchParams.get('authors');
+                categoriesParam && categoriesParam.split(',').forEach((param) => dispatch(addCategory(Number(param))));
+                termsParam && termsParam.split(',').forEach((param) => dispatch(addTerm(Number(param))));
+                authorsParam && authorsParam.split(',').forEach((param) => dispatch(addAuthor(Number(param))));
+            }, 300)
+        }
+
         if (mapElement.current) {
-            initializeMap();
+            if (didLogRef.current) {
+                didLogRef.current = false;
+                initializeMap();
+            }
+
         } else {
             document.addEventListener('DOMContentLoaded', initializeMap)
         }
         return () => {
+            clearTimeout(timeoutId);
             document.removeEventListener('DOMContentLoaded', initializeMap);
         }
     }, [])
@@ -104,6 +126,10 @@ export default function MainMap() {
     }, [soils, ecosystems, publications])
 
     useEffect(() => {
+        !didLogSearchParamsRef.current && updateFiltersInHistory();
+    }, [selectedCategories, selectedTerms, selectedAuthors])
+
+    useEffect(() => {
         if (window.innerWidth < 640) {
             document.addEventListener('click', handleClickOutside);
             return () => {
@@ -111,6 +137,30 @@ export default function MainMap() {
             };
         }
     }, [])
+
+    const updateFiltersInHistory = () => {
+        const params = new URLSearchParams(searchParams.toString())
+
+        if (selectedCategories.length > 0) {
+            params.set('categories', selectedCategories.join(','));
+        } else {
+            params.delete('categories');
+        }
+
+        if (selectedTerms.length > 0) {
+            params.set('terms', selectedTerms.join(','));
+        } else {
+            params.delete('terms');
+        }
+
+        if (selectedAuthors.length > 0) {
+            params.set('authors', selectedAuthors.join(','));
+        } else {
+            params.delete('authors');
+        }
+
+        router.replace(pathname + '?' + params.toString())
+    };
 
     const handleClickOutside = useCallback((e) => {
         if (!e.target.closest(".sideBar")) {

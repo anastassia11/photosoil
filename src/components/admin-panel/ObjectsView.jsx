@@ -50,11 +50,7 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
     }
 
     useEffect(() => {
-        console.log(_objects)
         setObjects(_objects.sort((a, b) => {
-            // const dateA = new Date(a.lastUpdated);
-            // const dateB = new Date(b.lastUpdated);
-            // return dateB.getTime() - dateA.getTime();
             return b.lastUpdated - a.lastUpdated
         }));
         setSelectedObjects([]);
@@ -164,9 +160,6 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
             }
 
             if (fieldName === 'lastUpdated') {
-                // const dateA = new Date(fieldA);
-                // const dateB = new Date(fieldB);
-                // return isAscending ? dateA.getTime() - dateB.getTime() : dateB.getTime() - dateA.getTime();
                 return isAscending ? fieldA - fieldB : fieldB - fieldA;
             }
 
@@ -184,7 +177,6 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
             const valueB = fieldB.toString();
             return isAscending ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
         }
-        // const [objects, setObjects] = useState([]);
         setObjects(prev => [...prev].sort(compareFn));
         setFilteredObjects(prev => [...prev].sort(compareFn));
         setSortedTypes(prev => ({ ...prev, [fieldName]: !prev[fieldName] }));

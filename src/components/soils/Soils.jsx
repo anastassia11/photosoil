@@ -76,16 +76,17 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
             setIsLoading(prev => ({ ...prev, items: false }));
         } else fetchItems();
 
-        // if (didLogRef.current && isFilters) {
-        if (isFilters) {
-            // didLogRef.current = false
-            const categoriesParam = searchParams.get('categories');
-            const termsParam = searchParams.get('terms');
-            const authorsParam = searchParams.get('authors');
-
-            categoriesParam && categoriesParam.split(',').forEach((param) => dispatch(addCategory(Number(param))));
-            termsParam && termsParam.split(',').forEach((param) => dispatch(addTerm(Number(param))));
-            authorsParam && authorsParam.split(',').forEach((param) => dispatch(addAuthor(Number(param))));
+        if (didLogRef.current && isFilters) {
+            const timeoutId = setTimeout(() => {
+                didLogRef.current = false
+                const categoriesParam = searchParams.get('categories');
+                const termsParam = searchParams.get('terms');
+                const authorsParam = searchParams.get('authors');
+                categoriesParam && categoriesParam.split(',').forEach((param) => dispatch(addCategory(Number(param))));
+                termsParam && termsParam.split(',').forEach((param) => dispatch(addTerm(Number(param))));
+                authorsParam && authorsParam.split(',').forEach((param) => dispatch(addAuthor(Number(param))));
+            }, 300)
+            return () => clearTimeout(timeoutId);
         }
     }, [])
 
@@ -105,7 +106,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
     }, [filterName, selectedCategories, selectedTerms, selectedAuthors, soils, draftIsVisible])
 
     useEffect(() => {
-        isFilters && updateFiltersInHistory();
+        isFilters && !didLogRef.current && updateFiltersInHistory();
     }, [selectedCategories, selectedTerms, selectedAuthors])
 
     const fetchClassifications = async () => {

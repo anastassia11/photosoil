@@ -4,14 +4,6 @@ import tokenVerification from '../account/token_verification';
 
 export async function createClassification(data) {
     await tokenVerification({ isRequired: true });
-    // const formData = new FormData();
-    // for (let key in data) {
-    //     if (Array.isArray(data[key])) {
-    //         data[key].forEach(value => {
-    //             formData.append(`${key}[]`, value);
-    //         });
-    //     } else formData.append(key, data[key])
-    // }
     try {
         const response = await axios.post(`${BASE_SERVER_URL}/api/Classification/Post`,
             data,

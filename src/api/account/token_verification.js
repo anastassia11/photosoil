@@ -28,8 +28,7 @@ export default async function tokenVerification({ isRequired }) {
         }
     }
     if (tokenData) {
-        // if (tokenData.time + tokenData.deadTime * 1000 < Date.now()) {
-        if (true) {
+        if (tokenData.time + Number(tokenData.deadTime) * 1000 < Date.now()) {
             try {
                 const response = await refreshToken(tokenData.refreshToken)
                 if (response.status === 200) {

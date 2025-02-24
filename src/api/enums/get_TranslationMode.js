@@ -3,13 +3,7 @@ import axios from 'axios'
 
 export async function getTranslationMode() {
     try {
-        const response = await axios.get(`${BASE_SERVER_URL}/api/Enum/TranslationMode`,
-            // {
-            //     headers: {
-            //         'Authorization': `Bearer ${JSON.parse(localStorage.getItem('tokenData'))?.token}`
-            //     }
-            // }
-        )
+        const response = await axios.get(`${BASE_SERVER_URL}/api/Enum/TranslationMode`)
         if (!response.data.error) {
             return { success: true, data: response.data }
         }
