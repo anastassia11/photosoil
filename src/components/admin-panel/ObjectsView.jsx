@@ -202,7 +202,7 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
         </th >
     }
 
-    const TableRow = ({ name, dataEng, dataRu, soilObject, ecoSystem, publication, news,
+    const TableRow = ({ name, dataEng, dataRu, userInfo,
         lastUpdated, isVisible, id, soilId, ecoSystemId, publicationId, newsId, type, isEnglish, title }) => {
         const date = new Date(lastUpdated * 1000).toLocaleString()
 
@@ -227,7 +227,7 @@ export default function ObjectsView({ _objects, isLoading, onDeleteClick, object
             </td>
 
             {objectType === 'userPage' ? <td className="px-4 py-3 text-sm text-zinc-500 whitespace-nowrap">{type?.title}</td>
-                : <td className="px-4 py-3 text-sm text-zinc-500 whitespace-nowrap">{soilObject?.user?.email || ecoSystem?.user?.email || publication?.user?.email || news?.user?.email}</td>}
+                : <td className="px-4 py-3 text-sm text-zinc-500 whitespace-nowrap">{userInfo?.email}</td>}
             <td className="px-4 py-3 text-sm text-zinc-500 whitespace-nowrap">{date}</td>
             <td className="px-4 py-3 text-sm whitespace-nowrap min-w-[175px]">
                 {isVisible !== undefined && <div className="flex items-center gap-x-2">
