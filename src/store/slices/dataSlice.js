@@ -1,11 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import axios from 'axios'
-
-import { BASE_SERVER_URL } from '@/utils/constants'
-
-import { getClassifications } from '@/api/classification/get_classifications'
-import { getSoils } from '@/api/soil/get_soils'
-import { getTags } from '@/api/tags/get_tags'
+import { createSlice } from '@reduxjs/toolkit'
 
 const dataSlice = createSlice({
 	name: 'data',
@@ -16,7 +9,6 @@ const dataSlice = createSlice({
 		selectedCategories: [],
 		selectedEcosystems: [],
 		selectedPublications: [],
-		status: null
 	},
 
 	reducers: {
@@ -24,7 +16,8 @@ const dataSlice = createSlice({
 		addTerm(state, action) {
 			const existingId = state.selectedTerms.find(id => id === action.payload)
 			if (!existingId) {
-				state.selectedTerms.push(action.payload)
+				state.selectedTerms = [...state.selectedTerms, action.payload]
+				// state.selectedTerms.push(action.payload)
 			}
 		},
 		deleteTerm(state, action) {

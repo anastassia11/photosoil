@@ -29,12 +29,12 @@ export default function AllLayout({ children }) {
 		[dispatch]
 	)
 
-	useEffect(() => {
-		document.addEventListener('click', handleClickOutside)
-		return () => {
-			document.removeEventListener('click', handleClickOutside)
-		}
-	}, [])
+	// useEffect(() => {
+	// 	document.addEventListener('click', handleClickOutside)
+	// 	return () => {
+	// 		document.removeEventListener('click', handleClickOutside)
+	// 	}
+	// }, [])
 
 	useEffect(() => {
 		dispatch(resetAuthor())

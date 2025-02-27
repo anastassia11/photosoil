@@ -1,7 +1,7 @@
 'use client'
 
 import { useParams, usePathname } from 'next/navigation'
-import { memo, useEffect, useRef, useState } from 'react'
+import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { Oval } from 'react-loader-spinner'
 import { useDispatch } from 'react-redux'
 import { Tooltip } from 'react-tooltip'
@@ -38,7 +38,7 @@ const Filter = memo(function Filter({
 	const searchRef = useRef(null)
 	const [selectedItems, setSelectedItems] = useState([])
 	const [filterName, setFilterName] = useState('')
-	const [filteredItems, setFilteredItems] = useState([])
+	// const [filteredItems, setFilteredItems] = useState([])
 	const [formVisible, setFormVisible] = useState({
 		visible: false,
 		type: ''
@@ -60,51 +60,47 @@ const Filter = memo(function Filter({
 			)
 	}, [items, allSelectedItems])
 
-	useEffect(() => {
+	const filteredItems = useMemo(() => {
 		const _filterName = filterName.toLowerCase().trim()
-		items &&
-			setFilteredItems(
-				items
-					.filter(
-						item =>
-							item.name?.toLowerCase().includes(_filterName) ||
-							item.codeEng?.toLowerCase().includes(_filterName) ||
-							item.codeRu?.toLowerCase().includes(_filterName) ||
-							item.dataEng?.name?.toLowerCase().includes(_filterName) ||
-							item.dataRu?.name?.toLowerCase().includes(_filterName) ||
-							item.nameEng?.toLowerCase().includes(_filterName) ||
-							item.nameRu?.toLowerCase().includes(_filterName)
-					)
-					.sort((a, b) => {
-						if (sortByOrder) return a.order - b.order
-						if (
-							a.name < b.name ||
-							(_isEng
-								? a.dataEng?.name < b.dataEng?.name
-								: a.dataRu?.name < b.dataRu?.name) ||
-							(_isEng ? a.nameEng < b.nameEng : a.nameRu < b.nameRu)
-						)
-							return -1
-						if (
-							a.name > b.name ||
-							(_isEng
-								? a.dataEng?.name > b.dataEng?.name
-								: a.dataRu?.name > b.dataRu?.name) ||
-							(_isEng ? a.nameEng > b.nameEng : a.nameRu > b.nameRu)
-						)
-							return 1
-						return 0
-					})
+		return items
+			.filter(
+				item =>
+					item.name?.toLowerCase().includes(_filterName) ||
+					item.codeEng?.toLowerCase().includes(_filterName) ||
+					item.codeRu?.toLowerCase().includes(_filterName) ||
+					item.dataEng?.name?.toLowerCase().includes(_filterName) ||
+					item.dataRu?.name?.toLowerCase().includes(_filterName) ||
+					item.nameEng?.toLowerCase().includes(_filterName) ||
+					item.nameRu?.toLowerCase().includes(_filterName)
 			)
-	}, [filterName, items])
+			.sort((a, b) => {
+				if (sortByOrder) return a.order - b.order
+				if (
+					a.name < b.name ||
+					(_isEng
+						? a.dataEng?.name < b.dataEng?.name
+						: a.dataRu?.name < b.dataRu?.name) ||
+					(_isEng ? a.nameEng < b.nameEng : a.nameRu < b.nameRu)
+				)
+					return -1
+				if (
+					a.name > b.name ||
+					(_isEng
+						? a.dataEng?.name > b.dataEng?.name
+						: a.dataRu?.name > b.dataRu?.name) ||
+					(_isEng ? a.nameEng > b.nameEng : a.nameRu > b.nameRu)
+				)
+					return 1
+				return 0
+			});
+	}, [filterName, items, sortByOrder, _isEng])
 
 	const handleItemSelect = (e, itemId) => {
-		const updatedItems = e.target.checked
-			? [...selectedItems, itemId]
-			: selectedItems.filter(item => item !== itemId)
 
 		e.target.checked ? addItem(itemId) : deleteItem(itemId)
-		setSelectedItems(updatedItems)
+		setSelectedItems(prev => e.target.checked
+			? [...prev, itemId]
+			: prev.filter(item => item !== itemId))
 	}
 
 	const handleItemsReset = () => {
@@ -116,14 +112,14 @@ const Filter = memo(function Filter({
 		isMapFilter
 			? setFilterOpen(!filterOpen)
 			: dispatch(
-					setDropdown({
-						key: _id,
-						isActive:
-							dropdown?.key !== null && dropdown?.key !== _id
-								? true
-								: !dropdown?.isActive
-					})
-				)
+				setDropdown({
+					key: _id,
+					isActive:
+						dropdown?.key !== null && dropdown?.key !== _id
+							? true
+							: !dropdown?.isActive
+				})
+			)
 	}
 
 	const handleAddTag = () => {
@@ -143,15 +139,15 @@ const Filter = memo(function Filter({
 			formVisible.type === 'create'
 				? await createTag(tagData)
 				: await putTag({
-						id: tagData.id,
-						data: { nameRu: tagData.nameRu, nameEng: tagData.nameEng }
-					})
+					id: tagData.id,
+					data: { nameRu: tagData.nameRu, nameEng: tagData.nameEng }
+				})
 		if (result.success) {
 			formVisible.type === 'create'
 				? setTags(prev => [...prev, result.data])
 				: setTags(prev =>
-						prev.map(item => (item.id === tagData.id ? result.data : item))
-					)
+					prev.map(item => (item.id === tagData.id ? result.data : item))
+				)
 			setFormVisible(prev => ({ visible: false, type: '' }))
 			setTagData({})
 		}
@@ -337,15 +333,14 @@ const Filter = memo(function Filter({
 
 					<div
 						className={`w-full duration-200 transition-all ${!isMapFilter ? 'top-[30px] absolute border z-50' : ''} 
-                    ${
-											isMapFilter
-												? filterOpen
-													? 'block'
-													: 'hidden'
-												: dropdown?.key == _id && dropdown?.isActive
-													? 'visible translate-y-4'
-													: 'invisible opacity-0'
-										}
+                    ${isMapFilter
+								? filterOpen
+									? 'block'
+									: 'hidden'
+								: dropdown?.key == _id && dropdown?.isActive
+									? 'visible translate-y-4'
+									: 'invisible opacity-0'
+							}
                      rounded-md border-gray-200 bg-white`}
 					>
 						<header
@@ -399,9 +394,9 @@ const Filter = memo(function Filter({
 										const isValid =
 											(isEng
 												? (nameEng && nameEng !== '') ||
-													(dataEng && dataEng.name !== '')
+												(dataEng && dataEng.name !== '')
 												: (nameRu && nameRu !== '') ||
-													(dataRu && dataRu.name !== '')) || name
+												(dataRu && dataRu.name !== '')) || name
 										if (isValid)
 											return (
 												<li
@@ -411,10 +406,10 @@ const Filter = memo(function Filter({
 													<label
 														htmlFor={`Item${type ? `-${type}-${id}` : `-${id}`}`}
 														className='flex flex-row cursor-pointer w-full'
-														// onClick={(e) => {
-														//     e.stopPropagation();
-														//     handleItemSelect(e, id);
-														// }}
+													// onClick={(e) => {
+													//     e.stopPropagation();
+													//     handleItemSelect(e, id);
+													// }}
 													>
 														<input
 															type='checkbox'
@@ -431,7 +426,7 @@ const Filter = memo(function Filter({
 													</label>
 													{(pathNames.includes('create') ||
 														pathNames.includes('edit')) &&
-													pathNames.includes('news') ? (
+														pathNames.includes('news') ? (
 														<span className='flex flex-row'>
 															<button
 																onClick={e =>
@@ -489,7 +484,7 @@ const Filter = memo(function Filter({
 						)}
 
 						{(pathNames.includes('create') || pathNames.includes('edit')) &&
-						pathNames.includes('news') ? (
+							pathNames.includes('news') ? (
 							<button
 								type='button'
 								className='font-medium text-blue-600 w-fit ml-4 mb-2'
@@ -510,9 +505,9 @@ const Filter = memo(function Filter({
 								if (id === _id) {
 									const isValid = isEng
 										? (nameEng && nameEng !== '') ||
-											(dataEng && dataEng.name !== '')
+										(dataEng && dataEng.name !== '')
 										: (nameRu && nameRu !== '') ||
-											(dataRu && dataRu.name !== '')
+										(dataRu && dataRu.name !== '')
 									if (isValid)
 										return (
 											<li
@@ -578,10 +573,14 @@ const Filter = memo(function Filter({
 			{formVisible.visible ? TagForm() : ''}
 		</div>
 	)
-	// }, (prevProps, nextProps) => {
-	//     return prevProps.dropdown?.isActive === nextProps.dropdown?.isActive &&
-	//         prevProps.dropdown?.key === nextProps.dropdown?.key
-	//         && prevProps.type === nextProps.type
+}, (prevProps, nextProps) => {
+
+	return prevProps.dropdown?.isActive === nextProps.dropdown?.isActive &&
+		prevProps.dropdown?.key === nextProps.dropdown?.key
+		&& prevProps.type === nextProps.type
+		//
+		&& prevProps.allSelectedItems === nextProps.allSelectedItems
+		&& prevProps.items === nextProps.items
 })
 
 export default Filter
