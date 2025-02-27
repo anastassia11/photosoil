@@ -24,21 +24,19 @@ const Filter = memo(function Filter({
 	sortByOrder,
 	items,
 	setTags,
-	allSelectedItems,
+	selectedItems,
 	addItem,
-	deleteItem,
 	resetItems,
 	isMapFilter,
-	isEng
 }) {
 	const dispatch = useDispatch()
 	const [filterOpen, setFilterOpen] = useState(false)
 	const paths = usePathname()
 	const pathNames = paths.split('/').filter(path => path)
 	const searchRef = useRef(null)
-	const [selectedItems, setSelectedItems] = useState([])
+
 	const [filterName, setFilterName] = useState('')
-	// const [filteredItems, setFilteredItems] = useState([])
+
 	const [formVisible, setFormVisible] = useState({
 		visible: false,
 		type: ''
@@ -49,16 +47,8 @@ const Filter = memo(function Filter({
 	const { t } = getTranslation(locale)
 
 	const _id = itemId ? `filter-${itemId}` : name
-	let _isEng = locale === 'en'
 
-	useEffect(() => {
-		items &&
-			setSelectedItems(
-				items
-					.filter(({ id }) => allSelectedItems?.includes(id))
-					.map(({ id }) => id)
-			)
-	}, [items, allSelectedItems])
+	let _isEng = locale === 'en'
 
 	const filteredItems = useMemo(() => {
 		const _filterName = filterName.toLowerCase().trim()
@@ -94,19 +84,6 @@ const Filter = memo(function Filter({
 				return 0
 			});
 	}, [filterName, items, sortByOrder, _isEng])
-
-	const handleItemSelect = (e, itemId) => {
-
-		e.target.checked ? addItem(itemId) : deleteItem(itemId)
-		setSelectedItems(prev => e.target.checked
-			? [...prev, itemId]
-			: prev.filter(item => item !== itemId))
-	}
-
-	const handleItemsReset = () => {
-		resetItems(selectedItems)
-		setSelectedItems([])
-	}
 
 	const handleOpenClick = () => {
 		isMapFilter
@@ -284,7 +261,7 @@ const Filter = memo(function Filter({
 						<span
 							className={`flex flex-row items-center justify-center space-x-1`}
 						>
-							{selectedItems.length ? (
+							{selectedItems?.length ? (
 								<span>
 									<svg
 										className='w-1.5 h-1.5'
@@ -347,13 +324,13 @@ const Filter = memo(function Filter({
 							className={`flex items-center justify-between ${!isMapFilter ? 'px-4 py-2' : 'px-4 py-1 pt-2'}`}
 						>
 							<span className=' text-gray-700'>
-								{selectedItems.length} {t('select')}{' '}
+								{selectedItems?.length} {t('select')}{' '}
 							</span>
 
 							<button
 								type='button'
 								className=' text-gray-900 underline underline-offset-4'
-								onClick={handleItemsReset}
+								onClick={() => resetItems(selectedItems)}
 							>
 								{t('reset')}
 							</button>
@@ -392,7 +369,7 @@ const Filter = memo(function Filter({
 								{filteredItems.map(
 									({ name, id, dataRu, dataEng, nameEng, nameRu }) => {
 										const isValid =
-											(isEng
+											(_isEng
 												? (nameEng && nameEng !== '') ||
 												(dataEng && dataEng.name !== '')
 												: (nameRu && nameRu !== '') ||
@@ -406,22 +383,18 @@ const Filter = memo(function Filter({
 													<label
 														htmlFor={`Item${type ? `-${type}-${id}` : `-${id}`}`}
 														className='flex flex-row cursor-pointer w-full'
-													// onClick={(e) => {
-													//     e.stopPropagation();
-													//     handleItemSelect(e, id);
-													// }}
 													>
 														<input
 															type='checkbox'
 															id={`Item${type ? `-${type}-${id}` : `-${id}`}`}
-															checked={selectedItems.includes(id)}
-															onChange={e => handleItemSelect(e, id)}
+															checked={selectedItems?.includes(id)}
+															onChange={() => addItem(id)}
 															className='min-w-5 w-5 min-h-5 h-5 mr-1 rounded border-gray-300 '
 														/>
 														<span className='text-gray-700 ml-2 '>
 															{name ||
-																(isEng ? nameEng : nameRu) ||
-																(isEng ? dataEng?.name : dataRu?.name)}
+																(_isEng ? nameEng : nameRu) ||
+																(_isEng ? dataEng?.name : dataRu?.name)}
 														</span>
 													</label>
 													{(pathNames.includes('create') ||
@@ -500,10 +473,10 @@ const Filter = memo(function Filter({
 				</div>
 				{pathNames.includes('create') || pathNames.includes('edit') ? (
 					<ul className='mt-2 flex flex-row flex-wrap w-fit max-w-full'>
-						{selectedItems.map(_id =>
+						{selectedItems?.map(_id =>
 							items.map(({ name, id, dataRu, dataEng, nameEng, nameRu }) => {
 								if (id === _id) {
-									const isValid = isEng
+									const isValid = _isEng
 										? (nameEng && nameEng !== '') ||
 										(dataEng && dataEng.name !== '')
 										: (nameRu && nameRu !== '') ||
@@ -516,12 +489,12 @@ const Filter = memo(function Filter({
 											>
 												<p className='max-w-full line-clamp-1'>
 													{name ||
-														(isEng ? nameEng : nameRu) ||
-														(isEng ? dataEng?.name : dataRu?.name)}
+														(_isEng ? nameEng : nameRu) ||
+														(_isEng ? dataEng?.name : dataRu?.name)}
 												</p>
 												<button
 													className='text-black pt-[1px]'
-													onClick={e => handleItemSelect(e, _id)}
+													onClick={() => addItem(_id)}
 												>
 													<svg
 														width='800px'
@@ -578,9 +551,10 @@ const Filter = memo(function Filter({
 	return prevProps.dropdown?.isActive === nextProps.dropdown?.isActive &&
 		prevProps.dropdown?.key === nextProps.dropdown?.key
 		&& prevProps.type === nextProps.type
-		//
-		&& prevProps.allSelectedItems === nextProps.allSelectedItems
+
+		&& prevProps.selectedItems?.toString() === nextProps.selectedItems?.toString()
 		&& prevProps.items === nextProps.items
+	// && prevProps.name === nextProps.name
 })
 
 export default Filter

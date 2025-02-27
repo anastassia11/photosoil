@@ -2,15 +2,10 @@
 
 import { usePathname } from 'next/navigation'
 import { useCallback, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
-import {
-	resetAuthor,
-	resetCategory,
-	resetTags,
-	resetTerm
-} from '@/store/slices/dataSlice'
 import { setDropdown } from '@/store/slices/generalSlice'
+import { filtersStore } from '@/store/valtioStore/filtersStore'
 
 export default function AllLayout({ children }) {
 	const dispatch = useDispatch()
@@ -37,11 +32,11 @@ export default function AllLayout({ children }) {
 	// }, [])
 
 	useEffect(() => {
-		dispatch(resetAuthor())
-		dispatch(resetCategory())
-		dispatch(resetTerm())
-		dispatch(resetTags())
-	}, [pathname, dispatch])
+		filtersStore.selectedAuthors = []
+		filtersStore.selectedCategories = []
+		filtersStore.selectedTerms = []
+		filtersStore.selectedTags = []
+	}, [pathname])
 
 	return <>{children}</>
 }

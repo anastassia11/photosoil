@@ -1,7 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 
 import alertReducer from './slices/alertSlice'
-import dataReducer from './slices/dataSlice'
 import formReducer from './slices/formSlice'
 import generalReducer from './slices/generalSlice'
 import modalReducer from './slices/modalSlice'
@@ -11,7 +10,6 @@ function createStore() {
 
 	const store = configureStore({
 		reducer: {
-			data: dataReducer,
 			general: generalReducer,
 			modal: modalReducer,
 			alert: alertReducer,

@@ -9,7 +9,7 @@ import {
 	useSearchParams
 } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 import Loader from '@/components/Loader'
 import Pagination from '@/components/Pagination'
@@ -17,18 +17,17 @@ import Dropdown from '@/components/admin-panel/ui-kit/Dropdown'
 import MotionWrapper from '@/components/admin-panel/ui-kit/MotionWrapper'
 import Filter from '@/components/soils/Filter'
 
-import { addTag, deleteTag, resetTags } from '@/store/slices/dataSlice'
-
 import { PAGINATION_OPTIONS } from '@/utils/constants'
 
 import { getAllNews } from '@/api/news/get_allNews'
 import { getTags } from '@/api/tags/get_tags'
 
 import { getTranslation } from '@/i18n/client'
+import { useSnapshot } from 'valtio'
+import { filtersStore } from '@/store/valtioStore/filtersStore'
 
 export default function NewsPageComponent() {
 	const pathname = usePathname()
-	const dispatch = useDispatch()
 	const [news, setNews] = useState([])
 	const [filterName, setFilterName] = useState('')
 	const [filteredNews, setFilteredNews] = useState([])
@@ -48,7 +47,7 @@ export default function NewsPageComponent() {
 	const router = useRouter()
 	const { locale } = useParams()
 	const { t } = getTranslation(locale)
-	const { selectedTags } = useSelector(state => state.data)
+	const { selectedTags } = useSnapshot(filtersStore)
 
 	const _isEng = locale === 'en'
 
@@ -60,7 +59,7 @@ export default function NewsPageComponent() {
 					(draftIsVisible
 						? true
 						: item.translations?.find(transl => transl.isEnglish === _isEng)
-								?.isVisible) &&
+							?.isVisible) &&
 					item.translations
 						?.find(transl => transl.isEnglish === _isEng)
 						?.title.toLowerCase()
@@ -78,15 +77,25 @@ export default function NewsPageComponent() {
 	}, [filterName, news, draftIsVisible, selectedTags])
 
 	useEffect(() => {
+		let timeoutId
+
 		localStorage.getItem('tokenData') &&
 			setToken(JSON.parse(localStorage.getItem('tokenData'))?.token)
 		fetchTags()
 		fetchNews()
-		// if (didLogRef.current) {
-		//     didLogRef.current = false;
-		//     const tagsParam = searchParams.get('tags');
-		//     tagsParam && tagsParam.split(',').forEach((param) => dispatch(addTag(Number(param))));
-		// }
+		if (didLogRef.current) {
+			timeoutId = setTimeout(() => {
+				didLogRef.current = false
+				const tagsParam = searchParams.get('tags')
+				tagsParam &&
+					tagsParam
+						.split(',')
+						.forEach(param => handleAddTag(Number(param)))
+			}, 300)
+		}
+		return () => {
+			clearTimeout(timeoutId)
+		}
 	}, [])
 
 	useEffect(() => {
@@ -110,21 +119,13 @@ export default function NewsPageComponent() {
 
 	const handleAddTag = useCallback(
 		newItem => {
-			dispatch(addTag(newItem))
+			filtersStore.selectedTags = selectedTags.includes(newItem)
+				? selectedTags.filter(
+					item => item !== newItem
+				) : [...selectedTags, newItem]
 		},
-		[dispatch]
+		[selectedTags]
 	)
-
-	const handleDeleteTag = useCallback(
-		deletedItem => {
-			dispatch(deleteTag(deletedItem))
-		},
-		[dispatch]
-	)
-
-	const handleResetTags = useCallback(() => {
-		dispatch(resetTags())
-	}, [dispatch])
 
 	const fetchNews = async () => {
 		const result = await getAllNews()
@@ -242,15 +243,17 @@ export default function NewsPageComponent() {
 					<MotionWrapper>
 						<Filter
 							dropdown={dropdown}
-							isEng={_isEng}
 							itemId='tags'
 							type='news-tags'
 							name={t('tags')}
 							items={tags}
-							allSelectedItems={selectedTags}
+
+							selectedItems={tags.map(({ id }) => id).filter(id => selectedTags?.includes(id))}
+
 							addItem={handleAddTag}
-							deleteItem={handleDeleteTag}
-							resetItems={handleResetTags}
+							resetItems={items => {
+								filtersStore.selectedTags = selectedTags.filter(term => !items.includes(term))
+							}}
 						/>
 					</MotionWrapper>
 				)}

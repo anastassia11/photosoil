@@ -1,7 +1,5 @@
 'use client'
 
-import Image from 'next/image'
-import Link from 'next/link'
 import {
 	useParams,
 	usePathname,
@@ -16,20 +14,9 @@ import React, {
 	useRef,
 	useState
 } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-
-import {
-	addAuthor,
-	addCategory,
-	addTerm,
-	deleteAuthor,
-	deleteCategory,
-	deleteTerm
-} from '@/store/slices/dataSlice'
+import { useSelector } from 'react-redux'
 
 import { useConstants } from '@/hooks/useConstants'
-
-import { BASE_SERVER_URL } from '@/utils/constants'
 
 import { getAuthors } from '@/api/author/get_authors'
 import { getClassifications } from '@/api/classification/get_classifications'
@@ -41,6 +28,8 @@ import Filter from '../soils/Filter'
 import { getTranslation } from '@/i18n/client'
 import ObjectCard from './ObjectCard'
 import SearchInput from './SearchInput'
+import { useSnapshot } from 'valtio'
+import { filtersStore } from '@/store/valtioStore/filtersStore'
 
 const SideBar = memo(function SideBar({
 	sidebarOpen,
@@ -55,11 +44,10 @@ const SideBar = memo(function SideBar({
 	draftIsVisible,
 	setDraftIsVisible
 }) {
-	const dispatch = useDispatch()
 	const searchParams = useSearchParams()
 	const router = useRouter()
 	const pathname = usePathname()
-	// const didLogRef = useRef(true)
+	const didLogRef = useRef(true)
 	const dropdown = useSelector(state => state.general.dropdown)
 
 	const [classifications, setClassifications] = useState([])
@@ -67,9 +55,8 @@ const SideBar = memo(function SideBar({
 
 	const [token, setToken] = useState(null)
 
-	const { selectedTerms, selectedCategories, selectedAuthors } = useSelector(
-		state => state.data
-	)
+	const { selectedTerms, selectedCategories, selectedAuthors } = useSnapshot(filtersStore)
+
 	const { locale } = useParams()
 	const { t } = getTranslation(locale)
 
@@ -86,45 +73,45 @@ const SideBar = memo(function SideBar({
 	const order = ['soil', 'ecosystem', 'publication']
 
 	useEffect(() => {
+		let timeoutId
 		setToken(JSON.parse(localStorage.getItem('tokenData'))?.token)
 		setSideBarOpen(window.innerWidth > 640)
 		fetchClassifications()
 		fetchAuthors()
-		// if (didLogRef.current) {
-		//   didLogRef.current = false
-		//   const categoriesParam = searchParams.get('categories');
-		//   const termsParam = searchParams.get('terms');
-		//   const authorsParam = searchParams.get('authors');
-
-		//   categoriesParam && categoriesParam.split(',').forEach((param) => dispatch(addCategory(Number(param))));
-		//   termsParam && termsParam.split(',').forEach((param) => dispatch(addTerm(Number(param))));
-		//   authorsParam && authorsParam.split(',').forEach((param) => dispatch(addAuthor(Number(param))));
-		// }
+		if (didLogRef.current) {
+			timeoutId = setTimeout(() => {
+				didLogRef.current = false
+				const categoriesParam = searchParams.get('categories')
+				const termsParam = searchParams.get('terms')
+				const authorsParam = searchParams.get('authors')
+				categoriesParam &&
+					categoriesParam
+						.split(',')
+						.forEach(param => handleAddCategory(Number(param)))
+				termsParam &&
+					termsParam
+						.split(',')
+						.forEach(param => handleAddTerm(Number(param)))
+				authorsParam &&
+					authorsParam
+						.split(',')
+						.forEach(param => handleAddAuthor(Number(param)))
+			}, 300)
+		}
+		return () => {
+			clearTimeout(timeoutId)
+		}
 	}, [])
 
-	// useEffect(() => {
-	//   updateFiltersInHistory();
-	// }, [selectedCategories, selectedTerms, selectedAuthors])
+	useEffect(() => {
+		!didLogRef.current && updateFiltersInHistory()
+	}, [selectedCategories, selectedTerms, selectedAuthors])
 
-	// useEffect(() => {
-	//   window.innerWidth > 640 && setSideBarOpen(!popupVisible)
-	// }, [popupVisible])
+	useEffect(() => {
+		window.innerWidth > 640 && setSideBarOpen(!popupVisible)
+	}, [popupVisible])
 
-	const fetchClassifications = async () => {
-		const result = await getClassifications()
-		if (result.success) {
-			setClassifications(result.data.sort((a, b) => a.order - b.order))
-		}
-	}
-
-	const fetchAuthors = async () => {
-		const result = await getAuthors()
-		if (result.success) {
-			setAuthors(result.data)
-		}
-	}
-
-	const updateFiltersInHistory = () => {
+	function updateFiltersInHistory() {
 		const params = new URLSearchParams(searchParams.toString())
 
 		if (selectedCategories.length > 0) {
@@ -147,6 +134,20 @@ const SideBar = memo(function SideBar({
 		router.replace(pathname + '?' + params.toString())
 	}
 
+	const fetchClassifications = async () => {
+		const result = await getClassifications()
+		if (result.success) {
+			setClassifications(result.data.sort((a, b) => a.order - b.order))
+		}
+	}
+
+	const fetchAuthors = async () => {
+		const result = await getAuthors()
+		if (result.success) {
+			setAuthors(result.data)
+		}
+	}
+
 	const handleViewSidebar = () => {
 		setSideBarOpen(!sidebarOpen)
 	}
@@ -161,71 +162,32 @@ const SideBar = memo(function SideBar({
 
 	const handleAddCategory = useCallback(
 		newItem => {
-			dispatch(addCategory(newItem))
+			filtersStore.selectedCategories = selectedCategories.includes(newItem)
+				? selectedCategories.filter(
+					item => item !== newItem
+				) : [...selectedCategories, newItem]
 		},
-		[dispatch]
-	)
-
-	const handleDeleteCategorie = useCallback(
-		newItem => {
-			dispatch(deleteCategory(newItem))
-		},
-		[dispatch]
-	)
-
-	const handleResetCategories = useCallback(
-		deletedItems => {
-			for (let item of deletedItems) {
-				dispatch(deleteCategory(item))
-			}
-		},
-		[dispatch]
+		[selectedCategories]
 	)
 
 	const handleAddTerm = useCallback(
 		newItem => {
-			dispatch(addTerm(newItem))
+			filtersStore.selectedTerms = selectedTerms.includes(newItem)
+				? selectedTerms.filter(
+					item => item !== newItem
+				) : [...selectedTerms, newItem]
 		},
-		[dispatch]
-	)
-
-	const handleDeleteTerm = useCallback(
-		deletedItem => {
-			dispatch(deleteTerm(deletedItem))
-		},
-		[dispatch]
-	)
-
-	const handleResetTerms = useCallback(
-		deletedItems => {
-			for (let item of deletedItems) {
-				dispatch(deleteTerm(item))
-			}
-		},
-		[dispatch]
+		[selectedTerms]
 	)
 
 	const handleAddAuthor = useCallback(
 		newItem => {
-			dispatch(addAuthor(newItem))
+			filtersStore.selectedAuthors = selectedAuthors.includes(newItem)
+				? selectedAuthors.filter(
+					item => item !== newItem
+				) : [...selectedAuthors, newItem]
 		},
-		[dispatch]
-	)
-
-	const handleDeleteAuthor = useCallback(
-		deletedItem => {
-			dispatch(deleteAuthor(deletedItem))
-		},
-		[dispatch]
-	)
-
-	const handleResetAuthors = useCallback(
-		deletedItems => {
-			for (let item of deletedItems) {
-				dispatch(deleteAuthor(item))
-			}
-		},
-		[dispatch]
+		[selectedAuthors]
 	)
 
 	return (
@@ -306,22 +268,22 @@ const SideBar = memo(function SideBar({
 							</p>
 						) : (
 							<div className='flex-1 h-full overflow-y-auto scroll sm:px-5 px-3 flex flex-col sm:space-y-3 space-y-1 w-full pb-3'>
-								{/* <MotionWrapper className='ml-1'> */}
-								<label
-									htmlFor='draftIsVisible'
-									className={`flex-row cursor-pointer max-w-fit
+								<MotionWrapper className='ml-1'>
+									<label
+										htmlFor='draftIsVisible'
+										className={`flex-row cursor-pointer max-w-fit
             ${!token ? 'hidden h-0 my-0' : 'flex'}`}
-								>
-									<input
-										type='checkbox'
-										id='draftIsVisible'
-										checked={draftIsVisible}
-										onChange={() => setDraftIsVisible(!draftIsVisible)}
-										className='min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 '
-									/>
-									<span className='select-none'>{t('grafts_visible')}</span>
-								</label>
-								{/* </MotionWrapper> */}
+									>
+										<input
+											type='checkbox'
+											id='draftIsVisible'
+											checked={draftIsVisible}
+											onChange={() => setDraftIsVisible(!draftIsVisible)}
+											className='min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 '
+										/>
+										<span className='select-none'>{t('grafts_visible')}</span>
+									</label>
+								</MotionWrapper>
 								<div className='pb-1.5'>
 									<p className='font-medium sm:text-xl text-lg sm:mb-1.5'>
 										{t('map_layers')}
@@ -364,13 +326,17 @@ const SideBar = memo(function SideBar({
 													dropdown={dropdown}
 													itemId={`author`}
 													name={t('authors')}
+
 													items={authors}
 													type='authors'
 													isMapFilter={true}
-													allSelectedItems={selectedAuthors}
+
+													selectedItems={authors.map(({ id }) => id).filter(id => selectedAuthors?.includes(id))}
 													addItem={handleAddAuthor}
-													deleteItem={handleDeleteAuthor}
-													resetItems={handleResetAuthors}
+
+													resetItems={items => {
+														filtersStore.selectedAuthors = selectedAuthors.filter(term => !items.includes(term))
+													}}
 												/>
 											</li>
 											<li key={'category'}>
@@ -379,12 +345,16 @@ const SideBar = memo(function SideBar({
 													name={t('category')}
 													itemId='category'
 													items={CATEGORY_ARRAY}
-													allSelectedItems={selectedCategories}
+
+													selectedItems={CATEGORY_ARRAY.map(({ id }) => id).filter(id => selectedCategories?.includes(id))}
+
 													type='category'
 													isMapFilter={true}
+
 													addItem={handleAddCategory}
-													deleteItem={handleDeleteCategorie}
-													resetItems={handleResetCategories}
+													resetItems={items => {
+														filtersStore.selectedCategories = selectedCategories.filter(term => !items.includes(term))
+													}}
 												/>
 											</li>
 											{classifications?.map(item => {
@@ -399,17 +369,18 @@ const SideBar = memo(function SideBar({
 														<li key={item.id}>
 															<Filter
 																dropdown={dropdown}
-																isEng={locale === 'en'}
 																itemId={item.id}
 																type='classif'
 																isMapFilter={true}
 																name={isEnglish ? item.nameEng : item.nameRu}
 																sortByOrder={!item.isAlphabeticallOrder}
 																items={item.terms}
-																allSelectedItems={selectedTerms}
+																selectedItems={item.terms.map(({ id }) => id).filter(id => selectedTerms?.includes(id))}
+
 																addItem={handleAddTerm}
-																deleteItem={handleDeleteTerm}
-																resetItems={handleResetTerms}
+																resetItems={items => {
+																	filtersStore.selectedTerms = selectedTerms.filter(term => !items.includes(term))
+																}}
 															/>
 														</li>
 													)
@@ -426,18 +397,10 @@ const SideBar = memo(function SideBar({
 		</div >
 	)
 }, (prevProps, nextProps) => {
-	console.log('sidebarOpen', prevProps.sidebarOpen === nextProps.sidebarOpen)
-	console.log('filterName', prevProps.filterName === nextProps.filterName)
-	console.log('objects', prevProps.objects === nextProps.objects)
-	//
-	console.log('layersVisible', prevProps.layersVisible === nextProps.layersVisible)
-	console.log('popupVisible', prevProps.popupVisible === nextProps.popupVisible)
-	console.log('draftIsVisible', prevProps.draftIsVisible === nextProps.draftIsVisible)
-
 	return prevProps.sidebarOpen === nextProps.sidebarOpen &&
 		prevProps.filterName === nextProps.filterName
 		&& prevProps.objects === nextProps.objects
-		//
+
 		&& prevProps.layersVisible === nextProps.layersVisible
 		&& prevProps.popupVisible === nextProps.popupVisible
 		&& prevProps.draftIsVisible === nextProps.draftIsVisible

@@ -11,10 +11,6 @@ import { setDirty } from '@/store/slices/formSlice'
 
 import { getClassification } from '@/api/classification/get_classification'
 import { putClassification } from '@/api/classification/put_classification'
-import { createTerm } from '@/api/term/create_term'
-import { deleteTerm } from '@/api/term/delete_term'
-import { putTerm } from '@/api/term/put_term'
-import { updateTermOrder } from '@/api/term/update_order'
 
 import { getTranslation } from '@/i18n/client'
 

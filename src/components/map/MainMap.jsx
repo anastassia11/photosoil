@@ -13,10 +13,9 @@ import {
 	useRef,
 	useState
 } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
 import { openAlert } from '@/store/slices/alertSlice'
-import { addAuthor, addCategory, addTerm } from '@/store/slices/dataSlice'
 
 import { getMapLayers } from '@/hooks/getMapLayers'
 
@@ -31,7 +30,7 @@ import { Point } from 'ol/geom'
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer'
 import 'ol/ol.css'
 import { fromLonLat } from 'ol/proj'
-import { BingMaps, Cluster, OSM, Vector as VectorSource, XYZ } from 'ol/source'
+import { Cluster, Vector as VectorSource } from 'ol/source'
 import { Fill, RegularShape, Stroke, Style } from 'ol/style'
 import { Text } from 'ol/style.js'
 
@@ -40,6 +39,8 @@ import SearchRegion from './SearchRegion'
 import SideBar from './SideBar'
 import Zoom from './Zoom'
 import { getTranslation } from '@/i18n/client'
+import { filtersStore } from '@/store/valtioStore/filtersStore'
+import { useSnapshot } from 'valtio'
 
 export default function MainMap() {
 	const dispatch = useDispatch()
@@ -55,9 +56,9 @@ export default function MainMap() {
 	const router = useRouter()
 	const pathname = usePathname()
 	const { t } = getTranslation(locale)
-	const { selectedTerms, selectedCategories, selectedAuthors } = useSelector(
-		state => state.data
-	)
+
+	const { selectedTerms, selectedCategories, selectedAuthors } = useSnapshot(filtersStore)
+
 	const [selectedLayer, setSelectedLayer] = useState('')
 
 	const [selectedObjects, setSelectedObjects] = useState([])
@@ -78,9 +79,6 @@ export default function MainMap() {
 	const mapRef = useRef(null)
 	const _isEng = locale === 'en'
 
-	useEffect(() => { console.log('selectedObjects') }, [selectedObjects])
-	useEffect(() => { console.log('objects') }, [objects])
-
 	useLayoutEffect(() => {
 		let timeoutId
 		const initializeMap = () => {
@@ -95,26 +93,6 @@ export default function MainMap() {
 				ecosystem: false,
 				publication: false
 			})
-		if (didLogSearchParamsRef.current) {
-			timeoutId = setTimeout(() => {
-				didLogSearchParamsRef.current = false
-				const categoriesParam = searchParams.get('categories')
-				const termsParam = searchParams.get('terms')
-				const authorsParam = searchParams.get('authors')
-				categoriesParam &&
-					categoriesParam
-						.split(',')
-						.forEach(param => dispatch(addCategory(Number(param))))
-				termsParam &&
-					termsParam
-						.split(',')
-						.forEach(param => dispatch(addTerm(Number(param))))
-				authorsParam &&
-					authorsParam
-						.split(',')
-						.forEach(param => dispatch(addAuthor(Number(param))))
-			}, 300)
-		}
 
 		if (mapElement.current) {
 			if (didLogRef.current) {
@@ -154,7 +132,7 @@ export default function MainMap() {
 	}, [soils, ecosystems, publications])
 
 	useEffect(() => {
-		!didLogSearchParamsRef.current && updateFiltersInHistory()
+		// !didLogSearchParamsRef.current && updateFiltersInHistory()
 	}, [selectedCategories, selectedTerms, selectedAuthors])
 
 	useEffect(() => {

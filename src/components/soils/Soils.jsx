@@ -9,19 +9,7 @@ import {
 	useSearchParams
 } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-
-import {
-	addAuthor,
-	addCategory,
-	addTerm,
-	deleteAuthor,
-	deleteCategory,
-	deleteTerm,
-	resetAuthor,
-	resetCategory,
-	resetTerm
-} from '@/store/slices/dataSlice'
+import { useSelector } from 'react-redux'
 
 import { useConstants } from '@/hooks/useConstants'
 
@@ -39,9 +27,10 @@ import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper'
 
 import Filter from './Filter'
 import { getTranslation } from '@/i18n/client'
+import { useSnapshot } from 'valtio'
+import { filtersStore } from '@/store/valtioStore/filtersStore'
 
 export default function Soils({ _soils, isAllSoils, isFilters, type }) {
-	const dispatch = useDispatch()
 	const { locale } = useParams()
 	const { t } = getTranslation(locale)
 
@@ -51,9 +40,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 	const searchParams = useSearchParams()
 	const dropdown = useSelector(state => state.general.dropdown)
 
-	const { selectedTerms, selectedCategories, selectedAuthors } = useSelector(
-		state => state.data
-	)
+	const { selectedTerms, selectedCategories, selectedAuthors } = useSnapshot(filtersStore)
 
 	const [classifications, setClassifications] = useState([])
 	const [soils, setSoils] = useState([])
@@ -103,7 +90,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 		} else fetchItems()
 
 		if (didLogRef.current && isFilters) {
-			const timeoutId = setTimeout(() => {
+			timeoutId = setTimeout(() => {
 				didLogRef.current = false
 				const categoriesParam = searchParams.get('categories')
 				const termsParam = searchParams.get('terms')
@@ -111,15 +98,15 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 				categoriesParam &&
 					categoriesParam
 						.split(',')
-						.forEach(param => dispatch(addCategory(Number(param))))
+						.forEach(param => handleAddCategory(Number(param)))
 				termsParam &&
 					termsParam
 						.split(',')
-						.forEach(param => dispatch(addTerm(Number(param))))
+						.forEach(param => handleAddTerm(Number(param)))
 				authorsParam &&
 					authorsParam
 						.split(',')
-						.forEach(param => dispatch(addAuthor(Number(param))))
+						.forEach(param => handleAddAuthor(Number(param)))
 			}, 300)
 			return () => clearTimeout(timeoutId)
 		}
@@ -135,7 +122,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 							(draftIsVisible
 								? true
 								: soil.translations?.find(transl => transl.isEnglish === _isEng)
-										?.isVisible) &&
+									?.isVisible) &&
 							(soil.translations
 								?.find(transl => transl.isEnglish === _isEng)
 								?.name.toLowerCase()
@@ -231,71 +218,32 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 
 	const handleAddCategory = useCallback(
 		newItem => {
-			dispatch(addCategory(newItem))
+			filtersStore.selectedCategories = selectedCategories.includes(newItem)
+				? selectedCategories.filter(
+					item => item !== newItem
+				) : [...selectedCategories, newItem]
 		},
-		[dispatch]
-	)
-
-	const handleDeleteCategorie = useCallback(
-		newItem => {
-			dispatch(deleteCategory(newItem))
-		},
-		[dispatch]
-	)
-
-	const handleResetCategories = useCallback(
-		deletedItems => {
-			for (let item of deletedItems) {
-				dispatch(deleteCategory(item))
-			}
-		},
-		[dispatch]
+		[selectedCategories]
 	)
 
 	const handleAddTerm = useCallback(
 		newItem => {
-			dispatch(addTerm(newItem))
+			filtersStore.selectedTerms = selectedTerms.includes(newItem)
+				? selectedTerms.filter(
+					item => item !== newItem
+				) : [...selectedTerms, newItem]
 		},
-		[dispatch]
-	)
-
-	const handleDeleteTerm = useCallback(
-		deletedItem => {
-			dispatch(deleteTerm(deletedItem))
-		},
-		[dispatch]
-	)
-
-	const handleResetTerms = useCallback(
-		deletedItems => {
-			for (let item of deletedItems) {
-				dispatch(deleteTerm(item))
-			}
-		},
-		[dispatch]
+		[selectedTerms]
 	)
 
 	const handleAddAuthor = useCallback(
 		newItem => {
-			dispatch(addAuthor(newItem))
+			filtersStore.selectedAuthors = selectedAuthors.includes(newItem)
+				? selectedAuthors.filter(
+					item => item !== newItem
+				) : [...selectedAuthors, newItem]
 		},
-		[dispatch]
-	)
-
-	const handleDeleteAuthor = useCallback(
-		deletedItem => {
-			dispatch(deleteAuthor(deletedItem))
-		},
-		[dispatch]
-	)
-
-	const handleResetAuthors = useCallback(
-		deletedItems => {
-			for (let item of deletedItems) {
-				dispatch(deleteAuthor(item))
-			}
-		},
-		[dispatch]
+		[selectedAuthors]
 	)
 
 	const SoilCard = ({ photo, name, id }) => {
@@ -359,11 +307,10 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 						value={filterName}
 						onChange={e => setFilterName(e.target.value)}
 						type='text'
-						placeholder={`${
-							isSoils || type === 'ecosystems'
-								? t('search_code')
-								: t('search_name')
-						}`}
+						placeholder={`${isSoils || type === 'ecosystems'
+							? t('search_code')
+							: t('search_name')
+							}`}
 						className='w-full py-2 pl-12 pr-4 border rounded-md outline-none bg-white focus:border-blue-600'
 					/>
 				</div>
@@ -412,12 +359,16 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 											dropdown={dropdown}
 											itemId={`author`}
 											name={t('authors')}
+
 											items={authors}
 											type='authors'
-											allSelectedItems={selectedAuthors}
+
+											selectedItems={authors.map(({ id }) => id).filter(id => selectedAuthors?.includes(id))}
 											addItem={handleAddAuthor}
-											deleteItem={handleDeleteAuthor}
-											resetItems={handleResetAuthors}
+
+											resetItems={items => {
+												filtersStore.selectedAuthors = selectedAuthors.filter(term => !items.includes(term))
+											}}
 										/>
 									</li>
 								</MotionWrapper>
@@ -427,12 +378,17 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 											<Filter
 												dropdown={dropdown}
 												name={t('category')}
+												itemId='category'
 												items={CATEGORY_ARRAY}
+
+												selectedItems={CATEGORY_ARRAY.map(({ id }) => id).filter(id => selectedCategories?.includes(id))}
+
 												type='category'
-												allSelectedItems={selectedCategories}
+
 												addItem={handleAddCategory}
-												deleteItem={handleDeleteCategorie}
-												resetItems={handleResetCategories}
+												resetItems={items => {
+													filtersStore.selectedCategories = selectedCategories.filter(term => !items.includes(term))
+												}}
 											/>
 										</MotionWrapper>
 									</li>
@@ -452,16 +408,18 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 												<MotionWrapper>
 													<Filter
 														dropdown={dropdown}
-														isEng={locale === 'en'}
 														itemId={item.id}
 														type='classif'
+
 														name={isEnglish ? item.nameEng : item.nameRu}
 														sortByOrder={!item.isAlphabeticallOrder}
 														items={item.terms}
-														allSelectedItems={selectedTerms}
+														selectedItems={item.terms.map(({ id }) => id).filter(id => selectedTerms?.includes(id))}
+
 														addItem={handleAddTerm}
-														deleteItem={handleDeleteTerm}
-														resetItems={handleResetTerms}
+														resetItems={items => {
+															filtersStore.selectedTerms = selectedTerms.filter(term => !items.includes(term))
+														}}
 													/>
 												</MotionWrapper>
 											</li>
