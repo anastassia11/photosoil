@@ -2,9 +2,7 @@
 
 import {
 	useParams,
-	usePathname,
-	useRouter,
-	useSearchParams
+	useSearchParams,
 } from 'next/navigation'
 import {
 	useCallback,
@@ -50,11 +48,9 @@ export default function MainMap() {
 	const [features, setFeatures] = useState([])
 
 	const [sidebarOpen, setSideBarOpen] = useState(false)
-	const { locale } = useParams()
 	const searchParams = useSearchParams()
+	const { locale } = useParams()
 
-	const router = useRouter()
-	const pathname = usePathname()
 	const { t } = getTranslation(locale)
 
 	const { selectedTerms, selectedCategories, selectedAuthors } = useSnapshot(filtersStore)
@@ -73,7 +69,6 @@ export default function MainMap() {
 	const [filterName, setFilterName] = useState('')
 
 	const didLogRef = useRef(true)
-	const didLogSearchParamsRef = useRef(true)
 	const mapElement = useRef()
 
 	const mapRef = useRef(null)
@@ -132,10 +127,6 @@ export default function MainMap() {
 	}, [soils, ecosystems, publications])
 
 	useEffect(() => {
-		// !didLogSearchParamsRef.current && updateFiltersInHistory()
-	}, [selectedCategories, selectedTerms, selectedAuthors])
-
-	useEffect(() => {
 		if (window.innerWidth < 640) {
 			document.addEventListener('click', handleClickOutside)
 			return () => {
@@ -143,30 +134,6 @@ export default function MainMap() {
 			}
 		}
 	}, [])
-
-	const updateFiltersInHistory = () => {
-		const params = new URLSearchParams(searchParams.toString())
-
-		if (selectedCategories.length > 0) {
-			params.set('categories', selectedCategories.join(','))
-		} else {
-			params.delete('categories')
-		}
-
-		if (selectedTerms.length > 0) {
-			params.set('terms', selectedTerms.join(','))
-		} else {
-			params.delete('terms')
-		}
-
-		if (selectedAuthors.length > 0) {
-			params.set('authors', selectedAuthors.join(','))
-		} else {
-			params.delete('authors')
-		}
-
-		router.replace(pathname + '?' + params.toString())
-	}
 
 	const handleClickOutside = useCallback(e => {
 		if (!e.target.closest('.sideBar')) {
@@ -193,15 +160,17 @@ export default function MainMap() {
 					}
 				}
 			})
-			filterName.length
-				? setSelectedObjects(
+			if (filterName.length) {
+				setSelectedObjects(
 					objects.filter(item =>
 						filteredIds.find(
 							obj => obj.id === item.id && obj._type === item._type
 						)
 					)
 				)
-				: setSelectedObjects([])
+			} else {
+				setSelectedObjects([])
+			}
 		},
 		[clusterLayer, features, layersVisible, objects, filterName]
 	)
@@ -288,7 +257,7 @@ export default function MainMap() {
 		setBaseLayer(baseLayer)
 	}
 
-	const handleZoomClick = zoomType => {
+	const handleZoomClick = useCallback(zoomType => {
 		if (zoomType === 'customZoomOut') {
 			let view = mapRef.current.getView()
 			let zoom = view.getZoom()
@@ -299,12 +268,12 @@ export default function MainMap() {
 			let zoom = view.getZoom()
 			view.animate({ zoom: zoom + 1 })
 		}
-	}
+	}, [])
 
-	const handleBaseLayerChange = layer => {
+	const handleBaseLayerChange = useCallback(layer => {
 		baseLayer.setSource(getMapLayers(layer, locale))
 		setSelectedLayer(layer)
-	}
+	}, [baseLayer, locale])
 
 	const typeConfig = [
 		{
@@ -613,7 +582,7 @@ export default function MainMap() {
 		setLayersVisible(prev => ({ ...prev, [name]: checked }))
 	}, [])
 
-	const selectLocationHandler = item => {
+	const selectLocationHandler = useCallback(item => {
 		let up = fromLonLat([item.boundingbox[3], item.boundingbox[1]])
 		let down = fromLonLat([item.boundingbox[2], item.boundingbox[0]])
 
@@ -623,13 +592,13 @@ export default function MainMap() {
 			maxZoom: 15,
 			padding: [20, 20, 20, 20]
 		})
-	}
+	}, [])
 
-	const handlePopupClose = () => {
+	const handlePopupClose = useCallback(() => {
 		setPopupVisible(false)
 		setFilterName('')
 		setSelectedObjects([])
-	}
+	}, [])
 
 	const getUserLocation = e => {
 		e.preventDefault()
@@ -674,8 +643,8 @@ export default function MainMap() {
 			<div
 				className={`z-40 absolute top-0 right-0 m-2 flex flex-row duration-300 lg:w-[500px] w-full pl-2`}
 			>
-				<SearchRegion onLocationHandler={selectLocationHandler} />
-				<LayersPanel
+				<SearchRegion locale={locale} onLocationHandler={selectLocationHandler} />
+				<LayersPanel locale={locale}
 					onLayerChange={handleBaseLayerChange}
 					currentLayer={selectedLayer}
 				/>
@@ -702,6 +671,7 @@ export default function MainMap() {
 			</div>
 
 			<SideBar
+				// locale={locale}
 				sidebarOpen={sidebarOpen}
 				filterName={filterName}
 				objects={selectedObjects}

@@ -11,6 +11,7 @@ import { setDropdown } from '@/store/slices/generalSlice'
 
 import LanguageChanger from './LanguageChanger'
 import { getTranslation } from '@/i18n/client'
+import Logo from './Logo'
 
 export default function Header({ locale }) {
 	const dispatch = useDispatch()
@@ -73,22 +74,7 @@ export default function Header({ locale }) {
             ease-in-out px-4 2xl:px-8 w-full border-b shadow-sm h-16  bg-white/90 flex flex-row items-center justify-between`}
 		>
 			<div className='flex-1 '>
-				<Link
-					href={`/${locale}`}
-					prefetch={false}
-					className='flex flex-row items-center w-fit'
-				>
-					<Image
-						src={'/logo.png'}
-						width={300}
-						height={300}
-						alt='logo'
-						className='sm:w-9 w-8'
-					/>
-					<p className='text-zinc-600 ml-2 sm:text-3xl text-2xl font-semibold'>
-						Photo<span className='pl-[2px] text-[#226eaf] font-bold'>SOIL</span>
-					</p>
-				</Link>
+				<Logo locale={locale} />
 			</div>
 
 			<ul className='hidden xl:flex flex-row items-center space-x-5 xl:space-x-7 2xl:space-x-8'>

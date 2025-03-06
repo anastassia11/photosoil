@@ -1,4 +1,6 @@
-export default function Zoom({ onClick }) {
+import { memo } from 'react'
+
+const Zoom = memo(function Zoom({ onClick }) {
 	return (
 		<div className='flex flex-col'>
 			<button
@@ -37,4 +39,5 @@ export default function Zoom({ onClick }) {
 			</button>
 		</div>
 	)
-}
+})
+export default Zoom

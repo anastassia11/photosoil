@@ -437,20 +437,21 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 									name='authors'
 									render={({ field: { value, onChange } }) => (
 										<Filter
-											dropdown={dropdown}
+											locale={locale}
 											name={t('authors')}
-											items={authors}
-											type='authors'
 											itemId={`author`}
-											allSelectedItems={value}
-											isEng={isEng}
-											addItem={newItem => onChange([...value, newItem])}
-											deleteItem={deletedItem =>
-												onChange(value.filter(item => item !== deletedItem))
-											}
-											resetItems={deletedItems =>
-												value.filter(item => !deletedItems.includes(item))
-											}
+											items={authors}
+
+											selectedItems={value}
+											type='authors'
+
+											addItem={newItem => {
+												value.includes(newItem)
+													? onChange(value.filter(item => item !== newItem))
+													: onChange([...value, newItem])
+											}}
+
+											resetItems={() => onChange([])}
 										/>
 									)}
 								/>
@@ -658,24 +659,25 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 														name='soilTerms'
 														render={({ field: { value, onChange } }) => (
 															<Filter
-																dropdown={dropdown}
+																locale={locale}
 																name={isEng ? item.nameEng : item.nameRu}
 																items={item.terms}
+																itemId={item.id}
+
+																selectedItems={item.terms.map(({ id }) => id).filter(id => value?.includes(id))}
 																type='classif'
-																allSelectedItems={value}
-																isEng={isEng}
-																addItem={newItem =>
-																	onChange([...value, newItem])
+
+																sortByOrder={!item.isAlphabeticallOrder}
+
+																addItem={newItem => {
+																	value.includes(newItem)
+																		? onChange(value.filter(item => item !== newItem))
+																		: onChange([...value, newItem])
 																}
-																deleteItem={deletedItem =>
-																	onChange(
-																		value.filter(item => item !== deletedItem)
-																	)
 																}
-																resetItems={deletedItems =>
-																	value.filter(
-																		item => !deletedItems.includes(item)
-																	)
+
+																resetItems={items =>
+																	onChange(value.filter(item => !items.includes(item)))
 																}
 															/>
 														)}
@@ -695,16 +697,19 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 									name='ecoSystems'
 									render={({ field: { value, onChange } }) => (
 										<Filter
-											dropdown={dropdown}
+											locale={locale}
 											name={t('ecosystems')}
 											items={ecosystems}
+
+											selectedItems={value}
 											type='ecosystem'
-											allSelectedItems={value}
-											isEng={isEng}
-											addItem={newItem => onChange([...value, newItem])}
-											deleteItem={deletedItem =>
-												onChange(value.filter(item => item !== deletedItem))
+
+											addItem={newItem =>
+												value.includes(newItem)
+													? onChange(value.filter(item => item !== newItem))
+													: onChange([...value, newItem])
 											}
+
 											resetItems={() => onChange([])}
 										/>
 									)}
@@ -717,16 +722,19 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 									name='soilObjects'
 									render={({ field: { value, onChange } }) => (
 										<Filter
-											dropdown={dropdown}
+											locale={locale}
 											name={t('soils')}
 											items={soils}
+
 											type='soil'
-											allSelectedItems={value}
-											isEng={isEng}
-											addItem={newItem => onChange([...value, newItem])}
-											deleteItem={deletedItem =>
-												onChange(value.filter(item => item !== deletedItem))
+											selectedItems={value}
+
+											addItem={newItem =>
+												value.includes(newItem)
+													? onChange(value.filter(item => item !== newItem))
+													: onChange([...value, newItem])
 											}
+
 											resetItems={() => onChange([])}
 										/>
 									)}
@@ -738,15 +746,17 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 								name='publications'
 								render={({ field: { value, onChange } }) => (
 									<Filter
-										dropdown={dropdown}
+										locale={locale}
 										name={t('publications')}
 										items={publications}
+
 										type='publications'
-										allSelectedItems={value}
-										isEng={isEng}
-										addItem={newItem => onChange([...value, newItem])}
-										deleteItem={deletedItem =>
-											onChange(value.filter(item => item !== deletedItem))
+										selectedItems={value}
+
+										ddItem={newItem =>
+											value.includes(newItem)
+												? onChange(value.filter(item => item !== newItem))
+												: onChange([...value, newItem])
 										}
 										resetItems={() => onChange([])}
 									/>

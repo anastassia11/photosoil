@@ -452,6 +452,7 @@ export default function NewsForm({
 							name='tags'
 							render={({ field: { value, onChange } }) => (
 								<Filter
+									locale={locale}
 									dropdown={dropdown}
 									name={t('tags')}
 									items={tags}

@@ -242,6 +242,7 @@ export default function NewsPageComponent() {
 				) : (
 					<MotionWrapper>
 						<Filter
+							locale={locale}
 							dropdown={dropdown}
 							itemId='tags'
 							type='news-tags'

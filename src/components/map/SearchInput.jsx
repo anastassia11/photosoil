@@ -20,7 +20,6 @@ const SearchInput = memo(function SearchInput({ filterName, setFilterName, place
             <input
                 value={filterName}
                 onChange={e => {
-                    console.log('onChange')
                     setFilterName(e.target.value)
                 }}
                 type='text'

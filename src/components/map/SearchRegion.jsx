@@ -1,17 +1,18 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 
 import { getTranslation } from '@/i18n/client'
 
-export default function SearchRegion({ onLocationHandler }) {
+const SearchRegion = memo(function SearchRegion({ onLocationHandler, locale }) {
 	const [searchTitle, setSearchTitle] = useState('')
 	const [debounceTimeout, setDebounceTimeout] = useState(null)
 	const [location, setLocation] = useState([])
 	const [locationVisible, setLocationVisible] = useState(false)
 
-	const { locale } = useParams()
+	// const { locale } = useParams()
+
 	const { t } = getTranslation(locale)
 
 	useEffect(() => {
@@ -68,7 +69,7 @@ export default function SearchRegion({ onLocationHandler }) {
 			if (result.length > 0) {
 				setLocation(result.slice(0, 5))
 			}
-		} catch (err) {}
+		} catch (err) { }
 	}
 
 	const handleLocationChange = item => {
@@ -154,4 +155,5 @@ export default function SearchRegion({ onLocationHandler }) {
 			</div>
 		</div>
 	)
-}
+})
+export default SearchRegion

@@ -30,8 +30,11 @@ import ObjectCard from './ObjectCard'
 import SearchInput from './SearchInput'
 import { useSnapshot } from 'valtio'
 import { filtersStore } from '@/store/valtioStore/filtersStore'
+import DraftSwitcher from './DraftSwitcher'
+import { dropdownStore } from '@/store/valtioStore/dropdownStore'
 
 const SideBar = memo(function SideBar({
+	// locale,
 	sidebarOpen,
 	setSideBarOpen,
 	filterName,
@@ -49,11 +52,10 @@ const SideBar = memo(function SideBar({
 	const pathname = usePathname()
 	const didLogRef = useRef(true)
 	const dropdown = useSelector(state => state.general.dropdown)
+	// const dropdown = useSnapshot(dropdownStore)
 
 	const [classifications, setClassifications] = useState([])
 	const [authors, setAuthors] = useState([])
-
-	const [token, setToken] = useState(null)
 
 	const { selectedTerms, selectedCategories, selectedAuthors } = useSnapshot(filtersStore)
 
@@ -74,42 +76,41 @@ const SideBar = memo(function SideBar({
 
 	useEffect(() => {
 		let timeoutId
-		setToken(JSON.parse(localStorage.getItem('tokenData'))?.token)
 		setSideBarOpen(window.innerWidth > 640)
 		fetchClassifications()
 		fetchAuthors()
-		if (didLogRef.current) {
-			timeoutId = setTimeout(() => {
-				didLogRef.current = false
-				const categoriesParam = searchParams.get('categories')
-				const termsParam = searchParams.get('terms')
-				const authorsParam = searchParams.get('authors')
-				categoriesParam &&
-					categoriesParam
-						.split(',')
-						.forEach(param => handleAddCategory(Number(param)))
-				termsParam &&
-					termsParam
-						.split(',')
-						.forEach(param => handleAddTerm(Number(param)))
-				authorsParam &&
-					authorsParam
-						.split(',')
-						.forEach(param => handleAddAuthor(Number(param)))
-			}, 300)
-		}
+		// if (didLogRef.current) {
+		// 	timeoutId = setTimeout(() => {
+		// 		didLogRef.current = false
+		// 		const categoriesParam = searchParams.get('categories')
+		// 		const termsParam = searchParams.get('terms')
+		// 		const authorsParam = searchParams.get('authors')
+		// 		categoriesParam &&
+		// 			categoriesParam
+		// 				.split(',')
+		// 				.forEach(param => handleAddCategory(Number(param)))
+		// 		termsParam &&
+		// 			termsParam
+		// 				.split(',')
+		// 				.forEach(param => handleAddTerm(Number(param)))
+		// 		authorsParam &&
+		// 			authorsParam
+		// 				.split(',')
+		// 				.forEach(param => handleAddAuthor(Number(param)))
+		// 	}, 300)
+		// }
 		return () => {
 			clearTimeout(timeoutId)
 		}
 	}, [])
 
 	useEffect(() => {
-		!didLogRef.current && updateFiltersInHistory()
+		// !didLogRef.current && updateFiltersInHistory()
 	}, [selectedCategories, selectedTerms, selectedAuthors])
 
-	useEffect(() => {
-		window.innerWidth > 640 && setSideBarOpen(!popupVisible)
-	}, [popupVisible])
+	// useEffect(() => {
+	// 	window.innerWidth > 640 && setSideBarOpen(!popupVisible)
+	// }, [popupVisible])
 
 	function updateFiltersInHistory() {
 		const params = new URLSearchParams(searchParams.toString())
@@ -176,8 +177,7 @@ const SideBar = memo(function SideBar({
 				? selectedTerms.filter(
 					item => item !== newItem
 				) : [...selectedTerms, newItem]
-		},
-		[selectedTerms]
+		}, [selectedTerms]
 	)
 
 	const handleAddAuthor = useCallback(
@@ -269,20 +269,8 @@ const SideBar = memo(function SideBar({
 						) : (
 							<div className='flex-1 h-full overflow-y-auto scroll sm:px-5 px-3 flex flex-col sm:space-y-3 space-y-1 w-full pb-3'>
 								<MotionWrapper className='ml-1'>
-									<label
-										htmlFor='draftIsVisible'
-										className={`flex-row cursor-pointer max-w-fit
-            ${!token ? 'hidden h-0 my-0' : 'flex'}`}
-									>
-										<input
-											type='checkbox'
-											id='draftIsVisible'
-											checked={draftIsVisible}
-											onChange={() => setDraftIsVisible(!draftIsVisible)}
-											className='min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 '
-										/>
-										<span className='select-none'>{t('grafts_visible')}</span>
-									</label>
+									<DraftSwitcher draftIsVisible={draftIsVisible} setDraftIsVisible={setDraftIsVisible}
+										label={t('grafts_visible')} />
 								</MotionWrapper>
 								<div className='pb-1.5'>
 									<p className='font-medium sm:text-xl text-lg sm:mb-1.5'>
@@ -323,7 +311,7 @@ const SideBar = memo(function SideBar({
 										<ul className='flex flex-col z-10 max-h-full sm:space-y-2.5 space-y-1 px-1'>
 											<li key={'authors'}>
 												<Filter
-													dropdown={dropdown}
+													locale={locale}
 													itemId={`author`}
 													name={t('authors')}
 
@@ -334,14 +322,12 @@ const SideBar = memo(function SideBar({
 													selectedItems={authors.map(({ id }) => id).filter(id => selectedAuthors?.includes(id))}
 													addItem={handleAddAuthor}
 
-													resetItems={items => {
-														filtersStore.selectedAuthors = selectedAuthors.filter(term => !items.includes(term))
-													}}
+													resetItems={() => filtersStore.selectedAuthors = []}
 												/>
 											</li>
 											<li key={'category'}>
 												<Filter
-													dropdown={dropdown}
+													locale={locale}
 													name={t('category')}
 													itemId='category'
 													items={CATEGORY_ARRAY}
@@ -352,9 +338,7 @@ const SideBar = memo(function SideBar({
 													isMapFilter={true}
 
 													addItem={handleAddCategory}
-													resetItems={items => {
-														filtersStore.selectedCategories = selectedCategories.filter(term => !items.includes(term))
-													}}
+													resetItems={() => filtersStore.selectedCategories = []}
 												/>
 											</li>
 											{classifications?.map(item => {
@@ -368,12 +352,13 @@ const SideBar = memo(function SideBar({
 													return (
 														<li key={item.id}>
 															<Filter
-																dropdown={dropdown}
+																locale={locale}
 																itemId={item.id}
 																type='classif'
 																isMapFilter={true}
 																name={isEnglish ? item.nameEng : item.nameRu}
 																sortByOrder={!item.isAlphabeticallOrder}
+
 																items={item.terms}
 																selectedItems={item.terms.map(({ id }) => id).filter(id => selectedTerms?.includes(id))}
 
@@ -399,7 +384,8 @@ const SideBar = memo(function SideBar({
 }, (prevProps, nextProps) => {
 	return prevProps.sidebarOpen === nextProps.sidebarOpen &&
 		prevProps.filterName === nextProps.filterName
-		&& prevProps.objects === nextProps.objects
+
+		&& prevProps.objects.toString() === nextProps.objects.toString()
 
 		&& prevProps.layersVisible === nextProps.layersVisible
 		&& prevProps.popupVisible === nextProps.popupVisible

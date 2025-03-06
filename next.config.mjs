@@ -97,6 +97,33 @@ const nextConfig = {
 			'valtio',
 			'zod',
 		],
+		// Добавляем поддержку WebAssembly
+		webpackBuildWorker: true,
+	},
+
+	// Решение для Critical dependency
+	webpack: (config, { isServer }) => {
+		// Игнорируем проблемные модули на сервере
+		if (isServer) {
+			config.externals.push({
+				'web-worker': 'commonjs2 web-worker',
+				'node:worker_threads': 'commonjs2 node:worker_threads'
+			});
+		}
+
+		// Убираем проблемный полифилл для Buffer
+		delete config.resolve.fallback?.buffer;
+		delete config.resolve.fallback?.bufferutil;
+		delete config.resolve.fallback?.['utf-8-validate'];
+
+		// Добавляем только необходимые настройки
+		config.experiments = {
+			...config.experiments,
+			asyncWebAssembly: true,
+			layers: true
+		};
+
+		return config;
 	}
 }
 

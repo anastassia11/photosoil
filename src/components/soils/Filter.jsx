@@ -1,9 +1,9 @@
 'use client'
 
-import { useParams, usePathname } from 'next/navigation'
-import { memo, useEffect, useMemo, useRef, useState } from 'react'
+import { usePathname } from 'next/navigation'
+import { memo, useMemo, useRef, useState } from 'react'
 import { Oval } from 'react-loader-spinner'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Tooltip } from 'react-tooltip'
 
 import { setDropdown } from '@/store/slices/generalSlice'
@@ -17,7 +17,7 @@ import { putTag } from '@/api/tags/put_tag'
 import { getTranslation } from '@/i18n/client'
 
 const Filter = memo(function Filter({
-	dropdown,
+	locale,
 	type,
 	itemId,
 	name,
@@ -34,6 +34,7 @@ const Filter = memo(function Filter({
 	const paths = usePathname()
 	const pathNames = paths.split('/').filter(path => path)
 	const searchRef = useRef(null)
+	const dropdown = useSelector(state => state.general.dropdown)
 
 	const [filterName, setFilterName] = useState('')
 
@@ -43,7 +44,6 @@ const Filter = memo(function Filter({
 	})
 	const [isLoading, setIsLoading] = useState(false)
 	const [tagData, setTagData] = useState({})
-	const { locale } = useParams()
 	const { t } = getTranslation(locale)
 
 	const _id = itemId ? `filter-${itemId}` : name
@@ -86,9 +86,10 @@ const Filter = memo(function Filter({
 	}, [filterName, items, sortByOrder, _isEng])
 
 	const handleOpenClick = () => {
-		isMapFilter
-			? setFilterOpen(!filterOpen)
-			: dispatch(
+		if (isMapFilter) {
+			setFilterOpen(!filterOpen)
+		} else {
+			dispatch(
 				setDropdown({
 					key: _id,
 					isActive:
@@ -97,6 +98,12 @@ const Filter = memo(function Filter({
 							: !dropdown?.isActive
 				})
 			)
+			// dropdownStore.key = _id
+			// dropdownStore.isActive = dropdown?.key !== null && dropdown?.key !== _id
+			// 	? true
+			// 	: !dropdown?.isActive
+		}
+
 	}
 
 	const handleAddTag = () => {
@@ -546,15 +553,15 @@ const Filter = memo(function Filter({
 			{formVisible.visible ? TagForm() : ''}
 		</div>
 	)
-}, (prevProps, nextProps) => {
+}
+	, (prevProps, nextProps) => {
 
-	return prevProps.dropdown?.isActive === nextProps.dropdown?.isActive &&
-		prevProps.dropdown?.key === nextProps.dropdown?.key
-		&& prevProps.type === nextProps.type
-
-		&& prevProps.selectedItems?.toString() === nextProps.selectedItems?.toString()
-		&& prevProps.items === nextProps.items
-	// && prevProps.name === nextProps.name
-})
+		return prevProps.type === nextProps.type
+			&& prevProps.selectedItems?.toString() === nextProps.selectedItems?.toString()
+			&& prevProps.items === nextProps.items
+			&& prevProps.name === nextProps.name
+			&& prevProps.addItem === nextProps.addItem
+	}
+)
 
 export default Filter

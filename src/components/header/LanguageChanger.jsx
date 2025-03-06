@@ -1,12 +1,11 @@
 'use client'
 
-import { useParams, usePathname, useRouter } from 'next/navigation'
-import { useEffect, useRef } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
+import { memo, useEffect, useRef } from 'react'
 
 import Dropdown from '../admin-panel/ui-kit/Dropdown'
 
-export default function LanguageChanger({ isTransparent }) {
-	const { locale } = useParams()
+const LanguageChanger = memo(function LanguageChanger({ locale, isTransparent }) {
 	const pathname = usePathname()
 	const pathnameRef = useRef(pathname)
 
@@ -43,3 +42,5 @@ export default function LanguageChanger({ isTransparent }) {
 		</div>
 	)
 }
+)
+export default LanguageChanger

@@ -29,6 +29,7 @@ import Filter from './Filter'
 import { getTranslation } from '@/i18n/client'
 import { useSnapshot } from 'valtio'
 import { filtersStore } from '@/store/valtioStore/filtersStore'
+import SoilCard from './SoilCard'
 
 export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 	const { locale } = useParams()
@@ -51,6 +52,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 	const [filteredSoils, setFilteredSoils] = useState([])
 
 	const [currentItems, setCurrentItems] = useState([])
+	const currentItemsUids = currentItems.map(({ id }) => id)
 	const [itemsPerPage, setItemsPerPage] = useState(0)
 
 	const [isLoading, setIsLoading] = useState({
@@ -80,6 +82,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 		type === 'dynamics'
 
 	useEffect(() => {
+		let timeoutId
 		setFiltersVisible(window.innerWidth > 640 || type === 'ecosystem')
 		setToken(JSON.parse(localStorage.getItem('tokenData'))?.token)
 		isSoils && fetchClassifications()
@@ -108,8 +111,8 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 						.split(',')
 						.forEach(param => handleAddAuthor(Number(param)))
 			}, 300)
-			return () => clearTimeout(timeoutId)
 		}
+		return () => clearTimeout(timeoutId)
 	}, [])
 
 	useEffect(() => {
@@ -246,45 +249,6 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 		[selectedAuthors]
 	)
 
-	const SoilCard = ({ photo, name, id }) => {
-		return (
-			<Link
-				href={{
-					pathname: `/${locale}/${type}/${id}`,
-					query: {}
-				}}
-				prefetch={false}
-				className='relative aspect-[2/3] overflow-hidden transition-all
-    rounded-md  hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] flex flex-col  duration-300 cursor-pointer'
-			>
-				<div className='h-[100%] w-full overflow-hidden opacity-80'>
-					<Image
-						priority
-						src={`${BASE_SERVER_URL}${photo.pathResize.length ? photo.pathResize : photo.path}`}
-						width={500}
-						height={500}
-						alt='soil'
-						className='blur-sm w-full h-full object-cover scale-150'
-					/>
-				</div>
-
-				<div className='h-[77%] absolute top-0 w-full flex'>
-					<Image
-						priority
-						src={`${BASE_SERVER_URL}${photo.pathResize.length ? photo.pathResize : photo.path}`}
-						width={500}
-						height={500}
-						alt='soil'
-						className='m-auto w-full h-full object-contain self-start'
-					/>
-				</div>
-				<div className='rounded-b-md flex p-4 items-start text-sm font-medium z-10 absolute bottom-0 h-[24%] backdrop-blur-md bg-black/40 text-white w-full'>
-					<p className='max-h-full overflow-hidden max-w-full'>{name}</p>
-				</div>
-			</Link>
-		)
-	}
-
 	return (
 		<div className='flex flex-col'>
 			<div className='relative flex flex-row space-x-2 mb-4'>
@@ -356,7 +320,8 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 								<MotionWrapper>
 									<li key={'authors'}>
 										<Filter
-											dropdown={dropdown}
+											locale={locale}
+											// dropdown={dropdown}
 											itemId={`author`}
 											name={t('authors')}
 
@@ -376,7 +341,8 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 									<li key='category'>
 										<MotionWrapper>
 											<Filter
-												dropdown={dropdown}
+												locale={locale}
+												// dropdown={dropdown}
 												name={t('category')}
 												itemId='category'
 												items={CATEGORY_ARRAY}
@@ -407,7 +373,8 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 											<li key={item.id}>
 												<MotionWrapper>
 													<Filter
-														dropdown={dropdown}
+														locale={locale}
+														// dropdown={dropdown}
 														itemId={item.id}
 														type='classif'
 
@@ -468,6 +435,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 									<li key={id}>
 										<MotionWrapper>
 											<SoilCard
+												locale={locale} type={type}
 												id={id}
 												photo={photo}
 												name={

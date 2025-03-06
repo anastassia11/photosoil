@@ -1,16 +1,16 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import React, { memo, useEffect, useState } from 'react'
 
 import { getTranslation } from '@/i18n/client'
 
-export default function LayersPanel({ onLayerChange, currentLayer }) {
+const LayersPanel = memo(function LayersPanel({ onLayerChange, currentLayer, locale }) {
 	const [drapdownState, setDrapdownState] = useState({
 		isActive: false,
 		key: null
 	})
-	const { locale } = useParams()
+	// const { locale } = useParams()
 	const { t } = getTranslation(locale)
 
 	const layers = [
@@ -23,11 +23,11 @@ export default function LayersPanel({ onLayerChange, currentLayer }) {
 	]
 
 	useEffect(() => {
-		document.onclick = e => {
-			const target = e.target
-			if (!target.closest('.layer-menu'))
-				setDrapdownState({ isActive: false, key: null })
-		}
+		// document.onclick = e => {
+		// 	const target = e.target
+		// 	if (!target.closest('.layer-menu'))
+		// 		setDrapdownState({ isActive: false, key: null })
+		// }
 	}, [])
 
 	return (
@@ -94,4 +94,5 @@ export default function LayersPanel({ onLayerChange, currentLayer }) {
 			</div>
 		</div>
 	)
-}
+})
+export default LayersPanel
