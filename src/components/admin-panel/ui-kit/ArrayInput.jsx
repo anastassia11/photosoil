@@ -57,15 +57,12 @@ export default function ArrayInput(
 	return (
 		<div className='flex flex-col w-full '>
 			<p className='font-medium'>
-				{title ? (
+				{!!title &&
 					<label className='font-medium flex flex-row'>
 						{title}
 						{isEng ? ' (EN) ' : ''}
 						<span className='text-orange-500'>{required ? '*' : ''}</span>
-					</label>
-				) : (
-					''
-				)}
+					</label>}
 			</p>
 			<ul>
 				<DndContext
@@ -87,7 +84,7 @@ export default function ArrayInput(
 								<input
 									ref={ref}
 									{...register(
-										`${name}.${index}${subName ? `.${subName}` : ''}`
+										`${name}.${index}${!!subName ? `.${subName}` : ''}`
 									)}
 									type='text'
 									className='bg-white w-full mt-1 p-2 outline-none border focus:border-blue-600 shadow-sm rounded-md'
@@ -127,7 +124,7 @@ export default function ArrayInput(
 			<button
 				type='button'
 				className='font-medium text-blue-600 w-fit'
-				onClick={() => onAppend({ nameRu: '', nameEng: '' })}
+				onClick={onAppend}
 			>
 				<span className='text-2xl pr-2'>+</span>
 				{t('add')}

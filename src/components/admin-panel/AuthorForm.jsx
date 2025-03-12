@@ -64,6 +64,7 @@ export default function AuthorForm({
 		handleSubmit,
 		reset,
 		control,
+		watch,
 		setValue,
 		formState: { errors, isSubmitting, isDirty }
 	} = useForm({
@@ -73,7 +74,8 @@ export default function AuthorForm({
 	const {
 		fields: contactFields,
 		append: appendContact,
-		remove: removeContact
+		remove: removeContact,
+		move: moveContact
 	} = useFieldArray({
 		control,
 		name: 'contacts'
@@ -81,12 +83,12 @@ export default function AuthorForm({
 	const {
 		fields: profileFields,
 		append: appendProfile,
-		remove: removeProfile
+		remove: removeProfile,
+		move: moveProfile
 	} = useFieldArray({
 		control,
 		name: 'otherProfiles'
 	})
-
 	const [role, setRole] = useState(null)
 	const { locale } = useParams()
 	const { t } = getTranslation(locale)
@@ -277,7 +279,8 @@ export default function AuthorForm({
 							name='contacts'
 							fields={contactFields}
 							onRemove={removeContact}
-							onAppend={appendContact}
+							onAppend={() => appendContact('')}
+							onMove={moveContact}
 							register={register}
 						/>
 						<ArrayInput
@@ -285,7 +288,8 @@ export default function AuthorForm({
 							name='otherProfiles'
 							fields={profileFields}
 							onRemove={removeProfile}
-							onAppend={appendProfile}
+							onAppend={() => appendProfile('')}
+							onMove={moveProfile}
 							register={register}
 						/>
 					</ul>

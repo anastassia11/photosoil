@@ -152,7 +152,7 @@ export default function DictionaryForm({
 								fields={termsFields}
 								sortable={sortByAlpha}
 								onRemove={removeTerms}
-								onAppend={appendTerms}
+								onAppend={() => appendTerms({ nameRu: '', nameEng: '' })}
 								onMove={moveTerms}
 								register={register}
 							/>
@@ -188,7 +188,7 @@ export default function DictionaryForm({
 								fields={termsFields}
 								sortable={sortByAlpha}
 								onRemove={removeTerms}
-								onAppend={appendTerms}
+								onAppend={() => appendTerms({ nameRu: '', nameEng: '' })}
 								onMove={moveTerms}
 								register={register}
 							/>
