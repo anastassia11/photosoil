@@ -336,6 +336,60 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 		}
 	}
 
+	const Column = ({ items }) => (
+		<div className="flex flex-col gap-4">
+			{items.map((item) => (
+				<div key={`classification-${item.id}`}>
+					<Controller
+						control={control}
+						name='soilTerms'
+						render={({ field: { value, onChange } }) => (
+							<Filter
+								locale={locale}
+								name={isEng ? item.nameEng : item.nameRu}
+								items={item.terms}
+								itemId={item.id}
+
+								selectedItems={item.terms.map(({ id }) => id).filter(id => value?.includes(id))}
+								type='classif'
+
+								sortByOrder={!item.isAlphabeticallOrder}
+
+								addItem={newItem => {
+									value.includes(newItem)
+										? onChange(value.filter(item => item !== newItem))
+										: onChange([...value, newItem])
+								}
+								}
+
+								resetItems={items =>
+									onChange(value.filter(item => !items.includes(item)))
+								}
+							/>
+						)}
+					/>
+				</div>
+			))}
+		</div>
+	);
+
+	const GridComponent = ({ classifications }) => {
+		const _classifications = classifications.filter(item => item.translationMode == 0
+			|| (isEng
+				? item.translationMode == 1
+				: item.translationMode == 2))
+		const midPoint = Math.ceil(_classifications.length / 2)
+		const firstColumnItems = _classifications.slice(0, midPoint)
+		const secondColumnItems = _classifications.slice(midPoint)
+
+		return (
+			<div className="grid md:grid-cols-2 grid-cols-1 gap-4 w-full mt-1">
+				<Column items={firstColumnItems} />
+				<Column items={secondColumnItems} />
+			</div>
+		);
+	};
+
 	return (
 		<form
 			className={`flex flex-col w-full h-fit max-h-full ${pathname !== 'edit' ? 'pb-[200px]' : 'pb-16'}`}
@@ -638,54 +692,7 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 						{type === 'soil' && (
 							<>
 								<p className='font-medium mt-8'>{t('classifications')}</p>
-								<ul
-									style={{
-										gridTemplateRows: `repeat(${Math.ceil(classifications.length / 2)}, minmax(0, 1fr))`
-									}}
-									className={`grid md:grid-cols-2 grid-cols-1 md:grid-flow-col
-                                gap-4 w-full mt-1`}
-								>
-									{classifications?.map(item => {
-										const isVisible =
-											item.translationMode == 0 ||
-											(isEng
-												? item.translationMode == 1
-												: item.translationMode == 2)
-										if (isVisible)
-											return (
-												<li key={`classification-${item.id}`}>
-													<Controller
-														control={control}
-														name='soilTerms'
-														render={({ field: { value, onChange } }) => (
-															<Filter
-																locale={locale}
-																name={isEng ? item.nameEng : item.nameRu}
-																items={item.terms}
-																itemId={item.id}
-
-																selectedItems={item.terms.map(({ id }) => id).filter(id => value?.includes(id))}
-																type='classif'
-
-																sortByOrder={!item.isAlphabeticallOrder}
-
-																addItem={newItem => {
-																	value.includes(newItem)
-																		? onChange(value.filter(item => item !== newItem))
-																		: onChange([...value, newItem])
-																}
-																}
-
-																resetItems={items =>
-																	onChange(value.filter(item => !items.includes(item)))
-																}
-															/>
-														)}
-													/>
-												</li>
-											)
-									})}
-								</ul>
+								<GridComponent classifications={classifications} />
 							</>
 						)}
 
