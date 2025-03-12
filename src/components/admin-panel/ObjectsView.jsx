@@ -201,8 +201,8 @@ export default function ObjectsView({
 			}
 
 			if (fieldName === 'creator') {
-				const emailA = a[parentName].userInfo?.email
-				const emailB = b[parentName].userInfo?.email
+				const emailA = a.userInfo?.email
+				const emailB = b.userInfo?.email
 				return isAscending
 					? emailA.localeCompare(emailB)
 					: emailB.localeCompare(emailA)
