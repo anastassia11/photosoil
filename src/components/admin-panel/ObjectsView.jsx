@@ -146,11 +146,11 @@ export default function ObjectsView({
 		selectedObjects.forEach(item => {
 			item.type
 				? onVisibleChange({
-						id: item.id,
-						type: item.type,
-						isVisible,
-						isMulti: true
-					})
+					id: item.id,
+					type: item.type,
+					isVisible,
+					isMulti: true
+				})
 				: onVisibleChange({ id: item, isVisible, isMulti: true })
 		})
 	}
@@ -201,8 +201,8 @@ export default function ObjectsView({
 			}
 
 			if (fieldName === 'creator') {
-				const emailA = a[parentName].user.email
-				const emailB = b[parentName].user.email
+				const emailA = a[parentName].userInfo?.email
+				const emailB = b[parentName].userInfo?.email
 				return isAscending
 					? emailA.localeCompare(emailB)
 					: emailB.localeCompare(emailA)
@@ -365,7 +365,7 @@ export default function ObjectsView({
 										key: `${objectType === 'userPage' ? `${type?.name}_${id}` : id}`,
 										isActive:
 											dropdown.key !== null &&
-											dropdown.key !==
+												dropdown.key !==
 												`${objectType === 'userPage' ? `${type?.name}_${id}` : id}`
 												? true
 												: !dropdown.isActive
