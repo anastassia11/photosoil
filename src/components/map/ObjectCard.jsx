@@ -31,18 +31,20 @@ export default function ObjectCard({ object }) {
                 </div>
             ) : (
                 <div className='flex flex-row w-full'>
-                    {object?.photo?.path ? (
+                    {(!!object?.photo?.pathResize || !!object?.photo?.path) && (
                         <div className='max-w-[40%] w-[40%]'>
                             <Image
                                 src={`${BASE_SERVER_URL}${object.photo?.pathResize?.length ? object.photo.pathResize : object.photo.path}`}
                                 className='aspect-[3/4] object-cover object-top border border-blue-600 shadow-md rounded-xl overflow-hidden'
+                                priority={true}
+
+                                placeholder="blur"
+                                blurDataURL={`${BASE_SERVER_URL}${object.photo?.pathResize?.length ? object.photo.pathResize : object.photo.path}`}
                                 alt={object?.name || 'object photo'}
                                 width={200}
                                 height={200}
                             />
                         </div>
-                    ) : (
-                        ''
                     )}
                     <div className='flex flex-col ml-2 max-w-[60%] w-[60%]'>
                         <p className='text-blue-700 text-sm sm:text-base'>

@@ -94,7 +94,7 @@ export default function SoilObject({ object, children, type }) {
 						<Loader className='w-[80%] h-[30px]' />
 					)}
 				</div>
-				{tokenData.role === 'Admin' || tokenData.email === object.userEmail ? (
+				{(tokenData.role === 'Admin' || tokenData.email === object.userEmail) && (
 					<Link
 						target='_blank'
 						prefetch={false}
@@ -120,8 +120,6 @@ export default function SoilObject({ object, children, type }) {
 						</svg>
 						<p className='pt-[3px]'>{t('edit_go')}</p>
 					</Link>
-				) : (
-					''
 				)}
 			</div>
 

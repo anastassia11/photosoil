@@ -55,14 +55,6 @@ const defaults = {
 			}
 		}
 	},
-	// on: {
-	//     'Carousel.ready Carousel.change': (fancybox) => {
-	//         fancybox.container.style.setProperty(
-	//             '--bg-image',
-	//             `url("${fancybox.getSlide().thumbSrc}")`
-	//         );
-	//     },
-	// },
 	tpl: {
 		main: `<div class="fancybox__container" role="dialog" aria-modal="true" aria-label="{{MODAL}}" tabindex="-1">
 <div class="fancybox__backdrop"></div>
@@ -88,12 +80,51 @@ export default function FancyBox(props) {
 			}
 		}
 	}
+
+	// Функция для скачивания изображения
+	const downloadImage = (imageUrl, imageName) => {
+		const link = document.createElement('a')
+		link.href = imageUrl
+		link.download = imageName || 'image.jpg' // Имя файла
+		document.body.appendChild(link)
+		link.click()
+		document.body.removeChild(link)
+	}
+
 	useEffect(() => {
 		const container = containerRef.current
 
 		const delegate = props.delegate || '[data-fancybox]'
 		const options = {
-			...defaults
+			...defaults,
+			// on: {
+			// 	afterShow: (fancybox, slide) => {
+			// 		const downloadButton = fancybox.container.querySelector('[data-fancybox-download]')
+			// 		if (downloadButton) {
+			// 			downloadButton.addEventListener('click', () => {
+			// 				const imageUrl = slide.src // URL текущего изображения
+			// 				const imageName = imageUrl.split('/').pop() // Имя файла из URL
+			// 				downloadImage(imageUrl, imageName) // Скачивание изображения
+			// 			})
+			// 		}
+			// 	},
+			// },
+			// Toolbar: {
+			// 	...defaults.Toolbar,
+			// 	items: {
+			// 		...defaults.Toolbar.items,
+			// 		download: {
+			// 			tpl: `<button class="f-button" title="Download" data-fancybox-download><svg tabindex="-1" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2M7 11l5 5 5-5M12 4v12"></path></svg></button>`,
+			// 			click: (fancybox, button) => {
+			// 				console.log(fancybox)
+			// 				const currentSlide = fancybox.getCarousel().getSlide()
+			// 				const imageUrl = currentSlide.src // URL текущего изображения
+			// 				const imageName = imageUrl.split('/').pop() // Имя файла из URL
+			// 				downloadImage(imageUrl, imageName) // Скачивание изображения
+			// 			}
+			// 		}
+			// 	}
+			// }
 		}
 		// const options = props.options || {};
 
