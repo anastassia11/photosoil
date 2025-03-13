@@ -3,6 +3,7 @@
 import { useParams } from 'next/navigation'
 import {
 	forwardRef,
+	memo,
 	useCallback,
 	useEffect,
 	useImperativeHandle,
@@ -43,7 +44,6 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 	const dispatch = useDispatch()
 	const { locale } = useParams()
 	const { t } = getTranslation(locale)
-	const dropdown = useSelector(state => state.general.dropdown)
 
 	const defaultValues = {
 		translations: [{ isEnglish: false }],
@@ -61,6 +61,7 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 		soilObjects: [],
 		mainPhoto: {}
 	}
+
 	const {
 		register,
 		reset,
@@ -68,23 +69,21 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 		watch,
 		trigger,
 		setValue,
+		getValues,
 		setFocus,
 		formState: { errors, isDirty }
 	} = useForm({ mode: 'onChange', defaultValues })
+
 	const { fields: translationsFields, append: appendTranslation } =
 		useFieldArray({
 			control,
 			name: 'translations'
 		})
 
-	const formValues = watch()
-	const translations = watch('translations')
 	const isExternal = watch('isExternal')
 
 	const createTwoLang = watch('createTwoLang')
 	const isEng = watch('currentLang')
-	const objectPhoto = watch('objectPhoto')
-
 	const [localObjectPhoto, setLocalObjectPhoto] = useState([])
 
 	const [classifications, setClassifications] = useState([])
@@ -165,7 +164,7 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 	}
 
 	const updateState = () => {
-		return formValues
+		return getValues()
 	}
 
 	const handleOtherPhotoSend = useCallback(
@@ -287,8 +286,9 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 		[pathname, dispatch, t, localObjectPhoto]
 	)
 
-	const handleTwoLangChange = e => {
+	const handleTwoLangChange = useCallback(e => {
 		const isChecked = e.target.checked
+		const translations = getValues('translations')
 		if (pathname === 'edit') {
 			if (isChecked) {
 				if (translations?.length < 2) {
@@ -303,11 +303,11 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 			}
 		}
 		setValue('createTwoLang', isChecked)
-	}
+	}, [pathname, getValues, appendTranslation, setValue, isEng, oldIsEng])
 
-	const handleLangChange = value => {
+	const handleLangChange = useCallback(value => {
 		setValue('currentLang', value)
-	}
+	}, [setValue])
 
 	const formCheck = async () => {
 		const result = await trigger()
@@ -316,6 +316,7 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 			if (firstErrorField === 'translations') {
 				for (const [index, transl] of errors.translations.entries()) {
 					if (!!transl) {
+						const translations = getValues('translations')
 						setValue('currentLang', translations[index].isEnglish)
 						const firstErrorField = Object.keys(transl)[0]
 						await new Promise(resolve => setTimeout(resolve, 10))
@@ -390,6 +391,31 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 		);
 	};
 
+	const ItemFilter = ({ name, items, title, type }) => {
+		return <Controller
+			control={control}
+			name={name}
+			render={({ field: { value, onChange } }) => (
+				<Filter
+					locale={locale}
+					name={title}
+					items={items}
+
+					selectedItems={value}
+					type={type}
+
+					addItem={newItem =>
+						value.includes(newItem)
+							? onChange(value.filter(item => item !== newItem))
+							: onChange([...value, newItem])
+					}
+
+					resetItems={() => onChange([])}
+				/>
+			)}
+		/>
+	}
+
 	return (
 		<form
 			className={`flex flex-col w-full h-fit max-h-full ${pathname !== 'edit' ? 'pb-[200px]' : 'pb-16'}`}
@@ -405,7 +431,6 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 						onLangChange={handleLangChange}
 						onTwoLangChange={handleTwoLangChange}
 					/>
-
 					<div className='flex flex-col w-full mt-4'>
 						{translationsFields.map((field, index) => (
 							<div
@@ -486,29 +511,8 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 								key='authors'
 								className={`mt-3 ${isExternal ? 'opacity-50 pointer-events-none' : ''}`}
 							>
-								<Controller
-									control={control}
-									name='authors'
-									render={({ field: { value, onChange } }) => (
-										<Filter
-											locale={locale}
-											name={t('authors')}
-											itemId={`author`}
-											items={authors}
 
-											selectedItems={value}
-											type='authors'
-
-											addItem={newItem => {
-												value.includes(newItem)
-													? onChange(value.filter(item => item !== newItem))
-													: onChange([...value, newItem])
-											}}
-
-											resetItems={() => onChange([])}
-										/>
-									)}
-								/>
+								<ItemFilter name='authors' items={authors} title={t('authors')} type='authors' />
 							</li>
 							<label
 								htmlFor='isExternal'
@@ -655,6 +659,7 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 
 						<div className='mt-8 flex flex-col'>
 							<p className='font-medium'>{t('other_photos')}</p>
+
 							<Controller
 								control={control}
 								name='objectPhoto'
@@ -699,76 +704,13 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 						<p className='font-medium mt-8'>{t('connection')}</p>
 						<div className='grid md:grid-cols-2 grid-cols-1 gap-4 w-full mt-1'>
 							{type !== 'ecosystem' && (
-								<Controller
-									control={control}
-									name='ecoSystems'
-									render={({ field: { value, onChange } }) => (
-										<Filter
-											locale={locale}
-											name={t('ecosystems')}
-											items={ecosystems}
-
-											selectedItems={value}
-											type='ecosystem'
-
-											addItem={newItem =>
-												value.includes(newItem)
-													? onChange(value.filter(item => item !== newItem))
-													: onChange([...value, newItem])
-											}
-
-											resetItems={() => onChange([])}
-										/>
-									)}
-								/>
+								<ItemFilter name='ecoSystems' type='ecosystem' title={t('ecosystems')} items={ecosystems} />
 							)}
 
 							{type !== 'soil' && (
-								<Controller
-									control={control}
-									name='soilObjects'
-									render={({ field: { value, onChange } }) => (
-										<Filter
-											locale={locale}
-											name={t('soils')}
-											items={soils}
-
-											type='soil'
-											selectedItems={value}
-
-											addItem={newItem =>
-												value.includes(newItem)
-													? onChange(value.filter(item => item !== newItem))
-													: onChange([...value, newItem])
-											}
-
-											resetItems={() => onChange([])}
-										/>
-									)}
-								/>
+								<ItemFilter name='soilObjects' type='soil' title={t('soils')} items={soils} />
 							)}
-
-							<Controller
-								control={control}
-								name='publications'
-								render={({ field: { value, onChange } }) => (
-									<Filter
-										locale={locale}
-										name={t('publications')}
-										items={publications}
-
-										type='publications'
-										selectedItems={value}
-
-										ddItem={newItem =>
-											value.includes(newItem)
-												? onChange(value.filter(item => item !== newItem))
-												: onChange([...value, newItem])
-										}
-										resetItems={() => onChange([])}
-									/>
-								)}
-							/>
+							<ItemFilter name='publications' type='publications' title={t('publications')} items={publications} />
 						</div>
 
 						{translationsFields.map((field, index) => (
@@ -792,4 +734,4 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 		</form>
 	)
 }
-export default forwardRef(ObjectForm)
+export default memo(forwardRef(ObjectForm))

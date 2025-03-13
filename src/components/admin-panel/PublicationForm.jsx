@@ -76,7 +76,7 @@ export default function PublicationForm({
 		})
 
 	const coordinates = watch('coordinates')
-	const translations = watch('translations')
+
 	const [isEng, setIsEng] = useState(false)
 	const [createTwoLang, setCreateTwoLang] = useState(false)
 	const [ecosystems, setEcosystems] = useState([])
@@ -171,6 +171,7 @@ export default function PublicationForm({
 	}
 
 	const handleTwoLangChange = e => {
+		const translations = getValues('translations')
 		const isChecked = e.target.checked
 		if (pathname === 'edit') {
 			if (isChecked) {
@@ -245,6 +246,7 @@ export default function PublicationForm({
 			if (firstErrorField === 'translations') {
 				for (const [index, transl] of errors.translations.entries()) {
 					if (!!transl) {
+						const translations = getValues('translations')
 						setIsEng(translations[index].isEnglish)
 						const firstErrorField = Object.keys(transl)[0]
 						await new Promise(resolve => setTimeout(resolve, 10))
@@ -432,19 +434,19 @@ export default function PublicationForm({
 							name='soilObjects'
 							render={({ field: { value, onChange } }) => (
 								<Filter
-									dropdown={dropdown}
+									locale={locale}
 									name={t('soils')}
 									items={soils}
+
 									type='soil'
-									allSelectedItems={value}
-									isEng={isEng}
-									addItem={newItem => onChange([...value, newItem])}
-									deleteItem={deletedItem =>
-										onChange(value.filter(item => item !== deletedItem))
+									selectedItems={value}
+
+									addItem={newItem =>
+										value.includes(newItem)
+											? onChange(value.filter(item => item !== newItem))
+											: onChange([...value, newItem])
 									}
-									resetItems={deletedItems =>
-										onChange(value.filter(item => !deletedItems.includes(item)))
-									}
+									resetItems={() => onChange([])}
 								/>
 							)}
 						/>
@@ -453,19 +455,19 @@ export default function PublicationForm({
 							name='ecoSystems'
 							render={({ field: { value, onChange } }) => (
 								<Filter
-									dropdown={dropdown}
+									locale={locale}
 									name={t('ecosystems')}
 									items={ecosystems}
+
 									type='ecosystem'
-									allSelectedItems={value}
-									isEng={isEng}
-									addItem={newItem => onChange([...value, newItem])}
-									deleteItem={deletedItem =>
-										onChange(value.filter(item => item !== deletedItem))
+									selectedItems={value}
+
+									addItem={newItem =>
+										value.includes(newItem)
+											? onChange(value.filter(item => item !== newItem))
+											: onChange([...value, newItem])
 									}
-									resetItems={deletedItems =>
-										onChange(value.filter(item => !deletedItems.includes(item)))
-									}
+									resetItems={() => onChange([])}
 								/>
 							)}
 						/>

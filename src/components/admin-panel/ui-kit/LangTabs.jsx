@@ -1,10 +1,10 @@
 import { Root, List, Trigger } from '@radix-ui/react-tabs'
 import { useParams } from 'next/navigation'
-import { useEffect } from 'react'
+import { memo, useEffect } from 'react'
 
 import { getTranslation } from '@/i18n/client'
 
-export default function LangTabs({
+function LangTabs({
 	onLangChange,
 	onTwoLangChange,
 	isEng,
@@ -67,3 +67,5 @@ export default function LangTabs({
 		</Root>
 	)
 }
+
+export default memo(LangTabs)

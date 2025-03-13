@@ -363,6 +363,7 @@ function MapArraySelect(
 		>
 			<div className='z-30 absolute top-0 right-0 m-2'>
 				<LayersPanel
+					locale={locale}
 					onLayerChange={handleBaseLayerChange}
 					currentLayer={selectedLayer}
 				/>

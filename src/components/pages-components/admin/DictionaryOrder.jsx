@@ -36,7 +36,7 @@ export default function DictionaryOrderComponent() {
 	const {
 		handleSubmit,
 		setValue,
-		watch,
+		getValues,
 		control,
 		formState: { isSubmitting, isDirty }
 	} = useForm({
@@ -48,7 +48,6 @@ export default function DictionaryOrderComponent() {
 	const { locale } = useParams()
 	const { t } = getTranslation(locale)
 	const router = useRouter()
-	const disconaries = watch('disconaries')
 
 	const _isEng = locale === 'en'
 
@@ -78,6 +77,7 @@ export default function DictionaryOrderComponent() {
 	}
 
 	function handleDragEnd(e, field) {
+		const disconaries = getValues('disconaries')
 		const { active, over } = e
 		if (over && active.id !== over.id) {
 			const oldIndex = disconaries.findIndex(item => item.id === active.id)

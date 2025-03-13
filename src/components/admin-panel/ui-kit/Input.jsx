@@ -1,8 +1,7 @@
-import React, { forwardRef } from 'react'
+import React, { forwardRef, memo } from 'react'
 
 function Input(
-	{ label, type, placeholder, isEng, required, error, ...props },
-	ref
+	{ label, type, placeholder, isEng, required, error, ...props }, ref
 ) {
 	return (
 		<div className='w-full'>
@@ -31,4 +30,4 @@ function Input(
 		</div>
 	)
 }
-export default forwardRef(Input)
+export default memo(forwardRef(Input))

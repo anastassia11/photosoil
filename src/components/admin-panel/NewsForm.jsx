@@ -41,7 +41,6 @@ export default function NewsForm({
 		register,
 		reset,
 		control,
-		watch,
 		trigger,
 		getValues,
 		setFocus,
@@ -67,7 +66,6 @@ export default function NewsForm({
 			control,
 			name: 'translations'
 		})
-	const translations = watch('translations')
 	const [localObjectPhoto, setLocalObjectPhoto] = useState([])
 	const [localFiles, setLocalFiles] = useState([])
 	const [tags, setTags] = useState([])
@@ -109,6 +107,7 @@ export default function NewsForm({
 	}
 
 	const handleTwoLangChange = e => {
+		const translations = getValues('translations')
 		const isChecked = e.target.checked
 		if (pathname === 'edit') {
 			if (isChecked) {
@@ -278,6 +277,7 @@ export default function NewsForm({
 			if (firstErrorField === 'translations') {
 				for (const [index, transl] of errors.translations.entries()) {
 					if (!!transl) {
+						const translations = getValues('translations')
 						setIsEng(translations[index].isEnglish)
 						const firstErrorField = Object.keys(transl)[0]
 						await new Promise(resolve => setTimeout(resolve, 10))

@@ -89,33 +89,33 @@ const Dropdown = memo(
 						<ul className={`scroll space-y-1 py-2 max-h-[200px] overflow-auto`}>
 							{items
 								? Object.entries(items).map(([key, value]) => (
-										<li key={`objectType-${key}`}>
-											<button
-												type='button'
-												className={`duration-300 space-x-2 flex-row justify-between w-full  cursor-pointer hover:text-blue-600 min-h-9 h-fit
+									<li key={`objectType-${key}`}>
+										<button
+											type='button'
+											className={`duration-300 space-x-2 flex-row justify-between w-full  cursor-pointer hover:text-blue-600 min-h-9 h-fit
                             hover:bg-zinc-100 flex px-4 items-center ${key === selectedValue?.id ? 'text-blue-600' : ''}`}
-												onClick={() => handleSelectClick(value, key)}
-											>
-												<p className='text-left'>{value}</p>
-												{selectedValue?.id === key ? (
-													<svg
-														xmlns='http://www.w3.org/2000/svg'
-														className='w-5 h-5 text-blue-600'
-														viewBox='0 0 20 20'
-														fill='currentColor'
-													>
-														<path
-															fillRule='evenodd'
-															d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
-															clipRule='evenodd'
-														/>
-													</svg>
-												) : (
-													''
-												)}
-											</button>
-										</li>
-									))
+											onClick={() => handleSelectClick(value, key)}
+										>
+											<p className='text-left'>{value}</p>
+											{selectedValue?.id === key ? (
+												<svg
+													xmlns='http://www.w3.org/2000/svg'
+													className='w-5 h-5 text-blue-600'
+													viewBox='0 0 20 20'
+													fill='currentColor'
+												>
+													<path
+														fillRule='evenodd'
+														d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
+														clipRule='evenodd'
+													/>
+												</svg>
+											) : (
+												''
+											)}
+										</button>
+									</li>
+								))
 								: ''}
 						</ul>
 					</div>
