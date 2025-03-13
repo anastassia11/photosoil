@@ -1,4 +1,5 @@
 import { useConstants } from '@/hooks/useConstants'
+import { getTranslation } from '@/i18n/client'
 import { BASE_SERVER_URL } from '@/utils/constants'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -6,6 +7,7 @@ import { useParams } from 'next/navigation'
 
 export default function ObjectCard({ object }) {
     const { locale } = useParams()
+    const { t } = getTranslation(locale)
     const { SOIL_ENUM, PUBLICATION_ENUM } = useConstants()
 
     const currentTransl =
