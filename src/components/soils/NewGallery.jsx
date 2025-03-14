@@ -50,6 +50,7 @@ export default function NewGallery({ mainPhoto, objectPhoto }) {
 										className='f-carousel__slide flex flex-col items-center justify-center min-h-full'
 										data-thumb-src={`${BASE_SERVER_URL}${pathResize.length ? pathResize : path}`}
 										data-fancybox='gallery'
+										data-title={locale === 'en' ? titleEng : titleRu}
 										data-src={`${BASE_SERVER_URL}${path}`}
 										data-caption={`<div class='flex flex-col h-full'>
                           <p class="text-base font-medium mb-3">${date}</p>

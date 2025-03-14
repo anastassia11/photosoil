@@ -4,9 +4,10 @@ import { Fancybox as NativeFancybox } from '@fancyapps/ui'
 import '@fancyapps/ui/dist/carousel/carousel.css'
 import '@fancyapps/ui/dist/carousel/carousel.thumbs.css'
 import '@fancyapps/ui/dist/fancybox/fancybox.css'
-import React, { PropsWithChildren, useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 
-// import '@fancyapps/ui/dist/fancybox/fancybox.css';
+import { generateFileName } from '@/utils/common'
+
 import '@/styles/gallery.css'
 
 const defaults = {
@@ -30,10 +31,35 @@ const defaults = {
 	},
 
 	Toolbar: {
+		items: {
+			customDownload: {
+				tpl: `<button type='button' class="f-button"><svg tabindex="-1" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2M7 11l5 5 5-5M12 4v12"></path></svg></button>`,
+				click: async () => {
+					const instance = NativeFancybox.getInstance()
+					const currentSlide = instance.getSlide()
+
+					const imageUrl = currentSlide.src
+					const fileName = currentSlide.title.length
+						? generateFileName(currentSlide.title)
+						: imageUrl.split('/').pop()
+
+					const response = await fetch(imageUrl)
+					const blob = await response.blob()
+					const url = window.URL.createObjectURL(blob)
+
+					const a = document.createElement('a')
+					a.href = url
+					a.download = fileName
+					a.click()
+
+					window.URL.revokeObjectURL(url)
+				}
+			}
+		},
 		display: {
-			left: ['close', 'zoomIn', 'zoomOut', 'download'],
+			left: ['close', 'zoomIn', 'zoomOut', 'customDownload'],
 			middle: [],
-			right: ['zoomIn', 'zoomOut', 'download', 'close']
+			right: ['zoomIn', 'zoomOut', 'customDownload', 'close']
 		}
 	},
 
@@ -62,7 +88,9 @@ const defaults = {
 <div class="fancybox__caption"></div>
 <div class="fancybox__toolbar"></div>
 <div class="fancybox__footer"></div>
-</div>`
+</div>`,
+		customDownload:
+			'<button class="fancybox__button--custom-download" title="Download">gg</button>'
 	}
 }
 
@@ -81,58 +109,18 @@ export default function FancyBox(props) {
 		}
 	}
 
-	// Функция для скачивания изображения
-	const downloadImage = (imageUrl, imageName) => {
-		const link = document.createElement('a')
-		link.href = imageUrl
-		link.download = imageName || 'image.jpg' // Имя файла
-		document.body.appendChild(link)
-		link.click()
-		document.body.removeChild(link)
-	}
-
 	useEffect(() => {
 		const container = containerRef.current
 
 		const delegate = props.delegate || '[data-fancybox]'
 		const options = {
-			...defaults,
-			// on: {
-			// 	afterShow: (fancybox, slide) => {
-			// 		const downloadButton = fancybox.container.querySelector('[data-fancybox-download]')
-			// 		if (downloadButton) {
-			// 			downloadButton.addEventListener('click', () => {
-			// 				const imageUrl = slide.src // URL текущего изображения
-			// 				const imageName = imageUrl.split('/').pop() // Имя файла из URL
-			// 				downloadImage(imageUrl, imageName) // Скачивание изображения
-			// 			})
-			// 		}
-			// 	},
-			// },
-			// Toolbar: {
-			// 	...defaults.Toolbar,
-			// 	items: {
-			// 		...defaults.Toolbar.items,
-			// 		download: {
-			// 			tpl: `<button class="f-button" title="Download" data-fancybox-download><svg tabindex="-1" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2M7 11l5 5 5-5M12 4v12"></path></svg></button>`,
-			// 			click: (fancybox, button) => {
-			// 				console.log(fancybox)
-			// 				const currentSlide = fancybox.getCarousel().getSlide()
-			// 				const imageUrl = currentSlide.src // URL текущего изображения
-			// 				const imageName = imageUrl.split('/').pop() // Имя файла из URL
-			// 				downloadImage(imageUrl, imageName) // Скачивание изображения
-			// 			}
-			// 		}
-			// 	}
-			// }
+			...defaults
 		}
-		// const options = props.options || {};
-
 		NativeFancybox.bind(container, delegate, options)
 
 		return () => {
 			NativeFancybox.unbind(container)
-			//NativeFancybox.close();
+			// NativeFancybox.close()
 		}
 	})
 
