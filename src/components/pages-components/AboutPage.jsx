@@ -63,9 +63,10 @@ export default async function AboutPageComponent({ locale }) {
 
 					<p className='sm:w-2/3 w-full text-base'>
 						База данных{' '}
-						<span className='font-semibold cursor-pointer text-blue-600 transition-all duration-300 hover:underline hover:text-blue-700'>
+						<Link href={`/${locale}`}
+							className='font-semibold cursor-pointer text-blue-600 transition-all duration-300 hover:underline hover:text-blue-700'>
 							PhotoSOIL
-						</span>{' '}
+						</Link>{' '}
 						призвана стать научной площадкой для исследователей, желающих
 						делиться своими фотографиями почв с теми, кому они могут быть
 						потенциально полезны. Миссия базы данных заключается в оказании
@@ -83,7 +84,7 @@ export default async function AboutPageComponent({ locale }) {
 					</p>
 
 					<div className='flex lg:flex-row flex-col space-y-4 lg:space-y-0 lg:space-x-4 space-x-0 mt-8'>
-						<div className='flex flex-col bg-white py-6 px-8 rounded-2xl lg:w-1/3 w-full space-y-4 border hover:border-blue-600 duration-300 cursor-pointer'>
+						<div className='flex flex-col bg-white py-6 px-8 rounded-2xl lg:w-1/3 w-full space-y-4 border hover:border-blue-600 duration-300 cursor-default'>
 							<h2 className='text-xl font-semibold text-blue-600'>
 								Почвенные профили
 							</h2>
@@ -95,8 +96,8 @@ export default async function AboutPageComponent({ locale }) {
 								элементов строения почвы, её боковых стенок, а также
 								растительных сообществ и ландшафтов.
 							</p>
-							<a
-								href='#'
+							<Link
+								href={`/${locale}/profiles`}
 								className='flex items-center -mx-1 text-blue-600 transition-colors duration-300 transform  hover:underline hover:text-blue-700 '
 							>
 								<span className='mx-1'>Узнать больше</span>
@@ -112,9 +113,9 @@ export default async function AboutPageComponent({ locale }) {
 										clipRule='evenodd'
 									></path>
 								</svg>
-							</a>
+							</Link>
 						</div>
-						<div className='flex flex-col bg-white p-6 px-8 rounded-2xl lg:w-1/3 w-full space-y-4 border hover:border-blue-600 duration-300 cursor-pointer'>
+						<div className='flex flex-col bg-white p-6 px-8 rounded-2xl lg:w-1/3 w-full space-y-4 border hover:border-blue-600 duration-300 cursor-default'>
 							<h2 className='text-xl font-semibold text-blue-600'>
 								Почвенные морфологические элементы
 							</h2>
@@ -125,9 +126,9 @@ export default async function AboutPageComponent({ locale }) {
 								фотографии аналогично первой категории сопровождены краткими
 								описаниями, привязаны к почвенным классификациям и карте.
 							</p>
-							<a
-								href='#'
-								className='flex items-center -mx-1 text-blue-600 transition-colors duration-300 transform  hover:underline hover:text-blue-700 '
+							<Link
+								href={`/${locale}/morphological`}
+								className='flex items-center -mx-1 text-blue-600 transition-colors duration-300 transform  hover:underline hover:text-blue-700'
 							>
 								<span className='mx-1'>Узнать больше</span>
 								<svg
@@ -142,9 +143,9 @@ export default async function AboutPageComponent({ locale }) {
 										clipRule='evenodd'
 									></path>
 								</svg>
-							</a>
+							</Link>
 						</div>
-						<div className='flex flex-col bg-white p-6 px-8 rounded-2xl lg:w-1/3 w-full space-y-4 border hover:border-blue-600 duration-300 cursor-pointer'>
+						<div className='flex flex-col bg-white p-6 px-8 rounded-2xl lg:w-1/3 w-full space-y-4 border hover:border-blue-600 duration-300 cursor-default'>
 							<h2 className='text-xl font-semibold text-blue-600'>
 								Динамика почв
 							</h2>
@@ -153,8 +154,8 @@ export default async function AboutPageComponent({ locale }) {
 								образом демонстрировали какие-либо быстрые трансформации почв,
 								например, связанные с эрозионными процессами.
 							</p>
-							<a
-								href='#'
+							<Link
+								href={`/${locale}/dynamics`}
 								className='flex items-center -mx-1 text-blue-600 transition-colors duration-300 transform  hover:underline hover:text-blue-700 '
 							>
 								<span className='mx-1'>Узнать больше</span>
@@ -170,7 +171,7 @@ export default async function AboutPageComponent({ locale }) {
 										clipRule='evenodd'
 									></path>
 								</svg>
-							</a>
+							</Link>
 						</div>
 					</div>
 				</div>
@@ -181,14 +182,15 @@ export default async function AboutPageComponent({ locale }) {
 
 					<p className='md:w-2/3 w-full text-base'>
 						Для структуризации данных используются{' '}
-						<span className='cursor-pointer text-blue-600 transition-colors duration-300 hover:underline hover:text-blue-700'>
+						<Link href='https://soils.narod.ru/'
+							className='cursor-pointer text-blue-600 transition-colors duration-300 hover:underline hover:text-blue-700'>
 							Классификация и диагностика почв России 2004 года
-						</span>{' '}
+						</Link>{' '}
 						с последующими дополнениями и{' '}
-						<span className='cursor-pointer text-blue-600 transition-colors duration-300 hover:underline hover:text-blue-700'>
+						<Link href='http://photosoil.tsu.ru/sites/default/files/PDF/wrb2014_2015_rus.pdf' className='cursor-pointer text-blue-600 transition-colors duration-300 hover:underline hover:text-blue-700'>
 							Международная классификация почв «World reference base for soil
 							resources 2014»
-						</span>
+						</Link>
 						.
 					</p>
 				</div>
