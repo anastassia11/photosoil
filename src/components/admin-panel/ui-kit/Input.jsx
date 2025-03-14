@@ -1,7 +1,8 @@
 import React, { forwardRef, memo } from 'react'
 
 function Input(
-	{ label, type, placeholder, isEng, required, error, ...props }, ref
+	{ label, type, placeholder, isEng, required, error, ...props },
+	ref
 ) {
 	return (
 		<div className='w-full'>

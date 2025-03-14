@@ -10,8 +10,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setDropdown } from '@/store/slices/generalSlice'
 
 import LanguageChanger from './LanguageChanger'
-import { getTranslation } from '@/i18n/client'
 import Logo from './Logo'
+import { getTranslation } from '@/i18n/client'
 
 export default function Header({ locale }) {
 	const dispatch = useDispatch()

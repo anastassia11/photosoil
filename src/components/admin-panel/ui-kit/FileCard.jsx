@@ -51,7 +51,8 @@ export default function FileCard({
 				<a
 					className='flex flex-row text-blue-700 hover:underline cursor-pointer duration-300 overflow-hidden'
 					href={`${BASE_SERVER_URL}${path}`}
-					target='_blank'>
+					target='_blank'
+				>
 					{fileTitle}
 				</a>
 			) : (

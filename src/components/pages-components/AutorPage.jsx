@@ -126,8 +126,8 @@ export default function AuthorPageComponent({ id }) {
 					<ul className='flex flex-col space-y-2 '>
 						{AUTHOR_INFO.map(({ title, name, isArray }, index) =>
 							name !== 'name' &&
-								((authorLang?.[name] && authorLang?.[name]?.length) ||
-									(author[name] && author[name]?.length)) ? (
+							((authorLang?.[name] && authorLang?.[name]?.length) ||
+								(author[name] && author[name]?.length)) ? (
 								<li
 									key={`INFO-${index}`}
 									className='flex flex-col w-full'
@@ -141,7 +141,7 @@ export default function AuthorPageComponent({ id }) {
 												<li key={item}>
 													{isAbsoluteUrl(item) ? (
 														<a
-															target="_blank"
+															target='_blank'
 															href={item}
 															className='text-blue-600 break-words'
 														>
@@ -149,7 +149,7 @@ export default function AuthorPageComponent({ id }) {
 														</a>
 													) : isEmail(item) ? (
 														<a
-															target="_blank"
+															target='_blank'
 															href={`mailto:${item}`}
 															className='text-blue-600 break-words'
 														>
@@ -170,8 +170,7 @@ export default function AuthorPageComponent({ id }) {
 													'text/html'
 												).body.innerHTML
 											}}
-										>
-										</div>
+										></div>
 									)}
 								</li>
 							) : (

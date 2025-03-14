@@ -38,3 +38,12 @@ export const request = async ({
 	const response = await axios.request(options)
 	return response
 }
+
+export const generateFileName = title => {
+	let safeName = title
+		.replace(/[\/\\:*?"<>|#%&$\+@=]/g, '')
+		.replace(/\s+/g, '_')
+		.toLowerCase()
+
+	return safeName.substring(0, 100)
+}

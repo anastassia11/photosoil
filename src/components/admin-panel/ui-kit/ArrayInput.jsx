@@ -57,12 +57,13 @@ export default function ArrayInput(
 	return (
 		<div className='flex flex-col w-full '>
 			<p className='font-medium'>
-				{!!title &&
+				{!!title && (
 					<label className='font-medium flex flex-row'>
 						{title}
 						{isEng ? ' (EN) ' : ''}
 						<span className='text-orange-500'>{required ? '*' : ''}</span>
-					</label>}
+					</label>
+				)}
 			</p>
 			<ul>
 				<DndContext

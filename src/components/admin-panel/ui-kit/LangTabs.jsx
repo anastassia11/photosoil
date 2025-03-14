@@ -1,4 +1,4 @@
-import { Root, List, Trigger } from '@radix-ui/react-tabs'
+import { List, Root, Trigger } from '@radix-ui/react-tabs'
 import { useParams } from 'next/navigation'
 import { memo, useEffect } from 'react'
 

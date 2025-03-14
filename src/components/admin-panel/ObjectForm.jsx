@@ -286,28 +286,34 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 		[pathname, dispatch, t, localObjectPhoto]
 	)
 
-	const handleTwoLangChange = useCallback(e => {
-		const isChecked = e.target.checked
-		const translations = getValues('translations')
-		if (pathname === 'edit') {
-			if (isChecked) {
+	const handleTwoLangChange = useCallback(
+		e => {
+			const isChecked = e.target.checked
+			const translations = getValues('translations')
+			if (pathname === 'edit') {
+				if (isChecked) {
+					if (translations?.length < 2) {
+						appendTranslation({ isEnglish: !isEng })
+					}
+				} else {
+					setValue('currentLang', oldIsEng)
+				}
+			} else {
 				if (translations?.length < 2) {
 					appendTranslation({ isEnglish: !isEng })
 				}
-			} else {
-				setValue('currentLang', oldIsEng)
 			}
-		} else {
-			if (translations?.length < 2) {
-				appendTranslation({ isEnglish: !isEng })
-			}
-		}
-		setValue('createTwoLang', isChecked)
-	}, [pathname, getValues, appendTranslation, setValue, isEng, oldIsEng])
+			setValue('createTwoLang', isChecked)
+		},
+		[pathname, getValues, appendTranslation, setValue, isEng, oldIsEng]
+	)
 
-	const handleLangChange = useCallback(value => {
-		setValue('currentLang', value)
-	}, [setValue])
+	const handleLangChange = useCallback(
+		value => {
+			setValue('currentLang', value)
+		},
+		[setValue]
+	)
 
 	const formCheck = async () => {
 		const result = await trigger()
@@ -338,8 +344,8 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 	}
 
 	const Column = ({ items }) => (
-		<div className="flex flex-col gap-4">
-			{items.map((item) => (
+		<div className='flex flex-col gap-4'>
+			{items.map(item => (
 				<div key={`classification-${item.id}`}>
 					<Controller
 						control={control}
@@ -350,19 +356,16 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 								name={isEng ? item.nameEng : item.nameRu}
 								items={item.terms}
 								itemId={item.id}
-
-								selectedItems={item.terms.map(({ id }) => id).filter(id => value?.includes(id))}
+								selectedItems={item.terms
+									.map(({ id }) => id)
+									.filter(id => value?.includes(id))}
 								type='classif'
-
 								sortByOrder={!item.isAlphabeticallOrder}
-
 								addItem={newItem => {
 									value.includes(newItem)
 										? onChange(value.filter(item => item !== newItem))
 										: onChange([...value, newItem])
-								}
-								}
-
+								}}
 								resetItems={items =>
 									onChange(value.filter(item => !items.includes(item)))
 								}
@@ -372,48 +375,48 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 				</div>
 			))}
 		</div>
-	);
+	)
 
 	const GridComponent = ({ classifications }) => {
-		const _classifications = classifications.filter(item => item.translationMode == 0
-			|| (isEng
-				? item.translationMode == 1
-				: item.translationMode == 2))
+		const _classifications = classifications.filter(
+			item =>
+				item.translationMode == 0 ||
+				(isEng ? item.translationMode == 1 : item.translationMode == 2)
+		)
 		const midPoint = Math.ceil(_classifications.length / 2)
 		const firstColumnItems = _classifications.slice(0, midPoint)
 		const secondColumnItems = _classifications.slice(midPoint)
 
 		return (
-			<div className="grid md:grid-cols-2 grid-cols-1 gap-4 w-full mt-1">
+			<div className='grid md:grid-cols-2 grid-cols-1 gap-4 w-full mt-1'>
 				<Column items={firstColumnItems} />
 				<Column items={secondColumnItems} />
 			</div>
-		);
-	};
+		)
+	}
 
 	const ItemFilter = ({ name, items, title, type }) => {
-		return <Controller
-			control={control}
-			name={name}
-			render={({ field: { value, onChange } }) => (
-				<Filter
-					locale={locale}
-					name={title}
-					items={items}
-
-					selectedItems={value}
-					type={type}
-
-					addItem={newItem =>
-						value.includes(newItem)
-							? onChange(value.filter(item => item !== newItem))
-							: onChange([...value, newItem])
-					}
-
-					resetItems={() => onChange([])}
-				/>
-			)}
-		/>
+		return (
+			<Controller
+				control={control}
+				name={name}
+				render={({ field: { value, onChange } }) => (
+					<Filter
+						locale={locale}
+						name={title}
+						items={items}
+						selectedItems={value}
+						type={type}
+						addItem={newItem =>
+							value.includes(newItem)
+								? onChange(value.filter(item => item !== newItem))
+								: onChange([...value, newItem])
+						}
+						resetItems={() => onChange([])}
+					/>
+				)}
+			/>
+		)
 	}
 
 	return (
@@ -511,8 +514,12 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 								key='authors'
 								className={`mt-3 ${isExternal ? 'opacity-50 pointer-events-none' : ''}`}
 							>
-
-								<ItemFilter name='authors' items={authors} title={t('authors')} type='authors' />
+								<ItemFilter
+									name='authors'
+									items={authors}
+									title={t('authors')}
+									type='authors'
+								/>
 							</li>
 							<label
 								htmlFor='isExternal'
@@ -704,13 +711,28 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 						<p className='font-medium mt-8'>{t('connection')}</p>
 						<div className='grid md:grid-cols-2 grid-cols-1 gap-4 w-full mt-1'>
 							{type !== 'ecosystem' && (
-								<ItemFilter name='ecoSystems' type='ecosystem' title={t('ecosystems')} items={ecosystems} />
+								<ItemFilter
+									name='ecoSystems'
+									type='ecosystem'
+									title={t('ecosystems')}
+									items={ecosystems}
+								/>
 							)}
 
 							{type !== 'soil' && (
-								<ItemFilter name='soilObjects' type='soil' title={t('soils')} items={soils} />
+								<ItemFilter
+									name='soilObjects'
+									type='soil'
+									title={t('soils')}
+									items={soils}
+								/>
 							)}
-							<ItemFilter name='publications' type='publications' title={t('publications')} items={publications} />
+							<ItemFilter
+								name='publications'
+								type='publications'
+								title={t('publications')}
+								items={publications}
+							/>
 						</div>
 
 						{translationsFields.map((field, index) => (

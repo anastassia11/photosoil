@@ -10,6 +10,7 @@ import {
 } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
+import { useSnapshot } from 'valtio'
 
 import Loader from '@/components/Loader'
 import Pagination from '@/components/Pagination'
@@ -17,14 +18,14 @@ import Dropdown from '@/components/admin-panel/ui-kit/Dropdown'
 import MotionWrapper from '@/components/admin-panel/ui-kit/MotionWrapper'
 import Filter from '@/components/soils/Filter'
 
+import { filtersStore } from '@/store/valtioStore/filtersStore'
+
 import { PAGINATION_OPTIONS } from '@/utils/constants'
 
 import { getAllNews } from '@/api/news/get_allNews'
 import { getTags } from '@/api/tags/get_tags'
 
 import { getTranslation } from '@/i18n/client'
-import { useSnapshot } from 'valtio'
-import { filtersStore } from '@/store/valtioStore/filtersStore'
 
 export default function NewsPageComponent() {
 	const pathname = usePathname()
@@ -59,7 +60,7 @@ export default function NewsPageComponent() {
 					(draftIsVisible
 						? true
 						: item.translations?.find(transl => transl.isEnglish === _isEng)
-							?.isVisible) &&
+								?.isVisible) &&
 					item.translations
 						?.find(transl => transl.isEnglish === _isEng)
 						?.title.toLowerCase()
@@ -88,9 +89,7 @@ export default function NewsPageComponent() {
 				didLogRef.current = false
 				const tagsParam = searchParams.get('tags')
 				tagsParam &&
-					tagsParam
-						.split(',')
-						.forEach(param => handleAddTag(Number(param)))
+					tagsParam.split(',').forEach(param => handleAddTag(Number(param)))
 			}, 300)
 		}
 		return () => {
@@ -120,9 +119,8 @@ export default function NewsPageComponent() {
 	const handleAddTag = useCallback(
 		newItem => {
 			filtersStore.selectedTags = selectedTags.includes(newItem)
-				? selectedTags.filter(
-					item => item !== newItem
-				) : [...selectedTags, newItem]
+				? selectedTags.filter(item => item !== newItem)
+				: [...selectedTags, newItem]
 		},
 		[selectedTags]
 	)
@@ -248,12 +246,14 @@ export default function NewsPageComponent() {
 							type='news-tags'
 							name={t('tags')}
 							items={tags}
-
-							selectedItems={tags.map(({ id }) => id).filter(id => selectedTags?.includes(id))}
-
+							selectedItems={tags
+								.map(({ id }) => id)
+								.filter(id => selectedTags?.includes(id))}
 							addItem={handleAddTag}
 							resetItems={items => {
-								filtersStore.selectedTags = selectedTags.filter(term => !items.includes(term))
+								filtersStore.selectedTags = selectedTags.filter(
+									term => !items.includes(term)
+								)
 							}}
 						/>
 					</MotionWrapper>

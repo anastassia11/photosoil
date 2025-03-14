@@ -69,7 +69,7 @@ const SearchRegion = memo(function SearchRegion({ onLocationHandler, locale }) {
 			if (result.length > 0) {
 				setLocation(result.slice(0, 5))
 			}
-		} catch (err) { }
+		} catch (err) {}
 	}
 
 	const handleLocationChange = item => {

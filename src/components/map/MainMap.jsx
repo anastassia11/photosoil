@@ -1,9 +1,6 @@
 'use client'
 
-import {
-	useParams,
-	useSearchParams,
-} from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import {
 	useCallback,
 	useEffect,
@@ -12,8 +9,10 @@ import {
 	useState
 } from 'react'
 import { useDispatch } from 'react-redux'
+import { useSnapshot } from 'valtio'
 
 import { openAlert } from '@/store/slices/alertSlice'
+import { filtersStore } from '@/store/valtioStore/filtersStore'
 
 import { getMapLayers } from '@/hooks/getMapLayers'
 
@@ -37,8 +36,6 @@ import SearchRegion from './SearchRegion'
 import SideBar from './SideBar'
 import Zoom from './Zoom'
 import { getTranslation } from '@/i18n/client'
-import { filtersStore } from '@/store/valtioStore/filtersStore'
-import { useSnapshot } from 'valtio'
 
 export default function MainMap() {
 	const dispatch = useDispatch()
@@ -53,7 +50,8 @@ export default function MainMap() {
 
 	const { t } = getTranslation(locale)
 
-	const { selectedTerms, selectedCategories, selectedAuthors } = useSnapshot(filtersStore)
+	const { selectedTerms, selectedCategories, selectedAuthors } =
+		useSnapshot(filtersStore)
 
 	const [selectedLayer, setSelectedLayer] = useState('')
 
@@ -84,10 +82,10 @@ export default function MainMap() {
 		localStorage.getItem('layersVisible')
 			? setLayersVisible(JSON.parse(localStorage.getItem('layersVisible')))
 			: setLayersVisible({
-				soil: true,
-				ecosystem: false,
-				publication: false
-			})
+					soil: true,
+					ecosystem: false,
+					publication: false
+				})
 
 		if (mapElement.current) {
 			if (didLogRef.current) {
@@ -184,32 +182,32 @@ export default function MainMap() {
 					(draftIsVisible
 						? true
 						: obj.translations?.find(transl => transl.isEnglish === _isEng)
-							?.isVisible) &&
+								?.isVisible) &&
 					(filterName.length
 						? obj.translations
-							?.find(transl => transl.isEnglish === _isEng)
-							?.name?.toLowerCase()
-							.includes(_filterName) ||
-						obj.translations
-							?.find(transl => transl.isEnglish === _isEng)
-							?.code?.toLowerCase()
-							.includes(_filterName)
+								?.find(transl => transl.isEnglish === _isEng)
+								?.name?.toLowerCase()
+								.includes(_filterName) ||
+							obj.translations
+								?.find(transl => transl.isEnglish === _isEng)
+								?.code?.toLowerCase()
+								.includes(_filterName)
 						: true) &&
 					(obj.objectType
 						? selectedCategories.length === 0 ||
-						selectedCategories.includes(obj.objectType)
+							selectedCategories.includes(obj.objectType)
 						: true) &&
 					(obj.authors
 						? selectedAuthors.length === 0 ||
-						selectedAuthors.some(selectedAuthor =>
-							obj.authors?.some(author => author === selectedAuthor)
-						)
+							selectedAuthors.some(selectedAuthor =>
+								obj.authors?.some(author => author === selectedAuthor)
+							)
 						: true) &&
 					(obj.terms
 						? selectedTerms.length === 0 ||
-						selectedTerms.some(selectedTerm =>
-							obj.terms?.some(term => term === selectedTerm)
-						)
+							selectedTerms.some(selectedTerm =>
+								obj.terms?.some(term => term === selectedTerm)
+							)
 						: true)
 			)
 			.map(({ id, _type }) => ({ id, _type }))
@@ -270,10 +268,13 @@ export default function MainMap() {
 		}
 	}, [])
 
-	const handleBaseLayerChange = useCallback(layer => {
-		baseLayer.setSource(getMapLayers(layer, locale))
-		setSelectedLayer(layer)
-	}, [baseLayer, locale])
+	const handleBaseLayerChange = useCallback(
+		layer => {
+			baseLayer.setSource(getMapLayers(layer, locale))
+			setSelectedLayer(layer)
+		},
+		[baseLayer, locale]
+	)
 
 	const typeConfig = [
 		{
@@ -643,8 +644,12 @@ export default function MainMap() {
 			<div
 				className={`z-40 absolute top-0 right-0 m-2 flex flex-row duration-300 lg:w-[500px] w-full pl-2`}
 			>
-				<SearchRegion locale={locale} onLocationHandler={selectLocationHandler} />
-				<LayersPanel locale={locale}
+				<SearchRegion
+					locale={locale}
+					onLocationHandler={selectLocationHandler}
+				/>
+				<LayersPanel
+					locale={locale}
 					onLayerChange={handleBaseLayerChange}
 					currentLayer={selectedLayer}
 				/>

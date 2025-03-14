@@ -437,10 +437,8 @@ export default function PublicationForm({
 									locale={locale}
 									name={t('soils')}
 									items={soils}
-
 									type='soil'
 									selectedItems={value}
-
 									addItem={newItem =>
 										value.includes(newItem)
 											? onChange(value.filter(item => item !== newItem))
@@ -458,10 +456,8 @@ export default function PublicationForm({
 									locale={locale}
 									name={t('ecosystems')}
 									items={ecosystems}
-
 									type='ecosystem'
 									selectedItems={value}
-
 									addItem={newItem =>
 										value.includes(newItem)
 											? onChange(value.filter(item => item !== newItem))

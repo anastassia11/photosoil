@@ -5,7 +5,10 @@ import { memo, useEffect, useRef } from 'react'
 
 import Dropdown from '../admin-panel/ui-kit/Dropdown'
 
-const LanguageChanger = memo(function LanguageChanger({ locale, isTransparent }) {
+const LanguageChanger = memo(function LanguageChanger({
+	locale,
+	isTransparent
+}) {
 	const pathname = usePathname()
 	const pathnameRef = useRef(pathname)
 
@@ -41,6 +44,5 @@ const LanguageChanger = memo(function LanguageChanger({ locale, isTransparent })
 			/>
 		</div>
 	)
-}
-)
+})
 export default LanguageChanger

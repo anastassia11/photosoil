@@ -5,7 +5,11 @@ import React, { memo, useEffect, useState } from 'react'
 
 import { getTranslation } from '@/i18n/client'
 
-const LayersPanel = memo(function LayersPanel({ onLayerChange, currentLayer, locale }) {
+const LayersPanel = memo(function LayersPanel({
+	onLayerChange,
+	currentLayer,
+	locale
+}) {
 	const [drapdownState, setDrapdownState] = useState({
 		isActive: false,
 		key: null

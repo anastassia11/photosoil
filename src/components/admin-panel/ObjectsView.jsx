@@ -146,11 +146,11 @@ export default function ObjectsView({
 		selectedObjects.forEach(item => {
 			item.type
 				? onVisibleChange({
-					id: item.id,
-					type: item.type,
-					isVisible,
-					isMulti: true
-				})
+						id: item.id,
+						type: item.type,
+						isVisible,
+						isMulti: true
+					})
 				: onVisibleChange({ id: item, isVisible, isMulti: true })
 		})
 	}
@@ -365,7 +365,7 @@ export default function ObjectsView({
 										key: `${objectType === 'userPage' ? `${type?.name}_${id}` : id}`,
 										isActive:
 											dropdown.key !== null &&
-												dropdown.key !==
+											dropdown.key !==
 												`${objectType === 'userPage' ? `${type?.name}_${id}` : id}`
 												? true
 												: !dropdown.isActive

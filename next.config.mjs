@@ -30,7 +30,8 @@ const nextConfig = {
 	},
 	experimental: {
 		// Используется для оптимизации пакетов
-		optimizePackageImports: ['@dnd-kit/core',
+		optimizePackageImports: [
+			'@dnd-kit/core',
 			'@dnd-kit/modifiers',
 			'@dnd-kit/sortable',
 			'@dnd-kit/utilities',
@@ -95,10 +96,10 @@ const nextConfig = {
 			'tailwind-merge',
 			'tailwindcss-animate',
 			'valtio',
-			'zod',
+			'zod'
 		],
 		// Добавляем поддержку WebAssembly
-		webpackBuildWorker: true,
+		webpackBuildWorker: true
 	},
 
 	// Решение для Critical dependency
@@ -108,22 +109,22 @@ const nextConfig = {
 			config.externals.push({
 				'web-worker': 'commonjs2 web-worker',
 				'node:worker_threads': 'commonjs2 node:worker_threads'
-			});
+			})
 		}
 
 		// Убираем проблемный полифилл для Buffer
-		delete config.resolve.fallback?.buffer;
-		delete config.resolve.fallback?.bufferutil;
-		delete config.resolve.fallback?.['utf-8-validate'];
+		delete config.resolve.fallback?.buffer
+		delete config.resolve.fallback?.bufferutil
+		delete config.resolve.fallback?.['utf-8-validate']
 
 		// Добавляем только необходимые настройки
 		config.experiments = {
 			...config.experiments,
 			asyncWebAssembly: true,
 			layers: true
-		};
+		}
 
-		return config;
+		return config
 	}
 }
 
