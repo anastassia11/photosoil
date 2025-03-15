@@ -250,7 +250,7 @@ const TextEditor = memo(
 												: '0'
 								}
 								items={HEADING}
-								dropdownKey='heading'
+								dropdownKey={`heading-${type}`}
 								onCategotyChange={handleHeadingChange}
 							/>
 						</div>

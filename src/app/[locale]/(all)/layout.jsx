@@ -15,7 +15,7 @@ export default function AllLayout({ children }) {
 		e => {
 			if (
 				!e.target.closest(
-					'.user, .dropdown, .soils, .category, .language, .languageChanger, .filter_dropdown, .in_page, .rang, .heading, .linkModal, .tag-form, .modal'
+					'.user, .dropdown, .soils, .category, .language, .languageChanger, .filter_dropdown, .in_page, .rang, .heading-about-en, .heading-about-ru, .linkModal, .tag-form, .modal'
 				)
 			) {
 				dispatch(setDropdown({ isActive: false, key: null }))
