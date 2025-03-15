@@ -39,9 +39,9 @@ const defaults = {
 					const currentSlide = instance.getSlide()
 
 					const imageUrl = currentSlide.src
-					const fileName = currentSlide.title.length
-						? generateFileName(currentSlide.title)
-						: imageUrl.split('/').pop()
+					const fileName = generateFileName(currentSlide.title?.length
+						? currentSlide.title
+						: imageUrl.split('/').pop())
 
 					const response = await fetch(imageUrl)
 					const blob = await response.blob()
