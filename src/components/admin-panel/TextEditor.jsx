@@ -71,8 +71,13 @@ const TextEditor = memo(
 			immediatelyRender: false,
 			onUpdate: ({ editor }) => {
 				const html = editor.getHTML()
-				if (html !== content) {
-					setContent(html)
+
+				// Проверяем наличие реального контента (текста или элементов)
+				const isEmpty = !editor.getText().trim().length
+
+				const newContent = isEmpty ? '' : html
+				if (newContent !== content) {
+					setContent(newContent)
 				}
 			}
 		})
@@ -150,10 +155,10 @@ const TextEditor = memo(
 		const handleHeadingChange = level => {
 			level != 0
 				? editor
-						.chain()
-						.focus()
-						.toggleHeading({ level: Number(level) })
-						.run()
+					.chain()
+					.focus()
+					.toggleHeading({ level: Number(level) })
+					.run()
 				: editor.chain().focus().setParagraph().run()
 		}
 
