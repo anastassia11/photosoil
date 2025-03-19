@@ -123,15 +123,15 @@ const Filter = memo(
 				formVisible.type === 'create'
 					? await createTag(tagData)
 					: await putTag({
-							id: tagData.id,
-							data: { nameRu: tagData.nameRu, nameEng: tagData.nameEng }
-						})
+						id: tagData.id,
+						data: { nameRu: tagData.nameRu, nameEng: tagData.nameEng }
+					})
 			if (result.success) {
 				formVisible.type === 'create'
 					? setTags(prev => [...prev, result.data])
 					: setTags(prev =>
-							prev.map(item => (item.id === tagData.id ? result.data : item))
-						)
+						prev.map(item => (item.id === tagData.id ? result.data : item))
+					)
 				setFormVisible(prev => ({ visible: false, type: '' }))
 				setTagData({})
 			}
@@ -316,16 +316,15 @@ const Filter = memo(
 						</div>
 
 						<div
-							className={`w-full duration-200 transition-all ${!isMapFilter ? 'top-[30px] absolute border z-50' : ''} 
-                    ${
-											isMapFilter
-												? filterOpen
-													? 'block'
-													: 'hidden'
-												: dropdown?.key == _id && dropdown?.isActive
-													? 'visible translate-y-4'
-													: 'invisible opacity-0'
-										}
+							className={`w-full duration-200 transition-all ${!isMapFilter ? 'top-[30px] absolute border overflow-hidden z-50' : ''} 
+                    ${isMapFilter
+									? filterOpen
+										? 'block'
+										: 'hidden'
+									: dropdown?.key == _id && dropdown?.isActive
+										? 'visible translate-y-4'
+										: 'invisible opacity-0'
+								}
                      rounded-md border-gray-200 bg-white`}
 						>
 							<header
@@ -366,106 +365,105 @@ const Filter = memo(
 									ref={searchRef}
 									type='text'
 									placeholder={t('search')}
-									className={`w-full pr-4  outline-none  ${isMapFilter ? 'border-b focus:border-blue-600 py-1 pl-[32px]' : 'py-2 pl-12  border-y'}`}
+									className={`w-full pr-4  outline-none  ${isMapFilter ? 'border-b focus:border-blue-600 py-1 pl-[32px]'
+										: `py-2 pl-12 border-y`}`}
 									onChange={e => setFilterName(e.target.value)}
 								/>
 							</div>
-							{filteredItems.length ? (
-								<ul
-									className={`scroll space-y-1 max-h-[200px] overflow-auto py-2 ${isMapFilter ? 'px-4' : 'px-4'}`}
-								>
-									{filteredItems.map(
-										({ name, id, dataRu, dataEng, nameEng, nameRu }) => {
-											const isValid =
-												(_isEng
-													? (nameEng && nameEng !== '') ||
+							{(!!filteredItems.length &&
+								((type === 'ecosystem' || type === 'soil' || type === 'publications') ? filterName.length > 3 : true)) && (
+									<ul
+										className={`scroll space-y-1 max-h-[200px] overflow-auto py-2 ${isMapFilter ? 'px-4' : 'px-4'}`}
+									>
+										{filteredItems.map(
+											({ name, id, dataRu, dataEng, nameEng, nameRu }) => {
+												const isValid =
+													(_isEng
+														? (nameEng && nameEng !== '') ||
 														(dataEng && dataEng.name !== '')
-													: (nameRu && nameRu !== '') ||
+														: (nameRu && nameRu !== '') ||
 														(dataRu && dataRu.name !== '')) || name
-											if (isValid)
-												return (
-													<li
-														key={`Item${type ? `-${type}-${id}` : `-${id}`}`}
-														className='flex flex-row justify-between group'
-													>
-														<label
-															htmlFor={`Item${type ? `-${type}-${id}` : `-${id}`}`}
-															className='flex flex-row cursor-pointer w-full'
+												if (isValid)
+													return (
+														<li
+															key={`Item${type ? `-${type}-${id}` : `-${id}`}`}
+															className='flex flex-row justify-between group'
 														>
-															<input
-																type='checkbox'
-																id={`Item${type ? `-${type}-${id}` : `-${id}`}`}
-																checked={selectedItems?.includes(id)}
-																onChange={() => addItem(id)}
-																className='min-w-5 w-5 min-h-5 h-5 mr-1 rounded border-gray-300 '
-															/>
-															<span className='text-gray-700 ml-2 '>
-																{name ||
-																	(_isEng ? nameEng : nameRu) ||
-																	(_isEng ? dataEng?.name : dataRu?.name)}
-															</span>
-														</label>
-														{(pathNames.includes('create') ||
-															pathNames.includes('edit')) &&
-														pathNames.includes('news') ? (
-															<span className='flex flex-row'>
-																<button
-																	onClick={e =>
-																		handleEditClick(e, { id, nameEng, nameRu })
-																	}
-																	type='button'
-																	className='group-hover:visible invisible mr-3 text-gray-500 hover:text-gray-700'
-																>
-																	<svg
-																		xmlns='http://www.w3.org/2000/svg'
-																		fill='none'
-																		viewBox='0 0 24 24'
-																		strokeWidth={1.5}
-																		stroke='currentColor'
-																		className='size-5'
+															<label
+																htmlFor={`Item${type ? `-${type}-${id}` : `-${id}`}`}
+																className='flex flex-row cursor-pointer w-full'
+															>
+																<input
+																	type='checkbox'
+																	id={`Item${type ? `-${type}-${id}` : `-${id}`}`}
+																	checked={selectedItems?.includes(id)}
+																	onChange={() => addItem(id)}
+																	className='min-w-5 w-5 min-h-5 h-5 mr-1 rounded border-gray-300 '
+																/>
+																<span className='text-gray-700 ml-2 '>
+																	{name ||
+																		(_isEng ? nameEng : nameRu) ||
+																		(_isEng ? dataEng?.name : dataRu?.name)}
+																</span>
+															</label>
+															{(pathNames.includes('create') ||
+																pathNames.includes('edit')) &&
+																pathNames.includes('news') ? (
+																<span className='flex flex-row'>
+																	<button
+																		onClick={e =>
+																			handleEditClick(e, { id, nameEng, nameRu })
+																		}
+																		type='button'
+																		className='group-hover:visible invisible mr-3 text-gray-500 hover:text-gray-700'
 																	>
-																		<path
-																			strokeLinecap='round'
-																			strokeLinejoin='round'
-																			d='m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125'
-																		/>
-																	</svg>
-																</button>
-																<button
-																	onClick={e => handleDeleteClick(e, id)}
-																	type='button'
-																	className='group-hover:visible invisible text-gray-500 hover:text-red-700'
-																>
-																	<svg
-																		xmlns='http://www.w3.org/2000/svg'
-																		fill='none'
-																		viewBox='0 0 24 24'
-																		strokeWidth={1.5}
-																		stroke='currentColor'
-																		className='size-5'
+																		<svg
+																			xmlns='http://www.w3.org/2000/svg'
+																			fill='none'
+																			viewBox='0 0 24 24'
+																			strokeWidth={1.5}
+																			stroke='currentColor'
+																			className='size-5'
+																		>
+																			<path
+																				strokeLinecap='round'
+																				strokeLinejoin='round'
+																				d='m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125'
+																			/>
+																		</svg>
+																	</button>
+																	<button
+																		onClick={e => handleDeleteClick(e, id)}
+																		type='button'
+																		className='group-hover:visible invisible text-gray-500 hover:text-red-700'
 																	>
-																		<path
-																			strokeLinecap='round'
-																			strokeLinejoin='round'
-																			d='m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0'
-																		/>
-																	</svg>
-																</button>
-															</span>
-														) : (
-															''
-														)}
-													</li>
-												)
-										}
-									)}
-								</ul>
-							) : (
-								''
-							)}
+																		<svg
+																			xmlns='http://www.w3.org/2000/svg'
+																			fill='none'
+																			viewBox='0 0 24 24'
+																			strokeWidth={1.5}
+																			stroke='currentColor'
+																			className='size-5'
+																		>
+																			<path
+																				strokeLinecap='round'
+																				strokeLinejoin='round'
+																				d='m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0'
+																			/>
+																		</svg>
+																	</button>
+																</span>
+															) : (
+																''
+															)}
+														</li>
+													)
+											}
+										)}
+									</ul>)}
 
 							{(pathNames.includes('create') || pathNames.includes('edit')) &&
-							pathNames.includes('news') ? (
+								pathNames.includes('news') ? (
 								<button
 									type='button'
 									className='font-medium text-blue-600 w-fit ml-4 mb-2'
@@ -486,9 +484,9 @@ const Filter = memo(
 									if (id === _id) {
 										const isValid = _isEng
 											? (nameEng && nameEng !== '') ||
-												(dataEng && dataEng.name !== '')
+											(dataEng && dataEng.name !== '')
 											: (nameRu && nameRu !== '') ||
-												(dataRu && dataRu.name !== '')
+											(dataRu && dataRu.name !== '')
 										if (isValid)
 											return (
 												<li
@@ -559,7 +557,7 @@ const Filter = memo(
 		return (
 			prevProps.type === nextProps.type &&
 			prevProps.selectedItems?.toString() ===
-				nextProps.selectedItems?.toString() &&
+			nextProps.selectedItems?.toString() &&
 			prevProps.items === nextProps.items &&
 			prevProps.name === nextProps.name &&
 			prevProps.addItem === nextProps.addItem
