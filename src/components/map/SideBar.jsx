@@ -194,11 +194,10 @@ const SideBar = memo(
 		return (
 			<div
 				id='map-sidebar'
-				className={`sideBar ${
-					sidebarOpen
-						? 'left-0 z-30'
-						: 'sm:-left-[408px] sm:z-20 z-30 -left-[calc(100%-90px)]'
-				} absolute lg:top-0 top-[45px] sm:w-[400px] w-[calc(100%-98px)] sm:max-w-[400px] max-h-[calc(100%-150px)] sm:max-h-[calc(100%-16px)]
+				className={`sideBar ${sidebarOpen
+					? 'left-0 z-30'
+					: 'sm:-left-[408px] sm:z-20 z-30 -left-[calc(100%-90px)]'
+					} absolute lg:top-0 top-[45px] sm:w-[400px] w-[calc(100%-98px)] sm:max-w-[400px] max-h-[calc(100%-150px)] sm:max-h-[calc(100%-16px)]
         shadow-lg bg-white duration-300 rounded-lg m-2 flex flex-row pb-4`}
 			>
 				<div className='relative flex-1 flex flex-col max-w-full'>
@@ -400,7 +399,7 @@ const SideBar = memo(
 		return (
 			prevProps.sidebarOpen === nextProps.sidebarOpen &&
 			prevProps.filterName === nextProps.filterName &&
-			prevProps.objects.toString() === nextProps.objects.toString() &&
+			prevProps.objects.map(({ id }) => id).toString() === nextProps.objects.map(({ id }) => id).toString() &&
 			prevProps.layersVisible === nextProps.layersVisible &&
 			prevProps.popupVisible === nextProps.popupVisible &&
 			prevProps.draftIsVisible === nextProps.draftIsVisible

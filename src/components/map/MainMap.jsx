@@ -82,10 +82,10 @@ export default function MainMap() {
 		localStorage.getItem('layersVisible')
 			? setLayersVisible(JSON.parse(localStorage.getItem('layersVisible')))
 			: setLayersVisible({
-					soil: true,
-					ecosystem: false,
-					publication: false
-				})
+				soil: true,
+				ecosystem: false,
+				publication: false
+			})
 
 		if (mapElement.current) {
 			if (didLogRef.current) {
@@ -182,32 +182,32 @@ export default function MainMap() {
 					(draftIsVisible
 						? true
 						: obj.translations?.find(transl => transl.isEnglish === _isEng)
-								?.isVisible) &&
+							?.isVisible) &&
 					(filterName.length
 						? obj.translations
-								?.find(transl => transl.isEnglish === _isEng)
-								?.name?.toLowerCase()
-								.includes(_filterName) ||
-							obj.translations
-								?.find(transl => transl.isEnglish === _isEng)
-								?.code?.toLowerCase()
-								.includes(_filterName)
+							?.find(transl => transl.isEnglish === _isEng)
+							?.name?.toLowerCase()
+							.includes(_filterName) ||
+						obj.translations
+							?.find(transl => transl.isEnglish === _isEng)
+							?.code?.toLowerCase()
+							.includes(_filterName)
 						: true) &&
 					(obj.objectType
 						? selectedCategories.length === 0 ||
-							selectedCategories.includes(obj.objectType)
+						selectedCategories.includes(obj.objectType)
 						: true) &&
 					(obj.authors
 						? selectedAuthors.length === 0 ||
-							selectedAuthors.some(selectedAuthor =>
-								obj.authors?.some(author => author === selectedAuthor)
-							)
+						selectedAuthors.some(selectedAuthor =>
+							obj.authors?.some(author => author === selectedAuthor)
+						)
 						: true) &&
 					(obj.terms
 						? selectedTerms.length === 0 ||
-							selectedTerms.some(selectedTerm =>
-								obj.terms?.some(term => term === selectedTerm)
-							)
+						selectedTerms.some(selectedTerm =>
+							obj.terms?.some(term => term === selectedTerm)
+						)
 						: true)
 			)
 			.map(({ id, _type }) => ({ id, _type }))
