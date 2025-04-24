@@ -10,8 +10,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setDropdown } from '@/store/slices/generalSlice'
 
 import * as Icons from './TextEditor/Icons'
-import Dropdown from './ui-kit/Dropdown'
 import '@/styles/editor.css'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../ui/select'
 
 const TextEditor = memo(
 	function TextEditor({ content, setContent, isSoil, type }) {
@@ -236,23 +236,26 @@ const TextEditor = memo(
 					</BubbleMenu>
 
 					{!isSoil ? (
-						<div className='w-[155px]'>
-							<Dropdown
-								flexRow={true}
-								noBold={true}
-								value={
-									editor?.isActive('heading', { level: 1 })
-										? '1'
-										: editor?.isActive('heading', { level: 2 })
-											? '2'
-											: editor?.isActive('heading', { level: 3 })
-												? '3'
-												: '0'
-								}
-								items={HEADING}
-								dropdownKey={`heading-${type}`}
-								onCategotyChange={handleHeadingChange}
-							/>
+						<div>
+							<Select
+								defaultValue='0'
+								value={editor?.isActive('heading', { level: 1 })
+									? '1'
+									: editor?.isActive('heading', { level: 2 })
+										? '2'
+										: editor?.isActive('heading', { level: 3 })
+											? '3'
+											: '0'}
+								onValueChange={handleHeadingChange}>
+								<SelectTrigger className="w-[155px] text-base">
+									<SelectValue />
+								</SelectTrigger>
+								<SelectContent>
+									{Object.entries(HEADING).map(([value, title]) =>
+										<SelectItem key={value} value={value}
+											className='text-base'>{title}</SelectItem>)}
+								</SelectContent>
+							</Select>
 						</div>
 					) : (
 						''
@@ -385,7 +388,7 @@ const TextEditor = memo(
 					editor={editor}
 					className='pointer-events-auto z-40 p-2 focus:outline-none'
 				/>
-			</div>
+			</div >
 		)
 	},
 	(prevProps, nextProps) => {

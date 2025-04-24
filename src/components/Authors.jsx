@@ -14,9 +14,10 @@ import { getAuthors } from '@/api/author/get_authors'
 
 import Loader from './Loader'
 import Pagination from './Pagination'
-import Dropdown from './admin-panel/ui-kit/Dropdown'
 import MotionWrapper from './admin-panel/ui-kit/MotionWrapper'
 import { getTranslation } from '@/i18n/client'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
+import { Label } from './ui/label'
 
 export default function Authors() {
 	const { locale } = useParams()
@@ -73,7 +74,7 @@ export default function Authors() {
 							src={`${BASE_SERVER_URL}${
 								// photo.pathResize.length
 								false ? photo.pathResize : photo.path
-							}`}
+								}`}
 							width={500}
 							height={500}
 							alt='soil'
@@ -142,16 +143,22 @@ export default function Authors() {
 				</div>
 			</div>
 			<div className={`flex flex-row justify-end  items-center mb-4`}>
-				<div className='self-end flex-row items-center justify-center w-[190px]'>
-					<Dropdown
-						name={t('in_page')}
-						value={itemsPerPage}
-						items={PAGINATION_OPTIONS}
-						onCategotyChange={setItemsPerPage}
-						flexRow={true}
-						dropdownKey='in_page'
-						noBold={true}
-					/>
+				<div className='self-end flex flex-row items-center justify-end w-[190px] space-x-2'>
+					<Label htmlFor="in_page"
+						className='text-base min-w-fit'>{t('in_page')}</Label>
+					<Select
+						id="in_page"
+						value={itemsPerPage.toString()}
+						onValueChange={setItemsPerPage}>
+						<SelectTrigger className="text-base w-[70px]">
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent className='min-w-0'>
+							{Object.entries(PAGINATION_OPTIONS).map(([value, title]) =>
+								<SelectItem key={value} value={value.toString()}
+									className='text-base'>{title}</SelectItem>)}
+						</SelectContent>
+					</Select>
 				</div>
 			</div>
 

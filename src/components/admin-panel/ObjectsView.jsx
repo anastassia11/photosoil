@@ -13,8 +13,9 @@ import { setDropdown } from '@/store/slices/generalSlice'
 
 import { PAGINATION_OPTIONS } from '@/utils/constants'
 
-import Dropdown from './ui-kit/Dropdown'
 import { getTranslation } from '@/i18n/client'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import { Label } from '../ui/label'
 
 export default function ObjectsView({
 	_objects,
@@ -146,11 +147,11 @@ export default function ObjectsView({
 		selectedObjects.forEach(item => {
 			item.type
 				? onVisibleChange({
-						id: item.id,
-						type: item.type,
-						isVisible,
-						isMulti: true
-					})
+					id: item.id,
+					type: item.type,
+					isVisible,
+					isMulti: true
+				})
 				: onVisibleChange({ id: item, isVisible, isMulti: true })
 		})
 	}
@@ -365,7 +366,7 @@ export default function ObjectsView({
 										key: `${objectType === 'userPage' ? `${type?.name}_${id}` : id}`,
 										isActive:
 											dropdown.key !== null &&
-											dropdown.key !==
+												dropdown.key !==
 												`${objectType === 'userPage' ? `${type?.name}_${id}` : id}`
 												? true
 												: !dropdown.isActive
@@ -1133,16 +1134,23 @@ export default function ObjectsView({
 				{languageChanger ? (
 					<div
 						className={`${languageChanger ? 'sm:mt-4' : 'mt-0'} sm:text-base text-sm mt-2 pl-1 sm:mt-0 sm:w-[232px] w-full md:mt-0 md:ml-4 h-fit
-                     `}
+                     flex flex-row space-x-2 items-center`}
 					>
-						<Dropdown
-							name={t('language')}
+						<Label htmlFor="language"
+							className='text-base'>{t('language')}</Label>
+						<Select
+							id="language"
 							value={currentLang}
-							items={LANGUAGES}
-							flexRow={true}
-							onCategotyChange={handleLangChange}
-							dropdownKey='language'
-						/>
+							onValueChange={handleLangChange}>
+							<SelectTrigger className="text-base">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								{Object.entries(LANGUAGES).map(([value, title]) =>
+									<SelectItem key={value} value={value}
+										className='text-base'>{title}</SelectItem>)}
+							</SelectContent>
+						</Select>
 					</div>
 				) : (
 					''
@@ -1207,15 +1215,22 @@ export default function ObjectsView({
 				</div>
 			</div>
 			<div className='flex xl:flex-row flex-col self-end xl:space-x-6'>
-				<div className='flex flex-row xl:justify-center justify-end mb-2 mr-1 xl:mr-0 xl:mb-0 items-center'>
-					<Dropdown
-						name={t('in_page')}
-						value={itemsPerPage}
-						items={PAGINATION_OPTIONS}
-						onCategotyChange={setItemsPerPage}
-						flexRow={true}
-						dropdownKey='in_page'
-					/>
+				<div className='flex flex-row space-x-2 xl:justify-center justify-end mb-2 mr-1 xl:mr-0 xl:mb-0 items-center'>
+					<Label htmlFor="in_page"
+						className='text-base min-w-fit'>{t('in_page')}</Label>
+					<Select
+						id="in_page"
+						value={itemsPerPage.toString()}
+						onValueChange={setItemsPerPage}>
+						<SelectTrigger className="text-base w-[70px]">
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent className='min-w-0'>
+							{Object.entries(PAGINATION_OPTIONS).map(([value, title]) =>
+								<SelectItem key={value} value={value.toString()}
+									className='text-base'>{title}</SelectItem>)}
+						</SelectContent>
+					</Select>
 				</div>
 				<Pagination
 					itemsPerPage={PAGINATION_OPTIONS[itemsPerPage]}

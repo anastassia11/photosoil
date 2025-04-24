@@ -25,12 +25,13 @@ import { getSoils } from '@/api/soil/get_soils'
 
 import Loader from '../Loader'
 import Pagination from '../Pagination'
-import Dropdown from '../admin-panel/ui-kit/Dropdown'
 import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper'
 
 import Filter from './Filter'
 import SoilCard from './SoilCard'
 import { getTranslation } from '@/i18n/client'
+import { Label } from '../ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 
 export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 	const { locale } = useParams()
@@ -125,7 +126,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 							(draftIsVisible
 								? true
 								: soil.translations?.find(transl => transl.isEnglish === _isEng)
-										?.isVisible) &&
+									?.isVisible) &&
 							(soil.translations
 								?.find(transl => transl.isEnglish === _isEng)
 								?.name.toLowerCase()
@@ -268,11 +269,10 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 						value={filterName}
 						onChange={e => setFilterName(e.target.value)}
 						type='text'
-						placeholder={`${
-							isSoils || type === 'ecosystems'
-								? t('search_code')
-								: t('search_name')
-						}`}
+						placeholder={`${isSoils || type === 'ecosystems'
+							? t('search_code')
+							: t('search_name')
+							}`}
 						className='w-full py-2 pl-12 pr-4 border rounded-md outline-none bg-white focus:border-blue-600'
 					/>
 				</div>
@@ -290,16 +290,22 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 				) : (
 					''
 				)}
-				<div className='self-end flex-row items-center justify-center w-[190px]'>
-					<Dropdown
-						name={t('in_page')}
-						value={itemsPerPage}
-						items={PAGINATION_OPTIONS}
-						onCategotyChange={setItemsPerPage}
-						flexRow={true}
-						dropdownKey='in_page'
-						noBold={true}
-					/>
+				<div className='self-end flex flex-row items-center justify-end w-[190px] space-x-2'>
+					<Label htmlFor="in_page"
+						className='text-base min-w-fit'>{t('in_page')}</Label>
+					<Select
+						id="in_page"
+						value={itemsPerPage.toString()}
+						onValueChange={setItemsPerPage}>
+						<SelectTrigger className="text-base w-[70px]">
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent className='min-w-0'>
+							{Object.entries(PAGINATION_OPTIONS).map(([value, title]) =>
+								<SelectItem key={value} value={value.toString()}
+									className='text-base'>{title}</SelectItem>)}
+						</SelectContent>
+					</Select>
 				</div>
 			</div>
 			{filtersVisible && isFilters ? (

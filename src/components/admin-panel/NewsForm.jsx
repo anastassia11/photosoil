@@ -70,7 +70,6 @@ export default function NewsForm({
 	const [localFiles, setLocalFiles] = useState([])
 	const [tags, setTags] = useState([])
 
-	const dropdown = useSelector(state => state.general.dropdown)
 	const [isEng, setIsEng] = useState(false)
 	const [createTwoLang, setCreateTwoLang] = useState(false)
 	const { locale } = useParams()
@@ -453,17 +452,20 @@ export default function NewsForm({
 							render={({ field: { value, onChange } }) => (
 								<Filter
 									locale={locale}
-									dropdown={dropdown}
 									name={t('tags')}
 									items={tags}
+
 									type='tags'
 									setTags={setTags}
-									allSelectedItems={value}
-									isEng={isEng}
-									addItem={newItem => onChange([...value, newItem])}
-									deleteItem={deletedItem =>
-										onChange(value.filter(item => item !== deletedItem))
-									}
+									selectedItems={tags
+										.map(({ id }) => id)
+										.filter(id => value?.includes(id))}
+
+									addItem={newItem => {
+										value.includes(newItem)
+											? onChange(value.filter(item => item !== newItem))
+											: onChange([...value, newItem])
+									}}
 									resetItems={() => onChange([])}
 								/>
 							)}

@@ -33,12 +33,13 @@ import Filter from '../soils/Filter'
 
 import TextEditor from './TextEditor'
 import DragAndDrop from './ui-kit/DragAndDrop'
-import Dropdown from './ui-kit/Dropdown'
 import Input from './ui-kit/Input'
 import LangTabs from './ui-kit/LangTabs'
 import PhotoCard from './ui-kit/PhotoCard'
 import Textarea from './ui-kit/Textarea'
 import { getTranslation } from '@/i18n/client'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import { Label } from '../ui/label'
 
 function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 	const dispatch = useDispatch()
@@ -456,18 +457,27 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 						))}
 
 						{type === 'soil' && (
-							<div className='mt-3'>
+							<div className='mt-3 flex flex-col space-y-1'>
+								<Label htmlFor="objectType"
+									className='text-base'>{t('objectType')}</Label>
 								<Controller
 									control={control}
 									name='objectType'
 									render={({ field: { onChange, value } }) => (
-										<Dropdown
-											name={t('objectType')}
-											value={value}
-											items={SOIL_ENUM}
-											onCategotyChange={type => onChange(Number(type))}
-											dropdownKey='category'
-										/>
+										<Select
+											id="objectType"
+											defaultValue={value}
+											value={value.toString()}
+											onValueChange={type => onChange(Number(type))}>
+											<SelectTrigger className="text-base">
+												<SelectValue />
+											</SelectTrigger>
+											<SelectContent>
+												{Object.entries(SOIL_ENUM).map(([value, title]) =>
+													<SelectItem key={value} value={value.toString()}
+														className='text-base'>{title}</SelectItem>)}
+											</SelectContent>
+										</Select>
 									)}
 								/>
 							</div>

@@ -17,7 +17,6 @@ import React, {
 import { useSelector } from 'react-redux'
 import { useSnapshot } from 'valtio'
 
-import { dropdownStore } from '@/store/valtioStore/dropdownStore'
 import { filtersStore } from '@/store/valtioStore/filtersStore'
 
 import { useConstants } from '@/hooks/useConstants'
@@ -53,8 +52,6 @@ const SideBar = memo(
 		const router = useRouter()
 		const pathname = usePathname()
 		const didLogRef = useRef(true)
-		const dropdown = useSelector(state => state.general.dropdown)
-		// const dropdown = useSnapshot(dropdownStore)
 
 		const [classifications, setClassifications] = useState([])
 		const [authors, setAuthors] = useState([])
@@ -286,7 +283,7 @@ const SideBar = memo(
 										</p>
 										<div
 											x-show='show'
-											x-transition
+											x-transition={true}
 											className='sm:space-y-2.5 space-y-1 px-1'
 										>
 											<LayerSwitch

@@ -10,10 +10,11 @@ import { setDirty } from '@/store/slices/formSlice'
 import { useConstants } from '@/hooks/useConstants'
 
 import ArrayInput from './ui-kit/ArrayInput'
-import Dropdown from './ui-kit/Dropdown'
 import Input from './ui-kit/Input'
 import SubmitBtn from './ui-kit/SubmitBtn'
 import { getTranslation } from '@/i18n/client'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import { Label } from '../ui/label'
 
 export default function DictionaryForm({
 	_dictionary,
@@ -96,18 +97,26 @@ export default function DictionaryForm({
 			</div>
 
 			<div className='flex flex-col h-fit items-start pb-16 mt-4'>
-				<div className='xl:w-[50%] w-full'>
+				<div className='xl:w-[50%] w-full flex flex-col space-y-1'>
+					<Label htmlFor="translationMode"
+						className='text-base'>{t('language')}</Label>
 					<Controller
 						control={control}
 						name='translationMode'
 						render={({ field: { onChange, value } }) => (
-							<Dropdown
-								name={t('language')}
-								value={value}
-								items={TRANSLATION_ENUM}
-								onCategotyChange={lang => onChange(Number(lang))}
-								dropdownKey='language'
-							/>
+							<Select
+								id="translationMode"
+								value={value.toString()}
+								onValueChange={lang => onChange(Number(lang))}>
+								<SelectTrigger className="text-base">
+									<SelectValue />
+								</SelectTrigger>
+								<SelectContent>
+									{Object.entries(TRANSLATION_ENUM).map(([value, title]) =>
+										<SelectItem key={value} value={value.toString()}
+											className='text-base'>{title}</SelectItem>)}
+								</SelectContent>
+							</Select>
 						)}
 					/>
 				</div>

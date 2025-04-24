@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from 'next/navigation'
 import { memo, useEffect, useRef } from 'react'
 
-import Dropdown from '../admin-panel/ui-kit/Dropdown'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 
 const LanguageChanger = memo(function LanguageChanger({
 	locale,
@@ -35,13 +35,18 @@ const LanguageChanger = memo(function LanguageChanger({
 
 	return (
 		<div className='sm:w-[80px] w-full h-full flex justify-center items-center -mt-1'>
-			<Dropdown
+			<Select
 				value={locale}
-				items={LANGUAGES}
-				isTransparent={isTransparent}
-				onCategotyChange={handleLanguageChange}
-				dropdownKey='languageChanger'
-			/>
+				onValueChange={handleLanguageChange}>
+				<SelectTrigger className="text-base border-none bg-transparent">
+					<SelectValue />
+				</SelectTrigger>
+				<SelectContent className='min-w-0'>
+					{Object.entries(LANGUAGES).map(([value, title]) =>
+						<SelectItem key={value} value={value}
+							className='text-base'>{title}</SelectItem>)}
+				</SelectContent>
+			</Select>
 		</div>
 	)
 })

@@ -14,18 +14,20 @@ import { useSnapshot } from 'valtio'
 
 import Loader from '@/components/Loader'
 import Pagination from '@/components/Pagination'
-import Dropdown from '@/components/admin-panel/ui-kit/Dropdown'
 import MotionWrapper from '@/components/admin-panel/ui-kit/MotionWrapper'
 import Filter from '@/components/soils/Filter'
 
 import { filtersStore } from '@/store/valtioStore/filtersStore'
 
-import { PAGINATION_OPTIONS } from '@/utils/constants'
+import { BASE_SERVER_URL, PAGINATION_OPTIONS } from '@/utils/constants'
 
 import { getAllNews } from '@/api/news/get_allNews'
 import { getTags } from '@/api/tags/get_tags'
 
 import { getTranslation } from '@/i18n/client'
+import Image from 'next/image'
+import { Label } from '../ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 
 export default function NewsPageComponent() {
 	const pathname = usePathname()
@@ -60,7 +62,7 @@ export default function NewsPageComponent() {
 					(draftIsVisible
 						? true
 						: item.translations?.find(transl => transl.isEnglish === _isEng)
-								?.isVisible) &&
+							?.isVisible) &&
 					item.translations
 						?.find(transl => transl.isEnglish === _isEng)
 						?.title.toLowerCase()
@@ -141,7 +143,7 @@ export default function NewsPageComponent() {
 		setIsLoading(prev => ({ ...prev, tags: false }))
 	}
 
-	const NewsCard = ({ id, tags, translations }) => {
+	const NewsCard = ({ id, tags, translations, photo }) => {
 		const currentTransl =
 			translations?.find(({ isEnglish }) => isEnglish === _isEng) || {}
 		const date = new Date(currentTransl?.lastUpdated * 1000).toLocaleString()
@@ -149,22 +151,29 @@ export default function NewsPageComponent() {
 			<Link
 				href={`/${locale}/news/${id}`}
 				prefetch={false}
-				className='sm:px-8 px-4 py-4 bg-white rounded-md hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] transition-all duration-300
-             w-full h-full flex flex-col justify-between'
+				className='bg-white rounded-md hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] transition-all duration-300
+             w-full h-full flex flex-col justify-between overflow-hidden'
 			>
-				<div className='flex flex-col'>
+				{!!photo && <Image
+					src={`${BASE_SERVER_URL}${photo.pathResize.length ? photo.pathResize : photo.path}`}
+					width={500}
+					height={500}
+					alt='soil'
+					className='m-auto w-full duration-300 h-full object-cover self-start 
+						aspect-[4/2] overflow-hidden' />}
+				<div className='flex flex-col px-4 sm:px-8 pt-4'>
 					<span className='text-sm font-light text-gray-600'>{date || ''}</span>
 
 					<div className='mt-2'>
-						<h3 className='sm:text-xl text-base font-medium text-gray-700 hover:text-gray-600'>
+						<h3 className='sm:text-xl text-base font-medium text-gray-700 hover:text-gray-600 line-clamp-3'>
 							{currentTransl?.title || ''}
 						</h3>
-						<p className='mt-2 text-gray-600'>
+						<p className={`mt-2 text-gray-600 ${photo ? 'line-clamp-4' : ''}`}>
 							{currentTransl?.annotation || ''}
 						</p>
 					</div>
 				</div>
-				<ul className='flex flex-row flex-wrap mt-4 align-bottom'>
+				<ul className='px-4 sm:px-8 pb-4 flex flex-row flex-wrap mt-4 align-bottom'>
 					{tags.map(({ id, nameRu, nameEng }) => (
 						<li
 							key={`tag-${id}`}
@@ -206,16 +215,22 @@ export default function NewsPageComponent() {
 				/>
 			</div>
 			<div className={`flex flex-row justify-end items-center`}>
-				<div className='self-end flex-row items-center justify-center w-[190px]'>
-					<Dropdown
-						name={t('in_page')}
-						value={itemsPerPage}
-						items={PAGINATION_OPTIONS}
-						onCategotyChange={setItemsPerPage}
-						flexRow={true}
-						dropdownKey='in_page'
-						noBold={true}
-					/>
+				<div className='self-end flex flex-row items-center justify-end w-[190px] space-x-2'>
+					<Label htmlFor="in_page"
+						className='text-base min-w-fit'>{t('in_page')}</Label>
+					<Select
+						id="in_page"
+						value={itemsPerPage.toString()}
+						onValueChange={setItemsPerPage}>
+						<SelectTrigger className="text-base w-[70px]">
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent className='min-w-0'>
+							{Object.entries(PAGINATION_OPTIONS).map(([value, title]) =>
+								<SelectItem key={value} value={value.toString()}
+									className='text-base'>{title}</SelectItem>)}
+						</SelectContent>
+					</Select>
 				</div>
 			</div>
 			<MotionWrapper>
@@ -270,13 +285,14 @@ export default function NewsPageComponent() {
 							</li>
 						))
 				) : news.length && filteredNews.length ? (
-					currentItems.map((item, idx) => (
+					currentItems.map(({ id, tags, translations, objectPhoto }, idx) => (
 						<li
 							key={`news_${idx}`}
 							className='w-full h-full'
 						>
 							<MotionWrapper className='w-full h-full'>
-								<NewsCard {...item} />
+								<NewsCard id={id} tags={tags} translations={translations}
+									photo={objectPhoto[0]} />
 							</MotionWrapper>
 						</li>
 					))

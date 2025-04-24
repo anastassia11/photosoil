@@ -21,11 +21,12 @@ import { sendPhoto } from '@/api/photo/send_photo'
 import TextEditor from './TextEditor'
 import ArrayInput from './ui-kit/ArrayInput'
 import DragAndDrop from './ui-kit/DragAndDrop'
-import Dropdown from './ui-kit/Dropdown'
 import Input from './ui-kit/Input'
 import SubmitBtn from './ui-kit/SubmitBtn'
 import Textarea from './ui-kit/Textarea'
 import { getTranslation } from '@/i18n/client'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import { Label } from '../ui/label'
 
 export default function AuthorForm({
 	_author,
@@ -256,19 +257,28 @@ export default function AuthorForm({
 						{role === 'Admin' && (
 							<li
 								key='rang'
-								className='w-[285px] mt-4'
+								className='w-[285px] mt-4 flex flex-col space-y-1'
 							>
+								<Label htmlFor="authorType"
+									className='text-base'>{t('rank')}</Label>
 								<Controller
 									control={control}
 									name='authorType'
 									render={({ field: { onChange, value } }) => (
-										<Dropdown
-											name={t('rank')}
-											value={value}
-											items={RANK_ENUM}
-											onCategotyChange={rank => onChange(Number(rank))}
-											dropdownKey='rang'
-										/>
+										<Select
+											id="authorType"
+											defaultValue={value}
+											value={value.toString()}
+											onValueChange={rank => onChange(Number(rank))}>
+											<SelectTrigger className="text-base">
+												<SelectValue />
+											</SelectTrigger>
+											<SelectContent>
+												{Object.entries(RANK_ENUM).map(([value, title]) =>
+													<SelectItem key={value} value={value.toString()}
+														className='text-base'>{title}</SelectItem>)}
+											</SelectContent>
+										</Select>
 									)}
 								/>
 							</li>

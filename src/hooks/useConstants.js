@@ -37,7 +37,8 @@ export const useConstants = () => {
 		{ name: 'edition', title: t('info_journal') },
 		{ name: 'type', title: t('publ_type') },
 		{ name: 'doi', title: 'DOI' },
-		{ name: 'description', title: t('annotation') }
+		{ name: 'description', title: t('annotation') },
+		{ name: 'comments', title: t('comments') }
 	]
 
 	const NEWS_INFO = [

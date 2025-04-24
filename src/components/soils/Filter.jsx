@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { memo, useMemo, useRef, useState } from 'react'
+import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { Oval } from 'react-loader-spinner'
 import { useDispatch, useSelector } from 'react-redux'
 import { Tooltip } from 'react-tooltip'
@@ -371,7 +371,7 @@ const Filter = memo(
 								/>
 							</div>
 							{(!!filteredItems.length &&
-								((type === 'ecosystem' || type === 'soil' || type === 'publications') ? filterName.length > 3 : true)) && (
+								((type === 'ecosystem' || type === 'soil' || type === 'publications') ? filterName.length > 2 : true)) && (
 									<ul
 										className={`scroll space-y-1 max-h-[200px] overflow-auto py-2 ${isMapFilter ? 'px-4' : 'px-4'}`}
 									>

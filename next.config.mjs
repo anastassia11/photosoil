@@ -25,7 +25,13 @@ const nextConfig = {
 				hostname: '80.78.243.185',
 				port: '1515',
 				pathname: '/**'
-			}
+			},
+			{
+				protocol: 'http',
+				hostname: '192.168.0.108',
+				port: '1515',
+				pathname: '/**'
+			},
 		]
 	},
 	experimental: {

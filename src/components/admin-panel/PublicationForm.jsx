@@ -21,7 +21,6 @@ import MapArraySelect from '../map/MapArraySelect'
 import Filter from '../soils/Filter'
 
 import DragAndDrop from './ui-kit/DragAndDrop'
-import Dropdown from './ui-kit/Dropdown'
 import FileCard from './ui-kit/FileCard'
 import Input from './ui-kit/Input'
 import LangTabs from './ui-kit/LangTabs'
@@ -29,6 +28,9 @@ import MapInput from './ui-kit/MapInput'
 import SubmitBtn from './ui-kit/SubmitBtn'
 import Textarea from './ui-kit/Textarea'
 import { getTranslation } from '@/i18n/client'
+import TextEditor from './TextEditor'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import { Label } from '../ui/label'
 
 export default function PublicationForm({
 	_publication,
@@ -86,7 +88,6 @@ export default function PublicationForm({
 		longtitude: ''
 	})
 
-	const dropdown = useSelector(state => state.general.dropdown)
 	const { locale } = useParams()
 	const dispatch = useDispatch()
 
@@ -296,19 +297,29 @@ export default function PublicationForm({
 										className={`${idx && 'mt-3'}`}
 									>
 										{name === 'type' ? (
-											<Controller
-												control={control}
-												name='type'
-												render={({ field: { onChange, value } }) => (
-													<Dropdown
-														name={title}
-														value={value}
-														items={PUBLICATION_ENUM}
-														onCategotyChange={type => onChange(Number(type))}
-														dropdownKey='category'
-													/>
-												)}
-											/>
+											<div className='flex flex-col space-y-1'>
+												<Label htmlFor="type"
+													className='text-base'>{title}</Label>
+												<Controller
+													control={control}
+													name='type'
+													render={({ field: { onChange, value } }) => (
+														<Select
+															id="type"
+															value={value.toString()}
+															onValueChange={type => onChange(Number(type))}>
+															<SelectTrigger className="text-base">
+																<SelectValue />
+															</SelectTrigger>
+															<SelectContent>
+																{Object.entries(PUBLICATION_ENUM).map(([value, title]) =>
+																	<SelectItem key={value} value={value.toString()}
+																		className='text-base'>{title}</SelectItem>)}
+															</SelectContent>
+														</Select>
+													)}
+												/>
+											</div>
 										) : name === 'doi' ? (
 											<Input
 												required={false}
@@ -329,7 +340,28 @@ export default function PublicationForm({
 															isEng={isEng}
 															placeholder=''
 														/>
-													) : (
+													) : name === 'comments' ? <>
+														<p className='font-medium'>{`${t('comments')} ${isEng ? '(EN)' : ''}`}</p>
+														<div
+															className={`${field.isEnglish === isEng ? 'visible' : 'hidden'}`}
+														>
+															<Controller
+																control={control}
+																name={`translations.${index}.comments`}
+																render={({ field: { onChange, value } }) => (
+																	<div className={`w-full relative mt-1 mb-2`}>
+																		<TextEditor
+																			type={`comments-${field.id}`}
+																			content={value}
+																			isSoil={true}
+																			setContent={html => onChange(html)}
+																		/>
+																	</div>
+																)}
+															/>
+														</div>
+
+													</> : (
 														<Input
 															required={name === 'name'}
 															error={errors.translations?.[index]?.[name]}
