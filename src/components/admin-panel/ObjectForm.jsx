@@ -41,7 +41,9 @@ import { getTranslation } from '@/i18n/client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { Label } from '../ui/label'
 
-function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
+function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, onMainPhotoSend, onOtherPhotoSend,
+	onObjectPhotoDelete
+}, ref) {
 	const dispatch = useDispatch()
 	const { locale } = useParams()
 	const { t } = getTranslation(locale)
@@ -169,25 +171,53 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 	}
 
 	const handleOtherPhotoSend = useCallback(
-		async (file, index, field) => {
-			setLocalObjectPhoto(prev => {
-				const _prev = [...prev, { isLoading: true }]
-				field.onChange(_prev)
-				return _prev
-			})
-
-			const result = await sendPhoto(file)
-			if (result.success) {
+		async (file, field) => {
+			if (pathname === 'edit') {
+				const photoId = uuid()
 				setLocalObjectPhoto(prev => {
-					const _prev = prev.map((photo, idx) =>
-						idx === index + localObjectPhoto.length
-							? { ...result.data, isLoading: false }
-							: photo
-					)
+					const _prev = [...prev, { id: photoId, isLoading: true }]
 					field.onChange(_prev)
 					return _prev
 				})
+				const result = await sendPhoto(file)
+				if (result.success) {
+					setLocalObjectPhoto(prev => {
+						const _prev = prev.map(photo => photo.id === photoId
+							? { ...result.data, isLoading: false }
+							: photo
+						)
+						field.onChange(_prev)
+						return _prev
+					})
+				} else {
+					setLocalObjectPhoto(prev => {
+						const _prev = prev.filter(photo => photo.id !== photoId)
+						field.onChange(_prev)
+						return _prev
+					})
+					dispatch(
+						openAlert({
+							title: t('error'),
+							message: t('error_photo'),
+							type: 'error'
+						})
+					)
+				}
 			} else {
+				onOtherPhotoSend(file, id)
+			}
+		},
+		[localObjectPhoto, dispatch, t]
+	)
+
+	const handleMainPhotoSend = useCallback(async (file, field) => {
+		field.onChange({ isLoading: true, name: file.name })
+		if (pathname === 'edit') {
+			const result = await sendPhoto(file)
+			if (result.success) {
+				field.onChange({ ...result.data, isLoading: false })
+			} else {
+				field.onChange({})
 				dispatch(
 					openAlert({
 						title: t('error'),
@@ -196,24 +226,10 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 					})
 				)
 			}
-		},
-		[localObjectPhoto, dispatch, t]
-	)
-
-	const handleMainPhotoSend = useCallback(async (file, field) => {
-		field.onChange({ isLoading: true, name: file.name })
-		const result = await sendPhoto(file)
-		if (result.success) {
-			field.onChange({ ...result.data, isLoading: false })
 		} else {
-			dispatch(
-				openAlert({
-					title: t('error'),
-					message: t('error_photo'),
-					type: 'error'
-				})
-			)
+			onMainPhotoSend(file, id)
 		}
+
 	}, [])
 
 	const handleCoordChange = useCallback(({ latitude, longtitude }) => {
@@ -261,7 +277,7 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 	)
 
 	const handleOtherPhotoDelete = useCallback(
-		async (id, field) => {
+		async (photoId, field) => {
 			dispatch(
 				openModal({
 					title: t('warning'),
@@ -273,18 +289,19 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 
 			const isConfirm = await dispatch(modalThunkActions.open())
 			if (isConfirm.payload) {
-				if (pathname !== 'edit') {
-					await deletePhotoById(id)
+				if (pathname === 'edit') {
+					setLocalObjectPhoto(prev => {
+						const _prev = prev.filter(photo => photo.id !== photoId)
+						field.onChange(_prev)
+						return _prev
+					})
+				} else {
+					onObjectPhotoDelete(photoId, id)
 				}
-				setLocalObjectPhoto(prev => {
-					const _prev = prev.filter(photo => photo.id !== id)
-					field.onChange(_prev)
-					return _prev
-				})
 			}
 			dispatch(closeModal())
 		},
-		[pathname, dispatch, t, localObjectPhoto]
+		[dispatch, t, id]
 	)
 
 	const handleTwoLangChange = useCallback(
@@ -699,8 +716,8 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item }, ref) {
 											<DragAndDrop
 												id='objectPhoto'
 												error={fieldState.error}
-												onLoadClick={(file, index) =>
-													handleOtherPhotoSend(file, index, field)
+												onLoadClick={(file) =>
+													handleOtherPhotoSend(file, field)
 												}
 												isMultiple={true}
 												accept='img'

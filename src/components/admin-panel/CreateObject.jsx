@@ -28,7 +28,7 @@ export default function CreateObject({ title, onCreate, type }) {
 	const router = useRouter()
 	const [drag, setDrag] = useState(false)
 	const [currentForm, setCurrentForm] = useState(null)
-	const [formData, setFormData] = useState([])
+	const [formData, setFormData] = useState({})
 	const [isLoading, setIsLoading] = useState(false)
 	const formRef = useRef(null)
 	const { locale } = useParams()
@@ -37,18 +37,11 @@ export default function CreateObject({ title, onCreate, type }) {
 	const handleChange = e => {
 		e.preventDefault()
 		let files = [...e.target.files]
-		files.forEach((file, index) => {
-			setFormData(prevData => [
-				...prevData,
-				{
-					mainPhoto: {
-						isLoading: true
-					}
-				}
-			])
-			requestSendPhoto(file, index)
+		files.forEach((file, idx) => {
+			const id = uuid()
+			handleSendPhoto(file, id)
+			if (idx === 0) setCurrentForm(id)
 		})
-		setCurrentForm(0)
 	}
 
 	const handleDragStart = e => {
@@ -64,46 +57,74 @@ export default function CreateObject({ title, onCreate, type }) {
 	const handleDrop = e => {
 		e.preventDefault()
 		let files = [...e.dataTransfer.files]
-		files.forEach((file, index) => {
-			setFormData(prevData => [
-				...prevData,
-				{
-					mainPhoto: {
-						isLoading: true
-					}
-				}
-			])
-			requestSendPhoto(file, index)
+		files.forEach((file, idx) => {
+			const id = uuid()
+			handleSendPhoto(file, id)
+			if (idx === 0) setCurrentForm(id)
 		})
-		setCurrentForm(0)
 		setDrag(false)
 	}
 
-	const handleSendPhoto = (file, index) => {
-		setFormData(prevData => [
+	const handleSendPhoto = (file, id) => {
+		setFormData(prevData => ({
 			...prevData,
-			{
+			[id]: {
 				mainPhoto: {
 					isLoading: true
-				}
+				},
+				objectPhoto: []
 			}
-		])
-		requestSendPhoto(file, index + formData.length)
+		}))
+		requestSendPhoto(file, id)
 	}
 
-	const requestSendPhoto = async (file, index) => {
+	const handleOtherPhotoSend = (file, id) => {
+		const photoId = uuid()
+		setFormData(prevData => ({
+			...prevData,
+			[id]: {
+				...prevData[id],
+				objectPhoto: [
+					...prevData[id].objectPhoto,
+					{ id: photoId, isLoading: true }
+				]
+			}
+		}))
+		requestSendOtherPhoto(file, id, photoId)
+	}
+
+	const requestSendOtherPhoto = async (file, id, photoId) => {
 		const result = await sendPhoto(file)
 		if (result.success) {
-			setFormData(prevData =>
-				prevData.map((data, idx) =>
-					idx === index
-						? {
-								...data,
-								mainPhoto: { ...result.data, isLoading: false }
-							}
-						: data
-				)
+			setFormData(prevData => ({
+				...prevData,
+				[id]: {
+					...prevData[id],
+					objectPhoto: prevData[id].objectPhoto.map(photo => photo.id === photoId
+						? { ...result.data, isLoading: false } : photo)
+				}
+			}))
+		} else {
+			dispatch(
+				openAlert({
+					title: t('error'),
+					message: t('error_photo'),
+					type: 'error'
+				})
 			)
+		}
+	}
+
+	const requestSendPhoto = async (file, id) => {
+		const result = await sendPhoto(file)
+		if (result.success) {
+			setFormData(prevData => ({
+				...prevData,
+				[id]: {
+					...prevData[id],
+					mainPhoto: { ...result.data, isLoading: false }
+				}
+			}))
 		}
 	}
 
@@ -114,17 +135,17 @@ export default function CreateObject({ title, onCreate, type }) {
 	}
 
 	const validateDataArray = data => {
-		return data.findIndex(item => {
-			if (item.createTwoLang) {
-				const valid = item.translations?.every(
+		return Object.keys(data).find(id => {
+			if (data[id].createTwoLang) {
+				const valid = data[id].translations?.every(
 					translation => translation.name.length
 				)
-				return !valid || !item.mainPhoto?.path?.length
+				return !valid || !data[id].mainPhoto?.path?.length
 			} else {
-				const valid = item.translations?.find(
-					translation => translation.isEnglish === item.currentLang
+				const valid = data[id].translations?.find(
+					translation => translation.isEnglish === data[id].currentLang
 				)
-				return !valid || !valid?.name.length || !item.mainPhoto?.path?.length
+				return !valid || !valid?.name.length || !data[id].mainPhoto?.path?.length
 			}
 		})
 	}
@@ -133,16 +154,16 @@ export default function CreateObject({ title, onCreate, type }) {
 		setIsLoading(true)
 		try {
 			const _creationResults = await Promise.all([
-				...formData.map(async (data, idx) => {
+				...Object.entries(formData).map(async ([id, data]) => {
 					const { createTwoLang, currentLang, mainPhoto, objectPhoto } = data
 
 					editPhoto(
 						mainPhoto.id,
 						createTwoLang
 							? {
-									titleEng: mainPhoto.titleEng || '',
-									titleRu: mainPhoto.titleRu || ''
-								}
+								titleEng: mainPhoto.titleEng || '',
+								titleRu: mainPhoto.titleRu || ''
+							}
 							: currentLang
 								? { titleEng: mainPhoto.titleEng || '' }
 								: { titleRu: mainPhoto.titleRu || '' }
@@ -152,9 +173,9 @@ export default function CreateObject({ title, onCreate, type }) {
 							photo.id,
 							createTwoLang
 								? {
-										titleEng: photo.titleEng || '',
-										titleRu: photo.titleRu || ''
-									}
+									titleEng: photo.titleEng || '',
+									titleRu: photo.titleRu || ''
+								}
 								: currentLang
 									? { titleEng: photo.titleEng || '' }
 									: { titleRu: photo.titleRu || '' }
@@ -172,7 +193,7 @@ export default function CreateObject({ title, onCreate, type }) {
 							({ isEnglish }) => isEnglish === currentLang
 						)
 					}
-					return await onCreate(createTwoLang ? dataForFetch : langData)
+					return await onCreate(id, createTwoLang ? dataForFetch : langData)
 				})
 			])
 			if (_creationResults.every(result => result.success === true)) {
@@ -186,25 +207,21 @@ export default function CreateObject({ title, onCreate, type }) {
 				)
 				dispatch(setDirty(false))
 			} else {
-				const indicesToRemove = _creationResults.reduce(
-					(indices, result, index) => {
-						if (!result.success) {
-							indices.push(index)
-							dispatch(
-								openAlert({
-									title: t('error'),
-									message: t('error_objects'),
-									type: 'error'
-								})
-							)
-						}
-						return indices
-					},
-					[]
-				)
-				setFormData(prevData =>
-					prevData.filter((data, idx) => indicesToRemove.includes(idx))
-				)
+				for (const result of _creationResults) {
+					if (!result.success) {
+						setFormData(prev => {
+							const { [result.id]: _, ...rest } = prev
+							return rest
+						})
+					}
+					dispatch(
+						openAlert({
+							title: t('error'),
+							message: t('error_objects'),
+							type: 'error'
+						})
+					)
+				}
 			}
 		} catch (error) {
 			dispatch(
@@ -221,13 +238,14 @@ export default function CreateObject({ title, onCreate, type }) {
 
 	const handleCreateClick = async () => {
 		const newValues = formRef.current.updateState()
-		const updatedFormData = formData.map((soil, index) =>
-			index === currentForm ? newValues : soil
-		)
+		const updatedFormData = { ...formData, [currentForm]: newValues }
+
+		setFormData(updatedFormData)
+
 		const invalidIndex = validateDataArray(updatedFormData)
-		if (invalidIndex !== -1) {
+		if (invalidIndex) {
 			if (invalidIndex !== currentForm) {
-				selectCurrentForm(invalidIndex)
+				setCurrentForm(invalidIndex)
 			}
 			setTimeout(() => {
 				formRef.current.formCheck()
@@ -237,23 +255,7 @@ export default function CreateObject({ title, onCreate, type }) {
 		}
 	}
 
-	const fetchDeletePhoto = async (id, idx) => {
-		const result = await deletePhotoById(id)
-		if (result.success) {
-			setFormData(prev => prev.filter((item, index) => index !== idx))
-			if (currentForm === idx) {
-				if (formData.length === 1) {
-					setCurrentForm(null)
-				} else {
-					setCurrentForm(currentForm === formData.length - 1 ? idx - 1 : idx)
-				}
-			} else if (currentForm > idx) {
-				setCurrentForm(currentForm - 1)
-			}
-		}
-	}
-
-	const handleSoilDelete = async (e, idx) => {
+	const handleSoilDelete = async (e, id) => {
 		dispatch(
 			openModal({
 				title: t('warning'),
@@ -265,19 +267,26 @@ export default function CreateObject({ title, onCreate, type }) {
 
 		const isConfirm = await dispatch(modalThunkActions.open())
 		if (isConfirm.payload) {
-			if (Number.isInteger(formData[idx].mainPhoto.id)) {
-				await fetchDeletePhoto(formData[idx].mainPhoto.id, idx)
-			} else {
-				setFormData(prev => prev.filter((item, index) => index !== idx))
-				if (currentForm === idx) {
-					if (formData.length === 1) {
-						setCurrentForm(null)
+			const photoId = formData[id].mainPhoto.id
+			const keys = Object.keys(formData)
+
+			if (currentForm === id) {
+				if (!keys.length) {
+					setCurrentForm(null)
+				} else {
+					const idx = keys.findIndex(item => item === id)
+					if (keys.length - 1 <= idx) {
+						setCurrentForm(keys[idx - 1])
 					} else {
-						setCurrentForm(idx)
+						setCurrentForm(keys[idx + 1])
 					}
-				} else if (currentForm > idx) {
-					setCurrentForm(currentForm - 1)
 				}
+			}
+			const { [id]: _, ...rest } = formData
+			setFormData(rest)
+
+			if (Number.isInteger(photoId)) {
+				await deletePhotoById(photoId)
 			}
 		}
 		dispatch(closeModal())
@@ -285,35 +294,34 @@ export default function CreateObject({ title, onCreate, type }) {
 
 	const handleFormClick = () => {
 		const id = uuid()
-		setCurrentForm(0)
-		setFormData([{ mainPhoto: { id, isLoading: false } }])
+		setCurrentForm(id)
+		setFormData({ [id]: { mainPhoto: { id, isLoading: false } } })
 	}
 
 	const selectCurrentForm = id => {
 		const newValues = formRef.current.updateState()
+		setFormData(prevData => ({ ...prevData, [currentForm]: newValues }))
+
 		setCurrentForm(id)
-		setFormData(prevData =>
-			prevData.map((soil, index) => (index === currentForm ? newValues : soil))
-		)
 	}
 
-	const PhotoCard = ({ id, path, pathResize, idx, isLoading }) => {
-		const translations = formData[idx]?.translations
+	const PhotoCard = ({ id, path, pathResize, itemId, isLoading }) => {
+		const translations = formData[itemId]?.translations
 		let name = ''
 		if (translations) {
 			name =
 				locale === 'en'
 					? translations.find(({ isEnglish }) => isEnglish)?.name ||
-						translations.find(({ isEnglish }) => !isEnglish)?.name
+					translations.find(({ isEnglish }) => !isEnglish)?.name
 					: translations.find(({ isEnglish }) => !isEnglish)?.name ||
-						translations.find(({ isEnglish }) => isEnglish)?.name
+					translations.find(({ isEnglish }) => isEnglish)?.name
 		}
 
 		return (
 			<div
 				className={`aspect-[1/1] relative bg-white rounded-lg border flex flex-row
-        duration-300 cursor-pointer hover:shadow-md ${currentForm === idx ? ' ring ring-blue-700 ring-opacity-30 w-full' : 'w-[95%]'}  overflow-hidden`}
-				onClick={() => selectCurrentForm(idx)}
+        duration-300 cursor-pointer hover:shadow-md ${currentForm === itemId ? ' ring ring-blue-700 ring-opacity-30 w-full' : 'w-[95%]'}  overflow-hidden`}
+				onClick={() => selectCurrentForm(itemId)}
 			>
 				<div className='flex flex-col items-center w-full h-full overflow-hidden'>
 					<button
@@ -321,7 +329,7 @@ export default function CreateObject({ title, onCreate, type }) {
                                 backdrop-blur-md bg-black bg-opacity-40 text-zinc-200 hover:text-white duration-300'
 						onClick={e => {
 							e.stopPropagation()
-							handleSoilDelete(e, idx)
+							handleSoilDelete(e, itemId)
 						}}
 					>
 						<svg
@@ -401,7 +409,7 @@ export default function CreateObject({ title, onCreate, type }) {
 				{title}
 			</h1>
 			<div className='relative h-full'>
-				{!formData.length ? (
+				{!Object.keys(formData).length ? (
 					<>
 						{drag ? (
 							<div
@@ -469,7 +477,18 @@ export default function CreateObject({ title, onCreate, type }) {
 									ref={formRef}
 									type={type}
 									id={currentForm}
-									item={formData.find((item, idx) => idx == currentForm)}
+									item={formData[currentForm]}
+									onMainPhotoSend={handleSendPhoto}
+									onOtherPhotoSend={handleOtherPhotoSend}
+									onObjectPhotoDelete={(photoId, id) => {
+										setFormData(prev => ({
+											...prev, [id]: {
+												...prev[id],
+												objectPhoto: prev[id].objectPhoto.filter(photo => photo.id !== photoId)
+											}
+										}))
+										if (Number.isInteger(photoId)) deletePhotoById(photoId)
+									}}
 								/>
 							) : (
 								''
@@ -484,17 +503,17 @@ export default function CreateObject({ title, onCreate, type }) {
 							<p className='font-medium'>
 								{`${type === 'soil' ? t('soils') : type === 'ecosystem' ? t('ecosystems') : ''}`}
 							</p>
-							{formData.length && (
+							{Object.keys(formData).length && (
 								<ul
 									className={`h-full w-full flex xl:flex-col flex-row justify-start 
                                     xl:space-y-2 xl:pr-2 pb-2 xl:pb-0 rounded-lg overflow-y-auto overflow-x-auto xl:overflow-x-hidden scroll items-center`}
 								>
-									{formData.map(({ mainPhoto }, idx) => (
+									{Object.entries(formData).map(([id, { mainPhoto }]) => (
 										<li
-											key={`${type}-${mainPhoto.id || idx}`}
+											key={`${type}-${mainPhoto.id || id}`}
 											className='xl:w-full h-full aspect-square p-[3px] flex flex-col items-center justify-center'
 										>
-											{PhotoCard({ ...mainPhoto, idx })}
+											{PhotoCard({ ...mainPhoto, itemId: id })}
 										</li>
 									))}
 									<div className='xl:min-w-[95%] xl:h-auto h-[95%] p-[3px] flex w-[150px] aspect-square max-w-[150px] xl:w-auto ml-2 xl:ml-0'>

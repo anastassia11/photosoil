@@ -7,6 +7,7 @@ import { useDispatch } from 'react-redux'
 import { openAlert } from '@/store/slices/alertSlice'
 
 import { getTranslation } from '@/i18n/client'
+import uuid from 'react-uuid'
 
 const DragAndDrop = memo(function DragAndDrop({
 	id,
@@ -25,9 +26,10 @@ const DragAndDrop = memo(function DragAndDrop({
 		const type =
 			accept === 'img' ? 'image/' : accept === 'pdf' ? 'application/pdf' : ''
 		let files = [...e.target.files]
-		files.forEach((file, index) => {
+		files.forEach((file) => {
 			if (file.type.startsWith(type)) {
-				onLoadClick(file, index)
+				const id = uuid()
+				onLoadClick(file, id)
 			} else {
 				dispatch(
 					openAlert({
@@ -56,9 +58,10 @@ const DragAndDrop = memo(function DragAndDrop({
 			accept === 'img' ? 'image/' : accept === 'pdf' ? 'application/pdf' : ''
 		let files = [...e.dataTransfer.files]
 
-		files.forEach((file, index) => {
+		files.forEach((file) => {
 			if (file.type.startsWith(type)) {
-				onLoadClick(file, index)
+				const id = uuid()
+				onLoadClick(file, id)
 			} else {
 				dispatch(
 					openAlert({

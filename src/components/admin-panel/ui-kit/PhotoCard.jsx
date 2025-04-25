@@ -55,34 +55,33 @@ const PhotoCard = memo(function PhotoCard({
 						{fileName}
 					</p>
 				)}
-				{!isLoading && (
-					<button
-						type='button'
-						className='overflow-hidden p-[6px] text-sm font-medium z-10 absolute top-0 right-0 rounded-tr-md rounded-bl-md
+
+				<button
+					type='button'
+					className='overflow-hidden p-[6px] text-sm font-medium z-10 absolute top-0 right-0 rounded-tr-md rounded-bl-md
                                 backdrop-blur-md bg-black bg-opacity-40 text-zinc-200 hover:text-white duration-300'
-						onClick={() => onDelete(id)}
+					onClick={() => onDelete(id)}
+				>
+					<svg
+						width='800px'
+						height='800px'
+						viewBox='0 0 24 24'
+						fill='none'
+						xmlns='http://www.w3.org/2000/svg'
+						className='w-4 h-4'
 					>
-						<svg
-							width='800px'
-							height='800px'
-							viewBox='0 0 24 24'
-							fill='none'
-							xmlns='http://www.w3.org/2000/svg'
-							className='w-4 h-4'
-						>
-							<g id='Menu / Close_LG'>
-								<path
-									id='Vector'
-									d='M21 21L12 12M12 12L3 3M12 12L21.0001 3M12 12L3 21.0001'
-									stroke='currentColor'
-									strokeWidth='3'
-									strokeLinecap='round'
-									strokeLinejoin='round'
-								/>
-							</g>
-						</svg>
-					</button>
-				)}
+						<g id='Menu / Close_LG'>
+							<path
+								id='Vector'
+								d='M21 21L12 12M12 12L3 3M12 12L21.0001 3M12 12L3 21.0001'
+								stroke='currentColor'
+								strokeWidth='3'
+								strokeLinecap='round'
+								strokeLinejoin='round'
+							/>
+						</g>
+					</svg>
+				</button>
 			</div>
 
 			<div className='w-full flex flex-col justify-between'>
@@ -90,8 +89,9 @@ const PhotoCard = memo(function PhotoCard({
 					value={isEng ? titleEng || '' : titleRu || ''}
 					onChange={e => onChange(e, id)}
 					type='text'
+					disabled={isLoading}
 					placeholder={`${t('text_toPhoto')} ${isEng ? '(EN)' : ''}`}
-					className='bg-white w-full p-2 outline-none border focus:border-blue-600 shadow-sm rounded-md max-h-full'
+					className='disabled:opacity-50 bg-white w-full p-2 outline-none border focus:border-blue-600 shadow-sm rounded-md max-h-full'
 				/>
 			</div>
 		</div>

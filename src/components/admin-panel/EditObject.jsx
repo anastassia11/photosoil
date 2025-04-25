@@ -105,9 +105,9 @@ export default function EditObject({ id, type, title }) {
 					mainPhoto.id,
 					createTwoLang
 						? {
-								titleEng: mainPhoto.titleEng || '',
-								titleRu: mainPhoto.titleRu || ''
-							}
+							titleEng: mainPhoto.titleEng || '',
+							titleRu: mainPhoto.titleRu || ''
+						}
 						: currentLang
 							? { titleEng: mainPhoto.titleEng || '' }
 							: { titleRu: mainPhoto.titleRu || '' }
