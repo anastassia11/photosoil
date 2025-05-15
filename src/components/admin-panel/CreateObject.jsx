@@ -22,6 +22,7 @@ import { putPhoto } from '@/api/photo/put_photo'
 import { sendPhoto } from '@/api/photo/send_photo'
 
 import { getTranslation } from '@/i18n/client'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
 
 export default function CreateObject({ title, onCreate, type }) {
 	const dispatch = useDispatch()
@@ -29,10 +30,21 @@ export default function CreateObject({ title, onCreate, type }) {
 	const [drag, setDrag] = useState(false)
 	const [currentForm, setCurrentForm] = useState(null)
 	const [formData, setFormData] = useState({})
+	const [btnDisabled, setBtnDisabled] = useState(false)
 	const [isLoading, setIsLoading] = useState(false)
 	const formRef = useRef(null)
 	const { locale } = useParams()
 	const { t } = getTranslation(locale)
+	const currentFormRef = useRef(currentForm)
+
+	useEffect(() => {
+		currentFormRef.current = currentForm
+	}, [currentForm])
+
+	useEffect(() => {
+		setBtnDisabled(Object.values(formData).some((data) => data.mainPhoto?.isLoading
+			|| data.objectPhoto?.some((photo) => photo.isLoading)))
+	}, [formData])
 
 	const handleChange = e => {
 		e.preventDefault()
@@ -66,13 +78,15 @@ export default function CreateObject({ title, onCreate, type }) {
 	}
 
 	const handleSendPhoto = (file, id) => {
+		const newValues = formRef.current?.updateState()
 		setFormData(prevData => ({
-			...prevData,
-			[id]: {
+			...prevData, [id]: {
+				...((id === currentForm && newValues) ? newValues : {}),
 				mainPhoto: {
+					fileName: file.name,
 					isLoading: true
 				},
-				objectPhoto: []
+				// objectPhoto: []
 			}
 		}))
 		requestSendPhoto(file, id)
@@ -80,13 +94,15 @@ export default function CreateObject({ title, onCreate, type }) {
 
 	const handleOtherPhotoSend = (file, id) => {
 		const photoId = uuid()
+		const newValues = formRef.current.updateState()
+
 		setFormData(prevData => ({
 			...prevData,
 			[id]: {
-				...prevData[id],
+				...newValues,
 				objectPhoto: [
-					...prevData[id].objectPhoto,
-					{ id: photoId, isLoading: true }
+					...(prevData[id].objectPhoto || []),
+					{ id: photoId, isLoading: true, fileName: file.name }
 				]
 			}
 		}))
@@ -96,10 +112,11 @@ export default function CreateObject({ title, onCreate, type }) {
 	const requestSendOtherPhoto = async (file, id, photoId) => {
 		const result = await sendPhoto(file)
 		if (result.success) {
+			const newValues = formRef.current.updateState()
 			setFormData(prevData => ({
 				...prevData,
 				[id]: {
-					...prevData[id],
+					...(id === currentFormRef.current ? newValues : prevData[id]),
 					objectPhoto: prevData[id].objectPhoto.map(photo => photo.id === photoId
 						? { ...result.data, isLoading: false } : photo)
 				}
@@ -118,11 +135,12 @@ export default function CreateObject({ title, onCreate, type }) {
 	const requestSendPhoto = async (file, id) => {
 		const result = await sendPhoto(file)
 		if (result.success) {
+			const newValues = formRef.current.updateState()
 			setFormData(prevData => ({
 				...prevData,
 				[id]: {
-					...prevData[id],
-					mainPhoto: { ...result.data, isLoading: false }
+					...(id === currentFormRef.current ? newValues : prevData[id]),
+					mainPhoto: prevData[id].mainPhoto.isLoading ? { ...result.data, isLoading: false } : prevData[id].mainPhoto
 				}
 			}))
 		}
@@ -305,6 +323,29 @@ export default function CreateObject({ title, onCreate, type }) {
 		setCurrentForm(id)
 	}
 
+	const handleObjectPhotoDelete = (photoId, id) => {
+		const newValues = formRef.current.updateState()
+		setFormData(prev => ({
+			...prev, [id]: {
+				...newValues,
+				objectPhoto: prev[id].objectPhoto.filter(photo => photo.id !== photoId)
+			}
+		}))
+		if (Number.isInteger(photoId)) deletePhotoById(photoId)
+	}
+
+	const handleDeletePhoto = (id) => {
+		const newId = uuid()
+		const newValues = formRef.current.updateState()
+		setFormData(prev => ({
+			...prev, [currentForm]: {
+				...newValues,
+				mainPhoto: { id: newId, isLoading: false }
+			}
+		}))
+		if (Number.isInteger(id)) deletePhotoById(id)
+	}
+
 	const PhotoCard = ({ id, path, pathResize, itemId, isLoading }) => {
 		const translations = formData[itemId]?.translations
 		let name = ''
@@ -479,16 +520,9 @@ export default function CreateObject({ title, onCreate, type }) {
 									id={currentForm}
 									item={formData[currentForm]}
 									onMainPhotoSend={handleSendPhoto}
+									onMainPhotoDelete={handleDeletePhoto}
 									onOtherPhotoSend={handleOtherPhotoSend}
-									onObjectPhotoDelete={(photoId, id) => {
-										setFormData(prev => ({
-											...prev, [id]: {
-												...prev[id],
-												objectPhoto: prev[id].objectPhoto.filter(photo => photo.id !== photoId)
-											}
-										}))
-										if (Number.isInteger(photoId)) deletePhotoById(photoId)
-									}}
+									onObjectPhotoDelete={handleObjectPhotoDelete}
 								/>
 							) : (
 								''
@@ -496,11 +530,11 @@ export default function CreateObject({ title, onCreate, type }) {
 						</div>
 
 						<div
-							className={`pt-2 xl:mb-0 flex flex-col xl:items-center w-full xl:w-[250px] space-y-2 xl:order-2 order-1 
+							className={`pt-2 xl:mb-0 flex flex-col xl:items-center w-full xl:w-[250px] max-w-full space-y-2 xl:order-2 order-1 
                             xl:pl-6 xl:sticky xl:top-0 
                             xl:max-h-[calc(100vh-40px)] h-[250px] xl:h-fit`}
 						>
-							<p className='font-medium'>
+							<p className='font-medium w-full'>
 								{`${type === 'soil' ? t('soils') : type === 'ecosystem' ? t('ecosystems') : ''}`}
 							</p>
 							{Object.keys(formData).length && (
@@ -510,7 +544,7 @@ export default function CreateObject({ title, onCreate, type }) {
 								>
 									{Object.entries(formData).map(([id, { mainPhoto }]) => (
 										<li
-											key={`${type}-${mainPhoto.id || id}`}
+											key={`${type}-${id}`}
 											className='xl:w-full h-full aspect-square p-[3px] flex flex-col items-center justify-center'
 										>
 											{PhotoCard({ ...mainPhoto, itemId: id })}
@@ -526,28 +560,37 @@ export default function CreateObject({ title, onCreate, type }) {
 									</div>
 								</ul>
 							)}
-							<button
-								type='submit'
-								onClick={handleCreateClick}
-								disabled={isLoading}
-								className='self-end min-h-[40px] w-full flex items-center justify-center px-8 py-2 font-medium text-center text-white transition-colors duration-300 
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<button
+										type='submit'
+										onClick={handleCreateClick}
+										disabled={isLoading || btnDisabled}
+										className='self-end min-h-[40px] w-full flex items-center justify-center px-8 py-2 font-medium text-center text-white transition-colors duration-300 
                 transform bg-blue-600 disabled:bg-blue-600/70 rounded-lg hover:bg-blue-500 focus:outline-none active:bg-blue-600 align-bottom'
-							>
-								{isLoading ? (
-									<Oval
-										height={20}
-										width={20}
-										color='#FFFFFF'
-										visible={true}
-										ariaLabel='oval-loading'
-										secondaryColor='#FFFFFF'
-										strokeWidth={4}
-										strokeWidthSecondary={4}
-									/>
-								) : (
-									t('create_objects')
-								)}
-							</button>
+									>
+										{isLoading ? (
+											<Oval
+												height={20}
+												width={20}
+												color='#FFFFFF'
+												visible={true}
+												ariaLabel='oval-loading'
+												secondaryColor='#FFFFFF'
+												strokeWidth={4}
+												strokeWidthSecondary={4}
+											/>
+										) : (
+											t('create_objects')
+										)}
+									</button>
+								</TooltipTrigger>
+								<TooltipContent
+									className={`${btnDisabled && !isLoading ? 'flex' : 'hidden'}`}>
+									<p>{t('wait')}</p>
+								</TooltipContent>
+							</Tooltip>
+
 						</div>
 					</div>
 				)}

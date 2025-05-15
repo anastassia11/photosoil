@@ -27,6 +27,7 @@ import Textarea from './ui-kit/Textarea'
 import { getTranslation } from '@/i18n/client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { Label } from '../ui/label'
+import { deletePhotoById } from '@/api/photo/delete_photo'
 
 export default function AuthorForm({
 	_author,
@@ -168,6 +169,7 @@ export default function AuthorForm({
 				<div className='md:min-w-[220px] md:max-w-[220px] md:w-fit'>
 					<SubmitBtn
 						isSubmitting={isSubmitting}
+						isDisabled={photoLoading}
 						btnText={btnText}
 					/>
 				</div>
@@ -183,7 +185,12 @@ export default function AuthorForm({
 							<Controller
 								control={control}
 								name='photo'
-								rules={{ required: t('required') }}
+								rules={{
+									required: t('required'),
+									validate: {
+										hasPath: value => (value?.path ? true : t('required'))
+									}
+								}}
 								render={({ field, fieldState }) => (
 									<div className='p-0.5 relative max-h-[370px] min-h-[370px] aspect-[3/4] rounded-md overflow-hidden'>
 										{photoLoading ? (

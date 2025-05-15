@@ -29,6 +29,7 @@ export default function EditObject({ id, type, title }) {
 	const { t } = getTranslation(locale)
 	const formRef = useRef(null)
 	const router = useRouter()
+	const [btnDisabled, setBtnDisabled] = useState(false)
 
 	useEffect(() => {
 		fetchObject()
@@ -175,6 +176,7 @@ export default function EditObject({ id, type, title }) {
 				<div className='md:min-w-[220px] md:max-w-[220px] md:w-fit'>
 					<SubmitBtn
 						isSubmitting={isLoading}
+						isDisabled={btnDisabled}
 						btnText={t('save')}
 						onClick={handleEditClick}
 					/>
@@ -187,6 +189,7 @@ export default function EditObject({ id, type, title }) {
 				pathname='edit'
 				oldTwoLang={oldTwoLang}
 				oldIsEng={searchParams.get('lang') === 'eng'}
+				setBtnDisabled={setBtnDisabled}
 			/>
 		</div>
 	)

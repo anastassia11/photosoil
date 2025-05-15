@@ -46,7 +46,11 @@ export default function AuthorEditComponent({ id }) {
 	}
 
 	const handleEditAuthor = async data => {
-		const result = await putAuthor(id, data)
+		const _data = {
+			...data, contacts: data.contacts.filter(c => c.length),
+			otherProfiles: data.otherProfiles.filter(c => c.length)
+		}
+		const result = await putAuthor(id, _data)
 		if (result.success) {
 			if (author.photoId !== data.photoId) {
 				await deletePhotoById(author.photoId)

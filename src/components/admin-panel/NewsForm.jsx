@@ -26,6 +26,7 @@ import PhotoCard from './ui-kit/PhotoCard'
 import SubmitBtn from './ui-kit/SubmitBtn'
 import Textarea from './ui-kit/Textarea'
 import { getTranslation } from '@/i18n/client'
+import uuid from 'react-uuid'
 
 export default function NewsForm({
 	_news,
@@ -77,6 +78,8 @@ export default function NewsForm({
 
 	const { NEWS_INFO } = useConstants()
 
+	const [btnDisabled, setBtnDisabled] = useState(false)
+
 	useEffect(() => {
 		if (_news) {
 			reset({
@@ -84,11 +87,16 @@ export default function NewsForm({
 				tags: _news.tags?.map(({ id }) => id)
 			})
 			setIsEng(oldIsEng)
-			setLocalFiles(_news.files)
-			setLocalObjectPhoto(_news.objectPhoto)
+			if (_news.files) setLocalFiles(_news.files)
+			if (_news.objectPhoto) setLocalObjectPhoto(_news.objectPhoto)
 			setCreateTwoLang(_news.translations?.length > 1)
 		}
 	}, [_news])
+
+	useEffect(() => {
+		setBtnDisabled(localObjectPhoto.some((photo) => photo.isLoading)
+			|| localFiles?.some((file) => file.isLoading))
+	}, [localObjectPhoto, localFiles])
 
 	useEffect(() => {
 		fetchTags()
@@ -128,9 +136,10 @@ export default function NewsForm({
 		setIsEng(value)
 	}
 
-	const handleNewsPhotoSend = async (field, file, index) => {
+	const handleNewsPhotoSend = async (field, file) => {
+		const photoId = uuid()
 		setLocalObjectPhoto(prev => {
-			const _prev = [...prev, { isLoading: true }]
+			const _prev = [...prev, { id: photoId, isLoading: true, fileName: file.name }]
 			field.onChange(_prev)
 			return _prev
 		})
@@ -138,8 +147,8 @@ export default function NewsForm({
 		const result = await sendPhoto(file)
 		if (result.success) {
 			setLocalObjectPhoto(prev => {
-				const _prev = prev.map((photo, idx) =>
-					idx === index + localObjectPhoto.length
+				const _prev = prev.map((photo) =>
+					photo.id === photoId
 						? { ...result.data, isLoading: false }
 						: photo
 				)
@@ -147,6 +156,11 @@ export default function NewsForm({
 				return _prev
 			})
 		} else {
+			setLocalObjectPhoto(prev => {
+				const _prev = prev.filter(photo => photo.id !== photoId)
+				field.onChange(_prev)
+				return _prev
+			})
 			dispatch(
 				openAlert({
 					title: t('error'),
@@ -157,9 +171,10 @@ export default function NewsForm({
 		}
 	}
 
-	const handleFilesSend = async (file, index, field) => {
+	const handleFilesSend = async (file, field) => {
+		const fileId = uuid()
 		setLocalFiles(prev => {
-			const _prev = [...prev, { isLoading: true, name: file.name }]
+			const _prev = [...prev, { id: fileId, isLoading: true, name: file.name }]
 			field.onChange(_prev)
 			return _prev
 		})
@@ -167,8 +182,8 @@ export default function NewsForm({
 		const result = await sendPhoto(file)
 		if (result.success) {
 			setLocalFiles(prev => {
-				const _prev = prev.map((file, idx) =>
-					idx === index + localFiles.length
+				const _prev = prev.map((file) =>
+					file.id === fileId
 						? { ...result.data, isLoading: false }
 						: file
 				)
@@ -176,6 +191,11 @@ export default function NewsForm({
 				return _prev
 			})
 		} else {
+			setLocalFiles(prev => {
+				const _prev = prev.filter((file) => file.id !== fileId)
+				field.onChange(_prev)
+				return _prev
+			})
 			dispatch(
 				openAlert({
 					title: t('error'),
@@ -183,11 +203,7 @@ export default function NewsForm({
 					type: 'error'
 				})
 			)
-			setLocalFiles(prev => {
-				const _prev = prev.filter((file, idx) => idx !== index)
-				field.onChange(_prev)
-				return _prev
-			})
+
 		}
 	}
 
@@ -203,14 +219,14 @@ export default function NewsForm({
 
 		const isConfirm = await dispatch(modalThunkActions.open())
 		if (isConfirm.payload) {
-			if (pathname !== 'edit') {
-				await deletePhotoById(id)
-			}
 			setLocalObjectPhoto(prev => {
 				const _prev = prev.filter(photo => photo.id !== id)
 				field.onChange(_prev)
 				return _prev
 			})
+			if (pathname !== 'edit') {
+				await deletePhotoById(id)
+			}
 		}
 		dispatch(closeModal())
 	}
@@ -227,14 +243,14 @@ export default function NewsForm({
 
 		const isConfirm = await dispatch(modalThunkActions.open())
 		if (isConfirm.payload) {
-			if (pathname !== 'edit') {
-				await deletePhotoById(id)
-			}
 			setLocalFiles(prev => {
 				const _prev = prev.filter(file => file.id !== id)
 				field.onChange(_prev)
 				return _prev
 			})
+			if (pathname !== 'edit') {
+				await deletePhotoById(id)
+			}
 		}
 		dispatch(closeModal())
 	}
@@ -301,6 +317,7 @@ export default function NewsForm({
 				</h1>
 				<div className='md:min-w-[220px] md:max-w-[220px] md:w-fit'>
 					<SubmitBtn
+						isDisabled={btnDisabled}
 						isSubmitting={isSubmitting}
 						btnText={btnText}
 					/>
@@ -380,9 +397,9 @@ export default function NewsForm({
 							name='objectPhoto'
 							render={({ field, fieldState }) => (
 								<ul className={`mt-1 grid md:grid-cols-2 grid-cols-1 gap-4 `}>
-									{!!Object.keys(field.value).length &&
-										field.value.map((photo, idx) => (
-											<li key={`photo-${idx}`}>
+									{!!field.value.length &&
+										field.value.map((photo) => (
+											<li key={`photo-${photo.id}`}>
 												<PhotoCard
 													{...photo}
 													isEng={isEng}
@@ -397,8 +414,8 @@ export default function NewsForm({
 										<DragAndDrop
 											id='news-photos'
 											error={fieldState.error}
-											onLoadClick={(file, index) =>
-												handleNewsPhotoSend(field, file, index)
+											onLoadClick={(file) =>
+												handleNewsPhotoSend(field, file)
 											}
 											isMultiple={true}
 											accept='img'
@@ -434,8 +451,8 @@ export default function NewsForm({
 										<DragAndDrop
 											id='news-files'
 											error={fieldState.error}
-											onLoadClick={(file, index) =>
-												handleFilesSend(file, index, field)
+											onLoadClick={(file) =>
+												handleFilesSend(file, field)
 											}
 											isMultiple={true}
 										/>

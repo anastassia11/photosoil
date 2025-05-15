@@ -9,7 +9,7 @@ import {
 	useImperativeHandle,
 	useState
 } from 'react'
-import { Controller, useFieldArray, useForm } from 'react-hook-form'
+import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
 import uuid from 'react-uuid'
 
@@ -42,7 +42,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Label } from '../ui/label'
 
 function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, onMainPhotoSend, onOtherPhotoSend,
-	onObjectPhotoDelete
+	onObjectPhotoDelete, onMainPhotoDelete, setBtnDisabled
 }, ref) {
 	const dispatch = useDispatch()
 	const { locale } = useParams()
@@ -85,8 +85,10 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, onMainPhot
 
 	const isExternal = watch('isExternal')
 
-	const createTwoLang = watch('createTwoLang')
+	const createTwoLang = useWatch({ control, name: 'createTwoLang' })
 	const isEng = watch('currentLang')
+
+	const mainPhoto = useWatch({ control, name: "mainPhoto" })
 	const [localObjectPhoto, setLocalObjectPhoto] = useState([])
 
 	const [classifications, setClassifications] = useState([])
@@ -130,6 +132,10 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, onMainPhot
 	useEffect(() => {
 		dispatch(setDirty(isDirty))
 	}, [isDirty])
+
+	useEffect(() => {
+		if (setBtnDisabled) setBtnDisabled(mainPhoto.isLoading || localObjectPhoto?.some((photo) => photo.isLoading))
+	}, [localObjectPhoto, mainPhoto])
 
 	const fetchClassifications = async () => {
 		const result = await getClassifications()
@@ -175,7 +181,7 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, onMainPhot
 			if (pathname === 'edit') {
 				const photoId = uuid()
 				setLocalObjectPhoto(prev => {
-					const _prev = [...prev, { id: photoId, isLoading: true }]
+					const _prev = [...prev, { id: photoId, isLoading: true, fileName: file.name }]
 					field.onChange(_prev)
 					return _prev
 				})
@@ -207,11 +213,11 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, onMainPhot
 				onOtherPhotoSend(file, id)
 			}
 		},
-		[localObjectPhoto, dispatch, t]
+		[dispatch, t, id, onOtherPhotoSend, pathname]
 	)
 
 	const handleMainPhotoSend = useCallback(async (file, field) => {
-		field.onChange({ isLoading: true, name: file.name })
+		field.onChange({ isLoading: true, fileName: file.name })
 		if (pathname === 'edit') {
 			const result = await sendPhoto(file)
 			if (result.success) {
@@ -229,8 +235,7 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, onMainPhot
 		} else {
 			onMainPhotoSend(file, id)
 		}
-
-	}, [])
+	}, [onMainPhotoSend, id, dispatch, pathname, t])
 
 	const handleCoordChange = useCallback(({ latitude, longtitude }) => {
 		setValue('latitude', latitude)
@@ -265,15 +270,16 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, onMainPhot
 
 			const isConfirm = await dispatch(modalThunkActions.open())
 			if (isConfirm.payload) {
-				const newId = uuid()
-				field.onChange({ id: newId })
-				if (pathname !== 'edit') {
-					await deletePhotoById(id)
+				if (pathname === 'edit') {
+					const newId = uuid()
+					field.onChange({ id: newId })
+				} else {
+					onMainPhotoDelete(id)
 				}
 			}
 			dispatch(closeModal())
 		},
-		[dispatch, t]
+		[dispatch, t, onMainPhotoDelete, pathname]
 	)
 
 	const handleOtherPhotoDelete = useCallback(
@@ -301,7 +307,7 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, onMainPhot
 			}
 			dispatch(closeModal())
 		},
-		[dispatch, t, id]
+		[dispatch, t, id, onObjectPhotoDelete, pathname]
 	)
 
 	const handleTwoLangChange = useCallback(
@@ -699,7 +705,7 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, onMainPhot
 								name='objectPhoto'
 								render={({ field, fieldState }) => (
 									<ul className={`mt-1 grid md:grid-cols-2 grid-cols-1 gap-4 `}>
-										{!!Object.keys(field.value).length &&
+										{!!field.value.length &&
 											field.value.map((photo, idx) => (
 												<li key={`photo-${idx}`}>
 													<PhotoCard

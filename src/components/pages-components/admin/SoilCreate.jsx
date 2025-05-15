@@ -12,11 +12,12 @@ export default function SoilCreateComponent() {
 	const { locale } = useParams()
 	const { t } = getTranslation(locale)
 
-	const fetchCreateSoil = async data => {
+	const fetchCreateSoil = async (id, data) => {
+		console.log(data)
 		const result = await createSoil(data)
 		if (result.success) {
-			return { success: true }
-		} else return { success: false, status: result.status }
+			return { id, success: true }
+		} else return { id, success: false, status: result.status }
 	}
 
 	return (

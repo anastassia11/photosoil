@@ -19,7 +19,7 @@
 	"create_dictionary": "Create dictionary",
 	"created_publication": "Publication created",
 	"create_ecosystems": "Create ecosystems",
-	"create_objects": "Create soils",
+	"create_objects": "Create objects",
 	"create_news": "Create news",
 	"create_publication": "Create publication",
 	"creation_author": "Author creation",
@@ -306,5 +306,6 @@
 	"loading": "Loading..",
 	"form_confirm": "Are you sure you want to leave this page? The data you entered may not be saved.",
 
-	"sortByAlpha": "Sort alphabetically when displaying"
+	"sortByAlpha": "Sort alphabetically when displaying",
+	"wait": "Please wait for files to finish loading"
 }

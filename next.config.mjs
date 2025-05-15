@@ -21,14 +21,14 @@ const nextConfig = {
 				pathname: '/**'
 			},
 			{
-				protocol: 'https',
-				hostname: '80.78.243.185',
+				protocol: 'http',
+				hostname: '46.173.25.120',
 				port: '1515',
 				pathname: '/**'
 			},
 			{
 				protocol: 'http',
-				hostname: '192.168.0.108',
+				hostname: '192.168.0.106',
 				port: '1515',
 				pathname: '/**'
 			},

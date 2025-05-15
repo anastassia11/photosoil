@@ -34,7 +34,7 @@ const DragAndDrop = memo(function DragAndDrop({
 				dispatch(
 					openAlert({
 						title: t('warning'),
-						message: `${t('error_file')} (.${accept})}`,
+						message: `${t('error_file')} (need .${accept})}`,
 						type: 'warning'
 					})
 				)
@@ -76,17 +76,19 @@ const DragAndDrop = memo(function DragAndDrop({
 	}
 
 	return (
-		<div className='min-h-full min-w-full flex flex-1 flex-col'>
+		<div className='flex w-full h-full flex-col'>
 			{drag ? (
 				<div
-					className='flex flex-col justify-center items-center rounded border-black/80 bg-black/45
+					className='px-4 
+					w-full
+					flex flex-col justify-center items-center rounded border-black/80 bg-black/45
                         border-dashed border-[1.5px] duration-300 flex-1 text-center'
 					onDragStart={e => handleDragStart(e)}
 					onDragLeave={e => handleDragLeave(e)}
 					onDragOver={e => handleDragStart(e)}
 					onDrop={e => handleDrop(e)}
 				>
-					<p className='text-white'>{t('release_files')}</p>
+					<p className='text-white xl:text-base text-sm'>{t('release_files')}</p>
 				</div>
 			) : (
 				<label
@@ -99,7 +101,7 @@ const DragAndDrop = memo(function DragAndDrop({
 					onDragLeave={e => handleDragLeave(e)}
 					onDragOver={e => handleDragStart(e)}
 				>
-					<p className='text-center'>
+					<p className='text-center xl:text-base text-sm'>
 						<span className='font-semibold'>{t('click_download')}</span>{' '}
 						{t('drag_files')}
 					</p>

@@ -12,11 +12,11 @@ export default function CreateEcosystemComponent() {
 	const { locale } = useParams()
 	const { t } = getTranslation(locale)
 
-	const fetchCreateEcosystem = async data => {
+	const fetchCreateEcosystem = async (id, data) => {
 		const result = await createEcosystem(data)
 		if (result.success) {
-			return { success: true }
-		} else return { success: false, status: result.status }
+			return { id, success: true }
+		} else return { id, success: false, status: result.status }
 	}
 
 	return (

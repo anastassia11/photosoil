@@ -10,6 +10,7 @@ import Header from '@/components/admin-panel/Header'
 import Sidebar from '@/components/admin-panel/Sidebar'
 
 import { closeAlert } from '@/store/slices/alertSlice'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
 const Alert = dynamic(() => import('@/components/admin-panel/ui-kit/Alert'), {
 	ssr: false
@@ -67,7 +68,7 @@ export default function AdminLayout({ children }) {
 							<Sidebar />
 						</div>
 
-						<div className='min-h-full flex flex-col sm:py-4 py-1 sm:px-8 px-4 lg:ml-[290px] w-full'>
+						<div className='min-h-full flex flex-col sm:py-4 py-1 sm:px-8 px-4 lg:w-[calc(100%-290px)] mr-0 ml-auto w-full'>
 							<Alert
 								isOpen={alertIsOpen}
 								{...alertProps}
@@ -115,7 +116,9 @@ export default function AdminLayout({ children }) {
 							</div>
 
 							<Breadcrumbs />
-							{children}
+							<TooltipProvider>
+								{children}
+							</TooltipProvider>
 							{isOpen && (
 								<Modal
 									isOpen={isOpen}

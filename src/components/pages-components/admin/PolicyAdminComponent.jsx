@@ -22,6 +22,7 @@ import { getRules } from '@/api/rules/get_rules'
 import { putRules } from '@/api/rules/put_rules'
 
 import { getTranslation } from '@/i18n/client'
+import uuid from 'react-uuid'
 
 export default function PolicyAdminComponent() {
 	const dispatch = useDispatch()
@@ -45,9 +46,15 @@ export default function PolicyAdminComponent() {
 	const [localFiles, setLocalFiles] = useState([])
 	const [initialFilesIds, setInitialFilesIds] = useState([])
 
+	const [btnDisabled, setBtnDisabled] = useState(false)
+
 	useEffect(() => {
 		fetchRules()
 	}, [])
+
+	useEffect(() => {
+		setBtnDisabled(localFiles?.some((file) => file.isLoading))
+	}, [localFiles])
 
 	useEffect(() => {
 		dispatch(setDirty(isDirty))
@@ -57,8 +64,9 @@ export default function PolicyAdminComponent() {
 		const result = await getRules()
 		if (result.success) {
 			reset(result.data)
-			setLocalFiles(result.data.files)
-			setInitialFilesIds(result.data.files.map(({ id }) => id))
+			const _files = result.data.files ?? []
+			setLocalFiles(_files)
+			setInitialFilesIds(_files.map(({ id }) => id))
 		}
 	}
 
@@ -115,8 +123,9 @@ export default function PolicyAdminComponent() {
 	}
 
 	const handleFilesSend = async (file, index, field) => {
+		const fileId = uuid()
 		setLocalFiles(prev => {
-			const _prev = [...prev, { isLoading: true, name: file.name }]
+			const _prev = [...prev, { id: fileId, isLoading: true, name: file.name }]
 			field.onChange(_prev)
 			return _prev
 		})
@@ -124,8 +133,8 @@ export default function PolicyAdminComponent() {
 		const result = await sendPhoto(file)
 		if (result.success) {
 			setLocalFiles(prev => {
-				const _prev = prev.map((file, idx) =>
-					idx === index + localFiles.length
+				const _prev = prev.map((file) =>
+					file.id === fileId
 						? { ...result.data, isLoading: false }
 						: file
 				)
@@ -133,6 +142,11 @@ export default function PolicyAdminComponent() {
 				return _prev
 			})
 		} else {
+			setLocalFiles(prev => {
+				const _prev = prev.filter((file) => file.id !== fileId)
+				field.onChange(_prev)
+				return _prev
+			})
 			dispatch(
 				openAlert({
 					title: t('error'),
@@ -156,6 +170,7 @@ export default function PolicyAdminComponent() {
 					<SubmitBtn
 						isSubmitting={isSubmitting}
 						btnText={t('save')}
+						isDisabled={btnDisabled}
 					/>
 				</div>
 			</div>

@@ -19,7 +19,11 @@ export default function AuthorCreateComponent() {
 	const { t } = getTranslation(locale)
 
 	const handleCreateAuthor = async data => {
-		const result = await createAuthor(data)
+		const _data = {
+			...data, contacts: data.contacts.filter(c => c.length),
+			otherProfiles: data.otherProfiles.filter(c => c.length)
+		}
+		const result = await createAuthor(_data)
 		if (result.success) {
 			router.push('/admin/authors')
 			dispatch(setDirty(false))

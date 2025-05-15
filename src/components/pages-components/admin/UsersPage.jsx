@@ -177,10 +177,10 @@ export default function UsersPageComponent() {
 										pattern:
 											name === 'email'
 												? {
-														value:
-															/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-														message: t('invalid_email')
-													}
+													value:
+														/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+													message: t('invalid_email')
+												}
 												: false
 									})}
 								/>

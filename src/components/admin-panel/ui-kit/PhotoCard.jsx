@@ -50,7 +50,7 @@ const PhotoCard = memo(function PhotoCard({
 						className='object-cover w-[150px] aspect-[1/1]'
 					/>
 				)}
-				{!isLoading && (
+				{fileName && (
 					<p className='overflow-hidden whitespace-nowrap overflow-ellipsis py-1 px-2 text-sm font-medium z-10 absolute bottom-0 backdrop-blur-md bg-black bg-opacity-40 text-white w-full'>
 						{fileName}
 					</p>

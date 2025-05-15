@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Controller, useFieldArray, useForm } from 'react-hook-form'
+import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { openAlert } from '@/store/slices/alertSlice'
@@ -78,6 +78,7 @@ export default function PublicationForm({
 		})
 
 	const coordinates = watch('coordinates')
+	const file = useWatch({ control, name: 'file' })
 
 	const [isEng, setIsEng] = useState(false)
 	const [createTwoLang, setCreateTwoLang] = useState(false)
@@ -272,6 +273,7 @@ export default function PublicationForm({
 				</h1>
 				<div className='md:min-w-[220px] md:max-w-[220px] md:w-fit'>
 					<SubmitBtn
+						isDisabled={file.isLoading}
 						isSubmitting={isSubmitting}
 						btnText={btnText}
 					/>
@@ -451,7 +453,7 @@ export default function PublicationForm({
 											error={fieldState.error}
 											onLoadClick={file => handleFileLoad(file, field)}
 											isMultiple={false}
-											accept='pdf'
+										// accept='pdf'
 										/>
 									</div>
 								)}

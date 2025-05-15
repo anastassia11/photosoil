@@ -43,7 +43,8 @@ export default function ObjectsView({
 		authorType: true,
 		creator: true,
 		lastUpdated: true,
-		isVisible: true
+		isVisible: true,
+		type: true
 	})
 	const [lastSorted, setLastSorted] = useState('lastUpdated')
 
@@ -64,6 +65,7 @@ export default function ObjectsView({
 	}
 
 	useEffect(() => {
+		console.log(_objects)
 		setObjects(
 			_objects.sort((a, b) => {
 				return b.lastUpdated - a.lastUpdated
@@ -167,21 +169,21 @@ export default function ObjectsView({
 	const sortedBy = fieldName => {
 		setLastSorted(fieldName)
 		const isAscending = sortedTypes[fieldName]
-		let parentName
-		switch (objectType) {
-			case 'objects':
-				parentName = 'soilObject'
-				break
-			case 'ecosystems':
-				parentName = 'ecoSystem'
-				break
-			case 'publications':
-				parentName = 'publication'
-				break
-			case 'news':
-				parentName = 'news'
-				break
-		}
+		// let parentName
+		// switch (objectType) {
+		// 	case 'objects':
+		// 		parentName = 'soilObject'
+		// 		break
+		// 	case 'ecosystems':
+		// 		parentName = 'ecoSystem'
+		// 		break
+		// 	case 'publications':
+		// 		parentName = 'publication'
+		// 		break
+		// 	case 'news':
+		// 		parentName = 'news'
+		// 		break
+		// }
 
 		const compareFn = (a, b) => {
 			let fieldA, fieldB
@@ -205,8 +207,8 @@ export default function ObjectsView({
 				const emailA = a.userInfo?.email
 				const emailB = b.userInfo?.email
 				return isAscending
-					? emailA.localeCompare(emailB)
-					: emailB.localeCompare(emailA)
+					? emailA?.localeCompare(emailB)
+					: emailB?.localeCompare(emailA)
 			}
 
 			if (fieldName === 'isVisible') {
@@ -221,11 +223,19 @@ export default function ObjectsView({
 							: 1
 			}
 
-			const valueA = fieldA.toString()
-			const valueB = fieldB.toString()
+			if (fieldName === 'type') {
+				const typeA = a.type.name?.toString()
+				const typeB = b.type.name?.toString()
+				return isAscending
+					? typeA?.localeCompare(typeB)
+					: typeB?.localeCompare(typeA)
+			}
+
+			const valueA = fieldA?.toString()
+			const valueB = fieldB?.toString()
 			return isAscending
-				? valueA.localeCompare(valueB)
-				: valueB.localeCompare(valueA)
+				? valueA?.localeCompare(valueB)
+				: valueB?.localeCompare(valueA)
 		}
 		setObjects(prev => [...prev].sort(compareFn))
 		setFilteredObjects(prev => [...prev].sort(compareFn))
@@ -831,7 +841,7 @@ export default function ObjectsView({
 							</button>
 						</div>
 					</th>
-					{objectType === 'userPage' && <ThItem name='type' />}
+					{objectType === 'userPage' && <ThItem name='type' fieldName='type' />}
 					{objectType !== 'users' && objectType !== 'userPage' && (
 						<ThItem
 							name='creator'
