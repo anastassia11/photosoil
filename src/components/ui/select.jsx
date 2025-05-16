@@ -12,18 +12,18 @@ const SelectGroup = SelectPrimitive.Group
 
 const SelectValue = SelectPrimitive.Value
 
-const SelectTrigger = React.forwardRef(({ className, children, ...props }, ref) => (
+const SelectTrigger = React.forwardRef(({ className, children, withoutIcon, ...props }, ref) => (
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm data-[placeholder]:text-muted-foreground focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+      "group/dropdown flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm data-[placeholder]:text-muted-foreground focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
       className
     )}
     {...props}>
     {children}
-    <SelectPrimitive.Icon asChild>
-      <ChevronDown className="h-4 w-4 opacity-50" />
-    </SelectPrimitive.Icon>
+    {!withoutIcon && <SelectPrimitive.Icon asChild>
+      <ChevronDown size={18} strokeWidth={1.5} className='transition group-data-[state=open]/dropdown:-rotate-180' />
+    </SelectPrimitive.Icon>}
   </SelectPrimitive.Trigger>
 ))
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName

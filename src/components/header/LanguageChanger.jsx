@@ -34,7 +34,7 @@ const LanguageChanger = memo(function LanguageChanger({
 	}
 
 	return (
-		<div className='sm:w-[80px] w-full h-full flex justify-center items-center -mt-1'>
+		<div className='sm:w-[80px] w-full h-full flex justify-center items-center'>
 			<Select
 				value={locale}
 				onValueChange={handleLanguageChange}>

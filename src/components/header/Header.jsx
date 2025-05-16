@@ -1,24 +1,19 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-
-import { setDropdown } from '@/store/slices/generalSlice'
+import React, { useEffect, useState } from 'react'
 
 import LanguageChanger from './LanguageChanger'
 import Logo from './Logo'
 import { getTranslation } from '@/i18n/client'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu'
+import { ChevronDown, Menu, X } from 'lucide-react'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible'
 
 export default function Header({ locale }) {
-	const dispatch = useDispatch()
 	const pathname = usePathname()
-	const dropdown = useSelector(state => state.general.dropdown)
-	const [prevScrollPos, setPrevScrollPos] = useState(0)
-	const [visible, setVisible] = useState(true)
 	const { t } = getTranslation(locale)
 	const [menuOpen, setMenuOpen] = useState(false)
 	const [token, setToken] = useState(null)
@@ -51,27 +46,14 @@ export default function Header({ locale }) {
 		setMenuOpen(false)
 	}, [pathname])
 
-	const handleScroll = useCallback(() => {
-		const currentScrollPos = window.scrollY
-		setVisible(currentScrollPos > 0 ? prevScrollPos > currentScrollPos : true)
-		setPrevScrollPos(currentScrollPos)
-	}, [prevScrollPos, setVisible, setPrevScrollPos])
-
-	useEffect(() => {
-		window.addEventListener('scroll', handleScroll)
-		return () => {
-			window.removeEventListener('scroll', handleScroll)
-		}
-	}, [handleScroll])
-
 	const handleClick = () => {
 		setMenuOpen(false)
 	}
 
 	return (
 		<header
-			className={`fixed top-0 z-50 transition-all duration-200 
-            ease-in-out px-4 2xl:px-8 w-full border-b shadow-sm h-16  bg-white/90 flex flex-row items-center justify-between`}
+			className={`w-screen fixed top-0 z-50 transition-all duration-200 
+            ease-in-out pl-4 pr-6 2xl:pl-8 2xl:pr-10 border-b shadow-sm h-16  bg-white/90 flex flex-row items-center justify-between`}
 		>
 			<div className='flex-1 '>
 				<Logo locale={locale} />
@@ -82,40 +64,25 @@ export default function Header({ locale }) {
 					<li key={key}>
 						{isDropdown ? (
 							<>
-								<button
-									className={` ${key} w-full flex items-center justify-between gap-1  hover:text-blue-600`}
-									onClick={() =>
-										dispatch(
-											setDropdown({
-												key: key,
-												isActive:
-													dropdown.key !== null && dropdown.key !== key
-														? true
-														: !dropdown.isActive
-											})
-										)
-									}
-								>
-									{title}
-									<span
-										className={`transition ${dropdown.key == key && dropdown.isActive ? '-rotate-180' : ''} `}
-									>
-										<svg
-											xmlns='http://www.w3.org/2000/svg'
-											fill='none'
-											viewBox='0 0 24 24'
-											strokeWidth='1.5'
-											stroke='currentColor'
-											className='h-4 w-4'
+								<DropdownMenu>
+									<DropdownMenuTrigger asChild className='group/dropdown'>
+										<button
+											className='w-full flex items-center justify-between gap-1 hover:text-blue-600'
 										>
-											<path
-												strokeLinecap='round'
-												strokeLinejoin='round'
-												d='M19.5 8.25l-7.5 7.5-7.5-7.5'
-											/>
-										</svg>
-									</span>
-								</button>
+											{title}
+											<ChevronDown size={18} strokeWidth={1.5} className='transition group-data-[state=open]/dropdown:-rotate-180' />
+										</button>
+									</DropdownMenuTrigger>
+									<DropdownMenuContent onCloseAutoFocus={e => e.preventDefault()}>
+										{navs?.map(({ key: navKey, title }) => (
+											<DropdownMenuItem key={navKey} className='text-base focus:text-blue-600 cursor-pointer'
+												onClick={() => window.location.href = `/${locale}/${navKey}`}>
+												{title}
+											</DropdownMenuItem>
+										))}
+									</DropdownMenuContent>
+								</DropdownMenu>
+
 							</>
 						) : (
 							<Link
@@ -126,31 +93,6 @@ export default function Header({ locale }) {
 								{title}
 							</Link>
 						)}
-
-						<div
-							className={`${isDropdown && dropdown.key == key && dropdown.isActive ? 'visible translate-y-4' : 'invisible opacity-0'}
-                            overflow-hidden w-[400px] absolute border shadow-md bg-white rounded-md transition-all duration-200`}
-						>
-							<ul className='py-2'>
-								{navs?.map(({ key: navKey, title }) => (
-									<li
-										key={navKey}
-										className='duration-300 cursor-pointer hover:text-blue-600 h-9 hover:bg-zinc-100 flex items-center xl:px-4 px-2'
-									>
-										<Link
-											onClick={() => {
-												dispatch(setDropdown({ isActive: false, key: null }))
-												setMenuOpen(false)
-											}}
-											href={`/${locale}/${navKey}`}
-											prefetch={false}
-										>
-											{title}
-										</Link>
-									</li>
-								))}
-							</ul>
-						</div>
 					</li>
 				))}
 			</ul>
@@ -195,33 +137,9 @@ export default function Header({ locale }) {
 					onClick={() => setMenuOpen(!menuOpen)}
 				>
 					{menuOpen ? (
-						<svg
-							xmlns='http://www.w3.org/2000/svg'
-							className='h-6 w-6'
-							viewBox='0 0 20 20'
-							fill='currentColor'
-						>
-							<path
-								fillRule='evenodd'
-								d='M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z'
-								clipRule='evenodd'
-							/>
-						</svg>
+						<X strokeWidth={1.5} />
 					) : (
-						<svg
-							xmlns='http://www.w3.org/2000/svg'
-							fill='none'
-							viewBox='0 0 24 24'
-							strokeWidth={1.5}
-							stroke='currentColor'
-							className='w-6 h-6'
-						>
-							<path
-								strokeLinecap='round'
-								strokeLinejoin='round'
-								d='M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5'
-							/>
-						</svg>
+						<Menu strokeWidth={1.5} />
 					)}
 				</button>
 			</div>
@@ -251,77 +169,46 @@ export default function Header({ locale }) {
 						</Link>
 					)}
 				</li>
-				<ul className='flex flex-col space-y-2'>
+				<ul className='flex flex-col space-y-2 px-2'>
 					{navigation.map(({ key, title, isDropdown, navs }) => (
 						<li key={key}>
 							{isDropdown ? (
 								<>
-									<button
-										className={` ${key} px-4 w-full flex items-center justify-between gap-1  hover:text-blue-600`}
-										onClick={() =>
-											dispatch(
-												setDropdown({
-													key: key,
-													isActive:
-														dropdown.key !== null && dropdown.key !== key
-															? true
-															: !dropdown.isActive
-												})
-											)
-										}
-									>
-										{title}
-										<span
-											className={`transition ${dropdown.key == key && dropdown.isActive ? '-rotate-180' : ''} `}
-										>
-											<svg
-												xmlns='http://www.w3.org/2000/svg'
-												fill='none'
-												viewBox='0 0 24 24'
-												strokeWidth='1.5'
-												stroke='currentColor'
-												className='h-4 w-4'
+									<Collapsible className='group/dropdown'>
+										<CollapsibleTrigger asChild className='group/dropdown'>
+											<button
+												className='w-full flex items-center justify-between gap-1 hover:text-blue-600'
 											>
-												<path
-													strokeLinecap='round'
-													strokeLinejoin='round'
-													d='M19.5 8.25l-7.5 7.5-7.5-7.5'
-												/>
-											</svg>
-										</span>
-									</button>
+												{title}
+												<ChevronDown size={18} strokeWidth={1.5} className='transition group-data-[state=open]/dropdown:-rotate-180' />
+											</button>
+										</CollapsibleTrigger>
+										<CollapsibleContent>
+											<div className='overflow-hidden'>
+												<ul className='pt-1 pl-2'>
+													{navs.map(({ key: navKey, title }) => (
+														<Link key={navKey}
+															className='duration-300 hover:text-blue-600 py-1 flex items-center px-4'
+															onClick={handleClick}
+															href={`/${locale}/${navKey}`}
+															prefetch={false}
+														>
+															{title}
+														</Link>
+													))}
+												</ul>
+											</div>
+										</CollapsibleContent>
+									</Collapsible>
 								</>
 							) : (
 								<Link
-									onClick={handleClick}
 									href={`/${locale}/${key}`}
 									prefetch={false}
-									className='px-4 duration-300 cursor-pointer hover:text-blue-600'
+									className='duration-300 cursor-pointer hover:text-blue-600'
 								>
 									{title}
 								</Link>
-							)}
-							{isDropdown && dropdown.key == key && dropdown.isActive ? (
-								<div className='overflow-hidden'>
-									<ul className='pt-1 pl-4'>
-										{navs.map(({ key: navKey, title }) => (
-											<li
-												key={navKey}
-												className='duration-300 cursor-pointer hover:text-blue-600 py-1 hover:bg-zinc-100 flex items-center px-4'
-											>
-												<Link
-													onClick={handleClick}
-													href={`/${locale}/${navKey}`}
-													prefetch={false}
-												>
-													{title}
-												</Link>
-											</li>
-										))}
-									</ul>
-								</div>
-							) : (
-								''
 							)}
 						</li>
 					))}

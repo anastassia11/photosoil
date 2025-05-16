@@ -63,7 +63,7 @@ export default function AdminLayout({ children }) {
 				isAuth ? (
 					<>
 						<div
-							className={`lg:block fixed z-50 duration-300 ${menuOpen ? 'block left-0' : 'lg:opacity-100 opacity-0 lg:left-0 -left-[290px]'}`}
+							className={`lg:block fixed z-50 duration-300 ${menuOpen ? 'block' : 'lg:opacity-100 opacity-0 lg:left-0 -left-[290px]'}`}
 						>
 							<Sidebar />
 						</div>
