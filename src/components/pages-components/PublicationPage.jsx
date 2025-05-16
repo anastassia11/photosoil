@@ -20,6 +20,7 @@ export default function PublicationPageComponent({ id }) {
 	const [tokenData, setTokenData] = useState({})
 	const { locale } = useParams()
 	const { t } = getTranslation(locale)
+	const [parser, setParser] = useState()
 
 	let _isEng = locale === 'en'
 
@@ -28,6 +29,9 @@ export default function PublicationPageComponent({ id }) {
 	)
 
 	useEffect(() => {
+		if (typeof document !== 'undefined') {
+			setParser(new DOMParser())
+		}
 		localStorage.getItem('tokenData') &&
 			setTokenData(JSON.parse(localStorage.getItem('tokenData')))
 		fetchPublication()
@@ -78,7 +82,7 @@ export default function PublicationPageComponent({ id }) {
 					{currentTransl?.name}
 				</h1>
 				{tokenData.role === 'Admin' ||
-				tokenData.email === publication.userEmail ? (
+					tokenData.email === publication.userEmail ? (
 					<Link
 						target='_blank'
 						prefetch={false}
@@ -174,6 +178,24 @@ export default function PublicationPageComponent({ id }) {
 						) : (
 							''
 						)}
+
+						{!!currentTransl?.comments?.length &&
+							currentTransl?.comments !== '<p></p>' && (
+								<div className='flex flex-col w-full'>
+									<span className=' text-zinc-500 font-semibold'>
+										{t('comments')}
+									</span>
+									<div
+										className='tiptap'
+										dangerouslySetInnerHTML={{
+											__html: parser?.parseFromString(
+												currentTransl?.comments || '',
+												'text/html'
+											).body.innerHTML
+										}}
+									></div>
+								</div>
+							)}
 					</div>
 
 					{publication.file ? (
@@ -186,7 +208,7 @@ export default function PublicationPageComponent({ id }) {
 								href={`${BASE_SERVER_URL}${publication.file?.path}`}
 								download={true}
 								target='_blank'
-								// onClick={handleDownload}
+							// onClick={handleDownload}
 							>
 								<svg
 									xmlns='http://www.w3.org/2000/svg'
