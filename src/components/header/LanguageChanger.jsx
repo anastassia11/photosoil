@@ -34,11 +34,11 @@ const LanguageChanger = memo(function LanguageChanger({
 	}
 
 	return (
-		<div className='sm:w-[80px] w-full h-full flex justify-center items-center'>
+		<div className='w-full h-full flex justify-center items-center'>
 			<Select
 				value={locale}
 				onValueChange={handleLanguageChange}>
-				<SelectTrigger className="text-base border-none bg-transparent">
+				<SelectTrigger className="text-base border-none bg-transparent gap-1">
 					<SelectValue />
 				</SelectTrigger>
 				<SelectContent className='min-w-0'>

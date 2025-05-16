@@ -123,7 +123,7 @@ export default function Header({ locale }) {
 							{t('dashboard')}
 						</Link>
 					)}
-					<div className='w-[80px] h-full flex items-center'>
+					<div className='h-full flex items-center'>
 						<LanguageChanger locale={locale} />
 					</div>
 				</motion.div>
@@ -171,7 +171,7 @@ export default function Header({ locale }) {
 				</li>
 				<ul className='flex flex-col space-y-2 px-2'>
 					{navigation.map(({ key, title, isDropdown, navs }) => (
-						<li key={key}>
+						<li key={key} className='w-full'>
 							{isDropdown ? (
 								<>
 									<Collapsible className='group/dropdown'>
@@ -205,7 +205,7 @@ export default function Header({ locale }) {
 								<Link
 									href={`/${locale}/${key}`}
 									prefetch={false}
-									className='duration-300 cursor-pointer hover:text-blue-600'
+									className='duration-300 cursor-pointer hover:text-blue-600 w-full flex'
 								>
 									{title}
 								</Link>

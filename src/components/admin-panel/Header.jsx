@@ -36,12 +36,12 @@ export default function Header() {
 				<DropdownMenuTrigger asChild
 					className='group/dropdown'>
 					<div
-						className='relative w-fit self-end flex flex-row items-center space-x-4
+						className='relative w-fit self-end flex flex-row items-center
                 mini:px-4 py-1 cursor-pointer'>
-						<span className='uppercase bg-blue-600 w-10 h-10 rounded-2xl text-white font-light text-2xl flex items-center justify-center'>
+						<span className='mr-2 uppercase bg-blue-600 w-10 h-10 rounded-2xl text-white font-light text-2xl flex items-center justify-center'>
 							{email?.[0]}
 						</span>
-						<div className='flex flex-col justify-center items-start'>
+						<div className='mr-2 flex flex-col justify-center items-start'>
 							<p
 								className='font-semibold group-hover/dropdown:text-blue-700 group-data-[state=open]/dropdown:text-blue-700 duration-300'
 							>
