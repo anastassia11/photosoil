@@ -162,7 +162,7 @@ export default function Header({ locale }) {
 						<Link
 							href={`/${locale}/admin`}
 							prefetch={false}
-							className='min-w-fit max-h-[40px] px-2 py-2 font-medium text-left text-blue-600 transition-colors duration-300 
+							className='min-w-fit max-h-[40px] py-2 font-medium text-left text-blue-600 transition-colors duration-300 
                 transform '
 						>
 							{t('dashboard')}

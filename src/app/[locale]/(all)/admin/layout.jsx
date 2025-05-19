@@ -58,7 +58,7 @@ export default function AdminLayout({ children }) {
 	}, [alertIsOpen, dispatch])
 
 	return (
-		<div className='flex flex-row min-h-screen'>
+		<div className='flex flex-row min-h-screen overflow-x-hidden pb-10'>
 			{isChecked ? (
 				isAuth ? (
 					<>

@@ -1111,20 +1111,20 @@ export default function ObjectsView({
                         shadow-md z-30 absolute overflow-hidden inline-flex justify-between bg-white border divide-x rounded-lg duration-200
                     ${selectedObjects.length ? 'opacity-100' : 'invisible opacity-0'}`}
 					>
-						<div className='min-w-fit w-full px-2 mini:px-4 sm:px-5 py-2 sm:block hidden font-medium text-blue-700 transition-colors duration-200 '>
+						<div className='min-w-fit w-full px-2 sm:px-5 py-2 sm:block hidden font-medium text-blue-700 transition-colors duration-200 '>
 							{selectedObjects.length} {t('select')}:
 						</div>
 						{visibilityControl ? (
 							<>
 								<button
-									className='min-w-fit w-full px-2 mini:px-4 sm:px-5 py-2 font-medium text-zinc-600 transition-colors duration-200 hover:bg-zinc-100'
+									className='min-w-fit w-full px-2 sm:px-5 py-2 font-medium text-zinc-600 transition-colors duration-200 hover:bg-zinc-100'
 									onClick={() => handleSelectedVisibleChange(true)}
 								>
 									{t('publish_go')}
 								</button>
 
 								<button
-									className='min-w-fit w-full px-2 mini:px-4 sm:px-5 py-2 font-medium text-zinc-600 transition-colors duration-200 hover:bg-zinc-100'
+									className='min-w-fit w-full px-2 sm:px-5 py-2 font-medium text-zinc-600 transition-colors duration-200 hover:bg-zinc-100'
 									onClick={() => handleSelectedVisibleChange(false)}
 								>
 									{t('no_publish_go')}
@@ -1134,7 +1134,7 @@ export default function ObjectsView({
 							''
 						)}
 						<button
-							className='min-w-fit w-full px-2 mini:px-4 sm:px-5 py-2 font-medium text-red-500 transition-colors duration-200 hover:bg-zinc-100'
+							className='min-w-fit w-full px-2 sm:px-5 py-2 font-medium text-red-500 transition-colors duration-200 hover:bg-zinc-100'
 							onClick={handleSelectedDelete}
 						>
 							{t('delete')}
