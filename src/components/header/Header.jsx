@@ -14,6 +14,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/colla
 
 export default function Header({ locale }) {
 	const pathname = usePathname()
+	const segment = pathname.split("/").pop()
+
 	const { t } = getTranslation(locale)
 	const [menuOpen, setMenuOpen] = useState(false)
 	const [token, setToken] = useState(null)
@@ -43,6 +45,7 @@ export default function Header({ locale }) {
 	}, [])
 
 	useEffect(() => {
+		console.log(pathname)
 		setMenuOpen(false)
 	}, [pathname])
 
@@ -67,7 +70,9 @@ export default function Header({ locale }) {
 								<DropdownMenu>
 									<DropdownMenuTrigger asChild className='group/dropdown'>
 										<button
-											className='w-full flex items-center justify-between gap-1 hover:text-blue-600'
+											className={`w-full flex items-center justify-between gap-1 hover:text-blue-600
+												${navs.map(({ key }) => key).some(str => str.includes(segment))
+												&& 'data-[state=closed]:font-semibold data-[state=closed]:text-blue-600'}`}
 										>
 											{title}
 											<ChevronDown size={18} strokeWidth={1.5} className='transition group-data-[state=open]/dropdown:-rotate-180' />
@@ -75,7 +80,9 @@ export default function Header({ locale }) {
 									</DropdownMenuTrigger>
 									<DropdownMenuContent onCloseAutoFocus={e => e.preventDefault()}>
 										{navs?.map(({ key: navKey, title }) => (
-											<DropdownMenuItem key={navKey} className='text-base focus:text-blue-600 cursor-pointer'
+											<DropdownMenuItem key={navKey.length ? navKey : 'main'} className={`text-base focus:text-blue-600 cursor-pointer
+												${segment.includes(navKey)
+												&& 'font-semibold text-blue-600'}`}
 												onClick={() => window.location.href = `/${locale}/${navKey}`}>
 												{title}
 											</DropdownMenuItem>
@@ -88,7 +95,9 @@ export default function Header({ locale }) {
 							<Link
 								href={`/${locale}/${key}`}
 								prefetch={false}
-								className='duration-300 cursor-pointer hover:text-blue-600'
+								className={`duration-300 cursor-pointer hover:text-blue-600
+									${((!!key.length && segment.includes(key)) || (!key.length && (segment === 'ru' || segment === 'en')))
+									&& 'font-semibold text-blue-600'}`}
 							>
 								{title}
 							</Link>
@@ -177,7 +186,9 @@ export default function Header({ locale }) {
 									<Collapsible className='group/dropdown'>
 										<CollapsibleTrigger asChild className='group/dropdown'>
 											<button
-												className='w-full flex items-center justify-between gap-1 hover:text-blue-600'
+												className={`duration-300 w-full flex items-center justify-between gap-1 hover:text-blue-600
+													${navs.map(({ key }) => key).some(str => str.includes(segment))
+													&& 'group-data-[state=closed]/dropdown:font-semibold group-data-[state=closed]/dropdown:text-blue-600'}`}
 											>
 												{title}
 												<ChevronDown size={18} strokeWidth={1.5} className='transition group-data-[state=open]/dropdown:-rotate-180' />
@@ -188,7 +199,9 @@ export default function Header({ locale }) {
 												<ul className='pt-1 pl-2'>
 													{navs.map(({ key: navKey, title }) => (
 														<Link key={navKey}
-															className='duration-300 hover:text-blue-600 py-1 flex items-center px-4'
+															className={`duration-300 hover:text-blue-600 py-1 flex items-center px-4
+																${segment.includes(navKey)
+																&& 'font-semibold text-blue-600'}`}
 															onClick={handleClick}
 															href={`/${locale}/${navKey}`}
 															prefetch={false}
@@ -205,7 +218,9 @@ export default function Header({ locale }) {
 								<Link
 									href={`/${locale}/${key}`}
 									prefetch={false}
-									className='duration-300 cursor-pointer hover:text-blue-600 w-full flex'
+									className={`duration-300 cursor-pointer hover:text-blue-600 w-full flex
+										${((!!key.length && segment.includes(key)) || (!key.length && (segment === 'ru' || segment === 'en')))
+										&& 'font-semibold text-blue-600'}`}
 								>
 									{title}
 								</Link>
