@@ -101,6 +101,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 				const categoriesParam = searchParams.get('categories')
 				const termsParam = searchParams.get('terms')
 				const authorsParam = searchParams.get('authors')
+
 				categoriesParam &&
 					categoriesParam
 						.split(',')
@@ -222,29 +223,29 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 
 	const handleAddCategory = useCallback(
 		newItem => {
-			filtersStore.selectedCategories = selectedCategories.includes(newItem)
-				? selectedCategories.filter(item => item !== newItem)
-				: [...selectedCategories, newItem]
+			filtersStore.selectedCategories = filtersStore.selectedCategories.includes(newItem)
+				? filtersStore.selectedCategories.filter(item => item !== newItem)
+				: [...filtersStore.selectedCategories, newItem]
 		},
-		[selectedCategories]
+		[]
 	)
 
 	const handleAddTerm = useCallback(
 		newItem => {
-			filtersStore.selectedTerms = selectedTerms.includes(newItem)
-				? selectedTerms.filter(item => item !== newItem)
-				: [...selectedTerms, newItem]
+			filtersStore.selectedTerms = filtersStore.selectedTerms.includes(newItem)
+				? filtersStore.selectedTerms.filter(item => item !== newItem)
+				: [...filtersStore.selectedTerms, newItem]
 		},
-		[selectedTerms]
+		[]
 	)
 
 	const handleAddAuthor = useCallback(
 		newItem => {
-			filtersStore.selectedAuthors = selectedAuthors.includes(newItem)
-				? selectedAuthors.filter(item => item !== newItem)
-				: [...selectedAuthors, newItem]
+			filtersStore.selectedAuthors = filtersStore.selectedAuthors.includes(newItem)
+				? filtersStore.selectedAuthors.filter(item => item !== newItem)
+				: [...filtersStore.selectedAuthors, newItem]
 		},
-		[selectedAuthors]
+		[]
 	)
 
 	return (

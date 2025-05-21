@@ -103,9 +103,9 @@ export default function NewsPageComponent() {
 		setFilteredNews(_filteredNews)
 	}, [_filteredNews])
 
-	// useEffect(() => {
-	//     updateFiltersInHistory();
-	// }, [selectedTags])
+	useEffect(() => {
+		!didLogRef.current && updateFiltersInHistory()
+	}, [selectedTags])
 
 	const updateFiltersInHistory = () => {
 		const params = new URLSearchParams(searchParams.toString())
@@ -120,11 +120,11 @@ export default function NewsPageComponent() {
 
 	const handleAddTag = useCallback(
 		newItem => {
-			filtersStore.selectedTags = selectedTags.includes(newItem)
-				? selectedTags.filter(item => item !== newItem)
-				: [...selectedTags, newItem]
+			filtersStore.selectedTags = filtersStore.selectedTags.includes(newItem)
+				? filtersStore.selectedTags.filter(item => item !== newItem)
+				: [...filtersStore.selectedTags, newItem]
 		},
-		[selectedTags]
+		[]
 	)
 
 	const fetchNews = async () => {
