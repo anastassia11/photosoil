@@ -101,7 +101,6 @@ export default function JoinForm() {
 			) : (
 				<p className='text-center'>
 					{t('application_accepted')}
-					Ваша заявка принята! Скоро мы с Вами свяжемся.
 				</p>
 			)}
 		</div>
