@@ -270,7 +270,7 @@ const SideBar = memo(
 								</p>
 							) : (
 								<div className='flex-1 h-full overflow-y-auto scroll sm:px-5 px-3 flex flex-col sm:space-y-3 space-y-1 w-full pb-3'>
-									<MotionWrapper className='ml-1'>
+									<MotionWrapper className='pl-0.5'>
 										<DraftSwitcher
 											draftIsVisible={draftIsVisible}
 											setDraftIsVisible={setDraftIsVisible}

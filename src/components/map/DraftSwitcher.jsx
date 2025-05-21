@@ -1,4 +1,5 @@
 import { memo, useEffect, useState } from 'react'
+import { Checkbox } from '../ui/checkbox'
 
 const DraftSwitcher = memo(
 	function DraftSwitcher({ draftIsVisible, setDraftIsVisible, label }) {
@@ -9,20 +10,21 @@ const DraftSwitcher = memo(
 		}, [])
 
 		return (
-			<label
-				htmlFor='draftIsVisible'
-				className={`flex-row cursor-pointer max-w-fit
-            ${!token ? 'hidden h-0 my-0' : 'flex'}`}
-			>
-				<input
-					type='checkbox'
-					id='draftIsVisible'
+			<div className={`items-top space-x-2 flex-row cursor-pointer max-w-fit
+				${!token ? 'hidden h-0 my-0' : 'flex'}`}>
+				<Checkbox id='draftIsVisible'
 					checked={draftIsVisible}
-					onChange={() => setDraftIsVisible(!draftIsVisible)}
-					className='min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 '
-				/>
-				<span className='select-none'>{label}</span>
-			</label>
+					onCheckedChange={() => setDraftIsVisible(!draftIsVisible)} />
+				<label
+					style={{
+						fontWeight: '400',
+					}}
+					htmlFor='draftIsVisible'
+					className="select-none pt-[2px] text-base cursor-pointer leading-none"
+				>
+					{label}
+				</label>
+			</div>
 		)
 	},
 	(prevProps, nextProps) => {

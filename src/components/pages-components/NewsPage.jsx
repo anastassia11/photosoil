@@ -28,6 +28,7 @@ import { getTranslation } from '@/i18n/client'
 import Image from 'next/image'
 import { Label } from '../ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import DraftSwitcher from '../map/DraftSwitcher'
 
 export default function NewsPageComponent() {
 	const pathname = usePathname()
@@ -233,22 +234,10 @@ export default function NewsPageComponent() {
 					</Select>
 				</div>
 			</div>
-			<MotionWrapper>
-				<label
-					htmlFor='draftIsVisible'
-					className={`flex-row cursor-pointer my-4
-                    flex ${!token ? 'hidden' : 'flex'}`}
-				>
-					<input
-						type='checkbox'
-						id='draftIsVisible'
-						checked={draftIsVisible}
-						onChange={() => setDraftIsVisible(!draftIsVisible)}
-						className='min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 '
-					/>
-					<span className='select-none'>{t('grafts_visible')}</span>
-				</label>
+			<MotionWrapper className='my-4 pl-0.5'>
+				<DraftSwitcher draftIsVisible={draftIsVisible} setDraftIsVisible={setDraftIsVisible} label={t('grafts_visible')} />
 			</MotionWrapper>
+
 			<div className='mt-4 mb-6 filters-grid'>
 				{isLoading.tags ? (
 					<Loader className='w-full h-[40px]' />

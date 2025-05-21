@@ -32,6 +32,7 @@ import SoilCard from './SoilCard'
 import { getTranslation } from '@/i18n/client'
 import { Label } from '../ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import DraftSwitcher from '../map/DraftSwitcher'
 
 export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 	const { locale } = useParams()
@@ -419,21 +420,8 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 				''
 			)}
 
-			<MotionWrapper>
-				<label
-					htmlFor='draftIsVisible'
-					className={`my-4 sm:self-end flex-row cursor-pointer max-w-fit
-            ${!token ? 'hidden' : 'flex'}`}
-				>
-					<input
-						type='checkbox'
-						id='draftIsVisible'
-						checked={draftIsVisible}
-						onChange={() => setDraftIsVisible(!draftIsVisible)}
-						className='min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 '
-					/>
-					<span className='select-none'>{t('grafts_visible')}</span>
-				</label>
+			<MotionWrapper className='my-4 pl-0.5'>
+				<DraftSwitcher draftIsVisible={draftIsVisible} setDraftIsVisible={setDraftIsVisible} label={t('grafts_visible')} />
 			</MotionWrapper>
 
 			<ul className='soils-grid my-4'>

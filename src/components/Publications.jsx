@@ -16,6 +16,7 @@ import MotionWrapper from './admin-panel/ui-kit/MotionWrapper'
 import { getTranslation } from '@/i18n/client'
 import { Label } from './ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
+import DraftSwitcher from './map/DraftSwitcher'
 
 export default function Publications({ _publications }) {
 	const [filterName, setFilterName] = useState('')
@@ -100,16 +101,6 @@ export default function Publications({ _publications }) {
 				</div>
 			</div>
 			<div className={`flex flex-row justify-end items-center`}>
-				{/* <MotionWrapper>
-                    <label htmlFor='draftIsVisible' className={`flex-row cursor-pointer items-center justify-center
-                    flex ${!token ? 'hidden' : 'flex'}`}>
-                        <input type="checkbox" id='draftIsVisible'
-                            checked={draftIsVisible}
-                            onChange={() => setDraftIsVisible(!draftIsVisible)}
-                            className="min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 " />
-                        <span className='select-none'>{t('grafts_visible')}</span>
-                    </label>
-                </MotionWrapper> */}
 				<div className='self-end flex flex-row items-center justify-end w-[190px] space-x-2'>
 					<Label htmlFor="in_page"
 						className='text-base min-w-fit'>{t('in_page')}</Label>
@@ -128,22 +119,11 @@ export default function Publications({ _publications }) {
 					</Select>
 				</div>
 			</div>
-			<MotionWrapper>
-				<label
-					htmlFor='draftIsVisible'
-					className={`my-4 flex-row cursor-pointer 
-                    flex ${!token ? 'hidden' : 'flex'}`}
-				>
-					<input
-						type='checkbox'
-						id='draftIsVisible'
-						checked={draftIsVisible}
-						onChange={() => setDraftIsVisible(!draftIsVisible)}
-						className='min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 '
-					/>
-					<span className='select-none'>{t('grafts_visible')}</span>
-				</label>
+
+			<MotionWrapper className='my-4 pl-0.5'>
+				<DraftSwitcher draftIsVisible={draftIsVisible} setDraftIsVisible={setDraftIsVisible} label={t('grafts_visible')} />
 			</MotionWrapper>
+
 			<section className=''>
 				<div className='mx-auto '>
 					<ul className=''>
