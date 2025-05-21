@@ -17,6 +17,8 @@ import { putTag } from '@/api/tags/put_tag'
 import { getTranslation } from '@/i18n/client'
 import { select } from 'slate'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
+import { ChevronDown, Search } from 'lucide-react'
+import { Checkbox } from '../ui/checkbox'
 
 const Filter = memo(
 	function Filter({
@@ -256,7 +258,7 @@ const Filter = memo(
 						<Tooltip>
 							<TooltipTrigger asChild>
 								<div
-									className={`overflow-visible flex cursor-pointer items-center justify-between gap-2 ${!isMapFilter ? 'bg-white border h-[40px] p-2' : ''} transition rounded-md`}
+									className={`overflow-visible flex cursor-pointer items-center justify-between gap-2 ${!isMapFilter ? 'bg-white border h-[40px] pl-3 pr-2' : ''} transition rounded-md`}
 									onClick={handleOpenClick}
 								>
 									<span
@@ -299,20 +301,7 @@ const Filter = memo(
 										) : (
 											''
 										)}
-										<svg
-											xmlns='http://www.w3.org/2000/svg'
-											fill='none'
-											viewBox='0 0 24 24'
-											strokeWidth='1.5'
-											stroke='currentColor'
-											className={`transition h-4 w-4 ${(dropdown?.key == _id && dropdown?.isActive) || filterOpen ? '-rotate-180' : ''}`}
-										>
-											<path
-												strokeLinecap='round'
-												strokeLinejoin='round'
-												d='M19.5 8.25l-7.5 7.5-7.5-7.5'
-											/>
-										</svg>
+										<ChevronDown size={18} strokeWidth={1.5} className={`transition ${(dropdown?.key == _id && dropdown?.isActive) || filterOpen ? '-rotate-180' : ''}`} />
 									</span>
 								</div>
 							</TooltipTrigger>
@@ -333,7 +322,7 @@ const Filter = memo(
                      rounded-md border-gray-200 bg-white`}
 						>
 							<header
-								className={`flex items-center justify-between ${!isMapFilter ? 'px-4 py-2' : 'px-4 py-1 pt-2'}`}
+								className={`flex items-center justify-between ${!isMapFilter ? 'px-3 py-2' : 'px-4 py-1 pt-2'}`}
 							>
 								<span className=' text-gray-700'>
 									{selectedItems?.length} {t('select')}{' '}
@@ -351,34 +340,21 @@ const Filter = memo(
 							<div
 								className={`relative ${isMapFilter ? 'mx-2.5 px-1.5' : 'w-full '}`}
 							>
-								<svg
-									xmlns='http://www.w3.org/2000/svg'
-									className={`absolute top-0 bottom-0 w-5 h-5 my-auto text-zinc-400 ${isMapFilter ? 'left-1.5' : 'left-4'}`}
-									fill='none'
-									viewBox='0 0 24 24'
-									stroke='currentColor'
-								>
-									<path
-										strokeLinecap='round'
-										strokeLinejoin='round'
-										strokeWidth={2}
-										d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
-									/>
-								</svg>
+								<Search className={`absolute top-0 bottom-0 w-5 h-5 my-auto text-zinc-400 ${isMapFilter ? 'left-1.5' : 'left-3'}`} />
 								<input
 									value={filterName}
 									ref={searchRef}
 									type='text'
 									placeholder={t('search')}
 									className={`w-full pr-4  outline-none  ${isMapFilter ? 'border-b focus:border-blue-600 py-1 pl-[32px]'
-										: `py-2 pl-12 border-y`}`}
+										: `py-2 pl-10 border-y`}`}
 									onChange={e => setFilterName(e.target.value)}
 								/>
 							</div>
 							{(!!filteredItems.length &&
 								((type === 'ecosystem' || type === 'soil' || type === 'publications') ? filterName.length > 2 : true)) && (
 									<ul
-										className={`scroll space-y-1 max-h-[200px] overflow-auto py-2 ${isMapFilter ? 'px-4' : 'px-4'}`}
+										className={`scroll space-y-2 max-h-[200px] overflow-auto py-2 ${isMapFilter ? 'px-4' : 'px-3'}`}
 									>
 										{filteredItems.map(
 											({ name, id, dataRu, dataEng, nameEng, nameRu }) => {
@@ -394,23 +370,22 @@ const Filter = memo(
 															key={`Item${type ? `-${type}-${id}` : `-${id}`}`}
 															className='flex flex-row justify-between group'
 														>
-															<label
-																htmlFor={`Item${type ? `-${type}-${id}` : `-${id}`}`}
-																className='flex flex-row cursor-pointer w-full'
-															>
-																<input
-																	type='checkbox'
-																	id={`Item${type ? `-${type}-${id}` : `-${id}`}`}
+															<div className="w-full max-w-full flex items-top space-x-2">
+																<Checkbox id={`Item${type ? `-${type}-${id}` : `-${id}`}`}
 																	checked={selectedItems?.includes(id)}
-																	onChange={() => addItem(id)}
-																	className='min-w-5 w-5 min-h-5 h-5 mr-1 rounded border-gray-300 '
-																/>
-																<span className='text-gray-700 ml-2 '>
+																	onCheckedChange={() => addItem(id)} />
+																<label
+																	style={{
+																		fontWeight: '350',
+																	}}
+																	htmlFor={`Item${type ? `-${type}-${id}` : `-${id}`}`}
+																	className="select-none pt-[2px] text-base cursor-pointer leading-none"
+																>
 																	{name ||
 																		(_isEng ? nameEng : nameRu) ||
 																		(_isEng ? dataEng?.name : dataRu?.name)}
-																</span>
-															</label>
+																</label>
+															</div>
 															{(pathNames.includes('create') ||
 																pathNames.includes('edit')) &&
 																pathNames.includes('news') ? (
