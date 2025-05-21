@@ -339,6 +339,9 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 													term => !items.includes(term)
 												)
 											}}
+											selectAll={() =>
+												(filtersStore.selectedAuthors = [...selectedAuthors, ...authors.map(({ id }) => id).filter(id => !selectedAuthors?.includes(id))])
+											}
 										/>
 									</li>
 								</MotionWrapper>
@@ -362,6 +365,9 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 															term => !items.includes(term)
 														)
 												}}
+												selectAll={() =>
+													(filtersStore.selectedCategories = [...selectedCategories, ...CATEGORY_ARRAY.map(({ id }) => id).filter(id => !selectedCategories?.includes(id))])
+												}
 											/>
 										</MotionWrapper>
 									</li>
@@ -396,6 +402,9 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 																term => !items.includes(term)
 															)
 														}}
+														selectAll={() =>
+															(filtersStore.selectedTerms = [...selectedTerms, ...item.terms.map(({ id }) => id).filter(id => !selectedTerms?.includes(id))])
+														}
 													/>
 												</MotionWrapper>
 											</li>

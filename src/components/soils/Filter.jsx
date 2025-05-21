@@ -15,6 +15,7 @@ import { deleteTag } from '@/api/tags/delete_tag'
 import { putTag } from '@/api/tags/put_tag'
 
 import { getTranslation } from '@/i18n/client'
+import { select } from 'slate'
 
 const Filter = memo(
 	function Filter({
@@ -28,6 +29,7 @@ const Filter = memo(
 		selectedItems,
 		addItem,
 		resetItems,
+		selectAll,
 		isMapFilter
 	}) {
 		const dispatch = useDispatch()
@@ -334,12 +336,13 @@ const Filter = memo(
 									{selectedItems?.length} {t('select')}{' '}
 								</span>
 
+								{/*  */}
 								<button
 									type='button'
 									className=' text-gray-900 underline underline-offset-4'
-									onClick={() => resetItems(selectedItems)}
+									onClick={() => (selectedItems.length || !selectAll) ? resetItems(selectedItems) : selectAll()}
 								>
-									{t('reset')}
+									{(selectedItems.length || !selectAll) ? t('reset') : t('select_all')}
 								</button>
 							</header>
 

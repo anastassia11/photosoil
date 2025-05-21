@@ -393,6 +393,9 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, onMainPhot
 								resetItems={items =>
 									onChange(value.filter(item => !items.includes(item)))
 								}
+								selectAll={() =>
+									onChange([...value, ...item.terms.map(({ id }) => id).filter(id => !value?.includes(id))])
+								}
 							/>
 						)}
 					/>

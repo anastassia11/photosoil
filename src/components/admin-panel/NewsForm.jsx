@@ -484,6 +484,7 @@ export default function NewsForm({
 											: onChange([...value, newItem])
 									}}
 									resetItems={() => onChange([])}
+									selectAll={() => onChange(tags.map(({ id }) => id))}
 								/>
 							)}
 						/>

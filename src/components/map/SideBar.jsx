@@ -329,6 +329,9 @@ const SideBar = memo(
 														resetItems={() =>
 															(filtersStore.selectedAuthors = [])
 														}
+														selectAll={() =>
+															(filtersStore.selectedAuthors = authors.map(({ id }) => id))
+														}
 													/>
 												</li>
 												<li key={'category'}>
@@ -345,6 +348,9 @@ const SideBar = memo(
 														addItem={handleAddCategory}
 														resetItems={() =>
 															(filtersStore.selectedCategories = [])
+														}
+														selectAll={() =>
+															(filtersStore.selectedCategories = CATEGORY_ARRAY.map(({ id }) => id))
 														}
 													/>
 												</li>
@@ -376,6 +382,9 @@ const SideBar = memo(
 																				term => !items.includes(term)
 																			)
 																	}}
+																	selectAll={() =>
+																		(filtersStore.selectedTerms = [...selectedTerms, ...item.terms.map(({ id }) => id).filter(id => !selectedTerms?.includes(id))])
+																	}
 																/>
 															</li>
 														)

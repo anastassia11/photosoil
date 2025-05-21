@@ -270,6 +270,9 @@ export default function NewsPageComponent() {
 									term => !items.includes(term)
 								)
 							}}
+							selectAll={() =>
+								(filtersStore.selectedTags = [...selectedTags, ...tags.map(({ id }) => id).filter(id => !selectedTags?.includes(id))])
+							}
 						/>
 					</MotionWrapper>
 				)}
