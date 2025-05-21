@@ -38,7 +38,7 @@ const LanguageChanger = memo(function LanguageChanger({
 			<Select
 				value={locale}
 				onValueChange={handleLanguageChange}>
-				<SelectTrigger className={`text-base border-none ${isTransparent ? 'bg-transparent hover:bg-transparent' : 'font-medium hover:bg-zinc-100 hover:text-accent-foreground data-[state=open]:bg-zinc-100'} gap-1`}>
+				<SelectTrigger className={`text-base border-none ${isTransparent ? 'bg-transparent hover:bg-transparent' : 'bg-transparent font-medium hover:bg-zinc-100 hover:text-accent-foreground data-[state=open]:bg-zinc-100'} gap-1`}>
 					<SelectValue />
 				</SelectTrigger>
 				<SelectContent className='min-w-0'>
