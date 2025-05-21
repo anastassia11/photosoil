@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { Oval } from 'react-loader-spinner'
 import { useDispatch, useSelector } from 'react-redux'
-import { Tooltip } from 'react-tooltip'
+// import { Tooltip } from 'react-tooltip'
 
 import { setDropdown } from '@/store/slices/generalSlice'
 import { openModal } from '@/store/slices/modalSlice'
@@ -16,6 +16,7 @@ import { putTag } from '@/api/tags/put_tag'
 
 import { getTranslation } from '@/i18n/client'
 import { select } from 'slate'
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 
 const Filter = memo(
 	function Filter({
@@ -252,71 +253,73 @@ const Filter = memo(
 						className='filter_dropdown'
 						id='filter_dropdown'
 					>
-						<div
-							className={`overflow-visible flex cursor-pointer items-center justify-between gap-2 ${!isMapFilter ? 'bg-white border h-[40px] p-2' : ''} transition rounded-md`}
-							onClick={handleOpenClick}
-							data-tooltip-id={`${_id}`}
-							data-tooltip-content={`${name}`}
-							data-tooltip-place={isMapFilter ? 'right' : 'top'}
-							data-tooltip-variant='dark'
-						>
-							<span
-								className={`text-base overflow-hidden whitespace-nowrap text-ellipsis duration-300
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<div
+									className={`overflow-visible flex cursor-pointer items-center justify-between gap-2 ${!isMapFilter ? 'bg-white border h-[40px] p-2' : ''} transition rounded-md`}
+									onClick={handleOpenClick}
+								>
+									<span
+										className={`text-base overflow-hidden whitespace-nowrap text-ellipsis duration-300
                         ${isMapFilter && filterOpen && 'font-medium text-blue-700'} ${!isMapFilter && 'font-medium'}`}
-							>
-								{name}
-							</span>
+									>
+										{name}
+									</span>
 
-							<span
-								className={`flex flex-row items-center justify-center space-x-1`}
-							>
-								{selectedItems?.length ? (
-									<span>
+									<span
+										className={`flex flex-row items-center justify-center space-x-1`}
+									>
+										{selectedItems?.length ? (
+											<span>
+												<svg
+													className='w-1.5 h-1.5'
+													viewBox='0 0 16 16'
+													fill='none'
+													xmlns='http://www.w3.org/2000/svg'
+												>
+													<g
+														id='SVGRepo_bgCarrier'
+														strokeWidth='0'
+													></g>
+													<g
+														id='SVGRepo_tracerCarrier'
+														strokeLinecap='round'
+														strokeLinejoin='round'
+													></g>
+													<g id='SVGRepo_iconCarrier'>
+														<circle
+															cx='8'
+															cy='8'
+															r='8'
+															fill='#2563eb'
+														></circle>
+													</g>
+												</svg>
+											</span>
+										) : (
+											''
+										)}
 										<svg
-											className='w-1.5 h-1.5'
-											viewBox='0 0 16 16'
-											fill='none'
 											xmlns='http://www.w3.org/2000/svg'
+											fill='none'
+											viewBox='0 0 24 24'
+											strokeWidth='1.5'
+											stroke='currentColor'
+											className={`transition h-4 w-4 ${(dropdown?.key == _id && dropdown?.isActive) || filterOpen ? '-rotate-180' : ''}`}
 										>
-											<g
-												id='SVGRepo_bgCarrier'
-												strokeWidth='0'
-											></g>
-											<g
-												id='SVGRepo_tracerCarrier'
+											<path
 												strokeLinecap='round'
 												strokeLinejoin='round'
-											></g>
-											<g id='SVGRepo_iconCarrier'>
-												<circle
-													cx='8'
-													cy='8'
-													r='8'
-													fill='#2563eb'
-												></circle>
-											</g>
+												d='M19.5 8.25l-7.5 7.5-7.5-7.5'
+											/>
 										</svg>
 									</span>
-								) : (
-									''
-								)}
-								<svg
-									xmlns='http://www.w3.org/2000/svg'
-									fill='none'
-									viewBox='0 0 24 24'
-									strokeWidth='1.5'
-									stroke='currentColor'
-									className={`transition h-4 w-4 ${(dropdown?.key == _id && dropdown?.isActive) || filterOpen ? '-rotate-180' : ''}`}
-								>
-									<path
-										strokeLinecap='round'
-										strokeLinejoin='round'
-										d='M19.5 8.25l-7.5 7.5-7.5-7.5'
-									/>
-								</svg>
-							</span>
-						</div>
-
+								</div>
+							</TooltipTrigger>
+							<TooltipContent side={isMapFilter ? 'right' : 'top'}>
+								<p>{name}</p>
+							</TooltipContent>
+						</Tooltip>
 						<div
 							className={`w-full duration-200 transition-all ${!isMapFilter ? 'top-[30px] absolute border overflow-hidden z-50' : ''} 
                     ${isMapFilter
@@ -336,7 +339,6 @@ const Filter = memo(
 									{selectedItems?.length} {t('select')}{' '}
 								</span>
 
-								{/*  */}
 								<button
 									type='button'
 									className=' text-gray-900 underline underline-offset-4'
@@ -535,23 +537,6 @@ const Filter = memo(
 						''
 					)}
 				</div>
-				{pathNames.includes('create') || pathNames.includes('edit') ? (
-					''
-				) : (
-					<Tooltip
-						id={`${_id}`}
-						style={{
-							fontSize: '14px',
-							height: '25px',
-							padding: '1px 8px 1px 8px',
-							whiteSpace: 'nowrap',
-							display: 'flex',
-							alignItems: 'center',
-							backgroundColor: 'rgb(82 82 91)',
-							zIndex: '100'
-						}}
-					/>
-				)}
 				{formVisible.visible ? TagForm() : ''}
 			</div>
 		)

@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux'
 
 import { setDropdown } from '@/store/slices/generalSlice'
 import { filtersStore } from '@/store/valtioStore/filtersStore'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
 export default function AllLayout({ children }) {
 	const dispatch = useDispatch()
@@ -38,5 +39,5 @@ export default function AllLayout({ children }) {
 		filtersStore.selectedTags = []
 	}, [pathname])
 
-	return <>{children}</>
+	return <TooltipProvider>{children}</TooltipProvider>
 }

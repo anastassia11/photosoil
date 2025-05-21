@@ -116,9 +116,7 @@ export default function AdminLayout({ children }) {
 							</div>
 
 							<Breadcrumbs />
-							<TooltipProvider>
-								{children}
-							</TooltipProvider>
+							{children}
 							{isOpen && (
 								<Modal
 									isOpen={isOpen}
