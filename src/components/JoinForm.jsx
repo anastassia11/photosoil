@@ -55,7 +55,18 @@ export default function JoinForm() {
 							required={true}
 							error={errors.name}
 							label={t('full_name')}
-							{...register('name', { required: t('required') })}
+							{...register('name', {
+								required: t('required'),
+								pattern: {
+									value: /^[A-Za-zА-Яа-яЁё\s]+$/,
+									message: t('only_letters'),
+								},
+								minLength: {
+									value: 5,
+									message: t('min_length_5'),
+								},
+							}
+							)}
 						/>
 						<Input
 							required={false}

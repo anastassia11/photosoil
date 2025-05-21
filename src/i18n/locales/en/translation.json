@@ -309,5 +309,8 @@
 	"sortByAlpha": "Sort alphabetically when displaying",
 	"wait": "Please wait for files to finish loading",
 
-	"application_accepted": "Your application has been accepted! We will contact you soon."
+	"application_accepted": "Your application has been accepted! We will contact you soon.",
+
+	"only_letters": "Only letters and spaces are allowed",
+	"min_length_5": "Minimum 5 characters"
 }
