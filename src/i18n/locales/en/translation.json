@@ -117,7 +117,7 @@
 	"show_map": "Show map",
 	"social_media": "Social media",
 	"soil": "Soil object",
-	"soilFeatures": "Soil features",
+	"soilFeatures": "Description of the soil",
 	"soils": "Soil objects",
 	"soils_ecosystems": "of soils and ecosystems",
 	"submit": "Send",
@@ -307,5 +307,7 @@
 	"form_confirm": "Are you sure you want to leave this page? The data you entered may not be saved.",
 
 	"sortByAlpha": "Sort alphabetically when displaying",
-	"wait": "Please wait for files to finish loading"
+	"wait": "Please wait for files to finish loading",
+
+	"application_accepted": "Your application has been accepted! We will contact you soon."
 }
