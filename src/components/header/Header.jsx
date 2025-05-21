@@ -9,8 +9,9 @@ import LanguageChanger from './LanguageChanger'
 import Logo from './Logo'
 import { getTranslation } from '@/i18n/client'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu'
-import { ChevronDown, Menu, X } from 'lucide-react'
+import { ChevronDown, Menu, MoveRight, Settings2, SquareArrowOutUpRight, X } from 'lucide-react'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible'
+import { Button } from '../ui/button'
 
 export default function Header({ locale }) {
 	const pathname = usePathname()
@@ -45,7 +46,6 @@ export default function Header({ locale }) {
 	}, [])
 
 	useEffect(() => {
-		console.log(pathname)
 		setMenuOpen(false)
 	}, [pathname])
 
@@ -72,7 +72,7 @@ export default function Header({ locale }) {
 										<button
 											className={`w-full flex items-center justify-between gap-1 hover:text-blue-600
 												${navs.map(({ key }) => key).some(str => str.includes(segment))
-												&& 'data-[state=closed]:font-semibold data-[state=closed]:text-blue-600'}`}
+												&& 'data-[state=closed]:font-medium data-[state=closed]:text-blue-600'}`}
 										>
 											{title}
 											<ChevronDown size={18} strokeWidth={1.5} className='transition group-data-[state=open]/dropdown:-rotate-180' />
@@ -82,7 +82,7 @@ export default function Header({ locale }) {
 										{navs?.map(({ key: navKey, title }) => (
 											<DropdownMenuItem key={navKey.length ? navKey : 'main'} className={`text-base focus:text-blue-600 cursor-pointer
 												${segment.includes(navKey)
-												&& 'font-semibold text-blue-600'}`}
+												&& 'font-medium text-blue-600'}`}
 												onClick={() => window.location.href = `/${locale}/${navKey}`}>
 												{title}
 											</DropdownMenuItem>
@@ -97,7 +97,7 @@ export default function Header({ locale }) {
 								prefetch={false}
 								className={`duration-300 cursor-pointer hover:text-blue-600
 									${((!!key.length && segment.includes(key)) || (!key.length && (segment === 'ru' || segment === 'en')))
-									&& 'font-semibold text-blue-600'}`}
+									&& 'font-medium text-blue-600'}`}
 							>
 								{title}
 							</Link>
@@ -123,14 +123,10 @@ export default function Header({ locale }) {
 							{t('join')}
 						</Link>
 					) : (
-						<Link
-							href={`/${locale}/admin`}
-							prefetch={false}
-							className='min-w-fit hidden sm:flex max-h-[40px] px-4 py-2 font-medium text-center text-blue-600 transition-colors duration-300 
-                transform '
-						>
+						<Button variant="ghost" size='lg' className='min-w-fit hidden sm:flex max-h-[40px]'
+							onClick={() => { console.log(`/${locale}/admin`) }}>
 							{t('dashboard')}
-						</Link>
+						</Button>
 					)}
 					<div className='h-full flex items-center'>
 						<LanguageChanger locale={locale} />
@@ -168,14 +164,10 @@ export default function Header({ locale }) {
 							{t('join')}
 						</Link>
 					) : (
-						<Link
-							href={`/${locale}/admin`}
-							prefetch={false}
-							className='min-w-fit max-h-[40px] py-2 font-medium text-left text-blue-600 transition-colors duration-300 
-                transform '
-						>
+						<Button variant="secondary" size='lg' className='min-w-fit max-h-[40px]'
+							onClick={() => { console.log(`/${locale}/admin`) }}>
 							{t('dashboard')}
-						</Link>
+						</Button>
 					)}
 				</li>
 				<ul className='flex flex-col space-y-2 px-2'>
@@ -188,7 +180,7 @@ export default function Header({ locale }) {
 											<button
 												className={`duration-300 w-full flex items-center justify-between gap-1 hover:text-blue-600
 													${navs.map(({ key }) => key).some(str => str.includes(segment))
-													&& 'group-data-[state=closed]/dropdown:font-semibold group-data-[state=closed]/dropdown:text-blue-600'}`}
+													&& 'group-data-[state=closed]/dropdown:font-medium group-data-[state=closed]/dropdown:text-blue-600'}`}
 											>
 												{title}
 												<ChevronDown size={18} strokeWidth={1.5} className='transition group-data-[state=open]/dropdown:-rotate-180' />
@@ -201,7 +193,7 @@ export default function Header({ locale }) {
 														<Link key={navKey}
 															className={`duration-300 hover:text-blue-600 py-1 flex items-center px-4
 																${segment.includes(navKey)
-																&& 'font-semibold text-blue-600'}`}
+																&& 'font-medium text-blue-600'}`}
 															onClick={handleClick}
 															href={`/${locale}/${navKey}`}
 															prefetch={false}
@@ -220,7 +212,7 @@ export default function Header({ locale }) {
 									prefetch={false}
 									className={`duration-300 cursor-pointer hover:text-blue-600 w-full flex
 										${((!!key.length && segment.includes(key)) || (!key.length && (segment === 'ru' || segment === 'en')))
-										&& 'font-semibold text-blue-600'}`}
+										&& 'font-medium text-blue-600'}`}
 								>
 									{title}
 								</Link>
