@@ -1,6 +1,6 @@
 'use client'
 
-import { useParams, useSearchParams } from 'next/navigation'
+import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
 import {
 	useCallback,
 	useEffect,
@@ -65,8 +65,11 @@ export default function MainMap() {
 	const [draftIsVisible, setDraftIsVisible] = useState(false)
 
 	const [filterName, setFilterName] = useState('')
+	const router = useRouter()
+	const pathname = usePathname()
 
 	const didLogRef = useRef(true)
+	const didLogFiltersRef = useRef(true)
 	const mapElement = useRef()
 
 	const mapRef = useRef(null)
@@ -99,6 +102,30 @@ export default function MainMap() {
 			clearTimeout(timeoutId)
 			document.removeEventListener('DOMContentLoaded', initializeMap)
 		}
+	}, [])
+
+	useEffect(() => {
+		let timeoutId
+		if (didLogFiltersRef.current) {
+			timeoutId = setTimeout(() => {
+				didLogFiltersRef.current = false
+				const categoriesParam = searchParams.get('categories')
+				const termsParam = searchParams.get('terms')
+				const authorsParam = searchParams.get('authors')
+
+				categoriesParam &&
+					categoriesParam
+						.split(',')
+						.forEach(param => handleAddCategory(Number(param)))
+				termsParam &&
+					termsParam.split(',').forEach(param => handleAddTerm(Number(param)))
+				authorsParam &&
+					authorsParam
+						.split(',')
+						.forEach(param => handleAddAuthor(Number(param)))
+			}, 300)
+		}
+		return () => clearTimeout(timeoutId)
 	}, [])
 
 	useEffect(() => {
@@ -138,6 +165,33 @@ export default function MainMap() {
 			setSideBarOpen(false)
 		}
 	}, [])
+
+	const handleAddCategory = useCallback(
+		newItem => {
+			filtersStore.selectedCategories = filtersStore.selectedCategories.includes(newItem)
+				? filtersStore.selectedCategories.filter(item => item !== newItem)
+				: [...filtersStore.selectedCategories, newItem]
+		},
+		[]
+	)
+
+	const handleAddTerm = useCallback(
+		newItem => {
+			filtersStore.selectedTerms = filtersStore.selectedTerms.includes(newItem)
+				? filtersStore.selectedTerms.filter(item => item !== newItem)
+				: [...filtersStore.selectedTerms, newItem]
+		},
+		[]
+	)
+
+	const handleAddAuthor = useCallback(
+		newItem => {
+			filtersStore.selectedAuthors = filtersStore.selectedAuthors.includes(newItem)
+				? filtersStore.selectedAuthors.filter(item => item !== newItem)
+				: [...filtersStore.selectedAuthors, newItem]
+		},
+		[]
+	)
 
 	const filterById = useCallback(
 		filteredIds => {
@@ -226,6 +280,34 @@ export default function MainMap() {
 		filterById,
 		_isEng
 	])
+
+	useEffect(() => {
+		!didLogFiltersRef.current && updateFiltersInHistory()
+	}, [selectedCategories, selectedTerms, selectedAuthors])
+
+	const updateFiltersInHistory = () => {
+		const params = new URLSearchParams(searchParams.toString())
+
+		if (selectedCategories.length > 0) {
+			params.set('categories', selectedCategories.join(','))
+		} else {
+			params.delete('categories')
+		}
+
+		if (selectedTerms.length > 0) {
+			params.set('terms', selectedTerms.join(','))
+		} else {
+			params.delete('terms')
+		}
+
+		if (selectedAuthors.length > 0) {
+			params.set('authors', selectedAuthors.join(','))
+		} else {
+			params.delete('authors')
+		}
+
+		router.replace(pathname + '?' + params.toString())
+	}
 
 	const init = () => {
 		let startcoords = fromLonLat([85.9075867, 53.1155423])

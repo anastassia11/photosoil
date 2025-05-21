@@ -41,7 +41,6 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 	const pathname = usePathname()
 	const router = useRouter()
 	const searchParams = useSearchParams()
-	const dropdown = useSelector(state => state.general.dropdown)
 
 	const { selectedTerms, selectedCategories, selectedAuthors } =
 		useSnapshot(filtersStore)
@@ -55,7 +54,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 	const [filteredSoils, setFilteredSoils] = useState([])
 
 	const [currentItems, setCurrentItems] = useState([])
-	const currentItemsUids = currentItems.map(({ id }) => id)
+
 	const [itemsPerPage, setItemsPerPage] = useState(0)
 
 	const [isLoading, setIsLoading] = useState({

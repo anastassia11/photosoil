@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 
 import LanguageChanger from './LanguageChanger'
@@ -15,6 +15,7 @@ import { Button } from '../ui/button'
 
 export default function Header({ locale }) {
 	const pathname = usePathname()
+	const router = useRouter()
 	const segment = pathname.split("/").pop()
 
 	const { t } = getTranslation(locale)
@@ -124,7 +125,7 @@ export default function Header({ locale }) {
 						</Link>
 					) : (
 						<Button variant="ghost" size='lg' className='min-w-fit hidden sm:flex max-h-[40px]'
-							onClick={() => { console.log(`/${locale}/admin`) }}>
+							onClick={() => router.push(`/${locale}/admin`)}>
 							{t('dashboard')}
 						</Button>
 					)}
@@ -165,7 +166,7 @@ export default function Header({ locale }) {
 						</Link>
 					) : (
 						<Button variant="secondary" size='lg' className='min-w-fit max-h-[40px]'
-							onClick={() => { console.log(`/${locale}/admin`) }}>
+							onClick={() => router.push(`/${locale}/admin`)}>
 							{t('dashboard')}
 						</Button>
 					)}
