@@ -117,6 +117,14 @@ export default function LoginPageComponent() {
 								</svg>
 							)}
 						</button>
+						<Link
+							href={`/${locale}/login/forgot-password`}
+							prefetch={false}
+							onClick={e => e.stopPropagation()}
+							className='absolute right-0 font-normal text-blue-600 hover:underline whitespace-normal '
+						>
+							{t('forgot-password')}
+						</Link>
 						<Input
 							required={true}
 							error={errors.password}

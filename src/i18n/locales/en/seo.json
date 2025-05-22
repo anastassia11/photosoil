@@ -29,6 +29,9 @@
 	"loginPage-title": "Authorization | Visual database of soils and ecosystems PhotoSOIL",
 	"loginPage-description": "LoginPage-description",
 
+	"forgot-passwordPage-title": "Reset password | Visual database of soils and ecosystems PhotoSOIL",
+	"forgot-passwordPage-description": "forgot-passwordPage-description",
+
 	"authorsPage-title": "Authors | Visual database of soils and ecosystems PhotoSOIL",
 	"authorsPage-description": "AuthorsPage-description",
 

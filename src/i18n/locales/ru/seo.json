@@ -29,6 +29,9 @@
 	"loginPage-title": "Авторизация | Визуальная база данных почв и экосистем PhotoSOIL",
 	"loginPage-description": "LoginPage-description",
 
+	"forgot-passwordPage-title": "Сброс пароля | Визуальная база данных почв и экосистем PhotoSOIL",
+	"forgot-passwordPage-description": "forgot-passwordPage-description",
+
 	"authorsPage-title": "Авторы | Визуальная база данных почв и экосистем PhotoSOIL",
 	"authorsPage-description": "AuthorsPage-description",
 

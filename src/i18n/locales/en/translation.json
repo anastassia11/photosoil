@@ -312,5 +312,19 @@
 	"application_accepted": "Your application has been accepted! We will contact you soon.",
 
 	"only_letters": "Only letters and spaces are allowed",
-	"min_length_5": "Minimum 5 characters"
+	"min_length_5": "Minimum 5 characters",
+
+	"forgot-password": "Forgot password?",
+
+	"forgot-password-title": "Password recovery",
+
+	"forgot-password-description1": "Enter the email address you used when registering.",
+
+	"forgot-password-description2": "We will send you a temporary password to log in.",
+
+	"forgot-password-description3": "After logging in, you can change your password in your profile settings.",
+	"reset_password": "Reset password",
+
+	"check_mail": "Check your email",
+	"forgot-password-description4": "We have sent a temporary password to log in to"
 }
