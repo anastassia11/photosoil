@@ -113,7 +113,11 @@ export default function Breadcrumbs() {
 		},
 		order: {
 			title: t('setting_order'),
-			isRef: false
+			isRef: true
+		},
+		settings: {
+			title: t('user_preferences'),
+			isRef: true
 		}
 	}
 
@@ -155,12 +159,8 @@ export default function Breadcrumbs() {
 			if (linkTexts[link]) {
 				itemTitle = linkTexts[link].title
 			} else {
-				if (index === 2) {
-					const mappedKey = titleMapping[pathNames[1]]
-					itemTitle = mappedKey ? linkTexts[mappedKey].title : null
-				} else {
-					itemTitle = linkTexts[link] ? linkTexts[link].title : null
-				}
+				const mappedKey = titleMapping[pathNames[index - 1]]
+				itemTitle = mappedKey ? linkTexts[mappedKey].title : null
 			}
 
 			return {

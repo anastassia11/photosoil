@@ -328,5 +328,13 @@
 	"reset_password": "Сбросить пароль",
 
 	"check_mail": "Проверьте свою электронную почту",
-	"forgot-password-description4": "Мы отправили временный пароль для входа на"
+	"forgot-password-description4": "Мы отправили временный пароль для входа на",
+
+	"user_preferences": "Настройки пользователя",
+
+	"currentPassword": "Старый пароль",
+	"newPassword": "Новый пароль",
+	"confirmPassword": "Подтвердите новый пароль",
+	"validatePassword": "Пароли не совпадают",
+	"changePassword": "Изменить пароль"
 }

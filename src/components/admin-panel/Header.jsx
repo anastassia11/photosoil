@@ -9,17 +9,20 @@ import LanguageChanger from '../header/LanguageChanger'
 import { getTranslation } from '@/i18n/client'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu'
 import { ChevronDown, LogOut } from 'lucide-react'
+import Link from 'next/link'
 
 export default function Header() {
 	const router = useRouter()
 	const [isLoading, setIsLoading] = useState(false)
 	const [email, setEmail] = useState(null)
+
+	const [open, setOpen] = useState(null)
 	const [role, setRole] = useState(null)
 	const { locale } = useParams()
 	const { t } = getTranslation(locale)
 
 	useEffect(() => {
-		localStorage.getItem('email') && setEmail(localStorage.getItem('email'))
+		localStorage.getItem('email') && setEmail(localStorage.getItem('email').split('@')[0])
 		localStorage.getItem('tokenData') &&
 			setRole(JSON.parse(localStorage.getItem('tokenData'))?.role)
 	}, [])
@@ -32,7 +35,8 @@ export default function Header() {
 
 	return (
 		<div className='relative w-fit self-end flex flex-row justify-center items-center'>
-			<DropdownMenu>
+			<DropdownMenu open={open}
+				onOpenChange={setOpen}>
 				<DropdownMenuTrigger asChild
 					className='group/dropdown'>
 					<div
@@ -43,7 +47,7 @@ export default function Header() {
 						</span>
 						<div className='mr-2 flex flex-col justify-center items-start'>
 							<p
-								className='font-semibold group-hover/dropdown:text-blue-700 group-data-[state=open]/dropdown:text-blue-700 duration-300'
+								className='min-w-fit text-nowrap font-semibold group-hover/dropdown:text-blue-700 group-data-[state=open]/dropdown:text-blue-700 duration-300'
 							>
 								{email}
 							</p>
@@ -57,7 +61,17 @@ export default function Header() {
 				</DropdownMenuTrigger>
 
 				<DropdownMenuContent onCloseAutoFocus={e => e.preventDefault()}>
-					<DropdownMenuItem className='w-48 text-base focus:text-blue-600 cursor-pointer'
+					<DropdownMenuItem className='text-base focus:text-blue-600 cursor-pointer'>
+						<Link
+							href={`/${locale}/admin/settings`}
+							prefetch={false}
+							onClick={() => setOpen(false)}
+						>
+							{t('user_preferences')}
+						</Link>
+
+					</DropdownMenuItem>
+					<DropdownMenuItem className='text-base focus:text-blue-600 cursor-pointer'
 						onClick={handleLogOut}
 						disabled={isLoading}>
 						{isLoading ? <Oval

@@ -75,7 +75,7 @@ export default function ForgotPasswordPageComponent() {
                             {errors.server.message}
                         </p>
                     )}
-                    <div className='w-fit'>
+                    <div className='w-48'>
                         <SubmitBtn
                             isSubmitting={isSubmitting}
                             btnText={t('reset_password')}

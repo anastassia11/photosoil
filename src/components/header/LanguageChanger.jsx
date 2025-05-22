@@ -44,7 +44,7 @@ const LanguageChanger = memo(function LanguageChanger({
 				<SelectContent className='min-w-0'>
 					{Object.entries(LANGUAGES).map(([value, title]) =>
 						<SelectItem key={value} value={value}
-							className='text-base'>{title}</SelectItem>)}
+							className='text-base cursor-pointer'>{title}</SelectItem>)}
 				</SelectContent>
 			</Select>
 		</div>

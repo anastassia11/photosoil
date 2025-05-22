@@ -326,5 +326,13 @@
 	"reset_password": "Reset password",
 
 	"check_mail": "Check your email",
-	"forgot-password-description4": "We have sent a temporary password to log in to"
+	"forgot-password-description4": "We have sent a temporary password to log in to",
+
+	"user_preferences": "User preferences",
+
+	"currentPassword": "Old password",
+	"newPassword": "New password",
+	"confirmPassword": "Confirm new password",
+	"validatePassword": "Passwords do not match",
+	"changePassword": "Change password"
 }
