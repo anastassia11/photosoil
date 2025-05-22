@@ -218,7 +218,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 			params.delete('authors')
 		}
 
-		router.replace(pathname + '?' + params.toString())
+		router.replace(pathname + '?' + params.toString(), { scroll: false })
 	}
 
 	const handleAddCategory = useCallback(
