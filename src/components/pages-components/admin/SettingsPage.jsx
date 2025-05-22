@@ -24,7 +24,12 @@ export default function SettingsPage() {
         handleSubmit,
         formState: { errors, isSubmitting, isDirty }
     } = useForm({
-        mode: 'onChange'
+        mode: 'onChange',
+        defaultValues: {
+            confirmPassword: "",
+            currentPassword: "",
+            newPassword: ""
+        }
     })
 
     const newPassword = useWatch({ control, name: "newPassword" })
@@ -35,7 +40,6 @@ export default function SettingsPage() {
 
     const handleFormSubmit = async userData => {
         const result = await changePassword(userData)
-        console.log(userData)
         if (result.success) {
             dispatch(setDirty(false))
             reset()
