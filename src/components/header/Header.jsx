@@ -56,7 +56,7 @@ export default function Header({ locale }) {
 
 	return (
 		<header
-			className={`w-screen fixed top-0 z-50 transition-all duration-200 
+			className={`backdrop-blur-sm w-screen fixed top-0 z-50 transition-all duration-200 
             ease-in-out pl-4 pr-6 2xl:pl-8 2xl:pr-10 border-b shadow-sm h-16  bg-white/90 flex flex-row items-center justify-between`}
 		>
 			<div className='flex-1 '>
@@ -112,7 +112,7 @@ export default function Header({ locale }) {
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
 					transition={{ duration: 0.5 }}
-					className='flex-1 justify-end space-x-0 2xl:space-x-2 h-full flex flex-row items-center w-fit'
+					className='flex-1 justify-end space-x-1 2xl:space-x-2 h-full flex flex-row items-center w-fit'
 				>
 					{!token ? (
 						<Link

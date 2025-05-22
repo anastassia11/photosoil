@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form'
 import Input from './admin-panel/ui-kit/Input'
 import SubmitBtn from './admin-panel/ui-kit/SubmitBtn'
 import { getTranslation } from '@/i18n/client'
+import { registerAuthor } from '@/api/account/post'
 
 export default function JoinForm() {
 	const {
@@ -21,8 +22,13 @@ export default function JoinForm() {
 	const { t } = getTranslation(locale)
 	const [submitting, setSubmitting] = useState(false)
 
-	const handleFormSubmit = data => {
-		setSubmitting(true)
+	const handleFormSubmit = async userData => {
+		const result = await registerAuthor(userData)
+		if (result.success) {
+			setSubmitting(true)
+		} else {
+			// setError('server', { type: 'manual', message: result.message })
+		}
 	}
 
 	return (
