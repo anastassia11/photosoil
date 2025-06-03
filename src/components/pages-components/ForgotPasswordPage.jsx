@@ -39,7 +39,7 @@ export default function ForgotPasswordPageComponent() {
     }
 
     return (
-        <div className='sm:space-y-6 sm:max-w-md m-auto sm:mt-24 w-full'>
+        <div className='sm:space-y-6 sm:max-w-md m-auto sm:mt-24 w-full p-4 sm:p-6'>
             {!submitting ? <div className=''>
                 <div className='mt-5 space-y-2'>
                     <h3 className='sm:text-2xl text-xl font-semibold'>
