@@ -121,7 +121,8 @@ export default function Publications({ _publications }) {
 			</div>
 
 			<MotionWrapper className='my-4 pl-0.5'>
-				<DraftSwitcher draftIsVisible={draftIsVisible} setDraftIsVisible={setDraftIsVisible} label={t('grafts_visible')} />
+				<DraftSwitcher draftIsVisible={draftIsVisible} setDraftIsVisible={setDraftIsVisible} label={t('grafts_visible')}
+					type='publications' />
 			</MotionWrapper>
 
 			<section className=''>

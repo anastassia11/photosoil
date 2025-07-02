@@ -421,7 +421,8 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 			)}
 
 			<MotionWrapper className='my-4 pl-0.5'>
-				<DraftSwitcher draftIsVisible={draftIsVisible} setDraftIsVisible={setDraftIsVisible} label={t('grafts_visible')} />
+				<DraftSwitcher draftIsVisible={draftIsVisible} setDraftIsVisible={setDraftIsVisible} label={t('grafts_visible')}
+					type={type} />
 			</MotionWrapper>
 
 			<ul className='soils-grid my-4'>

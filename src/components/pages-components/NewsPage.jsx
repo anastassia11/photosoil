@@ -235,7 +235,8 @@ export default function NewsPageComponent() {
 				</div>
 			</div>
 			<MotionWrapper className='my-4 pl-0.5'>
-				<DraftSwitcher draftIsVisible={draftIsVisible} setDraftIsVisible={setDraftIsVisible} label={t('grafts_visible')} />
+				<DraftSwitcher draftIsVisible={draftIsVisible} setDraftIsVisible={setDraftIsVisible} label={t('grafts_visible')}
+					type='news' />
 			</MotionWrapper>
 
 			<div className='mt-4 mb-6 filters-grid'>

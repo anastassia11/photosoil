@@ -275,6 +275,7 @@ const SideBar = memo(
 											draftIsVisible={draftIsVisible}
 											setDraftIsVisible={setDraftIsVisible}
 											label={t('grafts_visible')}
+											type='all'
 										/>
 									</MotionWrapper>
 									<div className='pb-1.5'>
