@@ -66,15 +66,15 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 	const [draftIsVisible, setDraftIsVisible] = useState(false)
 	const [token, setToken] = useState(null)
 
-	const { SOIL_ENUM } = useConstants()
-	const SOIL_ENUM_REF = useRef(SOIL_ENUM)
+	const { SOIL_ENUM2 } = useConstants()
+	const SOIL_ENUM_REF = useRef(SOIL_ENUM2)
 
 	const CATEGORY_ARRAY = useMemo(() => {
 		return Object.entries(SOIL_ENUM_REF.current).map(([key, value]) => ({
 			id: Number(key),
-			name: value
+			name: value[locale]
 		}))
-	}, [SOIL_ENUM_REF])
+	}, [SOIL_ENUM_REF, locale])
 
 	const _isEng = locale === 'en'
 

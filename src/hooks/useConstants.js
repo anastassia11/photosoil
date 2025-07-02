@@ -65,6 +65,21 @@ export const useConstants = () => {
 		2: t('morphological')
 	}
 
+	const SOIL_ENUM2 = {
+		0: {
+			ru: 'Динамика почв',
+			en: 'Soil dynamics'
+		},
+		1: {
+			ru: 'Почвенные профили',
+			en: 'Soil profiles'
+		},
+		2: {
+			ru: 'Почвенные морфологические элементы',
+			en: 'Soil morphons'
+		},
+	}
+
 	const TRANSLATION_ENUM = {
 		0: t('any_lang'),
 		1: t('only_en'),
@@ -86,6 +101,7 @@ export const useConstants = () => {
 		NEWS_INFO,
 		MODERATOR_INFO,
 		SOIL_ENUM,
+		SOIL_ENUM2,
 		RANK_ENUM,
 		TRANSLATION_ENUM,
 		PUBLICATION_ENUM

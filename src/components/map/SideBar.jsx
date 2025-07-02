@@ -62,15 +62,15 @@ const SideBar = memo(
 		const { locale } = useParams()
 		const { t } = getTranslation(locale)
 
-		const { SOIL_ENUM } = useConstants()
-		const SOIL_ENUM_REF = useRef(SOIL_ENUM)
+		const { SOIL_ENUM, SOIL_ENUM2 } = useConstants()
+		const SOIL_ENUM_REF = useRef(SOIL_ENUM2)
 
 		const CATEGORY_ARRAY = useMemo(() => {
 			return Object.entries(SOIL_ENUM_REF.current).map(([key, value]) => ({
 				id: Number(key),
-				name: value
+				name: value[locale]
 			}))
-		}, [SOIL_ENUM_REF])
+		}, [SOIL_ENUM_REF, locale])
 
 		const order = ['soil', 'ecosystem', 'publication']
 
