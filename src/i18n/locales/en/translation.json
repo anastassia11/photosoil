@@ -78,7 +78,7 @@
 	"main": "Home",
 	"main_editor": "Main Editor",
 	"moderator": "Moderator",
-	"morphological": "Soil morphological elements",
+	"morphological": "Soil morphons",
 	"news": "News",
 	"objectType": "Database object type",
 	"organization": "Organization",
@@ -334,5 +334,6 @@
 	"newPassword": "New password",
 	"confirmPassword": "Confirm new password",
 	"validatePassword": "Passwords do not match",
-	"changePassword": "Change password"
+	"changePassword": "Change password",
+	"go_to_view": "Go to view"
 }

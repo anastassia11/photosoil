@@ -336,5 +336,7 @@
 	"newPassword": "Новый пароль",
 	"confirmPassword": "Подтвердите новый пароль",
 	"validatePassword": "Пароли не совпадают",
-	"changePassword": "Изменить пароль"
+	"changePassword": "Изменить пароль",
+
+	"go_to_view": "Перейти к просмотру"
 }
