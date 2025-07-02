@@ -316,7 +316,7 @@ export default function AuthorForm({
 					<ul className='space-y-3 xl:w-[50%] xl:pr-6 xl:border-r'>
 						<p className='text-blue-700 font-semibold'>Русская версия</p>
 						{AUTHOR_INFO.map(({ name, isArray, title }) => (
-							<li key={name}>
+							<li key={`ru-${name}`}>
 								{!isArray &&
 									(name === 'description' ? (
 										<Controller
@@ -338,11 +338,6 @@ export default function AuthorForm({
 											)}
 										/>
 									) : (
-										// <Textarea
-										//     required={false}
-										//     {...register(`dataRu.${name}`)}
-										//     label={title}
-										//     placeholder='' />
 										<Input
 											required={name === 'name'}
 											error={errors.dataRu?.[name]}
@@ -358,7 +353,7 @@ export default function AuthorForm({
 					<ul className='space-y-3 xl:w-[50%] xl:pl-6 xl:mt-0 mt-6'>
 						<p className='text-blue-700 font-semibold'>English version</p>
 						{AUTHOR_INFO.map(({ name, isArray, title }) => (
-							<li key={name}>
+							<li key={`en-${name}`}>
 								{!isArray &&
 									(name === 'description' ? (
 										<Controller
@@ -380,11 +375,6 @@ export default function AuthorForm({
 											)}
 										/>
 									) : (
-										// <Textarea
-										//     required={false}
-										//     {...register(`dataEng.${name}`)}
-										//     label={title}
-										//     placeholder='' />
 										<Input
 											required={name === 'name'}
 											error={errors.dataEng?.[name]}

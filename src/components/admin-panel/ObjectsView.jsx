@@ -65,7 +65,6 @@ export default function ObjectsView({
 	}
 
 	useEffect(() => {
-		console.log(_objects)
 		setObjects(
 			_objects.sort((a, b) => {
 				return b.lastUpdated - a.lastUpdated
@@ -454,7 +453,7 @@ export default function ObjectsView({
 	}
 
 	const DictionaryTableRow = ({ nameRu, nameEng, id, translationMode }) => (
-		<tr className={`${selectedObjects.includes(id) ? 'bg-yellow-100/50' : ''}`}>
+		<tr key={`DictionaryTableRow-${id}`} className={`${selectedObjects.includes(id) ? 'bg-yellow-100/50' : ''}`}>
 			<td
 				key={`tableRow_dictionary_${id}`}
 				onClick={() => handleObjectSelect(!selectedObjects.includes(id), id)}
@@ -552,7 +551,7 @@ export default function ObjectsView({
 	)
 
 	const AuthorTableRow = ({ dataRu, dataEng, authorType, id }) => (
-		<tr
+		<tr key={`AuthorTableRow-${id}`}
 			className={`cursor-pointer ${selectedObjects.includes(id) ? 'bg-yellow-100/50' : ''}`}
 			onClick={() => handleObjectSelect(!selectedObjects.includes(id), id)}
 		>
@@ -670,7 +669,7 @@ export default function ObjectsView({
 
 	const ModeratorTableRow = ({ name, email, id, role }) => {
 		return (
-			<tr
+			<tr key={`ModeratorTableRow-${id}`}
 				className={`cursor-pointer 
     ${selectedObjects.includes(id) ? 'bg-yellow-100/50' : ''}`}
 				onClick={() => handleObjectSelect(!selectedObjects.includes(id), id)}
