@@ -92,18 +92,18 @@ export default function AuthorPageComponent({ id }) {
 				<button
 					className={`w-fit font-semibold pl-2 md:pl-0 md:border-l-0 border-l-2 md:border-b-2 translate-y-[2px]
                 hover:border-blue-600 text-blue-600 md:mr-10 mr-4 md:py-2 py-1.5 text-sm sm:text-base
-                ${!author.soilObjects?.length && 'hidden'}`}
+                ${!author.stats?.soilObjects?.[locale] && 'hidden'}`}
 					onClick={() => handleScrollToSection('soil-section')}
 				>
-					{t('soils')} ({author.soilObjects?.length})
+					{t('soils')} ({author.stats?.soilObjects?.[locale]})
 				</button>
 				<button
 					className={`text-blue-600 w-fit font-semibold text-sm sm:text-base md:border-l-0 pl-2 md:pl-0 border-l-2 md:border-b-2 translate-y-[2px]
                 hover:border-blue-600 md:py-2 py-1.5
-                ${!author.ecoSystems?.length && 'hidden'}`}
+                ${!author.stats?.ecoSystems?.[locale] && 'hidden'}`}
 					onClick={() => handleScrollToSection('ecosystems-section')}
 				>
-					{t('ecosystems')} ({author.ecoSystems?.length})
+					{t('ecosystems')} ({author.stats?.ecoSystems?.[locale]})
 				</button>
 			</div>
 			<div className='filters-grid mt-6 md:space-x-8'>
@@ -126,8 +126,8 @@ export default function AuthorPageComponent({ id }) {
 					<ul className='flex flex-col space-y-2 '>
 						{AUTHOR_INFO.map(({ title, name, isArray }, index) =>
 							name !== 'name' &&
-							((authorLang?.[name] && authorLang?.[name]?.length) ||
-								(author[name] && author[name]?.length)) ? (
+								((authorLang?.[name] && authorLang?.[name]?.length) ||
+									(author[name] && author[name]?.length)) ? (
 								<li
 									key={`INFO-${index}`}
 									className='flex flex-col w-full'
@@ -181,9 +181,9 @@ export default function AuthorPageComponent({ id }) {
 				</div>
 			</div>
 
-			{author.soilObjects?.length ? (
+			{author.stats?.soilObjects?.[locale] ? (
 				<div id='soil-section'>
-					<h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-2'>
+					<h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-4'>
 						{t('author_soils')}
 					</h3>
 					<Soils
@@ -196,9 +196,9 @@ export default function AuthorPageComponent({ id }) {
 				''
 			)}
 
-			{author.ecoSystems?.length ? (
+			{author.stats?.ecoSystems?.[locale] ? (
 				<div id='ecosystems-section'>
-					<h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-2'>
+					<h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-4'>
 						{t('author_ecosystems')}
 					</h3>
 					<Soils

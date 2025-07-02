@@ -128,18 +128,18 @@ export default function PublicationPageComponent({ id }) {
 				<button
 					className={`w-fit font-semibold pl-2 md:pl-0 md:border-l-0 border-l-2 md:border-b-2 translate-y-[2px]
                 hover:border-blue-600 text-blue-600 md:mr-10 mr-4 md:py-2 py-1.5 text-sm sm:text-base 
-                ${!publication.soilObjects?.length && 'hidden'}`}
+                ${!publication.stats?.soilObjects?.[locale] && 'hidden'}`}
 					onClick={() => handleScrollToSection('soils-section')}
 				>
-					{t('connect_soils')} ({publication.soilObjects?.length})
+					{t('connect_soils')} ({publication.stats?.soilObjects?.[locale]})
 				</button>
 				<button
 					className={`text-blue-600 w-fit font-semibold text-sm sm:text-base md:border-l-0 pl-2 md:pl-0 border-l-2 md:border-b-2 translate-y-[2px]
                 hover:border-blue-600 md:py-2 py-1.5
-                ${!publication.ecosystems?.length && 'hidden'}`}
+                ${!publication.stats?.ecosystems?.[locale] && 'hidden'}`}
 					onClick={() => handleScrollToSection('ecosystems-section')}
 				>
-					{t('connect_ecosystems')} ({publication.ecosystems?.length})
+					{t('connect_ecosystems')} ({publication.stats?.ecosystems?.[locale]})
 				</button>
 			</div>
 			<div className='flex lg:flex-row flex-col lg:space-x-8 mt-6 mb-6'>
@@ -231,7 +231,7 @@ export default function PublicationPageComponent({ id }) {
 				</div>
 			</div>
 
-			{publication.soilObjects?.length ? (
+			{publication.stats?.soilObjects?.[locale] ? (
 				<div id='soils-section'>
 					<h3 className='sm:text-2xl text-xl font-semibold sm:mt-12 mb-4'>
 						{t('connect_soils')}
@@ -246,7 +246,7 @@ export default function PublicationPageComponent({ id }) {
 				''
 			)}
 
-			{publication.ecosystems?.length ? (
+			{publication.stats?.ecosystems?.[locale] ? (
 				<div id='ecosystems-section'>
 					<h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-4'>
 						{t('connect_ecosystems')}
