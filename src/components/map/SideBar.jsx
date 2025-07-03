@@ -48,11 +48,6 @@ const SideBar = memo(
 		draftIsVisible,
 		setDraftIsVisible
 	}) {
-		const searchParams = useSearchParams()
-		const router = useRouter()
-		const pathname = usePathname()
-		const didLogRef = useRef(true)
-
 		const [classifications, setClassifications] = useState([])
 		const [authors, setAuthors] = useState([])
 
@@ -75,65 +70,10 @@ const SideBar = memo(
 		const order = ['soil', 'ecosystem', 'publication']
 
 		useEffect(() => {
-			let timeoutId
 			setSideBarOpen(window.innerWidth > 640)
 			fetchClassifications()
 			fetchAuthors()
-			// if (didLogRef.current) {
-			// 	timeoutId = setTimeout(() => {
-			// 		didLogRef.current = false
-			// 		const categoriesParam = searchParams.get('categories')
-			// 		const termsParam = searchParams.get('terms')
-			// 		const authorsParam = searchParams.get('authors')
-			// 		categoriesParam &&
-			// 			categoriesParam
-			// 				.split(',')
-			// 				.forEach(param => handleAddCategory(Number(param)))
-			// 		termsParam &&
-			// 			termsParam
-			// 				.split(',')
-			// 				.forEach(param => handleAddTerm(Number(param)))
-			// 		authorsParam &&
-			// 			authorsParam
-			// 				.split(',')
-			// 				.forEach(param => handleAddAuthor(Number(param)))
-			// 	}, 300)
-			// }
-			return () => {
-				clearTimeout(timeoutId)
-			}
 		}, [])
-
-		useEffect(() => {
-			// !didLogRef.current && updateFiltersInHistory()
-		}, [selectedCategories, selectedTerms, selectedAuthors])
-
-		// useEffect(() => {
-		// 	window.innerWidth > 640 && setSideBarOpen(!popupVisible)
-		// }, [popupVisible])
-
-		function updateFiltersInHistory() {
-			const params = new URLSearchParams(searchParams.toString())
-
-			if (selectedCategories.length > 0) {
-				params.set('categories', selectedCategories.join(','))
-			} else {
-				params.delete('categories')
-			}
-
-			if (selectedTerms.length > 0) {
-				params.set('terms', selectedTerms.join(','))
-			} else {
-				params.delete('terms')
-			}
-
-			if (selectedAuthors.length > 0) {
-				params.set('authors', selectedAuthors.join(','))
-			} else {
-				params.delete('authors')
-			}
-			router.replace(pathname + '?' + params.toString())
-		}
 
 		const fetchClassifications = async () => {
 			const result = await getClassifications()

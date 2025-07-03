@@ -95,25 +95,25 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 			setIsLoading(prev => ({ ...prev, items: false }))
 		} else fetchItems()
 
-		if (didLogRef.current && isFilters) {
-			timeoutId = setTimeout(() => {
-				didLogRef.current = false
-				const categoriesParam = searchParams.get('categories')
-				const termsParam = searchParams.get('terms')
-				const authorsParam = searchParams.get('authors')
+		// if (didLogRef.current && isFilters) {
+		// 	timeoutId = setTimeout(() => {
+		// 		didLogRef.current = false
+		// 		const categoriesParam = searchParams.get('categories')
+		// 		const termsParam = searchParams.get('terms')
+		// 		const authorsParam = searchParams.get('authors')
 
-				categoriesParam &&
-					categoriesParam
-						.split(',')
-						.forEach(param => handleAddCategory(Number(param)))
-				termsParam &&
-					termsParam.split(',').forEach(param => handleAddTerm(Number(param)))
-				authorsParam &&
-					authorsParam
-						.split(',')
-						.forEach(param => handleAddAuthor(Number(param)))
-			}, 300)
-		}
+		// 		categoriesParam &&
+		// 			categoriesParam
+		// 				.split(',')
+		// 				.forEach(param => handleAddCategory(Number(param)))
+		// 		termsParam &&
+		// 			termsParam.split(',').forEach(param => handleAddTerm(Number(param)))
+		// 		authorsParam &&
+		// 			authorsParam
+		// 				.split(',')
+		// 				.forEach(param => handleAddAuthor(Number(param)))
+		// 	}, 300)
+		// }
 		return () => clearTimeout(timeoutId)
 	}, [])
 
@@ -161,7 +161,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 	])
 
 	useEffect(() => {
-		isFilters && !didLogRef.current && updateFiltersInHistory()
+		// isFilters && !didLogRef.current && updateFiltersInHistory()
 	}, [selectedCategories, selectedTerms, selectedAuthors])
 
 	const fetchClassifications = async () => {
@@ -218,7 +218,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 			params.delete('authors')
 		}
 
-		router.replace(pathname + '?' + params.toString(), { scroll: false })
+		router.replace(pathname + '?' + params.toString())
 	}
 
 	const handleAddCategory = useCallback(

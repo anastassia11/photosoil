@@ -116,7 +116,7 @@ export default function NewsPageComponent() {
 		} else {
 			params.delete('tags')
 		}
-		router.replace(pathname + '?' + params.toString(), { scroll: false })
+		router.replace(pathname + '?' + params.toString())
 	}
 
 	const handleAddTag = useCallback(

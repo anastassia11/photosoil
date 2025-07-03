@@ -306,7 +306,7 @@ export default function MainMap() {
 			params.delete('authors')
 		}
 
-		router.replace(pathname + '?' + params.toString(), { scroll: false })
+		router.replace(pathname + '?' + params.toString())
 	}
 
 	const init = () => {
