@@ -4,13 +4,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
-import { Controller } from 'react-hook-form'
-
-import { useConstants } from '@/hooks/useConstants'
 
 import { BASE_SERVER_URL, PAGINATION_OPTIONS } from '@/utils/constants'
-
-import { getAuthors } from '@/api/author/get_authors'
 
 import Loader from './Loader'
 import Pagination from './Pagination'
@@ -18,15 +13,15 @@ import MotionWrapper from './admin-panel/ui-kit/MotionWrapper'
 import { getTranslation } from '@/i18n/client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { Label } from './ui/label'
+import useAuthors from '@/hooks/data/useAuthors'
 
 export default function Authors() {
 	const { locale } = useParams()
 	const { t } = getTranslation(locale)
+	const { authors, authorsIsLoading } = useAuthors()
 
-	const [authors, setAuthors] = useState([])
 	const [filterName, setFilterName] = useState('')
 	const [filteredAuthors, setFilteredAuthors] = useState([])
-	const [isLoading, setIsLoading] = useState(true)
 
 	const [currentItems, setCurrentItems] = useState([])
 	const [itemsPerPage, setItemsPerPage] = useState(0)
@@ -34,31 +29,22 @@ export default function Authors() {
 
 	useEffect(() => {
 		const _filterName = filterName.toLowerCase().trim()
-		setFilteredAuthors(prev =>
-			authors
-				.filter(author =>
-					locale === 'en'
-						? author.dataEng?.name.toLowerCase().includes(_filterName)
-						: author.dataRu?.name.toLowerCase().includes(_filterName)
-				)
-				.sort((a, b) => a.rank - b.rank)
-				.sort((a, b) => {
-					return a.authorType - b.authorType
-				})
-		)
-	}, [filterName, authors])
-
-	useEffect(() => {
-		fetchAuthors()
-	}, [])
-
-	const fetchAuthors = async () => {
-		const result = await getAuthors()
-		if (result.success) {
-			setAuthors(result.data)
+		if (authors) {
+			setFilteredAuthors(prev =>
+				authors
+					.filter(author =>
+						locale === 'en'
+							? author.dataEng?.name.toLowerCase().includes(_filterName)
+							: author.dataRu?.name.toLowerCase().includes(_filterName)
+					)
+					.sort((a, b) => a.rank - b.rank)
+					.sort((a, b) => {
+						return a.authorType - b.authorType
+					})
+			)
 		}
-		setIsLoading(false)
-	}
+
+	}, [filterName, authors])
 
 	const AuthorCard = ({ photo, dataEng, dataRu, authorType, id }) => {
 		return (
@@ -163,7 +149,7 @@ export default function Authors() {
 			</div>
 
 			<ul className='soils-grid mb-4'>
-				{isLoading ? (
+				{authorsIsLoading ? (
 					Array(8)
 						.fill('')
 						.map((item, idx) => (

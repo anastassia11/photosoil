@@ -1,6 +1,5 @@
 'use client'
 
-import { Truculenta } from 'next/font/google'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
@@ -9,14 +8,13 @@ import SoilObject from '@/components/soils/SoilObject'
 
 import { useConstants } from '@/hooks/useConstants'
 
-import { getSoil } from '@/api/soil/get_soil'
-
 import CollapsibleText from '../admin-panel/ui-kit/CollapsibleText'
 
 import { getTranslation } from '@/i18n/client'
+import useSoil from '@/hooks/data/itemById/useSoil'
 
 export default function SoilPageComponent({ id }) {
-	const [soil, setSoil] = useState({})
+	const { soil, soilIsLoading } = useSoil(id)
 	const [parser, setParser] = useState()
 
 	const { locale } = useParams()
@@ -32,7 +30,6 @@ export default function SoilPageComponent({ id }) {
 		if (typeof document !== 'undefined') {
 			setParser(new DOMParser())
 		}
-		fetchSoil()
 	}, [])
 
 	useEffect(() => {
@@ -44,21 +41,14 @@ export default function SoilPageComponent({ id }) {
 		}
 	}, [currentTransl])
 
-	const fetchSoil = async () => {
-		const result = await getSoil(id)
-		if (result.success) {
-			setSoil(result.data)
-		}
-	}
-
 	return (
 		<SoilObject
-			object={soil}
+			object={soil ?? {}}
 			type='soil'
 		>
-			<ul className='flex flex-col space-y-2 '>
+			{!soilIsLoading && <ul className='flex flex-col space-y-2 '>
 				{SOIL_INFO.map(({ name, title }) => {
-					return (soil?.hasOwnProperty(name) ?? soil[name]?.length) ||
+					return (soil?.hasOwnProperty(name) ?? soil?.[name]?.length) ||
 						(currentTransl?.hasOwnProperty(name) &&
 							currentTransl[name]?.length) ? (
 						<li
@@ -186,7 +176,7 @@ export default function SoilPageComponent({ id }) {
 				) : (
 					''
 				)}
-			</ul>
+			</ul>}
 		</SoilObject>
 	)
 }

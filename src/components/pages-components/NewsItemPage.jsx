@@ -1,22 +1,22 @@
 'use client'
 
-import moment from 'moment'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import NewGallery from '@/components/soils/NewGallery'
-import PdfGallery from '@/components/soils/PdfGallery'
 
 import { BASE_SERVER_URL } from '@/utils/constants'
 
-import { getNewsById } from '@/api/news/get_news'
-
 import { getTranslation } from '@/i18n/client'
 import '@/styles/editor.css'
+import useNewsItem from '@/hooks/data/itemById/useNewsItem'
+import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper'
+import Loader from '../Loader'
 
 export default function NewsItemPageComponent({ id }) {
-	const [news, setNews] = useState({})
+	const { news, newsIsLoading } = useNewsItem(id)
+
 	const [tokenData, setTokenData] = useState({})
 	const { locale } = useParams()
 	const { t } = getTranslation(locale)
@@ -36,7 +36,6 @@ export default function NewsItemPageComponent({ id }) {
 			'--product-view-height',
 			window.innerWidth > 640 ? '600px' : '300px'
 		)
-		fetchNews()
 	}, [])
 
 	useEffect(() => {
@@ -49,13 +48,6 @@ export default function NewsItemPageComponent({ id }) {
 		}
 	}, [currentTransl])
 
-	const fetchNews = async () => {
-		const result = await getNewsById(id)
-		if (result.success) {
-			setNews(result.data)
-		}
-	}
-
 	const handleScrollToSection = sectionId => {
 		const section = document.getElementById(sectionId)
 		section.scrollIntoView({ behavior: 'smooth' })
@@ -64,10 +56,19 @@ export default function NewsItemPageComponent({ id }) {
 	return (
 		<div className='flex flex-col'>
 			<div className='flex flex-col md:flex-row mb-2 justify-between sm:items-start'>
-				<h1 className='sm:text-2xl text-xl font-semibold'>
-					{currentTransl?.title}
-				</h1>
-				{tokenData.role === 'Admin' || tokenData.email === news.userEmail ? (
+				<div className='w-full'>
+					{!newsIsLoading ? (
+						<MotionWrapper>
+							<h1 className='sm:text-2xl text-xl font-semibold'>
+								{currentTransl?.title}
+							</h1>
+						</MotionWrapper>
+					) : (
+						<Loader className='w-full h-[30px]' />
+					)}
+				</div>
+
+				{(tokenData.role === 'Admin' || tokenData.email === news?.userEmail) && !newsIsLoading && (
 					<Link
 						target='_blank'
 						prefetch={false}
@@ -93,12 +94,11 @@ export default function NewsItemPageComponent({ id }) {
 						</svg>
 						<p className='pt-[3px]'>{t('edit_go')}</p>
 					</Link>
-				) : (
-					''
 				)}
 			</div>
+
 			<div className='flex md:flex-row w-full md:border-b-2 md:border-l-0 flex-col'>
-				<button
+				{!newsIsLoading && <><button
 					className={`w-fit font-semibold pl-2 md:pl-0 md:border-l-0 border-l-2 md:border-b-2 translate-y-[2px]
                 hover:border-blue-600 text-blue-600 md:mr-10 mr-4 md:py-2 py-1.5 text-sm sm:text-base 
                 ${!news.objectPhoto?.length && 'hidden'}`}
@@ -106,85 +106,86 @@ export default function NewsItemPageComponent({ id }) {
 				>
 					{t('gallery')} ({news.objectPhoto?.length})
 				</button>
-				<button
-					className={`text-blue-600 w-fit font-semibold text-sm sm:text-base md:border-l-0 pl-2 md:pl-0 border-l-2 md:border-b-2 translate-y-[2px]
+					<button
+						className={`text-blue-600 w-fit font-semibold text-sm sm:text-base md:border-l-0 pl-2 md:pl-0 border-l-2 md:border-b-2 translate-y-[2px]
                 hover:border-blue-600 md:py-2 py-1.5
                 ${!news.files?.length && 'hidden'}`}
-					onClick={() => handleScrollToSection('files-section')}
-				>
-					{t('files')} ({news.files?.length})
-				</button>
+						onClick={() => handleScrollToSection('files-section')}
+					>
+						{t('files')} ({news.files?.length})
+					</button></>}
 			</div>
-			<div className='flex sm:flex-row flex-col justify-between mt-4'>
-				<p className='text-gray-500 font-medium'>{date}</p>
-				<ul className='flex items-center flex-row'>
-					{news?.tags?.map(({ id, nameRu, nameEng }, index) => (
-						<li
-							key={`tag-${id}`}
-							className='mr-2 min-w-fit h-fit'
-						>
-							<Link
-								href={`/${locale}/news?tags=${id}`}
-								prefetch={false}
-								className='text-blue-600 hover:underline'
+
+			{!newsIsLoading && <>
+				<div className='flex sm:flex-row flex-col justify-between mt-4'>
+					<p className='text-gray-500 font-medium'>{date}</p>
+					<ul className='flex items-center flex-row'>
+						{news?.tags?.map(({ id, nameRu, nameEng }, index) => (
+							<li
+								key={`tag-${id}`}
+								className='mr-2 min-w-fit h-fit'
 							>
-								{_isEng ? nameEng || '' : nameRu || ''}
-								{news?.tags?.length > 1 &&
-									index + 1 < news?.tags?.length &&
-									','}
-							</Link>
-						</li>
-					))}
-				</ul>
-			</div>
-			{currentTransl?.content ? (
-				<div className='w-full bg-white md:pl-16 px-4 md:pr-32 md:pb-8 pb-4 md:mt-6 mt-2'>
-					<div
-						className='tiptap sm:mt-8 mt-4'
-						dangerouslySetInnerHTML={{
-							__html: parser?.parseFromString(
-								currentTransl?.content || '',
-								'text/html'
-							).body.innerHTML
-						}}
-					></div>
-				</div>
-			) : (
-				''
-			)}
-
-			<div
-				id='gallery-section'
-				className='mt-8 self-center'
-			>
-				<NewGallery objectPhoto={news?.objectPhoto} />
-			</div>
-
-			{!!news.files?.length && (
-				<div
-					id='files-section'
-					className='mt-8 flex flex-col'
-				>
-					<label className='font-medium min-h-fit mb-2'>
-						{`${t('files')}`}
-					</label>
-					<ul className={`mt-1 flex flex-col space-y-2`}>
-						{news.files.map(file => (
-							<li key={file.id}>
-								<a
-									className='flex flex-row text-blue-700 hover:underline duration-300 cursor-pointer'
-									href={`${BASE_SERVER_URL}${file?.path}`}
-									download={true}
-									target='_blank'
+								<Link
+									href={`/${locale}/news?tags=${id}`}
+									prefetch={false}
+									className='text-blue-600 hover:underline'
 								>
-									{file?.fileName}
-								</a>
-								{/* <PdfGallery path={file?.path} title={file?.fileName} /> */}
+									{_isEng ? nameEng || '' : nameRu || ''}
+									{news?.tags?.length > 1 &&
+										index + 1 < news?.tags?.length &&
+										','}
+								</Link>
 							</li>
 						))}
 					</ul>
 				</div>
-			)}
+				{!!currentTransl?.content && (
+					<div className='w-full bg-white md:pl-16 px-4 md:pr-32 md:pb-8 pb-4 md:mt-6 mt-2'>
+						<div
+							className='tiptap sm:mt-8 mt-4'
+							dangerouslySetInnerHTML={{
+								__html: parser?.parseFromString(
+									currentTransl?.content || '',
+									'text/html'
+								).body.innerHTML
+							}}
+						></div>
+					</div>
+				)}
+
+				<div
+					id='gallery-section'
+					className='mt-8 self-center'
+				>
+					<NewGallery objectPhoto={news?.objectPhoto} />
+				</div>
+
+				{!!news.files?.length && (
+					<div
+						id='files-section'
+						className='mt-8 flex flex-col'
+					>
+						<label className='font-medium min-h-fit mb-2'>
+							{`${t('files')}`}
+						</label>
+						<ul className={`mt-1 flex flex-col space-y-2`}>
+							{news.files.map(file => (
+								<li key={file.id}>
+									<a
+										className='flex flex-row text-blue-700 hover:underline duration-300 cursor-pointer'
+										href={`${BASE_SERVER_URL}${file?.path}`}
+										download={true}
+										target='_blank'
+									>
+										{file?.fileName}
+									</a>
+									{/* <PdfGallery path={file?.path} title={file?.fileName} /> */}
+								</li>
+							))}
+						</ul>
+					</div>
+				)}
+			</>}
 		</div>
 	)
 }

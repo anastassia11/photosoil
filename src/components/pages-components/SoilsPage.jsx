@@ -1,9 +1,12 @@
+'use client'
+
 import Soils from '@/components/soils/Soils'
+import useSoils from '@/hooks/data/useSoils'
+import { getTranslation } from '@/i18n/client'
 
-import { getTranslation } from '@/i18n'
-
-export default async function SoilsPageComponent({ type, locale }) {
-	const { t } = await getTranslation(locale)
+export default function SoilsPageComponent({ type, locale }) {
+	const { t } = getTranslation(locale)
+	const { soils } = useSoils()
 
 	return (
 		<div className='flex flex-col'>
@@ -19,6 +22,7 @@ export default async function SoilsPageComponent({ type, locale }) {
 								: ''}
 			</h1>
 			<Soils
+				_soils={soils}
 				isAllSoils={type === 'soils'}
 				type={type}
 				isFilters={true}

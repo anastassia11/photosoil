@@ -21,6 +21,7 @@ import DraftSwitcher from './map/DraftSwitcher'
 export default function Publications({ _publications }) {
 	const [filterName, setFilterName] = useState('')
 	const [publications, setPublications] = useState([])
+
 	const [filteredPublications, setFilteredPublications] = useState([])
 	const [currentItems, setCurrentItems] = useState([])
 	const [itemsPerPage, setItemsPerPage] = useState(0)

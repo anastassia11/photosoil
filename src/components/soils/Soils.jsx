@@ -1,7 +1,5 @@
 'use client'
 
-import Image from 'next/image'
-import Link from 'next/link'
 import {
 	useParams,
 	usePathname,
@@ -9,17 +7,14 @@ import {
 	useSearchParams
 } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useSelector } from 'react-redux'
 import { useSnapshot } from 'valtio'
 
 import { filtersStore } from '@/store/valtioStore/filtersStore'
 
 import { useConstants } from '@/hooks/useConstants'
 
-import { BASE_SERVER_URL, PAGINATION_OPTIONS } from '@/utils/constants'
+import { PAGINATION_OPTIONS } from '@/utils/constants'
 
-import { getAuthors } from '@/api/author/get_authors'
-import { getClassifications } from '@/api/classification/get_classifications'
 import { getEcosystems } from '@/api/ecosystem/get_ecosystems'
 import { getSoils } from '@/api/soil/get_soils'
 
@@ -33,6 +28,8 @@ import { getTranslation } from '@/i18n/client'
 import { Label } from '../ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import DraftSwitcher from '../map/DraftSwitcher'
+import useAuthors from '@/hooks/data/useAuthors'
+import useClassifications from '@/hooks/data/useClassifications'
 
 export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 	const { locale } = useParams()
@@ -46,9 +43,10 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 	const { selectedTerms, selectedCategories, selectedAuthors } =
 		useSnapshot(filtersStore)
 
-	const [classifications, setClassifications] = useState([])
+	const { classifications, classificationsIsLoading } = useClassifications()
 	const [soils, setSoils] = useState([])
-	const [authors, setAuthors] = useState([])
+
+	const { authors, authorsIsLoading } = useAuthors()
 
 	const [filterName, setFilterName] = useState('')
 	const [filtersVisible, setFiltersVisible] = useState(true)
@@ -88,32 +86,31 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 		let timeoutId
 		setFiltersVisible(window.innerWidth > 640 || type === 'ecosystem')
 		setToken(JSON.parse(localStorage.getItem('tokenData'))?.token)
-		isSoils && fetchClassifications()
-		fetchAuthors()
+		// isSoils && fetchClassifications()
 		if (_soils) {
 			setSoils(_soils)
 			setIsLoading(prev => ({ ...prev, items: false }))
 		} else fetchItems()
 
-		// if (didLogRef.current && isFilters) {
-		// 	timeoutId = setTimeout(() => {
-		// 		didLogRef.current = false
-		// 		const categoriesParam = searchParams.get('categories')
-		// 		const termsParam = searchParams.get('terms')
-		// 		const authorsParam = searchParams.get('authors')
+		if (didLogRef.current && isFilters) {
+			timeoutId = setTimeout(() => {
+				didLogRef.current = false
+				const categoriesParam = searchParams.get('categories')
+				const termsParam = searchParams.get('terms')
+				const authorsParam = searchParams.get('authors')
 
-		// 		categoriesParam &&
-		// 			categoriesParam
-		// 				.split(',')
-		// 				.forEach(param => handleAddCategory(Number(param)))
-		// 		termsParam &&
-		// 			termsParam.split(',').forEach(param => handleAddTerm(Number(param)))
-		// 		authorsParam &&
-		// 			authorsParam
-		// 				.split(',')
-		// 				.forEach(param => handleAddAuthor(Number(param)))
-		// 	}, 300)
-		// }
+				categoriesParam &&
+					categoriesParam
+						.split(',')
+						.forEach(param => handleAddCategory(Number(param)))
+				termsParam &&
+					termsParam.split(',').forEach(param => handleAddTerm(Number(param)))
+				authorsParam &&
+					authorsParam
+						.split(',')
+						.forEach(param => handleAddAuthor(Number(param)))
+			}, 300)
+		}
 		return () => clearTimeout(timeoutId)
 	}, [])
 
@@ -161,23 +158,8 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 	])
 
 	useEffect(() => {
-		// isFilters && !didLogRef.current && updateFiltersInHistory()
+		isFilters && !didLogRef.current && updateFiltersInHistory()
 	}, [selectedCategories, selectedTerms, selectedAuthors])
-
-	const fetchClassifications = async () => {
-		const result = await getClassifications()
-		if (result.success) {
-			setClassifications(result.data.sort((a, b) => a.order - b.order))
-		}
-		setIsLoading(prev => ({ ...prev, classifications: false }))
-	}
-
-	const fetchAuthors = async () => {
-		const result = await getAuthors()
-		if (result.success) {
-			setAuthors(result.data)
-		}
-	}
 
 	const fetchItems = async () => {
 		const result =
@@ -312,7 +294,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 			{filtersVisible && isFilters ? (
 				<ul className='filters-grid z-10 w-full mt-4'>
 					<>
-						{isLoading?.classifications && type !== 'ecosystems' ? (
+						{(classificationsIsLoading || authorsIsLoading) && type !== 'ecosystems' ? (
 							Array(8)
 								.fill('')
 								.map((item, idx) => (
@@ -331,8 +313,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 											name={t('authors')}
 											items={authors}
 											type='authors'
-											selectedItems={authors
-												.map(({ id }) => id)
+											selectedItems={authors.map(({ id }) => id)
 												.filter(id => selectedAuthors?.includes(id))}
 											addItem={handleAddAuthor}
 											resetItems={items => {

@@ -14,8 +14,6 @@ export async function generateMetadata({ params: { locale } }) {
 
 export default function NewsPage() {
 	return (
-		<Suspense>
-			<NewsPageComponent />
-		</Suspense>
+		<NewsPageComponent />
 	)
 }

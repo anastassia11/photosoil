@@ -1,6 +1,5 @@
 'use client'
 
-import moment from 'moment'
 import Link from 'next/link'
 import {
 	useParams,
@@ -21,29 +20,26 @@ import { filtersStore } from '@/store/valtioStore/filtersStore'
 
 import { BASE_SERVER_URL, PAGINATION_OPTIONS } from '@/utils/constants'
 
-import { getAllNews } from '@/api/news/get_allNews'
-import { getTags } from '@/api/tags/get_tags'
-
 import { getTranslation } from '@/i18n/client'
 import Image from 'next/image'
 import { Label } from '../ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import DraftSwitcher from '../map/DraftSwitcher'
+import useNews from '@/hooks/data/useNews'
 
 export default function NewsPageComponent() {
 	const pathname = usePathname()
-	const [news, setNews] = useState([])
+	const { news, newsIsLoading,
+		tags, tagsIsLoading } = useNews()
+
 	const [filterName, setFilterName] = useState('')
 	const [filteredNews, setFilteredNews] = useState([])
 	const [currentItems, setCurrentItems] = useState([])
-	const [tags, setTags] = useState([])
+
 	const [token, setToken] = useState(false)
 	const [draftIsVisible, setDraftIsVisible] = useState(false)
 	const [itemsPerPage, setItemsPerPage] = useState(0)
-	const [isLoading, setIsLoading] = useState({
-		items: true,
-		tags: true
-	})
+
 	const dropdown = useSelector(state => state.general.dropdown)
 
 	const didLogRef = useRef(true)
@@ -57,6 +53,7 @@ export default function NewsPageComponent() {
 
 	const _filteredNews = useMemo(() => {
 		const _filterName = filterName.toLowerCase().trim()
+		if (!news) return []
 		return news
 			.filter(
 				item =>
@@ -74,8 +71,6 @@ export default function NewsPageComponent() {
 						))
 			)
 			.sort((a, b) => {
-				// const dateA = new Date(a.createdDate);
-				// const dateB = new Date(b.createdDate);
 				return b.createdDate - a.createdDate
 			})
 	}, [filterName, news, draftIsVisible, selectedTags])
@@ -85,8 +80,6 @@ export default function NewsPageComponent() {
 
 		localStorage.getItem('tokenData') &&
 			setToken(JSON.parse(localStorage.getItem('tokenData'))?.token)
-		fetchTags()
-		fetchNews()
 		if (didLogRef.current) {
 			timeoutId = setTimeout(() => {
 				didLogRef.current = false
@@ -127,22 +120,6 @@ export default function NewsPageComponent() {
 		},
 		[]
 	)
-
-	const fetchNews = async () => {
-		const result = await getAllNews()
-		if (result.success) {
-			setNews(result.data)
-		}
-		setIsLoading(prev => ({ ...prev, items: false }))
-	}
-
-	const fetchTags = async () => {
-		const result = await getTags()
-		if (result.success) {
-			setTags(result.data)
-		}
-		setIsLoading(prev => ({ ...prev, tags: false }))
-	}
 
 	const NewsCard = ({ id, tags, translations, photo }) => {
 		const currentTransl =
@@ -240,7 +217,7 @@ export default function NewsPageComponent() {
 			</MotionWrapper>
 
 			<div className='mt-4 mb-6 filters-grid'>
-				{isLoading.tags ? (
+				{tagsIsLoading ? (
 					<Loader className='w-full h-[40px]' />
 				) : (
 					<MotionWrapper>
@@ -269,7 +246,7 @@ export default function NewsPageComponent() {
 			</div>
 
 			<ul className='news-grid mb-4'>
-				{isLoading.items ? (
+				{newsIsLoading ? (
 					Array(8)
 						.fill('')
 						.map((item, idx) => (

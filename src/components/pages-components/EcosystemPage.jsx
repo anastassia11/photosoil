@@ -8,12 +8,11 @@ import SoilObject from '@/components/soils/SoilObject'
 
 import { useConstants } from '@/hooks/useConstants'
 
-import { getEcosystem } from '@/api/ecosystem/get_ecosystem'
-
 import { getTranslation } from '@/i18n/client'
+import useEcosystem from '@/hooks/data/itemById/useEcosystem'
 
 export default function EcosystemPageComponent({ id }) {
-	const [ecosystem, setEcosystem] = useState({})
+	const { ecosystem, ecosystemIsLoading } = useEcosystem(id)
 	const [parser, setParser] = useState()
 
 	const { locale } = useParams()
@@ -30,7 +29,6 @@ export default function EcosystemPageComponent({ id }) {
 		if (typeof document !== 'undefined') {
 			setParser(new DOMParser())
 		}
-		fetchEcosystem()
 	}, [])
 
 	useEffect(() => {
@@ -42,19 +40,12 @@ export default function EcosystemPageComponent({ id }) {
 		}
 	}, [currentTransl])
 
-	const fetchEcosystem = async () => {
-		const result = await getEcosystem(id)
-		if (result.success) {
-			setEcosystem(result.data)
-		}
-	}
-
 	return (
 		<SoilObject
-			object={ecosystem}
+			object={ecosystem ?? {}}
 			type='ecosystem'
 		>
-			<ul className='flex flex-col space-y-2 '>
+			{!ecosystemIsLoading && <ul className='flex flex-col space-y-2 '>
 				{ECOSYSTEM_INFO.map(({ name, title }) => {
 					return currentTransl?.hasOwnProperty(name) &&
 						currentTransl[name]?.length &&
@@ -136,7 +127,7 @@ export default function EcosystemPageComponent({ id }) {
 				) : (
 					''
 				)}
-			</ul>
+			</ul>}
 		</SoilObject>
 	)
 }
