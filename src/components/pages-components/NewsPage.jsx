@@ -22,10 +22,10 @@ import { BASE_SERVER_URL, PAGINATION_OPTIONS } from '@/utils/constants'
 
 import { getTranslation } from '@/i18n/client'
 import Image from 'next/image'
-import { Label } from '../ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import DraftSwitcher from '../map/DraftSwitcher'
 import useNews from '@/hooks/data/useNews'
+import { recoveryItemsPerPage } from '@/utils/common'
+import PerPageSelect from '../PerPageSelect'
 
 export default function NewsPageComponent() {
 	const pathname = usePathname()
@@ -38,7 +38,7 @@ export default function NewsPageComponent() {
 
 	const [token, setToken] = useState(false)
 	const [draftIsVisible, setDraftIsVisible] = useState(false)
-	const [itemsPerPage, setItemsPerPage] = useState(0)
+	const [itemsPerPage, setItemsPerPage] = useState()
 
 	const dropdown = useSelector(state => state.general.dropdown)
 
@@ -50,6 +50,11 @@ export default function NewsPageComponent() {
 	const { selectedTags } = useSnapshot(filtersStore)
 
 	const _isEng = locale === 'en'
+
+	useEffect(() => {
+		const value = recoveryItemsPerPage({ key: 'news', pathname })
+		setItemsPerPage(value)
+	}, [pathname])
 
 	const _filteredNews = useMemo(() => {
 		const _filterName = filterName.toLowerCase().trim()
@@ -193,23 +198,7 @@ export default function NewsPageComponent() {
 				/>
 			</div>
 			<div className={`flex flex-row justify-end items-center`}>
-				<div className='self-end flex flex-row items-center justify-end w-[190px] space-x-2'>
-					<Label htmlFor="in_page"
-						className='text-base min-w-fit'>{t('in_page')}</Label>
-					<Select
-						id="in_page"
-						value={itemsPerPage.toString()}
-						onValueChange={setItemsPerPage}>
-						<SelectTrigger className="text-base w-[70px]">
-							<SelectValue />
-						</SelectTrigger>
-						<SelectContent className='min-w-0'>
-							{Object.entries(PAGINATION_OPTIONS).map(([value, title]) =>
-								<SelectItem key={value} value={value.toString()}
-									className='text-base'>{title}</SelectItem>)}
-						</SelectContent>
-					</Select>
-				</div>
+				<PerPageSelect itemsPerPage={itemsPerPage} setItemsPerPage={setItemsPerPage} type='news' />
 			</div>
 			<MotionWrapper className='my-4 pl-0.5'>
 				<DraftSwitcher draftIsVisible={draftIsVisible} setDraftIsVisible={setDraftIsVisible} label={t('grafts_visible')}
@@ -276,7 +265,7 @@ export default function NewsPageComponent() {
 			</ul>
 
 			<Pagination
-				itemsPerPage={PAGINATION_OPTIONS[itemsPerPage]}
+				itemsPerPage={PAGINATION_OPTIONS[itemsPerPage] ?? 12}
 				items={filteredNews}
 				updateCurrentItems={setCurrentItems}
 			/>

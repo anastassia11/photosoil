@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useParams, usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { useConstants } from '@/hooks/useConstants'
@@ -14,26 +14,33 @@ import Loader from './Loader'
 import Pagination from './Pagination'
 import MotionWrapper from './admin-panel/ui-kit/MotionWrapper'
 import { getTranslation } from '@/i18n/client'
-import { Label } from './ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import DraftSwitcher from './map/DraftSwitcher'
+import PerPageSelect from './PerPageSelect'
+import { recoveryItemsPerPage } from '@/utils/common'
 
-export default function Publications({ _publications }) {
+export default function Publications({ _publications, isChild = false }) {
 	const [filterName, setFilterName] = useState('')
 	const [publications, setPublications] = useState([])
-
+	const pathname = usePathname()
 	const [filteredPublications, setFilteredPublications] = useState([])
 	const [currentItems, setCurrentItems] = useState([])
-	const [itemsPerPage, setItemsPerPage] = useState(0)
+	const [itemsPerPage, setItemsPerPage] = useState()
+
 	const [draftIsVisible, setDraftIsVisible] = useState(false)
 	const [token, setToken] = useState(false)
 	const [isLoading, setIsLoading] = useState(true)
 
 	const { locale } = useParams()
+
 	const { t } = getTranslation(locale)
 	const { PUBLICATION_ENUM } = useConstants()
 
 	const _isEng = locale === 'en'
+
+	useEffect(() => {
+		const value = recoveryItemsPerPage({ isChild, key: 'publications', pathname })
+		setItemsPerPage(value)
+	}, [isChild, pathname])
 
 	useEffect(() => {
 		localStorage.getItem('tokenData') &&
@@ -102,23 +109,7 @@ export default function Publications({ _publications }) {
 				</div>
 			</div>
 			<div className={`flex flex-row justify-end items-center`}>
-				<div className='self-end flex flex-row items-center justify-end w-[190px] space-x-2'>
-					<Label htmlFor="in_page"
-						className='text-base min-w-fit'>{t('in_page')}</Label>
-					<Select
-						id="in_page"
-						value={itemsPerPage.toString()}
-						onValueChange={setItemsPerPage}>
-						<SelectTrigger className="text-base w-[70px]">
-							<SelectValue />
-						</SelectTrigger>
-						<SelectContent className='min-w-0'>
-							{Object.entries(PAGINATION_OPTIONS).map(([value, title]) =>
-								<SelectItem key={value} value={value.toString()}
-									className='text-base'>{title}</SelectItem>)}
-						</SelectContent>
-					</Select>
-				</div>
+				<PerPageSelect itemsPerPage={itemsPerPage} setItemsPerPage={setItemsPerPage} isChild={isChild} type='publications' />
 			</div>
 
 			<MotionWrapper className='my-4 pl-0.5'>
@@ -198,7 +189,7 @@ export default function Publications({ _publications }) {
 				</div>
 			</section>
 			<Pagination
-				itemsPerPage={PAGINATION_OPTIONS[itemsPerPage]}
+				itemsPerPage={PAGINATION_OPTIONS[itemsPerPage] ?? 12}
 				items={filteredPublications}
 				updateCurrentItems={setCurrentItems}
 			/>

@@ -252,7 +252,7 @@ export default function SoilObject({ object, children, type }) {
 					<h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-4'>
 						{t('connect_publ')}
 					</h3>
-					<Publications _publications={object.publications} />
+					<Publications _publications={object.publications} isChild={true} />
 				</div>
 			) : (
 				''

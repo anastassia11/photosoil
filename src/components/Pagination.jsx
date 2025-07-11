@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import ReactPaginate from 'react-paginate'
 
 import '@/styles/pagination.css'
@@ -10,6 +10,7 @@ export default function Pagination({
 	items,
 	updateCurrentItems
 }) {
+	const paginationRef = useRef(null)
 	const [pageCount, setPageCount] = useState(0)
 	const [itemOffset, setItemOffset] = useState(0)
 	const [pageRangeDisplayed, setPageRangeDisplayed] = useState(0)
@@ -27,19 +28,34 @@ export default function Pagination({
 
 	useEffect(() => {
 		const endOffset = itemOffset + Number(itemsPerPage)
-		updateCurrentItems(items.slice(itemOffset, endOffset))
+		const currentItems = items.slice(itemOffset, endOffset)
+
+		updateCurrentItems(currentItems)
 		setPageCount(Math.ceil(items.length / itemsPerPage))
 	}, [itemOffset, itemsPerPage, items])
 
 	const handlePageClick = event => {
 		const newOffset = (event.selected * itemsPerPage) % items.length
 		setItemOffset(newOffset)
+
+		const endOffset = itemOffset + Number(itemsPerPage)
+
+		const currentItems = items.slice(itemOffset, endOffset)
+		const currentItemCount = currentItems.length
+
+		// Прокрутка только если количество элементов изменилось
+		if (currentItemCount < itemsPerPage) {
+			const element = document.getElementById('pagination')
+			setTimeout(() => {
+				element.scrollIntoView()
+			}, 100)
+		}
 	}
 
 	return (
-		<>
+		<div ref={paginationRef} className='flex self-end' id='pagination'>
 			<ReactPaginate
-				className='flex self-end'
+				className='flex'
 				nextLabel={
 					<svg
 						xmlns='http://www.w3.org/2000/svg'
@@ -86,6 +102,6 @@ export default function Pagination({
 				disabledLinkClassName='disabled-link'
 				renderOnZeroPageCount={null}
 			/>
-		</>
+		</div>
 	)
 }

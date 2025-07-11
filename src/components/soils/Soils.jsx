@@ -25,11 +25,11 @@ import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper'
 import Filter from './Filter'
 import SoilCard from './SoilCard'
 import { getTranslation } from '@/i18n/client'
-import { Label } from '../ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import DraftSwitcher from '../map/DraftSwitcher'
 import useAuthors from '@/hooks/data/useAuthors'
 import useClassifications from '@/hooks/data/useClassifications'
+import PerPageSelect from '../PerPageSelect'
+import { recoveryItemsPerPage } from '@/utils/common'
 
 export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 	const { locale } = useParams()
@@ -54,7 +54,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 
 	const [currentItems, setCurrentItems] = useState([])
 
-	const [itemsPerPage, setItemsPerPage] = useState(0)
+	const [itemsPerPage, setItemsPerPage] = useState()
 
 	const [isLoading, setIsLoading] = useState({
 		items: true,
@@ -83,10 +83,14 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 		type === 'dynamics'
 
 	useEffect(() => {
+		const value = recoveryItemsPerPage({ isChild: !isFilters, key: type, pathname })
+		setItemsPerPage(value)
+	}, [isFilters, type, pathname])
+
+	useEffect(() => {
 		let timeoutId
 		setFiltersVisible(window.innerWidth > 640 || type === 'ecosystem')
 		setToken(JSON.parse(localStorage.getItem('tokenData'))?.token)
-		// isSoils && fetchClassifications()
 		if (_soils) {
 			setSoils(_soils)
 			setIsLoading(prev => ({ ...prev, items: false }))
@@ -160,6 +164,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 	useEffect(() => {
 		isFilters && !didLogRef.current && updateFiltersInHistory()
 	}, [selectedCategories, selectedTerms, selectedAuthors])
+
 
 	const fetchItems = async () => {
 		const result =
@@ -273,29 +278,17 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 				) : (
 					''
 				)}
-				<div className='self-end flex flex-row items-center justify-end w-[190px] space-x-2'>
-					<Label htmlFor="in_page"
-						className='text-base min-w-fit'>{t('in_page')}</Label>
-					<Select
-						id="in_page"
-						value={itemsPerPage.toString()}
-						onValueChange={setItemsPerPage}>
-						<SelectTrigger className="text-base w-[70px]">
-							<SelectValue />
-						</SelectTrigger>
-						<SelectContent className='min-w-0'>
-							{Object.entries(PAGINATION_OPTIONS).map(([value, title]) =>
-								<SelectItem key={value} value={value.toString()}
-									className='text-base'>{title}</SelectItem>)}
-						</SelectContent>
-					</Select>
-				</div>
+				<PerPageSelect itemsPerPage={itemsPerPage}
+					setItemsPerPage={setItemsPerPage}
+					isChild={!isFilters}
+					type={type}
+				/>
 			</div>
 			{filtersVisible && isFilters ? (
 				<ul className='filters-grid z-10 w-full mt-4'>
 					<>
-						{(classificationsIsLoading || authorsIsLoading) && type !== 'ecosystems' ? (
-							Array(8)
+						{(type === 'ecosystems' && authorsIsLoading) || (classificationsIsLoading || authorsIsLoading) ? (
+							Array(type === 'ecosystems' ? 1 : 8)
 								.fill('')
 								.map((item, idx) => (
 									<li key={idx}>
@@ -327,7 +320,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 										/>
 									</li>
 								</MotionWrapper>
-								{isAllSoils ? (
+								{isAllSoils && (
 									<li key='category'>
 										<MotionWrapper>
 											<Filter
@@ -353,10 +346,8 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 											/>
 										</MotionWrapper>
 									</li>
-								) : (
-									''
 								)}
-								{classifications?.map(item => {
+								{type !== 'ecosystems' && classifications?.map(item => {
 									const isEnglish = locale === 'en'
 									const isTranslationModeValid =
 										item.translationMode === 0 ||
@@ -453,7 +444,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 				)}
 			</ul>
 			<Pagination
-				itemsPerPage={PAGINATION_OPTIONS[itemsPerPage]}
+				itemsPerPage={PAGINATION_OPTIONS[itemsPerPage] ?? 12}
 				items={filteredSoils}
 				updateCurrentItems={setCurrentItems}
 			/>

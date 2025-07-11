@@ -7,3 +7,58 @@ export const PAGINATION_OPTIONS = {
 	2: '48',
 	3: '96'
 }
+
+export const PAGINATION_DATA = {
+	soils: {
+		num: 0,
+		children: {
+			ecosystems: 0,
+			publications: 0,
+		}
+	},
+	profiles: {
+		num: 0,
+		children: {
+			ecosystems: 0,
+			publications: 0,
+		}
+	},
+	morphological: {
+		num: 0,
+		children: {
+			ecosystems: 0,
+			publications: 0,
+		}
+	},
+	dynamics: {
+		num: 0,
+		children: {
+			ecosystems: 0,
+			publications: 0,
+		}
+	},
+	ecosystems: {
+		num: 0,
+		children: {
+			soils: 0,
+			publications: 0,
+		}
+	},
+	publications: {
+		num: 0,
+		children: {
+			soils: 0,
+			ecosystems: 0,
+		}
+	},
+	authors: {
+		num: 0,
+		children: {
+			soils: 0,
+			ecosystems: 0,
+		}
+	},
+	news: {
+		num: 0
+	}
+}

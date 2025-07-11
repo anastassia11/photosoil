@@ -2,7 +2,7 @@ import axios from 'axios'
 
 import tokenVerification from '@/api/account/token_verification'
 
-import { BASE_SERVER_URL } from './constants'
+import { BASE_SERVER_URL, PAGINATION_DATA } from './constants'
 
 export const request = async ({
 	method,
@@ -29,8 +29,8 @@ export const request = async ({
 			contentType === 'formData'
 				? formData
 				: {
-						...params
-					},
+					...params
+				},
 		headers: {
 			Authorization: `Bearer ${JSON.parse(localStorage.getItem('tokenData'))?.token}`
 		}
@@ -46,4 +46,14 @@ export const generateFileName = title => {
 		.toLowerCase()
 
 	return safeName.substring(0, 100)
+}
+
+export const recoveryItemsPerPage = ({ isChild = false, key, pathname }) => {
+	const defaultData = JSON.parse(localStorage.getItem('itemsPerPage')) ?? PAGINATION_DATA
+	if (!isChild) {
+		return defaultData[key].num
+	} else {
+		const _pathname = pathname.split('/')[2]
+		return defaultData[_pathname].children[key]
+	}
 }

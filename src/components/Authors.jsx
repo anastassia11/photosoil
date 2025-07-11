@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useParams, usePathname } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 
 import { BASE_SERVER_URL, PAGINATION_OPTIONS } from '@/utils/constants'
@@ -11,12 +11,13 @@ import Loader from './Loader'
 import Pagination from './Pagination'
 import MotionWrapper from './admin-panel/ui-kit/MotionWrapper'
 import { getTranslation } from '@/i18n/client'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
-import { Label } from './ui/label'
 import useAuthors from '@/hooks/data/useAuthors'
+import PerPageSelect from './PerPageSelect'
+import { recoveryItemsPerPage } from '@/utils/common'
 
 export default function Authors() {
 	const { locale } = useParams()
+	const pathname = usePathname()
 	const { t } = getTranslation(locale)
 	const { authors, authorsIsLoading } = useAuthors()
 
@@ -24,8 +25,14 @@ export default function Authors() {
 	const [filteredAuthors, setFilteredAuthors] = useState([])
 
 	const [currentItems, setCurrentItems] = useState([])
-	const [itemsPerPage, setItemsPerPage] = useState(0)
+	const [itemsPerPage, setItemsPerPage] = useState()
+
 	const _isEng = locale === 'en'
+
+	useEffect(() => {
+		const value = recoveryItemsPerPage({ key: 'authors', pathname })
+		setItemsPerPage(value)
+	}, [pathname])
 
 	useEffect(() => {
 		const _filterName = filterName.toLowerCase().trim()
@@ -129,23 +136,7 @@ export default function Authors() {
 				</div>
 			</div>
 			<div className={`flex flex-row justify-end  items-center mb-4`}>
-				<div className='self-end flex flex-row items-center justify-end w-[190px] space-x-2'>
-					<Label htmlFor="in_page"
-						className='text-base min-w-fit'>{t('in_page')}</Label>
-					<Select
-						id="in_page"
-						value={itemsPerPage.toString()}
-						onValueChange={setItemsPerPage}>
-						<SelectTrigger className="text-base w-[70px]">
-							<SelectValue />
-						</SelectTrigger>
-						<SelectContent className='min-w-0'>
-							{Object.entries(PAGINATION_OPTIONS).map(([value, title]) =>
-								<SelectItem key={value} value={value.toString()}
-									className='text-base'>{title}</SelectItem>)}
-						</SelectContent>
-					</Select>
-				</div>
+				<PerPageSelect itemsPerPage={itemsPerPage} setItemsPerPage={setItemsPerPage} type='authors' />
 			</div>
 
 			<ul className='soils-grid mb-4'>
@@ -172,7 +163,7 @@ export default function Authors() {
 				)}
 			</ul>
 			<Pagination
-				itemsPerPage={PAGINATION_OPTIONS[itemsPerPage]}
+				itemsPerPage={PAGINATION_OPTIONS[itemsPerPage] ?? 12}
 				items={filteredAuthors}
 				updateCurrentItems={setCurrentItems}
 			/>
