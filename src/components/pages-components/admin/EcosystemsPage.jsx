@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import ObjectsView from '@/components/admin-panel/ObjectsView'
@@ -10,50 +9,21 @@ import ObjectsView from '@/components/admin-panel/ObjectsView'
 import { closeModal, openModal } from '@/store/slices/modalSlice'
 import modalThunkActions from '@/store/thunks/modalThunk'
 
-import { deleteEcosystemById } from '@/api/ecosystem/delete_ecosystem'
-import { getEcosystemsForAdmin } from '@/api/ecosystem/get_ecosystems_forAdmin'
-import { putEcosystemVisible } from '@/api/ecosystem/put_ecosystemVisible'
-
 import { getTranslation } from '@/i18n/client'
+import useAdminEcosystems from '@/hooks/data/forAdmin/useAdminEcosystems'
+import { useState } from 'react'
 
 export default function EcosystemsAdminComponent() {
 	const dispatch = useDispatch()
-	const [ecosystems, setEcosystems] = useState([])
-	const [isLoading, setIsLoading] = useState(true)
+	const { ecosystems, ecosystemsIsLoading,
+		deleteEcosystem,
+		visibleChange,
+	} = useAdminEcosystems()
+
+	const [selectedObjects, setSelectedObjects] = useState([])
+
 	const { locale } = useParams()
 	const { t } = getTranslation(locale)
-
-	useEffect(() => {
-		fetchEcosystems()
-	}, [])
-
-	const fetchEcosystems = async () => {
-		const result = await getEcosystemsForAdmin()
-		if (result.success) {
-			setEcosystems(result.data)
-			setIsLoading(false)
-		}
-	}
-
-	const fetchDeleteEcosystem = async id => {
-		const result = await deleteEcosystemById(id)
-		if (result.success) {
-			setEcosystems(prevEcosystems =>
-				prevEcosystems.filter(ecosystem => ecosystem.id !== id)
-			)
-		}
-	}
-
-	const fetchVisibleChange = async (id, data) => {
-		const result = await putEcosystemVisible(id, data)
-		if (result.success) {
-			setEcosystems(prevEcosystems =>
-				prevEcosystems.map(ecosystem =>
-					ecosystem.id === id ? { ...ecosystem, ...data } : ecosystem
-				)
-			)
-		}
-	}
 
 	const handleDeleteClick = async ({ id, isMulti }) => {
 		dispatch(
@@ -67,7 +37,8 @@ export default function EcosystemsAdminComponent() {
 
 		const isConfirm = await dispatch(modalThunkActions.open())
 		if (isConfirm.payload) {
-			await fetchDeleteEcosystem(id)
+			deleteEcosystem(id)
+			setSelectedObjects([])
 		}
 		dispatch(closeModal())
 	}
@@ -89,7 +60,8 @@ export default function EcosystemsAdminComponent() {
 
 		const isConfirm = await dispatch(modalThunkActions.open())
 		if (isConfirm.payload) {
-			await fetchVisibleChange(id, { isVisible })
+			visibleChange({ id, isVisible })
+			setSelectedObjects([])
 		}
 		dispatch(closeModal())
 	}
@@ -108,14 +80,15 @@ export default function EcosystemsAdminComponent() {
 				</Link>
 			</div>
 			<ObjectsView
-				_objects={ecosystems}
+				objects={ecosystems}
 				onDeleteClick={handleDeleteClick}
 				objectType='ecosystems'
-				pathname=''
 				visibilityControl={true}
 				languageChanger={true}
+				isLoading={ecosystemsIsLoading}
 				onVisibleChange={handleVisibleChange}
-				isLoading={isLoading}
+				selectedObjects={selectedObjects}
+				setSelectedObjects={setSelectedObjects}
 			/>
 		</div>
 	)

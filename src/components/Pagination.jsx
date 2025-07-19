@@ -7,14 +7,17 @@ import '@/styles/pagination.css'
 
 export default function Pagination({
 	itemsPerPage,
+	currPage,
+	setCurrPage,
 	items,
 	updateCurrentItems
 }) {
 	const paginationRef = useRef(null)
-	const [pageCount, setPageCount] = useState(0)
-	const [itemOffset, setItemOffset] = useState(0)
+	const [pageCount, setPageCount] = useState(Math.ceil(items.length / itemsPerPage))
+	// const [itemOffset, setItemOffset] = useState(0)
 	const [pageRangeDisplayed, setPageRangeDisplayed] = useState(0)
 	const [marginPagesDisplayed, setMarginPagesDisplayed] = useState(0)
+	const [prevItemsLength, setPrevItemsLength] = useState()
 
 	useEffect(() => {
 		if (window.innerWidth < 640) {
@@ -27,35 +30,43 @@ export default function Pagination({
 	}, [])
 
 	useEffect(() => {
-		const endOffset = itemOffset + Number(itemsPerPage)
-		const currentItems = items.slice(itemOffset, endOffset)
+		const newOffset = (currPage * itemsPerPage) % items.length
+
+		const endOffset = newOffset + itemsPerPage
+		const currentItems = items.slice(newOffset, endOffset)
 
 		updateCurrentItems(currentItems)
 		setPageCount(Math.ceil(items.length / itemsPerPage))
-	}, [itemOffset, itemsPerPage, items])
+
+		// setPrevItemsLength(currentItems.length)
+	}, [currPage, itemsPerPage, items, updateCurrentItems])
 
 	const handlePageClick = event => {
+		setCurrPage(event.selected)
+
 		const newOffset = (event.selected * itemsPerPage) % items.length
-		setItemOffset(newOffset)
 
-		const endOffset = itemOffset + Number(itemsPerPage)
+		const endOffset = newOffset + itemsPerPage
+		const currentItems = items.slice(newOffset, endOffset)
 
-		const currentItems = items.slice(itemOffset, endOffset)
-		const currentItemCount = currentItems.length
-
+		// console.log(prevItemsLength, currentItems.length)
 		// Прокрутка только если количество элементов изменилось
-		if (currentItemCount < itemsPerPage) {
-			const element = document.getElementById('pagination')
-			setTimeout(() => {
-				element.scrollIntoView()
-			}, 100)
-		}
+		// if (prevItemsLength && (prevItemsLength !== currentItems.length)) {
+		// 	console.log('scrollIntoView')
+		// 	const element = document.getElementById('pagination')
+		// 	setTimeout(() => {
+		// 		element.scrollIntoView()
+		// 	}, 100)
+		// }
+		setPrevItemsLength(currentItems.length)
 	}
 
 	return (
 		<div ref={paginationRef} className='flex self-end' id='pagination'>
 			<ReactPaginate
 				className='flex'
+				// forcePage={currPage}
+				initialPage={currPage}
 				nextLabel={
 					<svg
 						xmlns='http://www.w3.org/2000/svg'
@@ -70,6 +81,7 @@ export default function Pagination({
 						/>
 					</svg>
 				}
+
 				onPageChange={handlePageClick}
 				pageRangeDisplayed={pageRangeDisplayed}
 				marginPagesDisplayed={marginPagesDisplayed}

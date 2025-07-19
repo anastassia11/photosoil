@@ -2,7 +2,7 @@
 
 import { isAbsoluteUrl } from 'next/dist/shared/lib/utils'
 import Image from 'next/image'
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import React, { useEffect, useMemo, useState } from 'react'
 
 import Soils from '@/components/soils/Soils'
@@ -18,6 +18,7 @@ import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper'
 import Loader from '../Loader'
 
 export default function AuthorPageComponent({ id }) {
+	const searchParams = useSearchParams()
 	const { author, authorIsLoading } = useAuthor(id)
 
 	const { locale } = useParams()
@@ -42,7 +43,7 @@ export default function AuthorPageComponent({ id }) {
 			}
 			setParser(new DOMParser())
 		}
-	}, [authorLang])
+	}, [authorLang, searchParams])
 
 	const handleScrollToSection = sectionId => {
 		const section = document.getElementById(sectionId)

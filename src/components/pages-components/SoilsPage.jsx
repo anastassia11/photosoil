@@ -6,7 +6,7 @@ import { getTranslation } from '@/i18n/client'
 
 export default function SoilsPageComponent({ type, locale }) {
 	const { t } = getTranslation(locale)
-	const { soils } = useSoils()
+	const { soils } = useSoils(type)
 
 	return (
 		<div className='flex flex-col'>

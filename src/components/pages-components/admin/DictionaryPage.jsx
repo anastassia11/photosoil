@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import ObjectsView from '@/components/admin-panel/ObjectsView'
@@ -10,38 +10,18 @@ import ObjectsView from '@/components/admin-panel/ObjectsView'
 import { closeModal, openModal } from '@/store/slices/modalSlice'
 import modalThunkActions from '@/store/thunks/modalThunk'
 
-import { deleteClassification } from '@/api/classification/delete_classification'
-import { getClassifications } from '@/api/classification/get_classifications'
-
 import { getTranslation } from '@/i18n/client'
+import useAdminDisconaries from '@/hooks/data/forAdmin/useAdminDisc'
 
 export default function DictionaryAdminPageComponent() {
 	const dispatch = useDispatch()
-	const [disconaries, setDisconaries] = useState([])
-	const [isLoading, setIsLoading] = useState(true)
+	const { disconaries, discIsLoading,
+		fetchDeleteDisc } = useAdminDisconaries()
 	const { locale } = useParams()
 	const { t } = getTranslation(locale)
+	const [selectedObjects, setSelectedObjects] = useState([])
 
 	const _isEng = locale === 'en'
-
-	useEffect(() => {
-		fetchDisconaries()
-	}, [])
-
-	const fetchDisconaries = async () => {
-		const result = await getClassifications()
-		if (result.success) {
-			setDisconaries(result.data.sort((a, b) => a.order - b.order))
-			setIsLoading(false)
-		}
-	}
-
-	const fetchDeleteDisconary = async id => {
-		const result = await deleteClassification(id)
-		if (result.success) {
-			setDisconaries(prev => prev.filter(disconary => disconary.id !== id))
-		}
-	}
 
 	const handleDeleteClick = async ({ id }) => {
 		dispatch(
@@ -55,7 +35,8 @@ export default function DictionaryAdminPageComponent() {
 
 		const isConfirm = await dispatch(modalThunkActions.open())
 		if (isConfirm.payload) {
-			await fetchDeleteDisconary(id)
+			fetchDeleteDisc(id)
+			setSelectedObjects([])
 		}
 		dispatch(closeModal())
 	}
@@ -100,13 +81,14 @@ export default function DictionaryAdminPageComponent() {
 				<p className=''>{t('setup_order')}</p>
 			</Link>
 			<ObjectsView
-				_objects={disconaries}
+				objects={disconaries}
 				onDeleteClick={handleDeleteClick}
 				objectType='dictionary'
-				pathname=''
 				visibilityControl={false}
 				languageChanger={true}
-				isLoading={isLoading}
+				isLoading={discIsLoading}
+				selectedObjects={selectedObjects}
+				setSelectedObjects={setSelectedObjects}
 			/>
 		</div>
 	)

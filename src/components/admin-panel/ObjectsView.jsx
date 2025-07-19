@@ -1,9 +1,8 @@
 'use client'
 
-import moment from 'moment'
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Oval } from 'react-loader-spinner'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -18,39 +17,32 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Label } from '../ui/label'
 
 export default function ObjectsView({
-	_objects,
+	objects,
 	isLoading,
 	onDeleteClick,
 	objectType,
 	visibilityControl,
 	languageChanger,
 	onVisibleChange,
-	onRoleChange
+	onRoleChange,
+	selectedObjects,
+	setSelectedObjects
 }) {
+	const searchParams = useSearchParams()
+	const pathname = usePathname()
+	const router = useRouter()
+	const didLogRef = useRef(true)
 	const dispatch = useDispatch()
-	const [objects, setObjects] = useState([])
-	const [selectedObjects, setSelectedObjects] = useState([])
+
 	const [filterName, setFilterName] = useState('')
 	const [currentLang, setCurrentLang] = useState('any')
 	const [publishStatus, setPublichStatus] = useState('all')
 
-	// true: по возрастанию, false: по убыванию
-	const [sortedTypes, setSortedTypes] = useState({
-		name: true,
-		title: true,
-		email: true,
-		role: true,
-		authorType: true,
-		creator: true,
-		lastUpdated: true,
-		isVisible: true,
-		type: true
-	})
-	const [lastSorted, setLastSorted] = useState('lastUpdated')
+	const [sortType, setSortType] = useState('1')
+	const [sortBy, setSortBy] = useState('lastUpdated')
 
 	const [currentItems, setCurrentItems] = useState([])
 	const [itemsPerPage, setItemsPerPage] = useState(0)
-	const [filteredObjects, setFilteredObjects] = useState([])
 
 	const dropdown = useSelector(state => state.general.dropdown)
 	const { locale } = useParams()
@@ -61,51 +53,77 @@ export default function ObjectsView({
 	const LANGUAGES = {
 		any: t('any'),
 		ru: t('ru'),
-		eng: t('eng')
+		en: t('eng')
 	}
 
 	useEffect(() => {
-		setObjects(
-			_objects.sort((a, b) => {
-				return b.lastUpdated - a.lastUpdated
-			})
-		)
-		setSelectedObjects([])
-	}, [_objects])
+		let timeoutId
+		if (didLogRef.current) {
+			timeoutId = setTimeout(() => {
+				const filterName = searchParams.get('search')
+				const currentLang = searchParams.get('lang')
+				const publishStatus = searchParams.get('publish')
+				const sortBy = searchParams.get('sortBy')
 
-	useEffect(() => {
-		const _filterName = filterName.toLowerCase().trim()
-		setFilteredObjects(prev =>
-			objects.filter(
-				object =>
-					(object?.name?.toLowerCase().includes(_filterName) ||
-						object?.code?.toLowerCase().includes(_filterName) ||
-						object?.email?.toLowerCase().includes(_filterName) ||
-						object?.title?.toLowerCase().includes(_filterName) ||
-						object?.dataEng?.name?.toLowerCase().includes(_filterName) ||
-						object?.dataRu?.name?.toLowerCase().includes(_filterName) ||
-						object?.nameRu?.toLowerCase().includes(_filterName) ||
-						object?.nameEng?.toLowerCase().includes(_filterName)) &&
-					((publishStatus === 'publish' && object.isVisible) ||
-						(publishStatus === 'not_publish' &&
-							!object.isVisible &&
-							object.isVisible !== undefined) ||
-						(publishStatus === 'all' && true)) &&
-					((currentLang === 'eng' && object.isEnglish) ||
-						(currentLang === 'ru' &&
-							!object.isEnglish &&
-							object.isEnglish !== undefined) ||
-						(currentLang === 'any' && true) ||
-						(currentLang === 'eng' &&
-							object.translationMode !== undefined &&
-							(object.translationMode == 1 || object.translationMode == 0)) ||
-						(currentLang === 'ru' &&
-							object.translationMode !== undefined &&
-							(object.translationMode == 2 || object.translationMode == 0)) ||
-						(currentLang === 'any' && true))
-			)
-		)
-	}, [objects, filterName, publishStatus, currentLang])
+				// 1 = по возрастанию 
+				// 0 = по убыванию
+				const sortType = searchParams.get('sortType')
+
+				if (currentLang) {
+					setCurrentLang(currentLang)
+				}
+				if (publishStatus) {
+					setPublichStatus(publishStatus == 1 ? 'publish' : 'not_publish')
+				}
+				if (filterName) {
+					setFilterName(filterName)
+				}
+				if (sortBy) {
+					setSortBy(sortBy)
+				}
+				if (sortType) {
+					setSortType(sortType)
+				}
+				didLogRef.current = false
+			}, 300)
+		}
+		return () => clearTimeout(timeoutId)
+	}, [])
+
+	// useEffect(() => {
+	// 	const _filterName = filterName.toLowerCase().trim()
+	// 	setFilteredObjects(prev =>
+	// 		objects.filter(
+	// 			object =>
+	// 				(object?.name?.toLowerCase().includes(_filterName) ||
+	// 					object?.code?.toLowerCase().includes(_filterName) ||
+	// 					object?.email?.toLowerCase().includes(_filterName) ||
+	// 					object?.title?.toLowerCase().includes(_filterName) ||
+	// 					object?.dataEng?.name?.toLowerCase().includes(_filterName) ||
+	// 					object?.dataRu?.name?.toLowerCase().includes(_filterName) ||
+	// 					object?.nameRu?.toLowerCase().includes(_filterName) ||
+	// 					object?.nameEng?.toLowerCase().includes(_filterName)) &&
+	// 				((publishStatus === 'publish' && object.isVisible) ||
+	// 					(publishStatus === 'not_publish' &&
+	// 						!object.isVisible &&
+	// 						object.isVisible !== undefined) ||
+	// 					(publishStatus === 'all' && true)) &&
+
+	// 				((currentLang === 'eng' && object.isEnglish) ||
+	// 					(currentLang === 'ru' &&
+	// 						!object.isEnglish &&
+	// 						object.isEnglish !== undefined) ||
+	// 					(currentLang === 'any' && true) ||
+	// 					(currentLang === 'eng' &&
+	// 						object.translationMode !== undefined &&
+	// 						(object.translationMode == 1 || object.translationMode == 0)) ||
+	// 					(currentLang === 'ru' &&
+	// 						object.translationMode !== undefined &&
+	// 						(object.translationMode == 2 || object.translationMode == 0)) ||
+	// 					(currentLang === 'any' && true))
+	// 		)
+	// 	)
+	// }, [objects, filterName, publishStatus, currentLang])
 
 	const handleObjectSelect = (checked, id, type) => {
 		setSelectedObjects(prev => {
@@ -163,26 +181,22 @@ export default function ObjectsView({
 
 	const handleLangChange = lang => {
 		setCurrentLang(lang)
+		updateHistory({ 'lang': lang === 'any' ? [] : [lang] })
 	}
 
 	const sortedBy = fieldName => {
-		setLastSorted(fieldName)
-		const isAscending = sortedTypes[fieldName]
-		// let parentName
-		// switch (objectType) {
-		// 	case 'objects':
-		// 		parentName = 'soilObject'
-		// 		break
-		// 	case 'ecosystems':
-		// 		parentName = 'ecoSystem'
-		// 		break
-		// 	case 'publications':
-		// 		parentName = 'publication'
-		// 		break
-		// 	case 'news':
-		// 		parentName = 'news'
-		// 		break
-		// }
+		if (fieldName == sortBy) {
+			const _sortType = sortType == '1' ? '0' : '1'
+			setSortBy(fieldName)
+			setSortType(_sortType)
+
+			updateHistory({ 'sortBy': [fieldName], 'sortType': [_sortType] })
+		} else {
+			setSortBy(fieldName)
+			setSortType('1')
+
+			updateHistory({ 'sortBy': [fieldName], 'sortType': ['1'] })
+		}
 
 		const compareFn = (a, b) => {
 			let fieldA, fieldB
@@ -236,9 +250,22 @@ export default function ObjectsView({
 				? valueA?.localeCompare(valueB)
 				: valueB?.localeCompare(valueA)
 		}
-		setObjects(prev => [...prev].sort(compareFn))
-		setFilteredObjects(prev => [...prev].sort(compareFn))
-		setSortedTypes(prev => ({ ...prev, [fieldName]: !prev[fieldName] }))
+	}
+
+	const updateHistory = useCallback((updates) => {
+		const params = new URLSearchParams(searchParams.toString())
+		Object.entries(updates).forEach(([key, value]) => {
+			if (Array.isArray(value) && value.length > 0) {
+				params.set(key, value.join(','))
+			} else {
+				params.delete(key)
+			}
+		})
+		router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+	}, [pathname, router, searchParams])
+
+	const updateCurrPage = (currPage) => {
+		updateHistory({ 'page': currPage ? [currPage] : [] })
 	}
 
 	const ThItem = ({ name, fieldName }) => {
@@ -258,7 +285,7 @@ export default function ObjectsView({
 						viewBox='0 0 24 24'
 						strokeWidth='1.5'
 						stroke='currentColor'
-						className={`ml-1 size-4 ${!sortedTypes[fieldName] && 'rotate-180'} ${lastSorted === fieldName && 'text-blue-700'}`}
+						className={`ml-1 size-4 ${sortBy === fieldName && sortType == '1' && 'scale-x-[-1]'} ${sortBy === fieldName && 'text-blue-700'}`}
 					>
 						<path
 							strokeLinecap='round'
@@ -488,7 +515,7 @@ export default function ObjectsView({
 										: ''
 							: currentLang === 'ru'
 								? nameRu
-								: currentLang === 'eng'
+								: currentLang === 'en'
 									? nameEng
 									: ''}
 					</Link>
@@ -829,7 +856,7 @@ export default function ObjectsView({
 									viewBox='0 0 24 24'
 									strokeWidth='1.5'
 									stroke='currentColor'
-									className={`ml-1 size-4 ${!sortedTypes[name] && 'rotate-180'} ${lastSorted === name && 'text-blue-700'}`}
+									className={`ml-1 size-4 ${sortBy === name && sortType == '1' && 'scale-x-[-1]'} ${sortBy === name && 'text-blue-700'}`}
 								>
 									<path
 										strokeLinecap='round'
@@ -896,7 +923,7 @@ export default function ObjectsView({
 									viewBox='0 0 24 24'
 									strokeWidth='1.5'
 									stroke='currentColor'
-									className={`ml-1 size-4 ${!sortedTypes['name'] && 'rotate-180'} ${lastSorted === 'name' && 'text-blue-700'}`}
+									className={`ml-1 size-4 ${sortBy === 'name' && sortType == '1' && 'scale-x-[-1]'} ${sortBy === 'name' && 'text-blue-700'}`}
 								>
 									<path
 										strokeLinecap='round'
@@ -948,7 +975,7 @@ export default function ObjectsView({
 									viewBox='0 0 24 24'
 									strokeWidth='1.5'
 									stroke='currentColor'
-									className={`ml-1 size-4 ${!sortedTypes['name'] && 'rotate-180'} ${lastSorted === 'name' && 'text-blue-700'}`}
+									className={`ml-1 size-4 ${sortBy === 'name' && sortType == '1' && 'scale-x-[-1]'} ${sortBy === 'name' && 'text-blue-700'}`}
 								>
 									<path
 										strokeLinecap='round'
@@ -1004,7 +1031,7 @@ export default function ObjectsView({
 									viewBox='0 0 24 24'
 									strokeWidth='1.5'
 									stroke='currentColor'
-									className={`ml-1 size-4 ${!sortedTypes['email'] && 'rotate-180'} ${lastSorted === 'email' && 'text-blue-700'}`}
+									className={`ml-1 size-4 ${sortBy === 'email' && sortType == '1' && 'scale-x-[-1]'} ${sortBy === 'email' && 'text-blue-700'}`}
 								>
 									<path
 										strokeLinecap='round'
@@ -1035,9 +1062,20 @@ export default function ObjectsView({
 		)
 	}
 
+	const changeFilterName = (e) => {
+		const value = e.target.value
+		setFilterName(value)
+		updateHistory({ 'search': value.length ? [value] : [] })
+	}
+
+	const changePublichStatus = (status) => {
+		setPublichStatus(status)
+		updateHistory({ 'publish': status === 'all' ? [] : [status === 'publish' ? 1 : 0] })
+	}
+
 	return (
 		<div
-			className={`flex flex-col w-fill  ${visibilityControl ? 'space-y-4' : 'space-y-2'}`}
+			className={`flex flex-col w-full  ${visibilityControl ? 'space-y-4' : 'space-y-2'}`}
 		>
 			<div className='w-full relative'>
 				<svg
@@ -1056,7 +1094,7 @@ export default function ObjectsView({
 				</svg>
 				<input
 					value={filterName}
-					onChange={e => setFilterName(e.target.value)}
+					onChange={changeFilterName}
 					type='text'
 					placeholder={
 						objectType === 'users'
@@ -1084,7 +1122,7 @@ export default function ObjectsView({
 						<button
 							className={`min-w-fit max-w-full px-2 mini:px-4 sm:px-5 py-2 font-medium text-zinc-600 transition-colors duration-200
                         ${publishStatus === 'all' ? 'bg-zinc-100' : 'hover:bg-zinc-100 bg-none'}`}
-							onClick={() => setPublichStatus('all')}
+							onClick={() => changePublichStatus('all')}
 						>
 							{t('all')}
 						</button>
@@ -1092,7 +1130,7 @@ export default function ObjectsView({
 						<button
 							className={`min-w-fit w-full px-2 sm:px-5 py-2 font-medium text-zinc-600 transition-colors duration-200 hover:bg-zinc-100
                         ${publishStatus === 'publish' ? 'bg-zinc-100' : 'hover:bg-zinc-100 bg-none'}`}
-							onClick={() => setPublichStatus('publish')}
+							onClick={() => changePublichStatus('publish')}
 						>
 							{t('published')}
 						</button>
@@ -1100,7 +1138,7 @@ export default function ObjectsView({
 						<button
 							className={`min-w-fit w-full px-2 sm:px-5 py-2 font-medium text-zinc-600 transition-colors duration-200 hover:bg-zinc-100
                          ${publishStatus === 'not_publish' ? 'bg-zinc-100' : 'hover:bg-zinc-100 bg-none'}`}
-							onClick={() => setPublichStatus('not_publish')}
+							onClick={() => changePublichStatus('not_publish')}
 						>
 							{t('no_published')}
 						</button>
@@ -1180,16 +1218,7 @@ export default function ObjectsView({
 								<TableHead />
 							)}
 							<tbody className='bg-white divide-y divide-zinc-200'>
-								{currentItems.map(object => {
-									return objectType === 'dictionary'
-										? DictionaryTableRow(object)
-										: objectType === 'authors'
-											? AuthorTableRow(object)
-											: objectType === 'users'
-												? ModeratorTableRow(object)
-												: TableRow(object)
-								})}
-								{!filteredObjects.length && (
+								{!objects.length ? (
 									<tr className='bg-white'>
 										<td className='px-4 py-[18px] text-sm font-medium text-zinc-700 whitespace-nowrap '>
 											{isLoading ? (
@@ -1217,7 +1246,15 @@ export default function ObjectsView({
 										<td className='px-4 py-[18px] text-sm text-zinc-500 whitespace-nowrap'></td>
 										<td className='px-4 py-[18px] text-sm text-zinc-500 whitespace-nowrap'></td>
 									</tr>
-								)}
+								) : currentItems.map(object => {
+									return objectType === 'dictionary'
+										? DictionaryTableRow(object)
+										: objectType === 'authors'
+											? AuthorTableRow(object)
+											: objectType === 'users'
+												? ModeratorTableRow(object)
+												: TableRow(object)
+								})}
 							</tbody>
 						</table>
 					</div>
@@ -1241,11 +1278,13 @@ export default function ObjectsView({
 						</SelectContent>
 					</Select>
 				</div>
-				<Pagination
-					itemsPerPage={PAGINATION_OPTIONS[itemsPerPage]}
-					items={filteredObjects}
+				{!!objects.length && <Pagination
+					itemsPerPage={Number(PAGINATION_OPTIONS[itemsPerPage] ?? 12)}
+					items={objects}
 					updateCurrentItems={setCurrentItems}
-				/>
+					currPage={Number(searchParams.get('page'))}
+					setCurrPage={updateCurrPage}
+				/>}
 			</div>
 		</div>
 	)

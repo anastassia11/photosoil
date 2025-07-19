@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 
 import SoilObject from '@/components/soils/SoilObject'
@@ -14,6 +14,7 @@ import { getTranslation } from '@/i18n/client'
 import useSoil from '@/hooks/data/itemById/useSoil'
 
 export default function SoilPageComponent({ id }) {
+	const searchParams = useSearchParams()
 	const { soil, soilIsLoading } = useSoil(id)
 	const [parser, setParser] = useState()
 
@@ -39,7 +40,7 @@ export default function SoilPageComponent({ id }) {
 				document.title = `${title} | PhotoSOIL`
 			}
 		}
-	}, [currentTransl])
+	}, [currentTransl, searchParams])
 
 	return (
 		<SoilObject

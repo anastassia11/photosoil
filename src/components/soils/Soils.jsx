@@ -15,9 +15,6 @@ import { useConstants } from '@/hooks/useConstants'
 
 import { PAGINATION_OPTIONS } from '@/utils/constants'
 
-import { getEcosystems } from '@/api/ecosystem/get_ecosystems'
-import { getSoils } from '@/api/soil/get_soils'
-
 import Loader from '../Loader'
 import Pagination from '../Pagination'
 import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper'
@@ -31,7 +28,7 @@ import useClassifications from '@/hooks/data/useClassifications'
 import PerPageSelect from '../PerPageSelect'
 import { recoveryItemsPerPage } from '@/utils/common'
 
-export default function Soils({ _soils, isAllSoils, isFilters, type }) {
+export default function Soils({ _soils, isAllSoils, isFilters = false, type }) {
 	const { locale } = useParams()
 	const { t } = getTranslation(locale)
 
@@ -50,7 +47,6 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 
 	const [filterName, setFilterName] = useState('')
 	const [filtersVisible, setFiltersVisible] = useState(true)
-	const [filteredSoils, setFilteredSoils] = useState([])
 
 	const [currentItems, setCurrentItems] = useState([])
 
@@ -62,10 +58,10 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 	})
 
 	const [draftIsVisible, setDraftIsVisible] = useState(false)
-	const [token, setToken] = useState(null)
 
 	const { SOIL_ENUM2 } = useConstants()
 	const SOIL_ENUM_REF = useRef(SOIL_ENUM2)
+	const isChild = !isFilters
 
 	const CATEGORY_ARRAY = useMemo(() => {
 		return Object.entries(SOIL_ENUM_REF.current).map(([key, value]) => ({
@@ -74,8 +70,6 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 		}))
 	}, [SOIL_ENUM_REF, locale])
 
-	const _isEng = locale === 'en'
-
 	const isSoils =
 		type === 'soils' ||
 		type === 'profiles' ||
@@ -83,157 +77,171 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 		type === 'dynamics'
 
 	useEffect(() => {
-		const value = recoveryItemsPerPage({ isChild: !isFilters, key: type, pathname })
+		const value = recoveryItemsPerPage({ isChild, key: type, pathname })
 		setItemsPerPage(value)
 	}, [isFilters, type, pathname])
 
 	useEffect(() => {
 		let timeoutId
 		setFiltersVisible(window.innerWidth > 640 || type === 'ecosystem')
-		setToken(JSON.parse(localStorage.getItem('tokenData'))?.token)
+
 		if (_soils) {
 			setSoils(_soils)
 			setIsLoading(prev => ({ ...prev, items: false }))
-		} else fetchItems()
+		}
 
-		if (didLogRef.current && isFilters) {
+		if (didLogRef.current) {
 			timeoutId = setTimeout(() => {
-				didLogRef.current = false
-				const categoriesParam = searchParams.get('categories')
-				const termsParam = searchParams.get('terms')
 				const authorsParam = searchParams.get('authors')
+				const draftIsVisible = searchParams.get(isChild ? `${type}_draft` : 'draft')
+				const filterName = searchParams.get(isChild ? `${type}_search` : 'search')
 
-				categoriesParam &&
-					categoriesParam
-						.split(',')
-						.forEach(param => handleAddCategory(Number(param)))
-				termsParam &&
-					termsParam.split(',').forEach(param => handleAddTerm(Number(param)))
-				authorsParam &&
-					authorsParam
-						.split(',')
-						.forEach(param => handleAddAuthor(Number(param)))
+				if (authorsParam) {
+					filtersStore.selectedAuthors = authorsParam.split(',').map(Number)
+				}
+				if (draftIsVisible) {
+					setDraftIsVisible(draftIsVisible === '1')
+				}
+				if (filterName) {
+					setFilterName(filterName)
+				}
+
+				if (isSoils) {
+					const categoriesParam = searchParams.get('categories')
+					const termsParam = searchParams.get('terms')
+					if (categoriesParam) {
+						filtersStore.selectedCategories = categoriesParam.split(',').map(Number)
+					}
+					if (termsParam) {
+						filtersStore.selectedTerms = termsParam.split(',').map(Number)
+					}
+				}
+				didLogRef.current = false
 			}, 300)
 		}
 		return () => clearTimeout(timeoutId)
-	}, [])
+	}, [_soils])
 
-	useEffect(() => {
-		const _filterName = filterName.toLowerCase().trim()
-		soils?.length &&
-			setFilteredSoils(
-				soils
-					.filter(
-						soil =>
-							(draftIsVisible
-								? true
-								: soil.translations?.find(transl => transl.isEnglish === _isEng)
-									?.isVisible) &&
-							(soil.translations
-								?.find(transl => transl.isEnglish === _isEng)
-								?.name.toLowerCase()
-								.includes(_filterName) ||
-								soil.translations
-									?.find(transl => transl.isEnglish === _isEng)
-									?.code?.toLowerCase()
-									.includes(_filterName)) &&
-							(selectedCategories.length === 0 ||
-								selectedCategories.includes(soil.objectType)) &&
-							(selectedAuthors.length === 0 ||
-								selectedAuthors.some(selectedAuthor =>
-									soil.authors?.some(author => author === selectedAuthor)
-								)) &&
-							(selectedTerms.length === 0 ||
-								selectedTerms.some(selectedTerm =>
-									soil.terms.some(term => term === selectedTerm)
-								))
-					)
-					.sort((a, b) => {
-						return b.createdDate - a.createdDate
-					})
-			)
-	}, [
-		filterName,
-		selectedCategories,
-		selectedTerms,
-		selectedAuthors,
-		soils,
-		draftIsVisible
-	])
-
-	useEffect(() => {
-		isFilters && !didLogRef.current && updateFiltersInHistory()
-	}, [selectedCategories, selectedTerms, selectedAuthors])
-
-
-	const fetchItems = async () => {
-		const result =
-			type === 'ecosystems' ? await getEcosystems() : await getSoils()
-		if (result.success) {
-			const data = result.data
-			const items =
-				type === 'profiles'
-					? data.filter(soil => soil.objectType === 1)
-					: type === 'dynamics'
-						? data.filter(soil => soil.objectType === 0)
-						: type === 'morphological'
-							? data.filter(soil => soil.objectType === 2)
-							: data
-			setSoils(items)
-		}
-		setIsLoading(prev => ({ ...prev, items: false }))
-	}
-
-	const updateFiltersInHistory = () => {
+	const updateHistory = useCallback((key, updatedArray) => {
 		const params = new URLSearchParams(searchParams.toString())
-
-		if (selectedCategories.length > 0) {
-			params.set('categories', selectedCategories.join(','))
+		if (updatedArray.length > 0) {
+			params.set(key, updatedArray.join(','))
 		} else {
-			params.delete('categories')
+			params.delete(key)
 		}
+		router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+	}, [pathname, router, searchParams])
 
-		if (selectedTerms.length > 0) {
-			params.set('terms', selectedTerms.join(','))
-		} else {
-			params.delete('terms')
-		}
+	const updateDraftIsVisible = () => {
+		const _visible = !draftIsVisible
+		setDraftIsVisible(_visible)
 
-		if (selectedAuthors.length > 0) {
-			params.set('authors', selectedAuthors.join(','))
-		} else {
-			params.delete('authors')
-		}
-
-		router.replace(pathname + '?' + params.toString())
+		updateHistory(isChild ? `${type}_draft` : 'draft', _visible ? ['1'] : [])
 	}
 
 	const handleAddCategory = useCallback(
 		newItem => {
-			filtersStore.selectedCategories = filtersStore.selectedCategories.includes(newItem)
+			const updatedArray = filtersStore.selectedCategories.includes(newItem)
 				? filtersStore.selectedCategories.filter(item => item !== newItem)
 				: [...filtersStore.selectedCategories, newItem]
+			filtersStore.selectedCategories = updatedArray
+			updateHistory('category', updatedArray)
 		},
-		[]
+		[updateHistory]
+	)
+
+	const handleResetCategory = useCallback(
+		items => {
+			const updatedArray = filtersStore.selectedCategories.filter(
+				term => !items.includes(term)
+			)
+			filtersStore.selectedCategories = updatedArray
+			updateHistory('category', updatedArray)
+		},
+		[updateHistory]
+	)
+
+	const handleAllCategory = useCallback(
+		() => {
+			const updatedArray = CATEGORY_ARRAY.map(({ id }) => id)
+			filtersStore.selectedCategories = updatedArray
+			updateHistory('category', updatedArray)
+		},
+		[updateHistory, CATEGORY_ARRAY]
 	)
 
 	const handleAddTerm = useCallback(
 		newItem => {
-			filtersStore.selectedTerms = filtersStore.selectedTerms.includes(newItem)
+			const updatedArray = filtersStore.selectedTerms.includes(newItem)
 				? filtersStore.selectedTerms.filter(item => item !== newItem)
 				: [...filtersStore.selectedTerms, newItem]
+			filtersStore.selectedTerms = updatedArray
+			updateHistory('terms', updatedArray)
 		},
-		[]
+		[updateHistory]
+	)
+
+	const handleResetTerm = useCallback(
+		items => {
+			const updatedArray = filtersStore.selectedTerms.filter(
+				term => !items.includes(term)
+			)
+			filtersStore.selectedTerms = updatedArray
+			updateHistory('terms', updatedArray)
+		},
+		[updateHistory]
+	)
+
+	const handleAllTerm = useCallback(
+		terms => {
+			const updatedArray = [...filtersStore.selectedTerms, ...terms.map(({ id }) => id).filter(id => !filtersStore.selectedTerms?.includes(id))]
+			filtersStore.selectedTerms = updatedArray
+			updateHistory('terms', updatedArray)
+		},
+		[updateHistory]
 	)
 
 	const handleAddAuthor = useCallback(
 		newItem => {
-			filtersStore.selectedAuthors = filtersStore.selectedAuthors.includes(newItem)
+			const updatedArray = filtersStore.selectedAuthors.includes(newItem)
 				? filtersStore.selectedAuthors.filter(item => item !== newItem)
 				: [...filtersStore.selectedAuthors, newItem]
+			filtersStore.selectedAuthors = updatedArray
+			updateHistory('authors', updatedArray)
 		},
-		[]
+		[updateHistory]
 	)
+
+	const handleResetAuthor = useCallback(
+		items => {
+			const updatedArray = filtersStore.selectedAuthors.filter(
+				term => !items.includes(term)
+			)
+
+			filtersStore.selectedAuthors = updatedArray
+			updateHistory('authors', updatedArray)
+		},
+		[updateHistory]
+	)
+
+	const handleAllAuthor = useCallback(
+		() => {
+			const updatedArray = authors.map(({ id }) => id)
+			filtersStore.selectedAuthors = updatedArray
+			updateHistory('authors', updatedArray)
+		},
+		[authors, updateHistory]
+	)
+
+	const changeFilterName = (e) => {
+		const value = e.target.value
+		setFilterName(value)
+		updateHistory(isChild ? `${type}_search` : 'search', value.length ? [value] : [])
+	}
+
+	const updateCurrPage = (currPage) => {
+		updateHistory(isChild ? `${type}_page` : 'page', currPage ? [currPage] : [])
+	}
 
 	return (
 		<div className='flex flex-col'>
@@ -255,7 +263,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 					</svg>
 					<input
 						value={filterName}
-						onChange={e => setFilterName(e.target.value)}
+						onChange={changeFilterName}
 						type='text'
 						placeholder={`${isSoils || type === 'ecosystems'
 							? t('search_code')
@@ -280,7 +288,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 				)}
 				<PerPageSelect itemsPerPage={itemsPerPage}
 					setItemsPerPage={setItemsPerPage}
-					isChild={!isFilters}
+					isChild={isChild}
 					type={type}
 				/>
 			</div>
@@ -301,7 +309,6 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 									<li key={'authors'}>
 										<Filter
 											locale={locale}
-											// dropdown={dropdown}
 											itemId={`author`}
 											name={t('authors')}
 											items={authors}
@@ -309,14 +316,8 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 											selectedItems={authors.map(({ id }) => id)
 												.filter(id => selectedAuthors?.includes(id))}
 											addItem={handleAddAuthor}
-											resetItems={items => {
-												filtersStore.selectedAuthors = selectedAuthors.filter(
-													term => !items.includes(term)
-												)
-											}}
-											selectAll={() =>
-												(filtersStore.selectedAuthors = [...selectedAuthors, ...authors.map(({ id }) => id).filter(id => !selectedAuthors?.includes(id))])
-											}
+											resetItems={handleResetAuthor}
+											selectAll={handleAllAuthor}
 										/>
 									</li>
 								</MotionWrapper>
@@ -325,7 +326,6 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 										<MotionWrapper>
 											<Filter
 												locale={locale}
-												// dropdown={dropdown}
 												name={t('category')}
 												itemId='category'
 												items={CATEGORY_ARRAY}
@@ -334,15 +334,8 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 												).filter(id => selectedCategories?.includes(id))}
 												type='category'
 												addItem={handleAddCategory}
-												resetItems={items => {
-													filtersStore.selectedCategories =
-														selectedCategories.filter(
-															term => !items.includes(term)
-														)
-												}}
-												selectAll={() =>
-													(filtersStore.selectedCategories = [...selectedCategories, ...CATEGORY_ARRAY.map(({ id }) => id).filter(id => !selectedCategories?.includes(id))])
-												}
+												resetItems={handleResetCategory}
+												selectAll={handleAllCategory}
 											/>
 										</MotionWrapper>
 									</li>
@@ -360,7 +353,6 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 												<MotionWrapper>
 													<Filter
 														locale={locale}
-														// dropdown={dropdown}
 														itemId={item.id}
 														type='classif'
 														name={isEnglish ? item.nameEng : item.nameRu}
@@ -370,14 +362,8 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 															.map(({ id }) => id)
 															.filter(id => selectedTerms?.includes(id))}
 														addItem={handleAddTerm}
-														resetItems={items => {
-															filtersStore.selectedTerms = selectedTerms.filter(
-																term => !items.includes(term)
-															)
-														}}
-														selectAll={() =>
-															(filtersStore.selectedTerms = [...selectedTerms, ...item.terms.map(({ id }) => id).filter(id => !selectedTerms?.includes(id))])
-														}
+														resetItems={handleResetTerm}
+														selectAll={() => handleAllTerm(item.terms)}
 													/>
 												</MotionWrapper>
 											</li>
@@ -393,7 +379,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 			)}
 
 			<MotionWrapper className='my-4 pl-0.5'>
-				<DraftSwitcher draftIsVisible={draftIsVisible} setDraftIsVisible={setDraftIsVisible} label={t('grafts_visible')}
+				<DraftSwitcher draftIsVisible={draftIsVisible} setDraftIsVisible={updateDraftIsVisible} label={t('grafts_visible')}
 					type={type} />
 			</MotionWrapper>
 
@@ -408,7 +394,7 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 						))
 				) : (
 					<>
-						{soils.length && filteredSoils.length ? (
+						{soils.length ? (
 							currentItems.map(
 								({ id, photo, translations, dataRu, dataEng }) => (
 									<li key={id}>
@@ -421,12 +407,13 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 												name={
 													translations?.find(
 														({ isEnglish }) => isEnglish === (locale === 'en')
-													)?.name ||
-													(locale === 'en'
-														? dataEng.name
-														: locale === 'ru'
-															? dataRu.name
-															: '')
+													)?.name
+													// ||
+													// (locale === 'en'
+													// 	? dataEng.name
+													// 	: locale === 'ru'
+													// 		? dataRu.name
+													// 		: '')
 												}
 											/>
 										</MotionWrapper>
@@ -443,11 +430,13 @@ export default function Soils({ _soils, isAllSoils, isFilters, type }) {
 					</>
 				)}
 			</ul>
-			<Pagination
-				itemsPerPage={PAGINATION_OPTIONS[itemsPerPage] ?? 12}
-				items={filteredSoils}
+			{!!soils.length && <Pagination
+				itemsPerPage={Number(PAGINATION_OPTIONS[itemsPerPage] ?? 12)}
+				items={soils}
 				updateCurrentItems={setCurrentItems}
-			/>
+				currPage={Number(searchParams.get(isChild ? `${type}_page` : 'page'))}
+				setCurrPage={updateCurrPage}
+			/>}
 		</div>
 	)
 }

@@ -1,14 +1,12 @@
 'use client'
 
 import Link from 'next/link'
-import { useParams, usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useConstants } from '@/hooks/useConstants'
 
 import { PAGINATION_OPTIONS } from '@/utils/constants'
-
-import { getPublications } from '@/api/publication/get_publications'
 
 import Loader from './Loader'
 import Pagination from './Pagination'
@@ -19,15 +17,18 @@ import PerPageSelect from './PerPageSelect'
 import { recoveryItemsPerPage } from '@/utils/common'
 
 export default function Publications({ _publications, isChild = false }) {
+	const searchParams = useSearchParams()
+	const pathname = usePathname()
+	const router = useRouter()
+
+	const didLogRef = useRef(true)
+
 	const [filterName, setFilterName] = useState('')
 	const [publications, setPublications] = useState([])
-	const pathname = usePathname()
-	const [filteredPublications, setFilteredPublications] = useState([])
 	const [currentItems, setCurrentItems] = useState([])
 	const [itemsPerPage, setItemsPerPage] = useState()
 
 	const [draftIsVisible, setDraftIsVisible] = useState(false)
-	const [token, setToken] = useState(false)
 	const [isLoading, setIsLoading] = useState(true)
 
 	const { locale } = useParams()
@@ -43,42 +44,53 @@ export default function Publications({ _publications, isChild = false }) {
 	}, [isChild, pathname])
 
 	useEffect(() => {
-		localStorage.getItem('tokenData') &&
-			setToken(JSON.parse(localStorage.getItem('tokenData'))?.token)
+		let timeoutId
+
 		if (_publications) {
 			setPublications(_publications)
 			setIsLoading(false)
-		} else fetchPublications()
-	}, [])
-
-	useEffect(() => {
-		const _filterName = filterName.toLowerCase().trim()
-		setFilteredPublications(prev =>
-			publications
-				.filter(
-					publication =>
-						(draftIsVisible
-							? true
-							: publication.translations?.find(
-								transl => transl.isEnglish === _isEng
-							)?.isVisible) &&
-						publication.translations
-							?.find(transl => transl.isEnglish === _isEng)
-							?.name.toLowerCase()
-							.includes(_filterName)
-				)
-				.sort((a, b) => {
-					return b.createdDate - a.createdDate
-				})
-		)
-	}, [filterName, publications, draftIsVisible])
-
-	const fetchPublications = async () => {
-		const result = await getPublications()
-		if (result.success) {
-			setPublications(result.data)
 		}
-		setIsLoading(false)
+		if (didLogRef.current) {
+			timeoutId = setTimeout(() => {
+				const draftIsVisible = searchParams.get(isChild ? `publications_draft` : 'draft')
+				const filterName = searchParams.get(isChild ? `publications_search` : 'search')
+
+				if (draftIsVisible) {
+					setDraftIsVisible(draftIsVisible === '1')
+				}
+				if (filterName) {
+					setFilterName(filterName)
+				}
+				didLogRef.current = false
+			}, 300)
+		}
+		return () => clearTimeout(timeoutId)
+	}, [_publications])
+
+	const updateHistory = useCallback((key, updatedArray) => {
+		const params = new URLSearchParams(searchParams.toString())
+		if (updatedArray.length > 0) {
+			params.set(key, updatedArray.join(','))
+		} else {
+			params.delete(key)
+		}
+		router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+	}, [pathname, router, searchParams])
+
+	const updateDraftIsVisible = () => {
+		const _visible = !draftIsVisible
+		setDraftIsVisible(_visible)
+		updateHistory(isChild ? 'publications_draft' : 'draft', _visible ? ['1'] : [])
+	}
+
+	const changeFilterName = (e) => {
+		const value = e.target.value
+		setFilterName(value)
+		updateHistory(isChild ? 'publications_search' : 'search', value.length ? [value] : [])
+	}
+
+	const updateCurrPage = (currPage) => {
+		updateHistory(isChild ? `publications_page` : 'page', currPage ? [currPage] : [])
 	}
 
 	return (
@@ -101,7 +113,7 @@ export default function Publications({ _publications, isChild = false }) {
 					</svg>
 					<input
 						value={filterName}
-						onChange={e => setFilterName(e.target.value)}
+						onChange={changeFilterName}
 						type='text'
 						placeholder={t('search_title')}
 						className='w-full py-2 pl-12 pr-4 border rounded-md outline-none bg-white focus:border-blue-600'
@@ -113,7 +125,7 @@ export default function Publications({ _publications, isChild = false }) {
 			</div>
 
 			<MotionWrapper className='my-4 pl-0.5'>
-				<DraftSwitcher draftIsVisible={draftIsVisible} setDraftIsVisible={setDraftIsVisible} label={t('grafts_visible')}
+				<DraftSwitcher draftIsVisible={draftIsVisible} setDraftIsVisible={updateDraftIsVisible} label={t('grafts_visible')}
 					type='publications' />
 			</MotionWrapper>
 
@@ -131,7 +143,7 @@ export default function Publications({ _publications, isChild = false }) {
 										<Loader className='w-full h-[140px] mb-4 ' />
 									</li>
 								))
-						) : publications.length && filteredPublications.length ? (
+						) : publications.length ? (
 							currentItems.map((item, idx) => (
 								<li
 									key={idx}
@@ -188,11 +200,13 @@ export default function Publications({ _publications, isChild = false }) {
 					</ul>
 				</div>
 			</section>
-			<Pagination
-				itemsPerPage={PAGINATION_OPTIONS[itemsPerPage] ?? 12}
-				items={filteredPublications}
+			{!!publications.length && <Pagination
+				itemsPerPage={Number(PAGINATION_OPTIONS[itemsPerPage] ?? 12)}
+				items={publications}
 				updateCurrentItems={setCurrentItems}
-			/>
+				currPage={Number(searchParams.get(isChild ? `publications_page` : 'page'))}
+				setCurrPage={updateCurrPage}
+			/>}
 		</div>
 	)
 }

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import ObjectsView from '@/components/admin-panel/ObjectsView'
@@ -10,46 +10,18 @@ import ObjectsView from '@/components/admin-panel/ObjectsView'
 import { closeModal, openModal } from '@/store/slices/modalSlice'
 import modalThunkActions from '@/store/thunks/modalThunk'
 
-import { deleteNewsById } from '@/api/news/delete_news'
-import { getNewsForAdmin } from '@/api/news/get_news_forAdmin'
-import { putNewsVisible } from '@/api/news/put_newsVisible'
-
 import { getTranslation } from '@/i18n/client'
+import useAdminNews from '@/hooks/data/forAdmin/useAdminNews'
 
 export default function NewsAdminComponent() {
 	const dispatch = useDispatch()
-	const [news, setNews] = useState([])
-	const [isLoading, setIsLoading] = useState(true)
+	const { news, newsIsLoading,
+		deleteNews,
+		visibleChange,
+	} = useAdminNews()
 	const { locale } = useParams()
 	const { t } = getTranslation(locale)
-
-	useEffect(() => {
-		fetchNews()
-	}, [])
-
-	const fetchNews = async () => {
-		const result = await getNewsForAdmin()
-		if (result.success) {
-			setNews(result.data)
-			setIsLoading(false)
-		}
-	}
-
-	const fetchDeleteNews = async id => {
-		const result = await deleteNewsById(id)
-		if (result.success) {
-			setNews(prevNews => prevNews.filter(news => news.id !== id))
-		}
-	}
-
-	const fetchVisibleChange = async (id, data) => {
-		const result = await putNewsVisible(id, data)
-		if (result.success) {
-			setNews(prevNews =>
-				prevNews.map(news => (news.id === id ? { ...news, ...data } : news))
-			)
-		}
-	}
+	const [selectedObjects, setSelectedObjects] = useState([])
 
 	const handleDeleteClick = async ({ id, isMulti }) => {
 		dispatch(
@@ -63,7 +35,8 @@ export default function NewsAdminComponent() {
 
 		const isConfirm = await dispatch(modalThunkActions.open())
 		if (isConfirm.payload) {
-			await fetchDeleteNews(id)
+			deleteNews(id)
+			setSelectedObjects([])
 		}
 		dispatch(closeModal())
 	}
@@ -85,7 +58,8 @@ export default function NewsAdminComponent() {
 
 		const isConfirm = await dispatch(modalThunkActions.open())
 		if (isConfirm.payload) {
-			await fetchVisibleChange(id, { isVisible })
+			visibleChange({ id, isVisible })
+			setSelectedObjects([])
 		}
 		dispatch(closeModal())
 	}
@@ -104,14 +78,15 @@ export default function NewsAdminComponent() {
 				</Link>
 			</div>
 			<ObjectsView
-				_objects={news}
+				objects={news}
 				onDeleteClick={handleDeleteClick}
 				objectType='news'
-				pathname=''
 				visibilityControl={true}
 				languageChanger={true}
 				onVisibleChange={handleVisibleClick}
-				isLoading={isLoading}
+				isLoading={newsIsLoading}
+				selectedObjects={selectedObjects}
+				setSelectedObjects={setSelectedObjects}
 			/>
 		</div>
 	)

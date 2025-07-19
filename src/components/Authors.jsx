@@ -2,8 +2,8 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useParams, usePathname } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 import { BASE_SERVER_URL, PAGINATION_OPTIONS } from '@/utils/constants'
 
@@ -18,11 +18,16 @@ import { recoveryItemsPerPage } from '@/utils/common'
 export default function Authors() {
 	const { locale } = useParams()
 	const pathname = usePathname()
+	const router = useRouter()
+
+	const didLogRef = useRef(true)
+
+	const searchParams = useSearchParams()
+
 	const { t } = getTranslation(locale)
 	const { authors, authorsIsLoading } = useAuthors()
 
 	const [filterName, setFilterName] = useState('')
-	const [filteredAuthors, setFilteredAuthors] = useState([])
 
 	const [currentItems, setCurrentItems] = useState([])
 	const [itemsPerPage, setItemsPerPage] = useState()
@@ -35,23 +40,35 @@ export default function Authors() {
 	}, [pathname])
 
 	useEffect(() => {
-		const _filterName = filterName.toLowerCase().trim()
-		if (authors) {
-			setFilteredAuthors(prev =>
-				authors
-					.filter(author =>
-						locale === 'en'
-							? author.dataEng?.name.toLowerCase().includes(_filterName)
-							: author.dataRu?.name.toLowerCase().includes(_filterName)
-					)
-					.sort((a, b) => a.rank - b.rank)
-					.sort((a, b) => {
-						return a.authorType - b.authorType
-					})
-			)
-		}
+		let timeoutId
 
-	}, [filterName, authors])
+		if (didLogRef.current) {
+			timeoutId = setTimeout(() => {
+				const filterName = searchParams.get('search')
+
+				if (filterName) {
+					setFilterName(filterName)
+				}
+				didLogRef.current = false
+			}, 300)
+		}
+		return () => clearTimeout(timeoutId)
+	}, [])
+
+	const updateHistory = useCallback((key, updatedArray) => {
+		const params = new URLSearchParams(searchParams.toString())
+
+		if (updatedArray.length > 0) {
+			params.set(key, updatedArray.join(','))
+		} else {
+			params.delete(key)
+		}
+		router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+	}, [pathname, router, searchParams])
+
+	const updateCurrPage = (currPage) => {
+		updateHistory('page', currPage ? [currPage] : [])
+	}
 
 	const AuthorCard = ({ photo, dataEng, dataRu, authorType, id }) => {
 		return (
@@ -128,7 +145,10 @@ export default function Authors() {
 					</svg>
 					<input
 						value={filterName}
-						onChange={e => setFilterName(e.target.value)}
+						onChange={e => {
+							setFilterName(e.target.value)
+							updateHistory('search', e.target.value.length ? [e.target.value] : [])
+						}}
 						type='text'
 						placeholder={t('search_name')}
 						className='w-full py-2 pl-12 pr-4 border rounded-md outline-none bg-white focus:border-blue-600'
@@ -148,7 +168,7 @@ export default function Authors() {
 								<Loader className='w-full h-full aspect-[2/3]' />
 							</li>
 						))
-				) : authors.length && filteredAuthors.length ? (
+				) : authors.length ? (
 					currentItems.map(author => (
 						<li key={author.id}>
 							<MotionWrapper>{AuthorCard({ ...author })}</MotionWrapper>
@@ -162,11 +182,13 @@ export default function Authors() {
 					</MotionWrapper>
 				)}
 			</ul>
-			<Pagination
-				itemsPerPage={PAGINATION_OPTIONS[itemsPerPage] ?? 12}
-				items={filteredAuthors}
+			{!!authors.length && <Pagination
+				itemsPerPage={Number(PAGINATION_OPTIONS[itemsPerPage] ?? 12)}
+				items={authors}
 				updateCurrentItems={setCurrentItems}
-			/>
+				currPage={Number(searchParams.get('page'))}
+				setCurrPage={updateCurrPage}
+			/>}
 		</div>
 	)
 }

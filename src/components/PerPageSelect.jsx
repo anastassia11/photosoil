@@ -11,7 +11,7 @@ export default function PerPageSelect({ itemsPerPage, setItemsPerPage, isChild =
     const pathname = usePathname()
 
     useEffect(() => {
-        if (!itemsPerPage) return
+        if (itemsPerPage == undefined || itemsPerPage == null) return
         const defaultData = JSON.parse(localStorage.getItem('itemsPerPage')) ?? PAGINATION_DATA
         if (!isChild) {
             localStorage.setItem('itemsPerPage', JSON.stringify({ ...defaultData, [type]: { ...defaultData[type], num: itemsPerPage } }))

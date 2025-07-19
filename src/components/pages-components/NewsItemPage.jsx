@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import NewGallery from '@/components/soils/NewGallery'
@@ -15,6 +15,7 @@ import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper'
 import Loader from '../Loader'
 
 export default function NewsItemPageComponent({ id }) {
+	const searchParams = useSearchParams()
 	const { news, newsIsLoading } = useNewsItem(id)
 
 	const [tokenData, setTokenData] = useState({})
@@ -46,7 +47,7 @@ export default function NewsItemPageComponent({ id }) {
 			}
 			setParser(new DOMParser())
 		}
-	}, [currentTransl])
+	}, [currentTransl, searchParams])
 
 	const handleScrollToSection = sectionId => {
 		const section = document.getElementById(sectionId)

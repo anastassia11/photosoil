@@ -5,6 +5,7 @@ import { BASE_SERVER_URL } from '@/utils/constants'
 import tokenVerification from '../account/token_verification'
 
 export async function putEcosystemVisible(id, data) {
+	console.log(id, data)
 	await tokenVerification({ isRequired: true })
 	const formData = new FormData()
 	for (let key in data) {

@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import ObjectsView from '@/components/admin-panel/ObjectsView'
@@ -10,36 +9,18 @@ import ObjectsView from '@/components/admin-panel/ObjectsView'
 import { openModal } from '@/store/slices/modalSlice'
 import modalThunkActions from '@/store/thunks/modalThunk'
 
-import { deleteAuthor } from '@/api/author/delete_author'
-import { getAuthorsForAdmin } from '@/api/author/get_authors_forAdmin'
-
 import { getTranslation } from '@/i18n/client'
+import useAdminAuthors from '@/hooks/data/forAdmin/useAdminAuthors'
+import { useState } from 'react'
 
 export default function AuthorsAdminPageComponent() {
 	const dispatch = useDispatch()
-	const [authors, setAuthors] = useState([])
-	const [isLoading, setIsLoading] = useState(true)
+	const { authors, authorsIsLoading,
+		fetchDeleteAuthor } = useAdminAuthors()
+
 	const { locale } = useParams()
 	const { t } = getTranslation(locale)
-
-	useEffect(() => {
-		fetchAuthors()
-	}, [])
-
-	const fetchAuthors = async () => {
-		const result = await getAuthorsForAdmin()
-		if (result.success) {
-			setAuthors(result.data)
-			setIsLoading(false)
-		}
-	}
-
-	const fetchDeleteAuthor = async id => {
-		const result = await deleteAuthor(id)
-		if (result.success) {
-			setAuthors(prevAuthors => prevAuthors.filter(author => author.id !== id))
-		}
-	}
+	const [selectedObjects, setSelectedObjects] = useState([])
 
 	const handleDeleteClick = async ({ id, isMulti }) => {
 		dispatch(
@@ -53,7 +34,8 @@ export default function AuthorsAdminPageComponent() {
 
 		const isConfirm = await dispatch(modalThunkActions.open())
 		if (isConfirm.payload) {
-			await fetchDeleteAuthor(id)
+			fetchDeleteAuthor(id)
+			setSelectedObjects([])
 		}
 	}
 
@@ -73,13 +55,14 @@ export default function AuthorsAdminPageComponent() {
 				</Link>
 			</div>
 			<ObjectsView
-				_objects={authors}
+				objects={authors}
 				onDeleteClick={handleDeleteClick}
 				objectType='authors'
-				pathname=''
 				visibilityControl={false}
 				languageChanger={false}
-				isLoading={isLoading}
+				isLoading={authorsIsLoading}
+				selectedObjects={selectedObjects}
+				setSelectedObjects={setSelectedObjects}
 			/>
 		</div>
 	)

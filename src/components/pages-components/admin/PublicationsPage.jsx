@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import ObjectsView from '@/components/admin-panel/ObjectsView'
@@ -10,50 +10,17 @@ import ObjectsView from '@/components/admin-panel/ObjectsView'
 import { closeModal, openModal } from '@/store/slices/modalSlice'
 import modalThunkActions from '@/store/thunks/modalThunk'
 
-import { deletePublicationById } from '@/api/publication/delete_publication'
-import { getPublicationsForAdmin } from '@/api/publication/get_publications_forAdmin'
-import { putPublicationVisible } from '@/api/publication/put_publicationVisible'
-
 import { getTranslation } from '@/i18n/client'
+import useAdminPubl from '@/hooks/data/forAdmin/useAdminPubl'
 
 export default function PublicationsAdminComponent() {
 	const dispatch = useDispatch()
-	const [publications, setPublications] = useState([])
-	const [isLoading, setIsLoading] = useState(true)
+	const { publications, publicationsIsLoading,
+		deletePubl, visibleChange
+	} = useAdminPubl()
 	const { locale } = useParams()
 	const { t } = getTranslation(locale)
-
-	useEffect(() => {
-		fetchPublications()
-	}, [])
-
-	const fetchPublications = async () => {
-		const result = await getPublicationsForAdmin()
-		if (result.success) {
-			setPublications(result.data)
-			setIsLoading(false)
-		}
-	}
-
-	const fetchDeletePublication = async id => {
-		const result = await deletePublicationById(id)
-		if (result.success) {
-			setPublications(prevPublications =>
-				prevPublications.filter(publication => publication.id !== id)
-			)
-		}
-	}
-
-	const fetchVisibleChange = async (id, data) => {
-		const result = await putPublicationVisible(id, data)
-		if (result.success) {
-			setPublications(prevPublications =>
-				prevPublications.map(publication =>
-					publication.id === id ? { ...publication, ...data } : publication
-				)
-			)
-		}
-	}
+	const [selectedObjects, setSelectedObjects] = useState([])
 
 	const handleDeleteClick = async ({ id, isMulti }) => {
 		dispatch(
@@ -67,7 +34,8 @@ export default function PublicationsAdminComponent() {
 
 		const isConfirm = await dispatch(modalThunkActions.open())
 		if (isConfirm.payload) {
-			await fetchDeletePublication(id)
+			deletePubl(id)
+			setSelectedObjects([])
 		}
 		dispatch(closeModal())
 	}
@@ -89,7 +57,8 @@ export default function PublicationsAdminComponent() {
 
 		const isConfirm = await dispatch(modalThunkActions.open())
 		if (isConfirm.payload) {
-			await fetchVisibleChange(id, { isVisible })
+			visibleChange({ id, isVisible })
+			setSelectedObjects([])
 		}
 		dispatch(closeModal())
 	}
@@ -110,14 +79,15 @@ export default function PublicationsAdminComponent() {
 				</Link>
 			</div>
 			<ObjectsView
-				_objects={publications}
+				objects={publications}
 				onDeleteClick={handleDeleteClick}
 				objectType='publications'
-				pathname=''
 				visibilityControl={true}
 				languageChanger={true}
+				isLoading={publicationsIsLoading}
 				onVisibleChange={handleVisibleChange}
-				isLoading={isLoading}
+				selectedObjects={selectedObjects}
+				setSelectedObjects={setSelectedObjects}
 			/>
 		</div>
 	)

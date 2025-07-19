@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import SoilObject from '@/components/soils/SoilObject'
@@ -12,6 +12,7 @@ import { getTranslation } from '@/i18n/client'
 import useEcosystem from '@/hooks/data/itemById/useEcosystem'
 
 export default function EcosystemPageComponent({ id }) {
+	const searchParams = useSearchParams()
 	const { ecosystem, ecosystemIsLoading } = useEcosystem(id)
 	const [parser, setParser] = useState()
 
@@ -38,7 +39,7 @@ export default function EcosystemPageComponent({ id }) {
 				document.title = `${title} | PhotoSOIL`
 			}
 		}
-	}, [currentTransl])
+	}, [currentTransl, searchParams])
 
 	return (
 		<SoilObject

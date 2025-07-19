@@ -7,7 +7,7 @@ import {
 	useRouter,
 	useSearchParams
 } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useSnapshot } from 'valtio'
 
@@ -33,10 +33,8 @@ export default function NewsPageComponent() {
 		tags, tagsIsLoading } = useNews()
 
 	const [filterName, setFilterName] = useState('')
-	const [filteredNews, setFilteredNews] = useState([])
 	const [currentItems, setCurrentItems] = useState([])
 
-	const [token, setToken] = useState(false)
 	const [draftIsVisible, setDraftIsVisible] = useState(false)
 	const [itemsPerPage, setItemsPerPage] = useState()
 
@@ -56,41 +54,21 @@ export default function NewsPageComponent() {
 		setItemsPerPage(value)
 	}, [pathname])
 
-	const _filteredNews = useMemo(() => {
-		const _filterName = filterName.toLowerCase().trim()
-		if (!news) return []
-		return news
-			.filter(
-				item =>
-					(draftIsVisible
-						? true
-						: item.translations?.find(transl => transl.isEnglish === _isEng)
-							?.isVisible) &&
-					item.translations
-						?.find(transl => transl.isEnglish === _isEng)
-						?.title.toLowerCase()
-						.includes(_filterName) &&
-					(selectedTags.length === 0 ||
-						selectedTags.some(selectedTag =>
-							item.tags.some(({ id }) => id === selectedTag)
-						))
-			)
-			.sort((a, b) => {
-				return b.createdDate - a.createdDate
-			})
-	}, [filterName, news, draftIsVisible, selectedTags])
-
 	useEffect(() => {
 		let timeoutId
 
-		localStorage.getItem('tokenData') &&
-			setToken(JSON.parse(localStorage.getItem('tokenData'))?.token)
 		if (didLogRef.current) {
 			timeoutId = setTimeout(() => {
-				didLogRef.current = false
 				const tagsParam = searchParams.get('tags')
-				tagsParam &&
-					tagsParam.split(',').forEach(param => handleAddTag(Number(param)))
+				const filterName = searchParams.get('search')
+
+				if (filterName) {
+					setFilterName(filterName)
+				}
+				if (tagsParam) {
+					filtersStore.selectedTags = tagsParam.split(',').map(Number)
+				}
+				didLogRef.current = false
 			}, 300)
 		}
 		return () => {
@@ -98,33 +76,51 @@ export default function NewsPageComponent() {
 		}
 	}, [])
 
-	useEffect(() => {
-		setFilteredNews(_filteredNews)
-	}, [_filteredNews])
-
-	useEffect(() => {
-		!didLogRef.current && updateFiltersInHistory()
-	}, [selectedTags])
-
-	const updateFiltersInHistory = () => {
+	const updateHistory = useCallback((key, updatedArray) => {
 		const params = new URLSearchParams(searchParams.toString())
 
-		if (selectedTags.length > 0) {
-			params.set('tags', selectedTags.join(','))
+		if (updatedArray.length > 0) {
+			params.set(key, updatedArray.join(','))
 		} else {
-			params.delete('tags')
+			params.delete(key)
 		}
-		router.replace(pathname + '?' + params.toString())
-	}
+		router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+	}, [pathname, router, searchParams])
 
 	const handleAddTag = useCallback(
 		newItem => {
-			filtersStore.selectedTags = filtersStore.selectedTags.includes(newItem)
+			const updatedArray = filtersStore.selectedTags.includes(newItem)
 				? filtersStore.selectedTags.filter(item => item !== newItem)
 				: [...filtersStore.selectedTags, newItem]
+			filtersStore.selectedTags = updatedArray
+			updateHistory('tags', updatedArray)
 		},
-		[]
+		[updateHistory]
 	)
+
+	const handleResetTag = useCallback(
+		items => {
+			const updatedArray = filtersStore.selectedTags.filter(
+				term => !items.includes(term)
+			)
+			filtersStore.selectedTags = updatedArray
+			updateHistory('tags', updatedArray)
+		},
+		[updateHistory]
+	)
+
+	const handleAllTag = useCallback(
+		() => {
+			const updatedArray = tags.map(({ id }) => id)
+			filtersStore.selectedTags = updatedArray
+			updateHistory('tags', updatedArray)
+		},
+		[tags, updateHistory]
+	)
+
+	const updateCurrPage = (currPage) => {
+		updateHistory('page', currPage ? [currPage] : [])
+	}
 
 	const NewsCard = ({ id, tags, translations, photo }) => {
 		const currentTransl =
@@ -191,7 +187,10 @@ export default function NewsPageComponent() {
 				</svg>
 				<input
 					value={filterName}
-					onChange={e => setFilterName(e.target.value)}
+					onChange={e => {
+						setFilterName(e.target.value)
+						updateHistory('search', e.target.value.length ? [e.target.value] : [])
+					}}
 					type='text'
 					placeholder={t('search_heading')}
 					className='w-full py-2 pl-12 pr-4 border rounded-md outline-none bg-white focus:border-blue-600'
@@ -221,14 +220,8 @@ export default function NewsPageComponent() {
 								.map(({ id }) => id)
 								.filter(id => selectedTags?.includes(id))}
 							addItem={handleAddTag}
-							resetItems={items => {
-								filtersStore.selectedTags = selectedTags.filter(
-									term => !items.includes(term)
-								)
-							}}
-							selectAll={() =>
-								(filtersStore.selectedTags = [...selectedTags, ...tags.map(({ id }) => id).filter(id => !selectedTags?.includes(id))])
-							}
+							resetItems={handleResetTag}
+							selectAll={handleAllTag}
 						/>
 					</MotionWrapper>
 				)}
@@ -243,7 +236,7 @@ export default function NewsPageComponent() {
 								<Loader className='w-full h-full aspect-[2/1]' />
 							</li>
 						))
-				) : news.length && filteredNews.length ? (
+				) : news.length ? (
 					currentItems.map(({ id, tags, translations, objectPhoto }, idx) => (
 						<li
 							key={`news_${idx}`}
@@ -264,11 +257,13 @@ export default function NewsPageComponent() {
 				)}
 			</ul>
 
-			<Pagination
-				itemsPerPage={PAGINATION_OPTIONS[itemsPerPage] ?? 12}
-				items={filteredNews}
+			{!!news.length && <Pagination
+				itemsPerPage={Number(PAGINATION_OPTIONS[itemsPerPage] ?? 12)}
+				items={news}
 				updateCurrentItems={setCurrentItems}
-			/>
+				currPage={Number(searchParams.get('page'))}
+				setCurrPage={updateCurrPage}
+			/>}
 		</div>
 	)
 }

@@ -1,8 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useParams, useSearchParams } from 'next/navigation'
+import { useEffect, useMemo, useState } from 'react'
 
 import Loader from '../Loader'
 import Publications from '../Publications'
@@ -15,6 +15,8 @@ import { getTranslation } from '@/i18n/client'
 import '@/styles/editor.css'
 
 export default function SoilObject({ object, children, type }) {
+	const searchParams = useSearchParams()
+
 	const [mapVisible, setMapVisible] = useState(true)
 	const [tokenData, setTokenData] = useState({})
 	const [parser, setParser] = useState()
@@ -75,6 +77,74 @@ export default function SoilObject({ object, children, type }) {
 			</div>
 		</div>
 	)
+
+	const filteredSoils = useMemo(() => {
+		if (!object.soilObjects?.length) return null
+
+		const filterName = searchParams.get('soils_search')
+		const draftIsVisible = searchParams.get('soils_draft')
+
+		const data = object.soilObjects.filter(soil => {
+			const translation = soil.translations?.find(
+				transl => transl.isEnglish === (locale === 'en')
+			)
+			const matchesSearch = !filterName || (
+				translation?.name.toLowerCase().includes(filterName.toLowerCase()) ||
+				translation?.code?.toLowerCase().includes(filterName.toLowerCase())
+			)
+			const matchesDraft = draftIsVisible == draftIsVisible == 1 || translation?.isVisible
+			return matchesSearch
+				&& matchesDraft
+		}).sort((a, b) => {
+			return b.createdDate - a.createdDate
+		})
+		return data
+	}, [object, searchParams, locale])
+
+	const filteredEcosystems = useMemo(() => {
+		if (!object.ecoSystems?.length) return null
+
+		const filterName = searchParams.get('ecosystems_search')
+		const draftIsVisible = searchParams.get('ecosystems_draft')
+
+		const data = object.ecoSystems.filter(ecosystem => {
+			const translation = ecosystem.translations?.find(
+				transl => transl.isEnglish === (locale === 'en')
+			)
+			const matchesSearch = !filterName || (
+				translation?.name.toLowerCase().includes(filterName.toLowerCase()) ||
+				translation?.code?.toLowerCase().includes(filterName.toLowerCase())
+			)
+			const matchesDraft = draftIsVisible == draftIsVisible == 1 || translation?.isVisible
+			return matchesSearch
+				&& matchesDraft
+		}).sort((a, b) => {
+			return b.createdDate - a.createdDate
+		})
+		return data
+	}, [object, searchParams, locale])
+
+	const filteredPublications = useMemo(() => {
+		if (!object.publications?.length) return null
+
+		const filterName = searchParams.get('publications_search')
+		const draftIsVisible = searchParams.get('publications_draft')
+
+		const data = object.publications.filter(publication => {
+			const translation = publication.translations?.find(
+				transl => transl.isEnglish === (locale === 'en')
+			)
+			const matchesSearch = !filterName || (
+				translation?.name.toLowerCase().includes(filterName.toLowerCase())
+			)
+			const matchesDraft = draftIsVisible == draftIsVisible == 1 || translation?.isVisible
+			return matchesSearch
+				&& matchesDraft
+		}).sort((a, b) => {
+			return b.createdDate - a.createdDate
+		})
+		return data
+	}, [object, searchParams, locale])
 
 	return (
 		<div className='flex flex-col'>
@@ -184,18 +254,13 @@ export default function SoilObject({ object, children, type }) {
 						</div>
 					)}
 				</div>
-				{Object.keys(object).length ? (
+				{!!Object.keys(object).length && (
 					<div className='md:ml-8 mt-6 md:mt-0 w-full'>
-						{/* <h3 className='sm:text-2xl text-xl font-semibold mb-2'>
-                        {t('info_obj')}
-                    </h3> */}
 						{children}
 					</div>
-				) : (
-					''
 				)}
 			</div>
-			{object.latitude && (
+			{!!object.latitude && (
 				<div id='map-section'>
 					<button
 						className='text-blue-600 w-fit mt-6'
@@ -203,7 +268,7 @@ export default function SoilObject({ object, children, type }) {
 					>
 						{mapVisible ? t('hide_map') : t('show_map')}
 					</button>
-					{mapVisible ? (
+					{mapVisible && (
 						<div className='mt-4 border rounded-lg overflow-hidden'>
 							<div className='relative w-full sm:aspect-[2/1] aspect-square'>
 								<MapSelect
@@ -213,49 +278,41 @@ export default function SoilObject({ object, children, type }) {
 								/>
 							</div>
 						</div>
-					) : (
-						''
 					)}
 				</div>
 			)}
 
-			{object.stats?.soilObjects?.[locale] ? (
+			{!!object.soilObjects?.length && (
 				<div id='soilObjects-section'>
 					<h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-4'>
 						{t('connect_soils')}
 					</h3>
 					<Soils
-						_soils={object.soilObjects}
-						isFilters={false}
+						_soils={filteredSoils}
 						type='soils'
 					/>
 				</div>
-			) : (
-				''
 			)}
-			{object.stats?.ecoSystems?.[locale] ? (
+			{!!object.ecoSystems?.length && (
 				<div id='ecosystems-section'>
 					<h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-4'>
 						{t('connect_ecosystems')}
 					</h3>
 					<Soils
-						_soils={object.ecoSystems}
-						isFilters={false}
+						_soils={filteredEcosystems}
 						type='ecosystems'
 					/>
 				</div>
-			) : (
-				''
 			)}
-			{object.stats?.publications?.[locale] ? (
+			{!!object.publications?.length && (
 				<div id='publications-section'>
 					<h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-4'>
 						{t('connect_publ')}
 					</h3>
-					<Publications _publications={object.publications} isChild={true} />
+					<Publications
+						_publications={filteredPublications}
+						isChild={true} />
 				</div>
-			) : (
-				''
 			)}
 		</div>
 	)

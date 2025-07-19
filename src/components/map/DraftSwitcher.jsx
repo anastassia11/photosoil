@@ -26,10 +26,6 @@ const DraftSwitcher = memo(
 				</label>
 			</div>
 		)
-	},
-	(prevProps, nextProps) => {
-		return prevProps.draftIsVisible === nextProps.draftIsVisible
-			&& prevProps.label === nextProps.label
 	}
 )
 export default DraftSwitcher

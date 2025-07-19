@@ -1,8 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
-import React, { useEffect, useRef, useState } from 'react'
+import { useParams, useSearchParams } from 'next/navigation'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 
 import MapArraySelect from '@/components/map/MapArraySelect'
 import Soils from '@/components/soils/Soils'
@@ -15,6 +15,7 @@ import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper'
 import Loader from '../Loader'
 
 export default function PublicationPageComponent({ id }) {
+	const searchParams = useSearchParams()
 	const { publication, publicationIsLoading } = usePublication(id)
 	const mapRef = useRef()
 	const [tokenData, setTokenData] = useState({})
@@ -43,12 +44,58 @@ export default function PublicationPageComponent({ id }) {
 				document.title = `${title} | PhotoSOIL`
 			}
 		}
-	}, [currentTransl])
+	}, [currentTransl, searchParams])
 
 	const handleScrollToSection = sectionId => {
 		const section = document.getElementById(sectionId)
 		section.scrollIntoView({ behavior: 'smooth' })
 	}
+
+	const filteredSoils = useMemo(() => {
+		if (!publication?.soilObjects?.length) return null
+
+		const filterName = searchParams.get('soils_search')
+		const draftIsVisible = searchParams.get('soils_draft')
+
+		const data = publication.soilObjects.filter(soil => {
+			const translation = soil.translations?.find(
+				transl => transl.isEnglish === (locale === 'en')
+			)
+			const matchesSearch = !filterName || (
+				translation?.name.toLowerCase().includes(filterName.toLowerCase()) ||
+				translation?.code?.toLowerCase().includes(filterName.toLowerCase())
+			)
+			const matchesDraft = draftIsVisible == draftIsVisible == 1 || translation?.isVisible
+			return matchesSearch
+				&& matchesDraft
+		}).sort((a, b) => {
+			return b.createdDate - a.createdDate
+		})
+		return data
+	}, [publication, searchParams, locale])
+
+	const filteredEcosystems = useMemo(() => {
+		if (!publication?.ecoSystems?.length) return null
+
+		const filterName = searchParams.get('ecosystems_search')
+		const draftIsVisible = searchParams.get('ecosystems_draft')
+
+		const data = publication.ecoSystems.filter(ecosystem => {
+			const translation = ecosystem.translations?.find(
+				transl => transl.isEnglish === (locale === 'en')
+			)
+			const matchesSearch = !filterName || (
+				translation?.name.toLowerCase().includes(filterName.toLowerCase()) ||
+				translation?.code?.toLowerCase().includes(filterName.toLowerCase())
+			)
+			const matchesDraft = draftIsVisible == draftIsVisible == 1 || translation?.isVisible
+			return matchesSearch
+				&& matchesDraft
+		}).sort((a, b) => {
+			return b.createdDate - a.createdDate
+		})
+		return data
+	}, [publication, searchParams, locale])
 
 	return (
 		<div className='flex flex-col'>
@@ -218,8 +265,7 @@ export default function PublicationPageComponent({ id }) {
 							{t('connect_soils')}
 						</h3>
 						<Soils
-							_soils={publication?.soilObjects}
-							isFilters={false}
+							_soils={filteredSoils}
 							type='soils'
 						/>
 					</div>
@@ -231,8 +277,7 @@ export default function PublicationPageComponent({ id }) {
 							{t('connect_ecosystems')}
 						</h3>
 						<Soils
-							_soils={publication?.ecosystems}
-							isFilters={false}
+							_soils={filteredEcosystems}
 							type='ecosystems'
 						/>
 					</div>

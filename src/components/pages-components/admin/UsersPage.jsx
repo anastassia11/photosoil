@@ -1,7 +1,7 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useDispatch } from 'react-redux'
 
@@ -9,23 +9,18 @@ import ObjectsView from '@/components/admin-panel/ObjectsView'
 import Input from '@/components/admin-panel/ui-kit/Input'
 import SubmitBtn from '@/components/admin-panel/ui-kit/SubmitBtn'
 
-import { openAlert } from '@/store/slices/alertSlice'
 import { closeModal, openModal } from '@/store/slices/modalSlice'
 import modalThunkActions from '@/store/thunks/modalThunk'
 
 import { useConstants } from '@/hooks/useConstants'
 
-import { changeRole } from '@/api/account/change_Role'
-import { createAccount } from '@/api/account/create_account'
-import { deleteAccount } from '@/api/account/delete_account'
-import { getAccounts } from '@/api/account/get_accounts'
-
 import { getTranslation } from '@/i18n/client'
+import useAccounts from '@/hooks/data/forAdmin/useAccounts'
 
 export default function UsersPageComponent() {
 	const dispatch = useDispatch()
-	const [accounts, setAccounts] = useState([])
-	const [isLoading, setIsLoading] = useState(true)
+	const { accounts, accountsIsLoading, fetchDeleteAccount, fetchCreateAccount, fetchChangeRole } = useAccounts()
+	const [selectedObjects, setSelectedObjects] = useState([])
 	const [formVisible, setFormVisible] = useState(false)
 
 	const {
@@ -42,47 +37,8 @@ export default function UsersPageComponent() {
 	const { t } = getTranslation(locale)
 	const { MODERATOR_INFO } = useConstants()
 
-	useEffect(() => {
-		fetchAccounts()
-	}, [])
-
-	const fetchAccounts = async () => {
-		const result = await getAccounts()
-		if (result.success) {
-			setAccounts(result.data)
-			setIsLoading(false)
-		}
-	}
-
-	const fetchDeleteAccount = async id => {
-		const result = await deleteAccount(id)
-		if (result.success) {
-			setAccounts(prevAccounts =>
-				prevAccounts.filter(account => account.id !== id)
-			)
-		}
-	}
-
 	const handleCreateAccount = async userData => {
-		const result = await createAccount(userData)
-		if (result.success) {
-			fetchAccounts()
-			dispatch(
-				openAlert({
-					title: t('success'),
-					message: t('created_account'),
-					type: 'success'
-				})
-			)
-		} else {
-			dispatch(
-				openAlert({
-					title: t('error'),
-					message: t('error_account'),
-					type: 'error'
-				})
-			)
-		}
+		fetchCreateAccount(userData)
 		handleCloseForm()
 	}
 
@@ -98,7 +54,8 @@ export default function UsersPageComponent() {
 
 		const isConfirm = await dispatch(modalThunkActions.open())
 		if (isConfirm.payload) {
-			await fetchDeleteAccount(id)
+			fetchDeleteAccount(id)
+			setSelectedObjects([])
 		}
 		dispatch(closeModal())
 	}
@@ -120,31 +77,7 @@ export default function UsersPageComponent() {
 
 		const isConfirm = await dispatch(modalThunkActions.open())
 		if (isConfirm.payload) {
-			const result = await changeRole(userId, isAdmin)
-			if (result.success) {
-				setAccounts(prevAccounts =>
-					prevAccounts.map(account =>
-						account.id === userId
-							? { ...account, role: isAdmin ? 'Admin' : 'Moderator' }
-							: account
-					)
-				)
-				dispatch(
-					openAlert({
-						title: t('success'),
-						message: isAdmin ? t('is_admin') : t('is_moderator'),
-						type: 'success'
-					})
-				)
-			} else {
-				dispatch(
-					openAlert({
-						title: t('error'),
-						message: t('error_rights'),
-						type: 'error'
-					})
-				)
-			}
+			fetchChangeRole({ userId, isAdmin })
 		}
 		dispatch(closeModal())
 	}
@@ -280,12 +213,13 @@ export default function UsersPageComponent() {
 				</button>
 			</div>
 			<ObjectsView
-				_objects={accounts}
+				objects={accounts}
 				onDeleteClick={handleDeleteClick}
-				pathname=''
 				onRoleChange={handleRoleChange}
 				objectType='users'
-				isLoading={isLoading}
+				isLoading={accountsIsLoading}
+				selectedObjects={selectedObjects}
+				setSelectedObjects={setSelectedObjects}
 			/>
 		</div>
 	)

@@ -9,6 +9,7 @@ import GlobalFormWarning from '@/components/GlobalFormWarning'
 import './globals.css'
 import store from '@/store'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -29,6 +30,7 @@ export default function RootLayout({ params: { locale }, children }) {
           </div> */}
 						<GlobalFormWarning />
 						{children}
+						<ReactQueryDevtools initialIsOpen={false} />
 					</QueryClientProvider>
 				</body>
 			</html>

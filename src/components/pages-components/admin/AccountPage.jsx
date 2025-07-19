@@ -1,7 +1,7 @@
 'use client'
 
-import { useParams, usePathname } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import ObjectsView from '@/components/admin-panel/ObjectsView'
@@ -9,23 +9,30 @@ import ObjectsView from '@/components/admin-panel/ObjectsView'
 import { closeModal, openModal } from '@/store/slices/modalSlice'
 import modalThunkActions from '@/store/thunks/modalThunk'
 
-import { getAccount } from '@/api/account/get_account'
-import { deleteEcosystemById } from '@/api/ecosystem/delete_ecosystem'
-import { putEcosystemVisible } from '@/api/ecosystem/put_ecosystemVisible'
-import { deletePublicationById } from '@/api/publication/delete_publication'
-import { putPublicationVisible } from '@/api/publication/put_publicationVisible'
-import { deleteSoilById } from '@/api/soil/delete_soil'
-import { putSoilVisible } from '@/api/soil/put_soilVisible'
-
 import { getTranslation } from '@/i18n/client'
+import useAccount from '@/hooks/data/forAdmin/useAccount'
+import useAdminEcosystems from '@/hooks/data/forAdmin/useAdminEcosystems'
+import useAdminPubl from '@/hooks/data/forAdmin/useAdminPubl'
+import useAdminNews from '@/hooks/data/forAdmin/useAdminNews'
+import useAdminSoils from '@/hooks/data/forAdmin/useAdminSoils'
 
 export default function AccountPageComponent({ id }) {
 	const dispatch = useDispatch()
-	const [user, setUser] = useState({})
-	const [userObjects, setUserObjects] = useState([])
-	const [isLoading, setIsLoading] = useState(true)
-	const [selectedFilters, setSelectedFilters] = useState([])
-	const [filteredObjects, setFilteredObjects] = useState([])
+	const didLogRef = useRef(true)
+	const pathname = usePathname()
+	const router = useRouter()
+	const searchParams = useSearchParams()
+
+	const { account, accountIsLoading } = useAccount(id)
+
+	const { deleteSoil, visibleChange: soilVisibleChange } = useAdminSoils()
+	const { deleteEcosystem, visibleChange: ecosystemVisibleChange } = useAdminEcosystems()
+	const { deletePubl, visibleChange: publVisibleChange } = useAdminPubl()
+	const { deleteNews, visibleChange: newsVisibleChange } = useAdminNews()
+
+	const [selectedObjects, setSelectedObjects] = useState([])
+	const [selectedFilters, setSelectedFilters] = useState(['objects', 'ecosystems', 'publications', 'news'])
+
 	const { locale } = useParams()
 	const { t } = getTranslation(locale)
 
@@ -37,117 +44,49 @@ export default function AccountPageComponent({ id }) {
 	]
 
 	useEffect(() => {
-		if (typeof document !== 'undefined' && user.email) {
-			document.title = `${user.email} | PhotoSOIL`
+		if (typeof document !== 'undefined' && account.email) {
+			document.title = `${account.email} | PhotoSOIL`
 		}
-	}, [user])
+	}, [account.email])
 
 	useEffect(() => {
-		fetchAccount()
+		let timeoutId
+		if (didLogRef.current) {
+			timeoutId = setTimeout(() => {
+				const disabledTypes = searchParams.get('disabled')?.split(',')
+				if (disabledTypes) {
+					setSelectedFilters(FILTERS.map(({ name }) => name).filter(el => !disabledTypes.includes(el)))
+				}
+
+				didLogRef.current = false
+			}, 300)
+		}
+		return () => clearTimeout(timeoutId)
 	}, [])
 
-	useEffect(() => {
-		setFilteredObjects(prev =>
-			userObjects.filter(object => selectedFilters.includes(object?.type?.name))
-		)
-	}, [selectedFilters, userObjects])
-
-	const fetchAccount = async () => {
-		const result = await getAccount(id)
-		if (result.success) {
-			let userData = result.data
-			let _userObjects = [
-				...userData.soilObjects.flatMap(({ translations }) =>
-					translations.map(translation => ({
-						...translation,
-						type: FILTERS.find(({ name }) => name === 'objects')
-					}))
-				),
-				...userData.ecoSystems.flatMap(({ translations }) =>
-					translations.map(translation => ({
-						...translation,
-						type: FILTERS.find(({ name }) => name === 'ecosystems')
-					}))
-				),
-				...userData.publications.flatMap(({ translations }) =>
-					translations.map(translation => ({
-						...translation,
-						type: FILTERS.find(({ name }) => name === 'publications')
-					}))
-				),
-				...userData.news.flatMap(({ translations }) =>
-					translations.map(translation => ({
-						...translation,
-						type: FILTERS.find(({ name }) => name === 'news')
-					}))
-				)
-			]
-			setUser(userData)
-			setUserObjects(_userObjects)
-			setSelectedFilters(FILTERS.map(({ name }) => name))
-			setIsLoading(false)
+	const updateHistory = useCallback((key, updatedArray) => {
+		const params = new URLSearchParams(searchParams.toString())
+		if (updatedArray.length > 0) {
+			params.set(key, updatedArray.join(','))
+		} else {
+			params.delete(key)
 		}
-	}
+		router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+	}, [pathname, router, searchParams])
 
 	const handleFilterSelect = e => {
 		const { name, checked } = e.target
-		checked
-			? setSelectedFilters(prevFilters => [...prevFilters, name])
-			: setSelectedFilters(prevFilters =>
-					prevFilters.filter(filterName => filterName !== name)
-				)
+		const newFilters = checked ? [...selectedFilters, name] : selectedFilters.filter(filterName => filterName !== name)
+		setSelectedFilters(newFilters)
+
+		updateHistory('disabled', FILTERS.map(({ name }) => name).filter(el => !newFilters.includes(el)))
 	}
 
 	const handleAllCheck = () => {
-		selectedFilters.length === FILTERS.length
-			? setSelectedFilters([])
-			: setSelectedFilters(FILTERS.map(({ name }) => name))
-	}
+		const newFilters = selectedFilters.length === FILTERS.length ? [] : FILTERS.map(({ name }) => name)
+		setSelectedFilters(newFilters)
 
-	const fetchObjectDelete = async (type, id) => {
-		let result
-		switch (type) {
-			case 'objects':
-				result = await deleteSoilById(id)
-				break
-			case 'ecosystems':
-				result = await deleteEcosystemById(id)
-				break
-			case 'publications':
-				result = await deletePublicationById(id)
-				break
-		}
-		if (result?.success) {
-			setUserObjects(prevObjects =>
-				prevObjects.filter(
-					object => object.type.name !== type || object.id !== id
-				)
-			)
-		}
-	}
-
-	const fetchVisibleChange = async (type, id, data) => {
-		let result
-		switch (type) {
-			case 'objects':
-				result = await putSoilVisible(id, data)
-				break
-			case 'ecosystems':
-				result = await putEcosystemVisible(id, data)
-				break
-			case 'publications':
-				result = await putPublicationVisible(id, data)
-				break
-		}
-		if (result?.success) {
-			setUserObjects(prevObjects =>
-				prevObjects.map(object =>
-					object.type.name === type && object.id === id
-						? { ...object, ...data }
-						: object
-				)
-			)
-		}
+		updateHistory('disabled', FILTERS.map(({ name }) => name).filter(el => !newFilters.includes(el)))
 	}
 
 	const handleDeleteClick = async ({ type, id, isMulti }) => {
@@ -162,7 +101,16 @@ export default function AccountPageComponent({ id }) {
 
 		const isConfirm = await dispatch(modalThunkActions.open())
 		if (isConfirm.payload) {
-			await fetchObjectDelete(type, id)
+			if (type === 'objects') {
+				deleteSoil(id)
+			} else if (type === 'ecosystems') {
+				deleteEcosystem(id)
+			} else if (type === 'publications') {
+				deletePubl(id)
+			} else if (type === 'news') {
+				deleteNews(id)
+			}
+			setSelectedObjects([])
 		}
 		dispatch(closeModal())
 	}
@@ -184,7 +132,16 @@ export default function AccountPageComponent({ id }) {
 
 		const isConfirm = await dispatch(modalThunkActions.open())
 		if (isConfirm.payload) {
-			await fetchVisibleChange(type, id, { isVisible })
+			if (type === 'objects') {
+				soilVisibleChange({ id, isVisible })
+			} else if (type === 'ecosystems') {
+				ecosystemVisibleChange({ id, isVisible })
+			} else if (type === 'publications') {
+				publVisibleChange({ id, isVisible })
+			} else if (type === 'news') {
+				newsVisibleChange({ id, isVisible })
+			}
+			setSelectedObjects([])
 		}
 		dispatch(closeModal())
 	}
@@ -194,8 +151,8 @@ export default function AccountPageComponent({ id }) {
 			<div className='flex flex-row items-center justify-between mb-2'>
 				<h1 className='sm:text-2xl text-xl font-semibold'>
 					{t('user_objects')}{' '}
-					<span className='text-blue-700'>{user.email}</span>{' '}
-					{user.name && `(${user.name})`}
+					<span className='text-blue-700'>{account.email}</span>{' '}
+					{account.name && `(${account.name})`}
 				</h1>
 			</div>
 
@@ -229,14 +186,15 @@ export default function AccountPageComponent({ id }) {
 				))}
 			</ul>
 			<ObjectsView
-				_objects={filteredObjects}
-				pathname=''
+				objects={account.userObjects ?? []}
 				onVisibleChange={handleVisibleChange}
 				visibilityControl={true}
 				languageChanger={true}
 				onDeleteClick={handleDeleteClick}
 				objectType='userPage'
-				isLoading={isLoading}
+				isLoading={accountIsLoading}
+				selectedObjects={selectedObjects}
+				setSelectedObjects={setSelectedObjects}
 			/>
 		</div>
 	)
