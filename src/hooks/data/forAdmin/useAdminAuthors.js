@@ -31,6 +31,14 @@ export default function useAdminAuthors() {
 
                 return matchesSearch
             }).sort((a, b) => {
+                const fieldA = _isEng ? a.dataEng.name : a.dataRu.name
+                const fieldB = _isEng ? b.dataEng.name : b.dataRu.name
+                return fieldA?.toString()?.localeCompare(fieldB)
+            }).sort((a, b) => {
+                return sortType == 1
+                    ? b.authorType - a.authorType
+                    : a.authorType - b.authorType
+            }).sort((a, b) => {
                 let fieldA, fieldB
 
                 if (sortBy === 'name') {
@@ -40,11 +48,15 @@ export default function useAdminAuthors() {
                     fieldA = a[sortBy]
                     fieldB = b[sortBy]
                 }
+                if (sortBy === 'authorType') {
+                    return sortType == 1
+                        ? b.authorType - a.authorType
+                        : a.authorType - b.authorType
+                }
 
                 return sortType == 1
                     ? fieldA?.toString()?.localeCompare(fieldB)
                     : fieldB?.toString()?.localeCompare(fieldA)
-
             })
 
             return data

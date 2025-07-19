@@ -41,7 +41,7 @@ export default function ObjectsView({
 	const [publishStatus, setPublichStatus] = useState('all')
 
 	const [sortType, setSortType] = useState('1')
-	const [sortBy, setSortBy] = useState('lastUpdated')
+	const [sortBy, setSortBy] = useState(objectType === 'authors' ? 'authorType' : 'lastUpdated')
 
 	const [currentItems, setCurrentItems] = useState([])
 	const [itemsPerPage, setItemsPerPage] = useState()
@@ -168,59 +168,6 @@ export default function ObjectsView({
 			setSortType('1')
 
 			updateHistory({ 'sortBy': [fieldName], 'sortType': ['1'] })
-		}
-
-		const compareFn = (a, b) => {
-			let fieldA, fieldB
-
-			if (fieldName === 'name' && objectType === 'authors') {
-				fieldA = a[_isEng ? 'dataEng' : 'dataRu'][fieldName]
-				fieldB = b[_isEng ? 'dataEng' : 'dataRu'][fieldName]
-			} else if (fieldName === 'name' && objectType === 'dictionary') {
-				fieldA = _isEng ? a.nameEng || a.nameRu : a.nameRu || a.nameEng
-				fieldB = _isEng ? b.nameEng || b.nameRu : b.nameRu || b.nameEng
-			} else {
-				fieldA = a[fieldName]
-				fieldB = b[fieldName]
-			}
-
-			if (fieldName === 'lastUpdated') {
-				return isAscending ? fieldA - fieldB : fieldB - fieldA
-			}
-
-			if (fieldName === 'creator') {
-				const emailA = a.userInfo?.email
-				const emailB = b.userInfo?.email
-				return isAscending
-					? emailA?.localeCompare(emailB)
-					: emailB?.localeCompare(emailA)
-			}
-
-			if (fieldName === 'isVisible') {
-				return fieldA === fieldB
-					? 0
-					: isAscending
-						? fieldA
-							? 1
-							: -1
-						: fieldA
-							? -1
-							: 1
-			}
-
-			if (fieldName === 'type') {
-				const typeA = a.type.name?.toString()
-				const typeB = b.type.name?.toString()
-				return isAscending
-					? typeA?.localeCompare(typeB)
-					: typeB?.localeCompare(typeA)
-			}
-
-			const valueA = fieldA?.toString()
-			const valueB = fieldB?.toString()
-			return isAscending
-				? valueA?.localeCompare(valueB)
-				: valueB?.localeCompare(valueA)
 		}
 	}
 

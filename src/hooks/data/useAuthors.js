@@ -25,7 +25,9 @@ export default function useAuthors() {
 
                 return matchesSearch
             }).sort((a, b) => {
-                return a.rank - b.rank
+                const fieldA = locale === 'en' ? a.dataEng.name : a.dataRu.name
+                const fieldB = locale === 'en' ? b.dataEng.name : b.dataRu.name
+                return fieldA?.toString()?.localeCompare(fieldB)
             }).sort((a, b) => {
                 return a.authorType - b.authorType
             })
