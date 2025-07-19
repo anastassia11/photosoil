@@ -1,6 +1,6 @@
 'use client'
 
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { memo, useEffect, useRef } from 'react'
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
@@ -9,14 +9,15 @@ const LanguageChanger = memo(function LanguageChanger({
 	locale,
 	isTransparent
 }) {
+	const router = useRouter()
 	const pathname = usePathname()
+	const searchParams = useSearchParams()
 	const pathnameRef = useRef(pathname)
 
 	useEffect(() => {
 		pathnameRef.current = pathname
 	}, [pathname])
 
-	const router = useRouter()
 	const LANGUAGES = {
 		ru: 'RU',
 		en: 'EN'
@@ -30,7 +31,7 @@ const LanguageChanger = memo(function LanguageChanger({
 	const redirectedPathname = locale => {
 		const segments = pathnameRef.current.split('/')
 		segments[1] = locale
-		return segments.join('/')
+		return `${segments.join('/')}?${searchParams.toString()}`
 	}
 
 	return (

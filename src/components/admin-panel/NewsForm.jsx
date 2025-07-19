@@ -38,6 +38,7 @@ export default function NewsForm({
 	oldIsEng
 }) {
 	const dispatch = useDispatch()
+	const { locale } = useParams()
 	const {
 		register,
 		reset,
@@ -51,7 +52,7 @@ export default function NewsForm({
 		defaultValues: {
 			translations: [
 				{
-					isEnglish: false,
+					isEnglish: locale === 'en',
 					annotation: '',
 					content: '',
 					title: ''
@@ -71,9 +72,9 @@ export default function NewsForm({
 	const [localFiles, setLocalFiles] = useState([])
 	const [tags, setTags] = useState([])
 
-	const [isEng, setIsEng] = useState(false)
+	const [isEng, setIsEng] = useState(locale === 'en')
 	const [createTwoLang, setCreateTwoLang] = useState(false)
-	const { locale } = useParams()
+
 	const { t } = getTranslation(locale)
 
 	const { NEWS_INFO } = useConstants()

@@ -313,7 +313,7 @@ export default function AuthorForm({
 				</div>
 
 				<div className='flex xl:flex-row flex-col w-full mt-8'>
-					<ul className='space-y-3 xl:w-[50%] xl:pr-6 xl:border-r'>
+					<ul className={`${locale === 'ru' ? 'order-1 xl:pr-6 xl:border-r' : 'order-2 xl:pl-6'} space-y-3 xl:w-[50%]`}>
 						<p className='text-blue-700 font-semibold'>Русская версия</p>
 						{AUTHOR_INFO.map(({ name, isArray, title }) => (
 							<li key={`ru-${name}`}>
@@ -350,7 +350,7 @@ export default function AuthorForm({
 							</li>
 						))}
 					</ul>
-					<ul className='space-y-3 xl:w-[50%] xl:pl-6 xl:mt-0 mt-6'>
+					<ul className={`${locale === 'en' ? 'order-1 xl:pr-6 xl:border-r' : 'order-2 xl:pl-6'} space-y-3 xl:w-[50%] xl:mt-0 mt-6`}>
 						<p className='text-blue-700 font-semibold'>English version</p>
 						{AUTHOR_INFO.map(({ name, isArray, title }) => (
 							<li key={`en-${name}`}>

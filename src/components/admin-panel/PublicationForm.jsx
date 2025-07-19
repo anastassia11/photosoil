@@ -41,6 +41,7 @@ export default function PublicationForm({
 	oldTwoLang,
 	oldIsEng
 }) {
+	const { locale } = useParams()
 	const {
 		register,
 		reset,
@@ -58,7 +59,7 @@ export default function PublicationForm({
 			doi: '',
 			translations: [
 				{
-					isEnglish: false,
+					isEnglish: locale === 'en',
 					authors: '',
 					description: '',
 					edition: '',
@@ -80,7 +81,7 @@ export default function PublicationForm({
 	const coordinates = watch('coordinates')
 	const file = useWatch({ control, name: 'file' })
 
-	const [isEng, setIsEng] = useState(false)
+	const [isEng, setIsEng] = useState(locale === 'en')
 	const [createTwoLang, setCreateTwoLang] = useState(false)
 	const [ecosystems, setEcosystems] = useState([])
 	const [soils, setSoils] = useState([])
@@ -89,7 +90,6 @@ export default function PublicationForm({
 		longtitude: ''
 	})
 
-	const { locale } = useParams()
 	const dispatch = useDispatch()
 
 	const mapRef = useRef(null)

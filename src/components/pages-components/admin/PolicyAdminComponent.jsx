@@ -28,7 +28,7 @@ export default function PolicyAdminComponent() {
 	const dispatch = useDispatch()
 	const { locale } = useParams()
 	const { t } = getTranslation(locale)
-	const [isEng, setIsEng] = useState(false)
+	const [isEng, setIsEng] = useState(locale === 'en')
 
 	const {
 		control,

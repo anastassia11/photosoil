@@ -49,9 +49,9 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, onMainPhot
 	const { t } = getTranslation(locale)
 
 	const defaultValues = {
-		translations: [{ isEnglish: false }],
+		translations: [locale === 'ru' ? { isEnglish: false } : { isEnglish: true }],
 		createTwoLang: false,
-		currentLang: false,
+		currentLang: locale === 'en',
 		objectType: 1,
 		latitude: '',
 		longtitude: '',

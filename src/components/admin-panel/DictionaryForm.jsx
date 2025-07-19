@@ -138,7 +138,7 @@ export default function DictionaryForm({
 					{translationMode == 0 || translationMode == 2 ? (
 						<ul
 							className={`space-y-3 
-                    ${translationMode == 0 ? 'xl:w-[50%] xl:pr-6 xl:border-r' : 'w-full'}`}
+                    ${translationMode == 0 ? `${locale === 'ru' ? 'order-1 xl:pr-6 xl:border-r' : 'order-2 xl:pl-6'} xl:w-[50%]` : 'w-full'}`}
 						>
 							<p className='text-blue-700 font-semibold'>Русская версия</p>
 							<div className='w-full'>
@@ -172,8 +172,8 @@ export default function DictionaryForm({
 
 					{translationMode == 0 || translationMode == 1 ? (
 						<ul
-							className={`space-y-3 xl:mt-0 mt-6
-                    ${translationMode == 0 ? 'xl:w-[50%] xl:pl-6' : 'w-full'}`}
+							className={`space-y-3 xl:mt-0 mt-6 
+                    ${translationMode == 0 ? `${locale === 'en' ? 'order-1 xl:pr-6 xl:border-r' : 'order-2 xl:pl-6'} xl:w-[50%]` : 'w-full'}`}
 						>
 							<p className='text-blue-700 font-semibold'>English version</p>
 							<div className='w-full'>

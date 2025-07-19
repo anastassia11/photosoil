@@ -30,13 +30,18 @@ const defaults = {
 	}
 }
 
-export default function Carousel(props) {
+export default function Carousel({ onPageChange, children }) {
 	const containerRef = useRef(null)
 
 	useEffect(() => {
 		const container = containerRef.current
 		const options = {
-			...defaults
+			...defaults,
+			on: {
+				change: (carousel) => {
+					onPageChange(carousel.page)
+				}
+			}
 		}
 
 		const instance = new NativeCarousel(container, options, { Thumbs })
@@ -52,7 +57,7 @@ export default function Carousel(props) {
 			className='f-carousel lg:order-last'
 			ref={containerRef}
 		>
-			{props.children}
+			{children}
 		</div>
 	)
 }

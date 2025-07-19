@@ -25,24 +25,28 @@ function LangTabs({
 		>
 			<List className='w-full border-b flex md:items-center gap-x-4 overflow-x-auto justify-between md:flex-row flex-col'>
 				<div className='flex items-center gap-x-4 overflow-x-auto md:order-1 order-2'>
-					<Trigger
-						disabled={!createTwoLang && isEng}
-						className='disabled:text-gray-400 group outline-none border-b-2 border-[#f6f7f9] data-[state=active]:border-blue-600 data-[state=active]:text-blue-600'
-						value={false}
-					>
-						<div className='pb-2.5 px-2 group-disabled:text-current duration-150 group-hover:text-blue-600 font-medium'>
-							Русскоязычная версия
-						</div>
-					</Trigger>
-					<Trigger
-						disabled={!createTwoLang}
-						className='disabled:text-gray-400 group outline-none border-b-2 border-[#f6f7f9] data-[state=active]:border-blue-600 data-[state=active]:text-blue-600'
-						value={true}
-					>
-						<div className='pb-2.5 px-2 group-disabled:text-current duration-150 group-hover:text-blue-600 font-medium'>
-							English version
-						</div>
-					</Trigger>
+					<span className={`${locale === 'ru' ? 'order-1' : 'order-2'}`}>
+						<Trigger
+							disabled={!createTwoLang && isEng}
+							className='disabled:text-gray-400 group outline-none border-b-2 border-[#f6f7f9] data-[state=active]:border-blue-600 data-[state=active]:text-blue-600'
+							value={false}
+						>
+							<div className='pb-2.5 px-2 group-disabled:text-current duration-150 group-hover:text-blue-600 font-medium'>
+								Русскоязычная версия
+							</div>
+						</Trigger>
+					</span>
+					<span className={`${locale === 'en' ? 'order-1' : 'order-2'}`}>
+						<Trigger
+							disabled={!createTwoLang}
+							className='disabled:text-gray-400 group outline-none border-b-2 border-[#f6f7f9] data-[state=active]:border-blue-600 data-[state=active]:text-blue-600'
+							value={true}
+						>
+							<div className='pb-2.5 px-2 group-disabled:text-current duration-150 group-hover:text-blue-600 font-medium'>
+								English version
+							</div>
+						</Trigger>
+					</span>
 				</div>
 				{(!oldTwoLang || !isEdit) && (
 					<label
