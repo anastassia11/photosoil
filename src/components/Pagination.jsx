@@ -21,8 +21,8 @@ export default function Pagination({
 
 	useEffect(() => {
 		if (window.innerWidth < 640) {
-			setPageRangeDisplayed(1)
-			setMarginPagesDisplayed(0)
+			setPageRangeDisplayed(0)
+			setMarginPagesDisplayed(1)
 		} else {
 			setPageRangeDisplayed(2)
 			setMarginPagesDisplayed(2)
@@ -42,6 +42,7 @@ export default function Pagination({
 	}, [currPage, itemsPerPage, items, updateCurrentItems])
 
 	const handlePageClick = event => {
+		console.log('Selected page:', event.selected)
 		setCurrPage(event.selected)
 
 		const newOffset = (event.selected * itemsPerPage) % items.length
@@ -65,7 +66,6 @@ export default function Pagination({
 		<div ref={paginationRef} className='flex self-end' id='pagination'>
 			<ReactPaginate
 				className='flex'
-				// forcePage={currPage}
 				initialPage={currPage}
 				nextLabel={
 					<svg
@@ -106,9 +106,7 @@ export default function Pagination({
 				previousLinkClassName='page-link'
 				nextClassName='page-item'
 				nextLinkClassName='page-link'
-				breakLabel='...'
-				breakClassName='page-item'
-				breakLinkClassName='page-link'
+				breakClassName='break-item'
 				containerClassName='pagination'
 				activeLinkClassName='active-link'
 				disabledLinkClassName='disabled-link'

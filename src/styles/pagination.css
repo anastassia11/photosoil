@@ -13,11 +13,19 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	user-select: none;
 }
 
 .page-link:hover {
 	background-color: #2563eb;
 	color: #fff;
+}
+
+.break-item {
+	pointer-events: none;
+	cursor: default;
+	user-select: none;
+	padding: 0.5rem 0.5rem;
 }
 
 .active-link {
