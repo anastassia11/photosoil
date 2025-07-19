@@ -26,7 +26,7 @@ import View from 'ol/View'
 import { Point } from 'ol/geom'
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer'
 import 'ol/ol.css'
-import { fromLonLat } from 'ol/proj'
+import { fromLonLat, toLonLat } from 'ol/proj'
 import { Cluster, Vector as VectorSource } from 'ol/source'
 import { Fill, RegularShape, Stroke, Style } from 'ol/style'
 import { Text } from 'ol/style.js'
@@ -69,6 +69,9 @@ export default function MainMap() {
 	const pathname = usePathname()
 
 	const didLogRef = useRef(true)
+
+	const didLogRef2 = useRef(true)
+
 	const didLogFiltersRef = useRef(true)
 	const mapElement = useRef()
 
@@ -103,6 +106,44 @@ export default function MainMap() {
 			document.removeEventListener('DOMContentLoaded', initializeMap)
 		}
 	}, [])
+
+	useEffect(() => {
+		const map = mapRef.current
+		if (!map) return
+
+		const view = map.getView()
+
+		const updateSearchParams = () => {
+			const center = view.getCenter()
+			const zoom = view.getZoom()
+
+			if (!center || zoom === undefined) return
+
+			const [lon, lat] = toLonLat(center)
+
+			const newParams = new URLSearchParams(searchParams.toString())
+
+			newParams.set('zoom', zoom.toFixed(2))
+			newParams.set('center', `${lon.toFixed(6)},${lat.toFixed(6)}`)
+
+			router.replace(`${pathname}?${newParams.toString()}`, { scroll: false })
+		}
+
+		// Подписка на изменение зума и центра
+		const listenerKeys = [
+			view.on('change:resolution', updateSearchParams),
+			view.on('change:center', updateSearchParams)
+		]
+
+		return () => {
+			listenerKeys.forEach((key) => {
+				view.un('change:resolution', key.listener)
+				view.un('change:center', key.listener)
+			})
+		}
+	}, [])
+
+
 
 	useEffect(() => {
 		let timeoutId
@@ -311,11 +352,30 @@ export default function MainMap() {
 
 	const init = () => {
 		let startcoords = fromLonLat([85.9075867, 53.1155423])
+		let initialZoom = 3
+
+		// Читаем зум из URL
+		const zoomFromURL = searchParams.get('zoom')
+		const centerFromURL = searchParams.get('center')
+
+		if (centerFromURL) {
+			const [lon, lat] = centerFromURL.split(',').map(Number)
+			if (!isNaN(lon) && !isNaN(lat)) {
+				startcoords = fromLonLat([lon, lat])
+			}
+		}
+
+		if (zoomFromURL) {
+			const zoom = parseFloat(zoomFromURL)
+			if (!isNaN(zoom)) {
+				initialZoom = zoom
+			}
+		}
 
 		//Создаем вид
 		let view = new View({
 			center: startcoords,
-			zoom: 3,
+			zoom: initialZoom,
 			rotation: 0,
 			constrainRotation: true,
 			rotateExtent: [0, 0, 0, 0]
@@ -758,7 +818,6 @@ export default function MainMap() {
 			</div>
 
 			<SideBar
-				// locale={locale}
 				sidebarOpen={sidebarOpen}
 				filterName={filterName}
 				objects={selectedObjects}
