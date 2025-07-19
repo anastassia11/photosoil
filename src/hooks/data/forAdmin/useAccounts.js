@@ -38,6 +38,8 @@ export default function useAccounts() {
 
                 return matchesSearch
             }).sort((a, b) => {
+                return a.role?.toString()?.localeCompare(b.role)
+            }).sort((a, b) => {
                 let fieldA, fieldB
 
                 fieldA = a[sortBy]
@@ -46,7 +48,6 @@ export default function useAccounts() {
                 return sortType == 1
                     ? fieldA?.toString()?.localeCompare(fieldB)
                     : fieldB?.toString()?.localeCompare(fieldA)
-
             })
 
             return data

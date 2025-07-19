@@ -41,7 +41,7 @@ export default function ObjectsView({
 	const [publishStatus, setPublichStatus] = useState('all')
 
 	const [sortType, setSortType] = useState('1')
-	const [sortBy, setSortBy] = useState(objectType === 'authors' ? 'authorType' : 'lastUpdated')
+	const [sortBy, setSortBy] = useState(objectType === 'authors' ? 'authorType' : objectType === 'users' ? 'role' : 'lastUpdated')
 
 	const [currentItems, setCurrentItems] = useState([])
 	const [itemsPerPage, setItemsPerPage] = useState()
