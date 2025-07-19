@@ -1,9 +1,9 @@
-import { PAGINATION_DATA, PAGINATION_OPTIONS } from '@/utils/constants';
-import { Label } from './ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { useParams, usePathname } from 'next/navigation';
-import { getTranslation } from '@/i18n/client';
-import { useEffect } from 'react';
+import { PAGINATION_DATA, PAGINATION_OPTIONS } from '@/utils/constants'
+import { Label } from './ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
+import { useParams, usePathname } from 'next/navigation'
+import { getTranslation } from '@/i18n/client'
+import { useEffect } from 'react'
 
 export default function PerPageSelect({ itemsPerPage, setItemsPerPage, isChild = false, type }) {
     const { locale } = useParams()

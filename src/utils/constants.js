@@ -60,5 +60,17 @@ export const PAGINATION_DATA = {
 	},
 	news: {
 		num: 0
+	},
+	admin: {
+		children: {
+			objects: 0,
+			ecosystems: 0,
+			publications: 0,
+			news: 0,
+			authors: 0,
+			userPage: 0,
+			dictionary: 0,
+			users: 0
+		}
 	}
 }

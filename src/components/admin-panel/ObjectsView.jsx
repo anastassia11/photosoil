@@ -15,6 +15,8 @@ import { PAGINATION_OPTIONS } from '@/utils/constants'
 import { getTranslation } from '@/i18n/client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { Label } from '../ui/label'
+import PerPageSelect from '../PerPageSelect'
+import { recoveryItemsPerPage } from '@/utils/common'
 
 export default function ObjectsView({
 	objects,
@@ -42,7 +44,7 @@ export default function ObjectsView({
 	const [sortBy, setSortBy] = useState('lastUpdated')
 
 	const [currentItems, setCurrentItems] = useState([])
-	const [itemsPerPage, setItemsPerPage] = useState(0)
+	const [itemsPerPage, setItemsPerPage] = useState()
 
 	const dropdown = useSelector(state => state.general.dropdown)
 	const { locale } = useParams()
@@ -90,40 +92,10 @@ export default function ObjectsView({
 		return () => clearTimeout(timeoutId)
 	}, [])
 
-	// useEffect(() => {
-	// 	const _filterName = filterName.toLowerCase().trim()
-	// 	setFilteredObjects(prev =>
-	// 		objects.filter(
-	// 			object =>
-	// 				(object?.name?.toLowerCase().includes(_filterName) ||
-	// 					object?.code?.toLowerCase().includes(_filterName) ||
-	// 					object?.email?.toLowerCase().includes(_filterName) ||
-	// 					object?.title?.toLowerCase().includes(_filterName) ||
-	// 					object?.dataEng?.name?.toLowerCase().includes(_filterName) ||
-	// 					object?.dataRu?.name?.toLowerCase().includes(_filterName) ||
-	// 					object?.nameRu?.toLowerCase().includes(_filterName) ||
-	// 					object?.nameEng?.toLowerCase().includes(_filterName)) &&
-	// 				((publishStatus === 'publish' && object.isVisible) ||
-	// 					(publishStatus === 'not_publish' &&
-	// 						!object.isVisible &&
-	// 						object.isVisible !== undefined) ||
-	// 					(publishStatus === 'all' && true)) &&
-
-	// 				((currentLang === 'eng' && object.isEnglish) ||
-	// 					(currentLang === 'ru' &&
-	// 						!object.isEnglish &&
-	// 						object.isEnglish !== undefined) ||
-	// 					(currentLang === 'any' && true) ||
-	// 					(currentLang === 'eng' &&
-	// 						object.translationMode !== undefined &&
-	// 						(object.translationMode == 1 || object.translationMode == 0)) ||
-	// 					(currentLang === 'ru' &&
-	// 						object.translationMode !== undefined &&
-	// 						(object.translationMode == 2 || object.translationMode == 0)) ||
-	// 					(currentLang === 'any' && true))
-	// 		)
-	// 	)
-	// }, [objects, filterName, publishStatus, currentLang])
+	useEffect(() => {
+		const value = recoveryItemsPerPage({ isChild: true, key: objectType, pathname })
+		setItemsPerPage(value)
+	}, [objectType, pathname])
 
 	const handleObjectSelect = (checked, id, type) => {
 		setSelectedObjects(prev => {
@@ -1260,32 +1232,22 @@ export default function ObjectsView({
 					</div>
 				</div>
 			</div>
-			<div className='flex xl:flex-row flex-col self-end xl:space-x-6'>
-				<div className='flex flex-row space-x-2 xl:justify-center justify-end mb-2 mr-1 xl:mr-0 xl:mb-0 items-center'>
-					<Label htmlFor="in_page"
-						className='text-base min-w-fit'>{t('in_page')}</Label>
-					<Select
-						id="in_page"
-						value={itemsPerPage.toString()}
-						onValueChange={setItemsPerPage}>
-						<SelectTrigger className="text-base w-[70px]">
-							<SelectValue />
-						</SelectTrigger>
-						<SelectContent className='min-w-0'>
-							{Object.entries(PAGINATION_OPTIONS).map(([value, title]) =>
-								<SelectItem key={value} value={value.toString()}
-									className='text-base'>{title}</SelectItem>)}
-						</SelectContent>
-					</Select>
+			{!!objects.length && <div className='flex xl:flex-row flex-col self-end xl:space-x-6'>
+				<div className='flex xl:justify-center justify-end mb-2 mr-1 xl:mr-0 xl:mb-0'>
+					<PerPageSelect itemsPerPage={itemsPerPage}
+						setItemsPerPage={setItemsPerPage}
+						isChild={true}
+						type={objectType}
+					/>
 				</div>
-				{!!objects.length && <Pagination
+				<Pagination
 					itemsPerPage={Number(PAGINATION_OPTIONS[itemsPerPage] ?? 12)}
 					items={objects}
 					updateCurrentItems={setCurrentItems}
 					currPage={Number(searchParams.get('page'))}
 					setCurrPage={updateCurrPage}
-				/>}
-			</div>
+				/>
+			</div>}
 		</div>
 	)
 }
