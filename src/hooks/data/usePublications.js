@@ -33,7 +33,7 @@ export default function usePublications() {
                     && matchesDraft
             }).sort((a, b) => {
                 return b.createdDate - a.createdDate
-            })
+            }).map(item => ({ ...item, _type: 'publication' }))
 
             return data
         }

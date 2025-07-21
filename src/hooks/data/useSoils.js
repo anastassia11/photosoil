@@ -23,7 +23,7 @@ export default function useSoils(type) {
                             ? data.filter(soil => soil.objectType === 2)
                             : data
 
-            const selectedCategories = searchParams.get('categories')?.split(',').map(Number) ?? []
+            const selectedCategories = searchParams.get('category')?.split(',').map(Number) ?? []
             const selectedTerms = searchParams.get('terms')?.split(',').map(Number) ?? []
             const selectedAuthors = searchParams.get('authors')?.split(',').map(Number) ?? []
             const filterName = searchParams.get('search')
@@ -61,7 +61,7 @@ export default function useSoils(type) {
                     && matchesDraft
             }).sort((a, b) => {
                 return b.createdDate - a.createdDate
-            })
+            }).map(item => ({ ...item, _type: 'soil' }))
 
             return data
         },

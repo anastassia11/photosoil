@@ -166,6 +166,13 @@ export default function NewsPageComponent() {
 		)
 	}
 
+	const updateDraftIsVisible = () => {
+		const _visible = !draftIsVisible
+		setDraftIsVisible(_visible)
+
+		updateHistory('draft', _visible ? ['1'] : [])
+	}
+
 	return (
 		<div className='flex flex-col'>
 			<h1 className='sm:text-2xl text-xl font-semibold mb-4'>{t('news')}</h1>
@@ -200,7 +207,7 @@ export default function NewsPageComponent() {
 				<PerPageSelect itemsPerPage={itemsPerPage} setItemsPerPage={setItemsPerPage} type='news' />
 			</div>
 			<MotionWrapper className='my-4 pl-0.5'>
-				<DraftSwitcher draftIsVisible={draftIsVisible} setDraftIsVisible={setDraftIsVisible} label={t('grafts_visible')}
+				<DraftSwitcher draftIsVisible={draftIsVisible} setDraftIsVisible={updateDraftIsVisible} label={t('grafts_visible')}
 					type='news' />
 			</MotionWrapper>
 

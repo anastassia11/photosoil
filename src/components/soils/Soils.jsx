@@ -43,7 +43,7 @@ export default function Soils({ _soils, isAllSoils, isFilters = false, type }) {
 	const { classifications, classificationsIsLoading } = useClassifications()
 	const [soils, setSoils] = useState([])
 
-	const { authors, authorsIsLoading } = useAuthors()
+	const { authors, authorsIsLoading } = useAuthors({ needSort: false })
 
 	const [filterName, setFilterName] = useState('')
 	const [filtersVisible, setFiltersVisible] = useState(true)

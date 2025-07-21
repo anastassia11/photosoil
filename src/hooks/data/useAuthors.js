@@ -2,7 +2,7 @@ import { getAuthors } from '@/api/author/get_authors'
 import { useQuery } from '@tanstack/react-query'
 import { useParams, useSearchParams } from 'next/navigation'
 
-export default function useAuthors() {
+export default function useAuthors({ needSort = true }) {
     const searchParams = useSearchParams()
     const { locale } = useParams()
 
@@ -23,13 +23,13 @@ export default function useAuthors() {
                     translation?.code?.toLowerCase().includes(filterName.toLowerCase())
                 )
 
-                return matchesSearch
+                return !needSort || matchesSearch
             }).sort((a, b) => {
                 const fieldA = locale === 'en' ? a.dataEng.name : a.dataRu.name
                 const fieldB = locale === 'en' ? b.dataEng.name : b.dataRu.name
                 return fieldA?.toString()?.localeCompare(fieldB)
             }).sort((a, b) => {
-                return a.authorType - b.authorType
+                return !needSort || (a.authorType - b.authorType)
             })
 
             return data

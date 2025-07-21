@@ -40,7 +40,7 @@ export default function useEcosystems() {
                     && matchesDraft
             }).sort((a, b) => {
                 return b.createdDate - a.createdDate
-            })
+            }).map(item => ({ ...item, _type: 'ecosystem' }))
 
             return data
         }

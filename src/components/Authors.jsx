@@ -25,7 +25,7 @@ export default function Authors() {
 	const searchParams = useSearchParams()
 
 	const { t } = getTranslation(locale)
-	const { authors, authorsIsLoading } = useAuthors()
+	const { authors, authorsIsLoading } = useAuthors({ needSort: true })
 
 	const [filterName, setFilterName] = useState('')
 

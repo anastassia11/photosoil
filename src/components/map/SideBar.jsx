@@ -11,18 +11,13 @@ import React, {
 	useCallback,
 	useEffect,
 	useMemo,
-	useRef,
-	useState
+	useRef
 } from 'react'
-import { useSelector } from 'react-redux'
 import { useSnapshot } from 'valtio'
 
 import { filtersStore } from '@/store/valtioStore/filtersStore'
 
 import { useConstants } from '@/hooks/useConstants'
-
-import { getAuthors } from '@/api/author/get_authors'
-import { getClassifications } from '@/api/classification/get_classifications'
 
 import LayerSwitch from '../admin-panel/ui-kit/LayerSwitch'
 import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper'
@@ -32,10 +27,11 @@ import DraftSwitcher from './DraftSwitcher'
 import ObjectCard from './ObjectCard'
 import SearchInput from './SearchInput'
 import { getTranslation } from '@/i18n/client'
+import useClassifications from '@/hooks/data/useClassifications'
+import useAuthors from '@/hooks/data/useAuthors'
 
 const SideBar = memo(
 	function SideBar({
-		// locale,
 		sidebarOpen,
 		setSideBarOpen,
 		filterName,
@@ -48,11 +44,16 @@ const SideBar = memo(
 		draftIsVisible,
 		setDraftIsVisible
 	}) {
-		const [classifications, setClassifications] = useState([])
-		const [authors, setAuthors] = useState([])
+
+		const { classifications } = useClassifications()
+		const { authors } = useAuthors({ needSort: false })
 
 		const { selectedTerms, selectedCategories, selectedAuthors } =
 			useSnapshot(filtersStore)
+
+		const pathname = usePathname()
+		const router = useRouter()
+		const searchParams = useSearchParams()
 
 		const { locale } = useParams()
 		const { t } = getTranslation(locale)
@@ -71,23 +72,7 @@ const SideBar = memo(
 
 		useEffect(() => {
 			setSideBarOpen(window.innerWidth > 640)
-			fetchClassifications()
-			fetchAuthors()
 		}, [])
-
-		const fetchClassifications = async () => {
-			const result = await getClassifications()
-			if (result.success) {
-				setClassifications(result.data.sort((a, b) => a.order - b.order))
-			}
-		}
-
-		const fetchAuthors = async () => {
-			const result = await getAuthors()
-			if (result.success) {
-				setAuthors(result.data)
-			}
-		}
 
 		const handleViewSidebar = () => {
 			setSideBarOpen(!sidebarOpen)
@@ -101,31 +86,108 @@ const SideBar = memo(
 			[onVisibleChange]
 		)
 
+		const updateHistory = useCallback((key, updatedArray) => {
+			const params = new URLSearchParams(searchParams.toString())
+			if (updatedArray.length > 0) {
+				params.set(key, updatedArray.join(','))
+			} else {
+				params.delete(key)
+			}
+			router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+		}, [pathname, router, searchParams])
+
 		const handleAddCategory = useCallback(
 			newItem => {
-				filtersStore.selectedCategories = selectedCategories.includes(newItem)
-					? selectedCategories.filter(item => item !== newItem)
-					: [...selectedCategories, newItem]
+				const updatedArray = filtersStore.selectedCategories.includes(newItem)
+					? filtersStore.selectedCategories.filter(item => item !== newItem)
+					: [...filtersStore.selectedCategories, newItem]
+				filtersStore.selectedCategories = updatedArray
+				updateHistory('category', updatedArray)
 			},
-			[selectedCategories]
+			[updateHistory]
+		)
+
+		const handleResetCategory = useCallback(
+			items => {
+				const updatedArray = filtersStore.selectedCategories.filter(
+					term => !items.includes(term)
+				)
+				filtersStore.selectedCategories = updatedArray
+				updateHistory('category', updatedArray)
+			},
+			[updateHistory]
+		)
+
+		const handleAllCategory = useCallback(
+			() => {
+				const updatedArray = CATEGORY_ARRAY.map(({ id }) => id)
+				filtersStore.selectedCategories = updatedArray
+				updateHistory('category', updatedArray)
+			},
+			[updateHistory, CATEGORY_ARRAY]
 		)
 
 		const handleAddTerm = useCallback(
 			newItem => {
-				filtersStore.selectedTerms = selectedTerms.includes(newItem)
-					? selectedTerms.filter(item => item !== newItem)
-					: [...selectedTerms, newItem]
+				const updatedArray = filtersStore.selectedTerms.includes(newItem)
+					? filtersStore.selectedTerms.filter(item => item !== newItem)
+					: [...filtersStore.selectedTerms, newItem]
+				filtersStore.selectedTerms = updatedArray
+				updateHistory('terms', updatedArray)
 			},
-			[selectedTerms]
+			[updateHistory]
+		)
+
+		const handleResetTerm = useCallback(
+			items => {
+				const updatedArray = filtersStore.selectedTerms.filter(
+					term => !items.includes(term)
+				)
+				filtersStore.selectedTerms = updatedArray
+				updateHistory('terms', updatedArray)
+			},
+			[updateHistory]
+		)
+
+		const handleAllTerm = useCallback(
+			terms => {
+				const updatedArray = [...filtersStore.selectedTerms, ...terms.map(({ id }) => id).filter(id => !filtersStore.selectedTerms?.includes(id))]
+				filtersStore.selectedTerms = updatedArray
+				updateHistory('terms', updatedArray)
+			},
+			[updateHistory]
 		)
 
 		const handleAddAuthor = useCallback(
 			newItem => {
-				filtersStore.selectedAuthors = selectedAuthors.includes(newItem)
-					? selectedAuthors.filter(item => item !== newItem)
-					: [...selectedAuthors, newItem]
+				const updatedArray = filtersStore.selectedAuthors.includes(newItem)
+					? filtersStore.selectedAuthors.filter(item => item !== newItem)
+					: [...filtersStore.selectedAuthors, newItem]
+				filtersStore.selectedAuthors = updatedArray
+				updateHistory('authors', updatedArray)
 			},
-			[selectedAuthors]
+			[updateHistory]
+		)
+
+		const handleResetAuthor = useCallback(
+			items => {
+				const updatedArray = filtersStore.selectedAuthors.filter(
+					term => !items.includes(term)
+				)
+
+				filtersStore.selectedAuthors = updatedArray
+				updateHistory('authors', updatedArray)
+			},
+			[updateHistory]
+		)
+
+		const handleAllAuthor = useCallback(
+			() => {
+				const updatedArray = authors.map(({ id }) => id)
+				filtersStore.selectedAuthors = updatedArray
+				updateHistory('authors', updatedArray)
+			},
+			[authors, updateHistory]
 		)
 
 		return (
@@ -267,12 +329,8 @@ const SideBar = memo(
 															.map(({ id }) => id)
 															.filter(id => selectedAuthors?.includes(id))}
 														addItem={handleAddAuthor}
-														resetItems={() =>
-															(filtersStore.selectedAuthors = [])
-														}
-														selectAll={() =>
-															(filtersStore.selectedAuthors = authors.map(({ id }) => id))
-														}
+														resetItems={handleResetAuthor}
+														selectAll={handleAllAuthor}
 													/>
 												</li>
 												<li key={'category'}>
@@ -287,12 +345,8 @@ const SideBar = memo(
 														type='category'
 														isMapFilter={true}
 														addItem={handleAddCategory}
-														resetItems={() =>
-															(filtersStore.selectedCategories = [])
-														}
-														selectAll={() =>
-															(filtersStore.selectedCategories = CATEGORY_ARRAY.map(({ id }) => id))
-														}
+														resetItems={handleResetCategory}
+														selectAll={handleAllCategory}
 													/>
 												</li>
 												{classifications?.map(item => {
@@ -317,15 +371,8 @@ const SideBar = memo(
 																		.map(({ id }) => id)
 																		.filter(id => selectedTerms?.includes(id))}
 																	addItem={handleAddTerm}
-																	resetItems={items => {
-																		filtersStore.selectedTerms =
-																			selectedTerms.filter(
-																				term => !items.includes(term)
-																			)
-																	}}
-																	selectAll={() =>
-																		(filtersStore.selectedTerms = [...selectedTerms, ...item.terms.map(({ id }) => id).filter(id => !selectedTerms?.includes(id))])
-																	}
+																	resetItems={handleResetTerm}
+																	selectAll={() => handleAllTerm(item.terms)}
 																/>
 															</li>
 														)
