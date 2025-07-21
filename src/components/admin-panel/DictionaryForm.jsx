@@ -15,6 +15,7 @@ import SubmitBtn from './ui-kit/SubmitBtn'
 import { getTranslation } from '@/i18n/client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { Label } from '../ui/label'
+import { Checkbox } from '../ui/checkbox'
 
 export default function DictionaryForm({
 	_dictionary,
@@ -121,18 +122,16 @@ export default function DictionaryForm({
 					/>
 				</div>
 
-				<label
-					htmlFor='isAlphabeticallOrder'
-					className={`ml-1 font-medium select-none mt-3 flex flex-row cursor-pointer items-center`}
-				>
-					<input
-						type='checkbox'
-						id='isAlphabeticallOrder'
-						{...register(`isAlphabeticallOrder`)}
-						className='cursor-pointer min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 '
+				<div className={`ml-1 mt-3 flex flex-row items-center space-x-2`}>
+					<Controller
+						control={control}
+						name='isAlphabeticallOrder'
+						render={({ field: { onChange, value } }) => (
+							<Checkbox id='isAlphabeticallOrder' checked={value} onCheckedChange={onChange} />
+						)}
 					/>
-					<span>{t('sortByAlpha')}</span>
-				</label>
+					<Label htmlFor="isAlphabeticallOrder" className='cursor-pointer text-base'>{t('sortByAlpha')}</Label>
+				</div>
 
 				<div className='flex xl:flex-row flex-col w-full mt-8'>
 					{translationMode == 0 || translationMode == 2 ? (

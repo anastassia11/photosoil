@@ -3,6 +3,8 @@ import { useParams } from 'next/navigation'
 import { memo, useEffect } from 'react'
 
 import { getTranslation } from '@/i18n/client'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
 
 function LangTabs({
 	onLangChange,
@@ -49,23 +51,14 @@ function LangTabs({
 					</span>
 				</div>
 				{(!oldTwoLang || !isEdit) && (
-					<label
-						htmlFor='createTwoLang'
-						className={`md:order-2 order-1 pb-4 pr-1 md:pb-2.5 flex flex-row cursor-pointer items-center`}
-					>
-						<input
-							type='checkbox'
-							id='createTwoLang'
-							checked={createTwoLang}
-							onChange={onTwoLangChange}
-							className='min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 '
-						/>
-						<span>
+					<div className={`md:order-2 order-1 pb-4 pr-1 md:pb-2.5 flex flex-row items-center space-x-2`}>
+						<Checkbox id='createTwoLang' checked={createTwoLang} onCheckedChange={onTwoLangChange} />
+						<Label htmlFor="createTwoLang" className='cursor-pointer text-base'>
 							{isEdit
 								? `${oldIsEng ? t('add_ru') : t('add_en')}`
 								: t('create_two_lang')}
-						</span>
-					</label>
+						</Label>
+					</div>
 				)}
 			</List>
 		</Root>

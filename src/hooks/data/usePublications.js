@@ -26,9 +26,10 @@ export default function usePublications() {
                     translation?.name.toLowerCase().includes(filterName.toLowerCase())
                 )
 
-                const matchesDraft = draftIsVisible == draftIsVisible == 1 || translation?.isVisible
+                const matchesDraft = draftIsVisible && draftIsVisible == 1 || translation?.isVisible
 
-                return matchesSearch
+                return translation
+                    && matchesSearch
                     && matchesDraft
             }).sort((a, b) => {
                 return b.createdDate - a.createdDate

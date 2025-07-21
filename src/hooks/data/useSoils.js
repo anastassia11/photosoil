@@ -51,9 +51,10 @@ export default function useSoils(type) {
                         soil.terms.some(term => term === selectedTerm)
                     )
 
-                const matchesDraft = draftIsVisible == draftIsVisible == 1 || translation?.isVisible
+                const matchesDraft = draftIsVisible && draftIsVisible == 1 || translation?.isVisible
 
-                return matchesSearch
+                return translation
+                    && matchesSearch
                     && matchesCategory
                     && matchesAuthor
                     && matchesTerm

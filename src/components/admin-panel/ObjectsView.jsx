@@ -17,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Label } from '../ui/label'
 import PerPageSelect from '../PerPageSelect'
 import { recoveryItemsPerPage } from '@/utils/common'
+import { Checkbox } from '../ui/checkbox'
 
 export default function ObjectsView({
 	objects,
@@ -98,15 +99,16 @@ export default function ObjectsView({
 	}, [objectType, pathname])
 
 	const handleObjectSelect = (checked, id, type) => {
-		setSelectedObjects(prev => {
-			if (checked) {
-				return type ? [...prev, { id, type }] : [...prev, id]
-			} else {
-				return type
-					? prev.filter(item => item.type !== type || item.id !== id)
-					: prev.filter(item => item !== id)
-			}
-		})
+		let updated
+		if (checked) {
+			updated = type ? [...selectedObjects, { id, type }] : [...selectedObjects, id]
+		} else {
+			updated = type
+				? selectedObjects.filter(item => item.type !== type || item.id !== id)
+				: selectedObjects.filter(item => item !== id)
+		}
+
+		setSelectedObjects(updated)
 	}
 
 	const handleAllCheked = checked => {
@@ -254,22 +256,12 @@ export default function ObjectsView({
 			>
 				<td className='px-4 py-3 text-sm font-medium text-zinc-700 whitespace-nowrap overflow-hidden w-full'>
 					<div className='max-w-full md:w-fit w-[300px] flex flex-row items-center gap-x-3 overflow-hidden'>
-						<input
-							type='checkbox'
-							checked={
-								!!(
-									selectedObjects.includes(id) ||
-									selectedObjects.find(
-										obj => obj.id === id && obj.type === type.name
-									)
-								)
-							}
-							onClick={e => e.stopPropagation()}
-							onChange={e =>
-								handleObjectSelect(e.target.checked, id, type?.name)
-							}
-							className='cursor-pointer text-blue-500 border-zinc-300 rounded min-w-4 min-h-4'
-						/>
+						<Checkbox checked={!!(
+							selectedObjects.includes(id) ||
+							selectedObjects.find(
+								obj => obj.id === id && obj.type === type.name
+							)
+						)} onCheckedChange={checked => handleObjectSelect(checked, id, type?.name)} />
 						<Link
 							onClick={e => e.stopPropagation()}
 							prefetch={false}
@@ -406,16 +398,8 @@ export default function ObjectsView({
 				className='w-full cursor-pointer px-4 py-3 text-sm font-medium text-zinc-700 whitespace-nowrap '
 			>
 				<div className='flex flex-row items-center gap-x-3'>
-					<input
-						type='checkbox'
-						checked={selectedObjects.includes(id)}
-						onClick={e => e.stopPropagation()}
-						onChange={e => {
-							e.stopPropagation()
-							handleObjectSelect(e.target.checked, id)
-						}}
-						className='text-blue-500 border-zinc-300 rounded min-w-4 min-h-4 cursor-pointer'
-					/>
+					<Checkbox checked={selectedObjects.includes(id)}
+						onCheckedChange={checked => handleObjectSelect(checked, id)} />
 					<Link
 						href={`/${locale}/admin/${objectType}/edit/${id}`}
 						prefetch={false}
@@ -506,13 +490,8 @@ export default function ObjectsView({
 				className='w-full px-4 py-3 text-sm font-medium text-zinc-700 whitespace-nowrap'
 			>
 				<div className='flex flex-row items-center gap-x-3'>
-					<input
-						type='checkbox'
-						checked={selectedObjects.includes(id)}
-						onClick={e => e.stopPropagation()}
-						onChange={e => handleObjectSelect(e.target.checked, id)}
-						className='cursor-pointer text-blue-500 border-zinc-300 rounded min-w-4 min-h-4'
-					/>
+					<Checkbox checked={selectedObjects.includes(id)}
+						onCheckedChange={checked => handleObjectSelect(checked, id)} />
 					<Link
 						href={`/${locale}/admin/${objectType}/edit/${id}`}
 						prefetch={false}
@@ -625,16 +604,8 @@ export default function ObjectsView({
 					className='px-4 py-3 text-sm font-medium text-zinc-700 whitespace-nowrap '
 				>
 					<div className='flex flex-row items-center gap-x-3'>
-						<input
-							type='checkbox'
-							checked={selectedObjects.includes(id)}
-							onClick={e => e.stopPropagation()}
-							onChange={e => {
-								e.stopPropagation()
-								handleObjectSelect(e.target.checked, id)
-							}}
-							className='cursor-pointer text-blue-500 border-zinc-300 rounded min-w-4 min-h-4'
-						/>
+						<Checkbox checked={selectedObjects.includes(id)}
+							onCheckedChange={checked => handleObjectSelect(checked, id)} />
 						<Link
 							onClick={e => e.stopPropagation()}
 							href={`/${locale}/admin/${objectType}/${id}`}
@@ -740,6 +711,14 @@ export default function ObjectsView({
 
 	const TableHead = () => {
 		const name = objectType === 'news' ? 'title' : 'name'
+		const checked = currentItems.every(
+			object =>
+				selectedObjects.includes(object.id) ||
+				!!selectedObjects.find(
+					obj =>
+						obj.id === object.id && obj.type === object.type.name
+				)
+		) && !!selectedObjects.length
 		return (
 			<thead className='bg-zinc-100'>
 				<tr>
@@ -747,22 +726,9 @@ export default function ObjectsView({
 						scope='col'
 						className='py-3.5 px-4 text-sm font-normal text-left text-zinc-500'
 					>
-						<div className='flex items-center'>
-							<input
-								type='checkbox'
-								checked={
-									currentItems.every(
-										object =>
-											selectedObjects.includes(object.id) ||
-											selectedObjects.find(
-												obj =>
-													obj.id === object.id && obj.type === object.type.name
-											)
-									) && selectedObjects.length
-								}
-								onChange={e => handleAllCheked(e.target.checked)}
-								className='cursor-pointer text-blue-500 border-zinc-300 rounded w-4 h-4 mr-3'
-							/>
+						<div className='flex flex-row items-center gap-x-3'>
+							<Checkbox checked={checked}
+								onCheckedChange={handleAllCheked} />
 
 							<button
 								className='flex items-center'
@@ -813,6 +779,9 @@ export default function ObjectsView({
 	}
 
 	const DictionaryTableHead = () => {
+		const checked = currentItems.every(object =>
+			selectedObjects.includes(object.id)
+		) && !!selectedObjects.length
 		return (
 			<thead className='bg-zinc-100'>
 				<tr>
@@ -821,16 +790,8 @@ export default function ObjectsView({
 						className='py-3.5 px-4 text-sm font-normal text-left text-zinc-500'
 					>
 						<div className='flex items-center gap-x-3'>
-							<input
-								type='checkbox'
-								checked={
-									currentItems.every(object =>
-										selectedObjects.includes(object.id)
-									) && selectedObjects.length
-								}
-								onChange={e => handleAllCheked(e.target.checked)}
-								className='cursor-pointer text-blue-500 border-zinc-300 rounded w-4 h-4'
-							/>
+							<Checkbox checked={checked}
+								onCheckedChange={handleAllCheked} />
 							<button
 								className='flex items-center'
 								onClick={() => sortedBy('name')}
@@ -865,6 +826,9 @@ export default function ObjectsView({
 	}
 
 	const AuthorTableHead = () => {
+		const checked = currentItems.every(object =>
+			selectedObjects.includes(object.id)
+		) && !!selectedObjects.length
 		return (
 			<thead className='bg-zinc-100'>
 				<tr>
@@ -873,16 +837,8 @@ export default function ObjectsView({
 						className='py-3.5 px-4 text-sm font-normal text-left text-zinc-500'
 					>
 						<div className='flex items-center gap-x-3'>
-							<input
-								type='checkbox'
-								checked={
-									currentItems.every(object =>
-										selectedObjects.includes(object.id)
-									) && selectedObjects.length
-								}
-								onChange={e => handleAllCheked(e.target.checked)}
-								className='cursor-pointer text-blue-500 border-zinc-300 rounded w-4 h-4'
-							/>
+							<Checkbox checked={checked}
+								onCheckedChange={handleAllCheked} />
 							<button
 								className='flex items-center'
 								onClick={() => sortedBy('name')}
@@ -921,6 +877,9 @@ export default function ObjectsView({
 	}
 
 	const ModeratorTableHead = () => {
+		const checked = currentItems.every(object =>
+			selectedObjects.includes(object.id)
+		) && !!selectedObjects.length
 		return (
 			<thead className='bg-zinc-100'>
 				<tr>
@@ -929,16 +888,8 @@ export default function ObjectsView({
 						className='py-3.5 px-4 text-sm font-normal text-left text-zinc-500'
 					>
 						<div className='flex items-center gap-x-3'>
-							<input
-								type='checkbox'
-								checked={
-									currentItems.every(object =>
-										selectedObjects.includes(object.id)
-									) && selectedObjects.length
-								}
-								onChange={e => handleAllCheked(e.target.checked)}
-								className='cursor-pointer text-blue-500 border-zinc-300 rounded w-4 h-4'
-							/>
+							<Checkbox checked={checked}
+								onCheckedChange={handleAllCheked} />
 							<button
 								className='flex items-center'
 								onClick={() => sortedBy('email')}

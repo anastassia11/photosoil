@@ -32,9 +32,10 @@ export default function useNews() {
                         item.tags?.some(({ id }) => id === selectedTag)
                     )
 
-                const matchesDraft = draftIsVisible == draftIsVisible == 1 || translation?.isVisible
+                const matchesDraft = draftIsVisible && draftIsVisible == 1 || translation?.isVisible
 
-                return matchesSearch
+                return translation
+                    && matchesSearch
                     && matchesTags
                     && matchesDraft
             }).sort((a, b) => {

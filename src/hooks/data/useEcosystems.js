@@ -32,9 +32,10 @@ export default function useEcosystems() {
                         ecosystem.authors?.some(author => author === selectedAuthor)
                     )
 
-                const matchesDraft = draftIsVisible == draftIsVisible == 1 || translation?.isVisible
+                const matchesDraft = draftIsVisible && draftIsVisible == 1 || translation?.isVisible
 
-                return matchesSearch
+                return translation
+                    && matchesSearch
                     && matchesAuthor
                     && matchesDraft
             }).sort((a, b) => {

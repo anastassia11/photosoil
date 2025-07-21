@@ -15,6 +15,8 @@ import useAdminEcosystems from '@/hooks/data/forAdmin/useAdminEcosystems'
 import useAdminPubl from '@/hooks/data/forAdmin/useAdminPubl'
 import useAdminNews from '@/hooks/data/forAdmin/useAdminNews'
 import useAdminSoils from '@/hooks/data/forAdmin/useAdminSoils'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
 
 export default function AccountPageComponent({ id }) {
 	const dispatch = useDispatch()
@@ -74,8 +76,7 @@ export default function AccountPageComponent({ id }) {
 		router.replace(`${pathname}?${params.toString()}`, { scroll: false })
 	}, [pathname, router, searchParams])
 
-	const handleFilterSelect = e => {
-		const { name, checked } = e.target
+	const handleFilterSelect = (name, checked) => {
 		const newFilters = checked ? [...selectedFilters, name] : selectedFilters.filter(filterName => filterName !== name)
 		setSelectedFilters(newFilters)
 
@@ -167,21 +168,10 @@ export default function AccountPageComponent({ id }) {
 
 			<ul className='flex flex-row flex-wrap'>
 				{FILTERS.map(({ title, name }) => (
-					<li key={name}>
-						<label
-							htmlFor={`Item${name}`}
-							className='flex flex-row cursor-pointer mr-12 mb-4 select-none'
-						>
-							<input
-								type='checkbox'
-								id={`Item${name}`}
-								name={name}
-								checked={selectedFilters.includes(name)}
-								onChange={handleFilterSelect}
-								className='cursor-pointer min-w-5 w-5 min-h-5 h-5 mr-1 rounded border-gray-300 '
-							/>
-							<span className='text-gray-700'>{title}</span>
-						</label>
+					<li key={name} className='flex flex-row items-center space-x-2 mr-12 mb-4'>
+						<Checkbox id={`Item${name}`} name={name} checked={selectedFilters.includes(name)}
+							onCheckedChange={checked => handleFilterSelect(name, checked)} />
+						<Label htmlFor={`Item${name}`} className='cursor-pointer text-base'>{title}</Label>
 					</li>
 				))}
 			</ul>

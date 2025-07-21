@@ -172,11 +172,10 @@ export default function PublicationForm({
 		dispatch(closeModal())
 	}
 
-	const handleTwoLangChange = e => {
+	const handleTwoLangChange = checked => {
 		const translations = getValues('translations')
-		const isChecked = e.target.checked
 		if (pathname === 'edit') {
-			if (isChecked) {
+			if (checked) {
 				if (translations?.length < 2) {
 					appendTranslation({ isEnglish: !isEng })
 				}
@@ -188,7 +187,7 @@ export default function PublicationForm({
 				appendTranslation({ isEnglish: !isEng })
 			}
 		}
-		setCreateTwoLang(isChecked)
+		setCreateTwoLang(checked)
 	}
 
 	const handleLangChange = value => {

@@ -40,6 +40,7 @@ import Textarea from './ui-kit/Textarea'
 import { getTranslation } from '@/i18n/client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { Label } from '../ui/label'
+import { Checkbox } from '../ui/checkbox'
 
 function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, onMainPhotoSend, onOtherPhotoSend,
 	onObjectPhotoDelete, onMainPhotoDelete, setBtnDisabled
@@ -311,11 +312,10 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, onMainPhot
 	)
 
 	const handleTwoLangChange = useCallback(
-		e => {
-			const isChecked = e.target.checked
+		checked => {
 			const translations = getValues('translations')
 			if (pathname === 'edit') {
-				if (isChecked) {
+				if (checked) {
 					if (translations?.length < 2) {
 						appendTranslation({ isEnglish: !isEng })
 					}
@@ -327,7 +327,7 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, onMainPhot
 					appendTranslation({ isEnglish: !isEng })
 				}
 			}
-			setValue('createTwoLang', isChecked)
+			setValue('createTwoLang', checked)
 		},
 		[pathname, getValues, appendTranslation, setValue, isEng, oldIsEng]
 	)
@@ -557,18 +557,17 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, onMainPhot
 									type='authors'
 								/>
 							</li>
-							<label
-								htmlFor='isExternal'
-								className={`font-medium select-none mt-3 flex flex-row cursor-pointer items-center`}
-							>
-								<input
-									type='checkbox'
-									id='isExternal'
-									{...register(`isExternal`)}
-									className='cursor-pointer min-w-5 w-5 min-h-5 h-5 mr-2 rounded border-gray-300 '
+							<div className={`mt-3 flex flex-row items-center space-x-2`}>
+
+								<Controller
+									control={control}
+									name='isExternal'
+									render={({ field: { onChange, value } }) => (
+										<Checkbox id='isExternal' checked={value} onCheckedChange={onChange} />
+									)}
 								/>
-								<span>{`${t('isExternal')} ${isEng ? '(EN)' : ''}`}</span>
-							</label>
+								<Label htmlFor="isExternal" className='cursor-pointer text-base'>{`${t('isExternal')} ${isEng ? '(EN)' : ''}`}</Label>
+							</div>
 							<div
 								className={`${isExternal ? 'visible' : 'invisible opacity-0 max-h-0 overflow-hidden'} duration-300
                             w-full relative mt-2 `}
