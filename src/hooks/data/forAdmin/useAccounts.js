@@ -7,15 +7,17 @@ import { changeRole } from '@/api/account/change_Role'
 import { useDispatch } from 'react-redux'
 import { getTranslation } from '@/i18n/client'
 import { openAlert } from '@/store/slices/alertSlice'
+import { useSnapshot } from 'valtio'
+import { adminSortsStore } from '@/store/valtioStore/adminSortsStore'
 
 export default function useAccounts() {
     const queryClient = useQueryClient()
     const searchParams = useSearchParams()
     const { locale } = useParams()
+    const { sortBy, sortType } = useSnapshot(adminSortsStore)
+
     const dispatch = useDispatch()
     const { t } = getTranslation(locale)
-
-    const _isEng = locale === 'en'
 
     const { data: accounts = [], isLoading: accountsIsLoading } = useQuery({
         queryKey: ['admin accounts'],
@@ -24,11 +26,6 @@ export default function useAccounts() {
             let data = [...res.data]
 
             const filterName = searchParams.get('search')
-            const sortBy = searchParams.get('sortBy')
-
-            // 1 = по возрастанию 
-            // 0 = по убыванию
-            const sortType = searchParams.get('sortType')
 
             data = data.filter(account => {
                 const matchesSearch = !filterName || (

@@ -1,12 +1,15 @@
 import { deleteSoilById } from '@/api/soil/delete_soil'
 import { getSoilsForAdmin } from '@/api/soil/get_soils_forAdmin'
 import { putSoilVisible } from '@/api/soil/put_soilVisible'
+import { adminSortsStore } from '@/store/valtioStore/adminSortsStore'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSearchParams } from 'next/navigation'
+import { useSnapshot } from 'valtio'
 
 export default function useAdminSoils() {
     const queryClient = useQueryClient()
     const searchParams = useSearchParams()
+    const { sortBy, sortType } = useSnapshot(adminSortsStore)
 
     const { data: soils = [], isLoading: soilsIsLoading } = useQuery({
         queryKey: ['admin soils'],
@@ -17,11 +20,6 @@ export default function useAdminSoils() {
             const filterName = searchParams.get('search')
             const currentLang = searchParams.get('lang')
             const publishStatus = searchParams.get('publish')
-            const sortBy = searchParams.get('sortBy')
-
-            // 1 = по возрастанию 
-            // 0 = по убыванию
-            const sortType = searchParams.get('sortType')
 
             data = data.filter(soil => {
 
@@ -53,7 +51,7 @@ export default function useAdminSoils() {
                 }
 
                 if (sortBy === 'lastUpdated') {
-                    return sortType == 1 ? fieldA - fieldB : fieldB - fieldA
+                    return sortType == 1 ? fieldB - fieldA : fieldA - fieldB
                 } else if (sortBy === 'isVisible') {
                     return fieldA === fieldB
                         ? 0

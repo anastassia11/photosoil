@@ -42,7 +42,6 @@ export default function Pagination({
 	}, [currPage, itemsPerPage, items, updateCurrentItems])
 
 	const handlePageClick = event => {
-		console.log('Selected page:', event.selected)
 		setCurrPage(event.selected)
 
 		const newOffset = (event.selected * itemsPerPage) % items.length

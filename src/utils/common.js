@@ -2,7 +2,7 @@ import axios from 'axios'
 
 import tokenVerification from '@/api/account/token_verification'
 
-import { BASE_SERVER_URL, PAGINATION_DATA } from './constants'
+import { ADMIN_SORTS, BASE_SERVER_URL, PAGINATION_DATA } from './constants'
 
 export const request = async ({
 	method,
@@ -56,4 +56,9 @@ export const recoveryItemsPerPage = ({ isChild = false, key, pathname }) => {
 		const _pathname = pathname.split('/')[2]
 		return defaultData[_pathname].children[key]
 	}
+}
+
+export const recoveryAdminSort = (key) => {
+	const defaultData = JSON.parse(localStorage.getItem('adminSorts')) ?? ADMIN_SORTS
+	return defaultData[key]
 }

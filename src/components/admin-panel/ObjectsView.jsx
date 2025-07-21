@@ -10,14 +10,16 @@ import Pagination from '@/components/Pagination'
 
 import { setDropdown } from '@/store/slices/generalSlice'
 
-import { PAGINATION_OPTIONS } from '@/utils/constants'
+import { ADMIN_SORTS, PAGINATION_OPTIONS } from '@/utils/constants'
 
 import { getTranslation } from '@/i18n/client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { Label } from '../ui/label'
 import PerPageSelect from '../PerPageSelect'
-import { recoveryItemsPerPage } from '@/utils/common'
+import { recoveryAdminSort, recoveryItemsPerPage } from '@/utils/common'
 import { Checkbox } from '../ui/checkbox'
+import { adminSortsStore } from '@/store/valtioStore/adminSortsStore'
+import { useSnapshot } from 'valtio'
 
 export default function ObjectsView({
 	objects,
@@ -41,8 +43,7 @@ export default function ObjectsView({
 	const [currentLang, setCurrentLang] = useState('any')
 	const [publishStatus, setPublichStatus] = useState('all')
 
-	const [sortType, setSortType] = useState('1')
-	const [sortBy, setSortBy] = useState(objectType === 'authors' ? 'authorType' : objectType === 'users' ? 'role' : 'lastUpdated')
+	const { sortType, sortBy } = useSnapshot(adminSortsStore)
 
 	const [currentItems, setCurrentItems] = useState([])
 	const [itemsPerPage, setItemsPerPage] = useState()
@@ -66,11 +67,6 @@ export default function ObjectsView({
 				const filterName = searchParams.get('search')
 				const currentLang = searchParams.get('lang')
 				const publishStatus = searchParams.get('publish')
-				const sortBy = searchParams.get('sortBy')
-
-				// 1 = по возрастанию 
-				// 0 = по убыванию
-				const sortType = searchParams.get('sortType')
 
 				if (currentLang) {
 					setCurrentLang(currentLang)
@@ -81,12 +77,6 @@ export default function ObjectsView({
 				if (filterName) {
 					setFilterName(filterName)
 				}
-				if (sortBy) {
-					setSortBy(sortBy)
-				}
-				if (sortType) {
-					setSortType(sortType)
-				}
 				didLogRef.current = false
 			}, 300)
 		}
@@ -94,8 +84,12 @@ export default function ObjectsView({
 	}, [])
 
 	useEffect(() => {
-		const value = recoveryItemsPerPage({ isChild: true, key: objectType, pathname })
-		setItemsPerPage(value)
+		const items = recoveryItemsPerPage({ isChild: true, key: objectType, pathname })
+		const sorts = recoveryAdminSort(objectType)
+		setItemsPerPage(items)
+
+		adminSortsStore.sortBy = sorts.sortBy
+		adminSortsStore.sortType = sorts.sortType
 	}, [objectType, pathname])
 
 	const handleObjectSelect = (checked, id, type) => {
@@ -158,18 +152,22 @@ export default function ObjectsView({
 		updateHistory({ 'lang': lang === 'any' ? [] : [lang] })
 	}
 
+	const saveAdminSorts = (sortBy, sortType) => {
+		adminSortsStore.sortBy = sortBy
+		adminSortsStore.sortType = sortType
+
+		const defaultData = JSON.parse(localStorage.getItem('adminSorts')) ?? ADMIN_SORTS
+		const newData = { ...defaultData, [objectType]: { sortBy, sortType } }
+
+		localStorage.setItem('adminSorts', JSON.stringify(newData))
+	}
+
 	const sortedBy = fieldName => {
 		if (fieldName == sortBy) {
 			const _sortType = sortType == '1' ? '0' : '1'
-			setSortBy(fieldName)
-			setSortType(_sortType)
-
-			updateHistory({ 'sortBy': [fieldName], 'sortType': [_sortType] })
+			saveAdminSorts(fieldName, _sortType)
 		} else {
-			setSortBy(fieldName)
-			setSortType('1')
-
-			updateHistory({ 'sortBy': [fieldName], 'sortType': ['1'] })
+			saveAdminSorts(fieldName, '1')
 		}
 	}
 

@@ -74,3 +74,38 @@ export const PAGINATION_DATA = {
 		}
 	}
 }
+
+export const ADMIN_SORTS = {
+	objects: {
+		sortBy: 'lastUpdated',
+		sortType: 1
+	},
+	ecosystems: {
+		sortBy: 'lastUpdated',
+		sortType: 1
+	},
+	publications: {
+		sortBy: 'lastUpdated',
+		sortType: 1
+	},
+	news: {
+		sortBy: 'lastUpdated',
+		sortType: 1
+	},
+	authors: {
+		sortBy: 'authorType',
+		sortType: 1
+	},
+	dictionary: {
+		sortBy: 'name',
+		sortType: 1
+	},
+	users: {
+		sortBy: 'role',
+		sortType: 1
+	},
+	userPage: {
+		sortBy: 'lastUpdated',
+		sortType: 1
+	}
+}

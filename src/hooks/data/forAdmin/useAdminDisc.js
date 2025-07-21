@@ -1,12 +1,15 @@
 import { deleteClassification } from '@/api/classification/delete_classification'
 import { getClassifications } from '@/api/classification/get_classifications'
+import { adminSortsStore } from '@/store/valtioStore/adminSortsStore'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams, useSearchParams } from 'next/navigation'
+import { useSnapshot } from 'valtio'
 
 export default function useAdminDisconaries() {
     const queryClient = useQueryClient()
     const searchParams = useSearchParams()
     const { locale } = useParams()
+    const { sortBy, sortType } = useSnapshot(adminSortsStore)
 
     const _isEng = locale === 'en'
 
@@ -17,12 +20,7 @@ export default function useAdminDisconaries() {
             let data = [...res.data]
 
             const filterName = searchParams.get('search')
-            const sortBy = searchParams.get('sortBy')
             const currentLang = searchParams.get('lang')
-
-            // 1 = по возрастанию 
-            // 0 = по убыванию
-            const sortType = searchParams.get('sortType')
 
             data = data.filter(disc => {
                 const matchesSearch = !filterName ||

@@ -156,7 +156,7 @@ export default function NewsItemPageComponent({ id }) {
 
 				<div
 					id='gallery-section'
-					className='mt-8 self-center'
+					className='mt-8 self-center w-full'
 				>
 					<NewGallery objectPhoto={news?.objectPhoto} />
 				</div>

@@ -2,10 +2,12 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams, useSearchParams } from 'next/navigation'
 import { getTranslation } from '@/i18n/client'
 import { getAccount } from '@/api/account/get_account'
+import { useSnapshot } from 'valtio'
+import { adminSortsStore } from '@/store/valtioStore/adminSortsStore'
 
 export default function useAccount(id) {
     const searchParams = useSearchParams()
-
+    const { sortBy, sortType } = useSnapshot(adminSortsStore)
     const { locale } = useParams()
     const { t } = getTranslation(locale)
 
@@ -27,11 +29,6 @@ export default function useAccount(id) {
             const publishStatus = searchParams.get('publish')
 
             const disabledTypes = searchParams.get('disabled')
-            const sortBy = searchParams.get('sortBy')
-
-            // 1 = по возрастанию 
-            // 0 = по убыванию
-            const sortType = searchParams.get('sortType')
 
             let userObjects = [
                 ...data.soilObjects.flatMap(({ translations }) =>

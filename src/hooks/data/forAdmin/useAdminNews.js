@@ -1,12 +1,15 @@
 import { deleteNewsById } from '@/api/news/delete_news'
 import { getNewsForAdmin } from '@/api/news/get_news_forAdmin'
 import { putNewsVisible } from '@/api/news/put_newsVisible'
+import { adminSortsStore } from '@/store/valtioStore/adminSortsStore'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSearchParams } from 'next/navigation'
+import { useSnapshot } from 'valtio'
 
 export default function useAdminNews() {
     const queryClient = useQueryClient()
     const searchParams = useSearchParams()
+    const { sortBy, sortType } = useSnapshot(adminSortsStore)
 
     const { data: news = [], isLoading: newsIsLoading } = useQuery({
         queryKey: ['admin news'],
@@ -17,11 +20,6 @@ export default function useAdminNews() {
             const filterName = searchParams.get('search')
             const currentLang = searchParams.get('lang')
             const publishStatus = searchParams.get('publish')
-            const sortBy = searchParams.get('sortBy')
-
-            // 1 = по возрастанию 
-            // 0 = по убыванию
-            const sortType = searchParams.get('sortType')
 
             data = data.filter(item => {
                 const matchesSearch = !filterName || (
@@ -48,7 +46,7 @@ export default function useAdminNews() {
                 }
 
                 if (sortBy === 'lastUpdated') {
-                    return sortType == 1 ? fieldA - fieldB : fieldB - fieldA
+                    return sortType == 1 ? fieldB - fieldA : fieldA - fieldB
                 } else if (sortBy === 'isVisible') {
                     return fieldA === fieldB
                         ? 0

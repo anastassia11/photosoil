@@ -1,12 +1,15 @@
 import { deletePublicationById } from '@/api/publication/delete_publication'
 import { getPublicationsForAdmin } from '@/api/publication/get_publications_forAdmin'
 import { putPublicationVisible } from '@/api/publication/put_publicationVisible'
+import { adminSortsStore } from '@/store/valtioStore/adminSortsStore'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSearchParams } from 'next/navigation'
+import { useSnapshot } from 'valtio'
 
 export default function useAdminPubl() {
     const queryClient = useQueryClient()
     const searchParams = useSearchParams()
+    const { sortBy, sortType } = useSnapshot(adminSortsStore)
 
     const { data: publications = [], isLoading: publicationsIsLoading } = useQuery({
         queryKey: ['admin publications'],
@@ -17,11 +20,6 @@ export default function useAdminPubl() {
             const filterName = searchParams.get('search')
             const currentLang = searchParams.get('lang')
             const publishStatus = searchParams.get('publish')
-            const sortBy = searchParams.get('sortBy')
-
-            // 1 = по возрастанию 
-            // 0 = по убыванию
-            const sortType = searchParams.get('sortType')
 
             data = data.filter(publ => {
                 const matchesSearch = !filterName || (
@@ -52,7 +50,7 @@ export default function useAdminPubl() {
                 }
 
                 if (sortBy === 'lastUpdated') {
-                    return sortType == 1 ? fieldA - fieldB : fieldB - fieldA
+                    return sortType == 1 ? fieldB - fieldA : fieldA - fieldB
                 } else if (sortBy === 'isVisible') {
                     return fieldA === fieldB
                         ? 0

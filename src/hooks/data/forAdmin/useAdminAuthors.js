@@ -1,12 +1,15 @@
 import { deleteAuthor } from '@/api/author/delete_author'
 import { getAuthorsForAdmin } from '@/api/author/get_authors_forAdmin'
+import { adminSortsStore } from '@/store/valtioStore/adminSortsStore'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams, useSearchParams } from 'next/navigation'
+import { useSnapshot } from 'valtio'
 
 export default function useAdminAuthors() {
     const queryClient = useQueryClient()
     const searchParams = useSearchParams()
     const { locale } = useParams()
+    const { sortBy, sortType } = useSnapshot(adminSortsStore)
 
     const _isEng = locale === 'en'
 
@@ -17,11 +20,6 @@ export default function useAdminAuthors() {
             let data = [...res.data]
 
             const filterName = searchParams.get('search')
-            const sortBy = searchParams.get('sortBy')
-
-            // 1 = по возрастанию 
-            // 0 = по убыванию
-            const sortType = searchParams.get('sortType')
 
             data = data.filter(author => {
                 const matchesSearch = !filterName || (
