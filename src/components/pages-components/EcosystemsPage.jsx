@@ -3,6 +3,7 @@
 import Soils from '@/components/soils/Soils'
 import useEcosystems from '@/hooks/data/useEcosystems'
 import { getTranslation } from '@/i18n/client'
+import { Suspense } from 'react'
 
 export default function EcosystemsPageComponent({ locale }) {
     const { t } = getTranslation(locale)
@@ -18,6 +19,6 @@ export default function EcosystemsPageComponent({ locale }) {
                 isFilters={true}
                 _soils={data}
             />
-        </div>
+        </div >
     )
 }
