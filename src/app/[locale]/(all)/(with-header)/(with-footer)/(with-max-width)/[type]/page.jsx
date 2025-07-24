@@ -1,6 +1,7 @@
 import SoilsPageComponent from '@/components/pages-components/SoilsPage'
 
 import { getTranslation } from '@/i18n'
+import { Suspense } from 'react'
 
 export async function generateMetadata({ params: { locale, type } }) {
 	const { t } = await getTranslation(locale, 'seo')
