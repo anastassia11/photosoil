@@ -516,16 +516,16 @@ const Filter = memo(
 			</div>
 		)
 	},
-	(prevProps, nextProps) => {
-		return (
-			prevProps.type === nextProps.type &&
-			prevProps.selectedItems?.toString() ===
-			nextProps.selectedItems?.toString() &&
-			prevProps.items === nextProps.items &&
-			prevProps.name === nextProps.name &&
-			prevProps.addItem === nextProps.addItem
-		)
-	}
+	// (prevProps, nextProps) => {
+	// 	return (
+	// 		prevProps.type === nextProps.type &&
+	// 		prevProps.selectedItems?.toString() ===
+	// 		nextProps.selectedItems?.toString() &&
+	// 		prevProps.items === nextProps.items &&
+	// 		prevProps.name === nextProps.name &&
+	// 		prevProps.addItem === nextProps.addItem
+	// 	)
+	// }
 )
 
 export default Filter

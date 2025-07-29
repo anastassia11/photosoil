@@ -48,8 +48,8 @@ export default function useAdminAuthors() {
                 }
                 if (sortBy === 'authorType') {
                     return sortType == 1
-                        ? b.authorType - a.authorType
-                        : a.authorType - b.authorType
+                        ? a.authorType - b.authorType
+                        : b.authorType - a.authorType
                 }
 
                 return sortType == 1

@@ -9,16 +9,10 @@ import {
 	useState
 } from 'react'
 import { useDispatch } from 'react-redux'
-import { useSnapshot } from 'valtio'
 
 import { openAlert } from '@/store/slices/alertSlice'
-import { filtersStore } from '@/store/valtioStore/filtersStore'
 
 import { getMapLayers } from '@/hooks/getMapLayers'
-
-import { getEcosystems } from '@/api/ecosystem/get_ecosystems'
-import { getPublications } from '@/api/publication/get_publications'
-import { getSoils } from '@/api/soil/get_soils'
 
 import Feature from 'ol/Feature'
 import OLMap from 'ol/Map'
@@ -36,6 +30,10 @@ import SearchRegion from './SearchRegion'
 import SideBar from './SideBar'
 import Zoom from './Zoom'
 import { getTranslation } from '@/i18n/client'
+import useSoils from '@/hooks/data/useSoils'
+import useEcosystems from '@/hooks/data/useEcosystems'
+import usePublications from '@/hooks/data/usePublications'
+import { throttle } from 'lodash'
 
 export default function MainMap() {
 	const dispatch = useDispatch()
@@ -50,41 +48,27 @@ export default function MainMap() {
 
 	const { t } = getTranslation(locale)
 
-	const { selectedTerms, selectedCategories, selectedAuthors } =
-		useSnapshot(filtersStore)
-
 	const [selectedLayer, setSelectedLayer] = useState('')
 
 	const [selectedObjects, setSelectedObjects] = useState([])
-	const [layersVisible, setLayersVisible] = useState(null)
-	const [objects, setObjects] = useState([])
-	const [soils, setSoils] = useState([])
-	const [ecosystems, setEcosystems] = useState([])
-	const [publications, setPublications] = useState([])
-	const [popupVisible, setPopupVisible] = useState(false)
-	const [draftIsVisible, setDraftIsVisible] = useState(false)
 
-	const [filterName, setFilterName] = useState('')
+	const [layersVisible, setLayersVisible] = useState(null)
+
+	const { soils, soilsIsLoading } = useSoils()
+	const { data: ecosystems, isLoading: ecosystemsIsLoading } = useEcosystems()
+	const { data: publications, isLoading: publicationsIsLoading } = usePublications()
+
+	const [popupVisible, setPopupVisible] = useState(false)
+
 	const router = useRouter()
 	const pathname = usePathname()
 
 	const didLogRef = useRef(true)
-
-	const didLogRef2 = useRef(true)
-
-	const didLogFiltersRef = useRef(true)
 	const mapElement = useRef()
 
 	const mapRef = useRef(null)
-	const _isEng = locale === 'en'
 
 	useLayoutEffect(() => {
-		let timeoutId
-		const initializeMap = () => {
-			init()
-			loadLayers()
-		}
-
 		localStorage.getItem('layersVisible')
 			? setLayersVisible(JSON.parse(localStorage.getItem('layersVisible')))
 			: setLayersVisible({
@@ -93,19 +77,62 @@ export default function MainMap() {
 				publication: false
 			})
 
+		localStorage.getItem('layer')
+			? setSelectedLayer(JSON.parse(localStorage.getItem('layer')))
+			: setSelectedLayer('OSM')
+
+		if (soilsIsLoading || ecosystemsIsLoading || publicationsIsLoading) return
+
+		const initializeMap = () => {
+			init()
+			// loadLayers()
+		}
+
+		let timeoutId
+
+		timeoutId = setTimeout(() => {
+			const soilIds = searchParams.get('soilIds')?.split(',').map(Number)
+			const ecosIds = searchParams.get('ecosIds')?.split(',').map(Number)
+			const publIds = searchParams.get('publIds')?.split(',').map(Number)
+
+			let _selectedSoils = []
+			let _selectedEcoss = []
+			let _selectedPubls = []
+
+			if (soilIds) {
+				_selectedSoils = soils.filter(({ id }) => soilIds?.includes(id))
+			}
+			if (ecosIds) {
+				_selectedEcoss = ecosystems.filter(({ id }) => ecosIds?.includes(id))
+			}
+			if (publIds) {
+				_selectedPubls = publications.filter(({ id }) => publIds?.includes(id))
+			}
+			setSelectedObjects([..._selectedSoils, ..._selectedEcoss, ..._selectedPubls])
+
+			if (soilIds || ecosIds || publIds) {
+				setPopupVisible(true)
+			}
+		}, 300)
+
 		if (mapElement.current) {
 			if (didLogRef.current) {
-				didLogRef.current = false
 				initializeMap()
+				didLogRef.current = false
 			}
 		} else {
 			document.addEventListener('DOMContentLoaded', initializeMap)
 		}
 		return () => {
-			clearTimeout(timeoutId)
 			document.removeEventListener('DOMContentLoaded', initializeMap)
+			clearTimeout(timeoutId)
 		}
-	}, [])
+	}, [soilsIsLoading, ecosystemsIsLoading, publicationsIsLoading])
+
+	useEffect(() => {
+		if (soilsIsLoading || ecosystemsIsLoading || publicationsIsLoading) return
+		loadLayers()
+	}, [soils, ecosystems, publications])
 
 	useEffect(() => {
 		const map = mapRef.current
@@ -113,20 +140,26 @@ export default function MainMap() {
 
 		const view = map.getView()
 
+		let debounceTimer
+
 		const updateSearchParams = () => {
-			const center = view.getCenter()
-			const zoom = view.getZoom()
+			// Очищаем предыдущий таймер
+			clearTimeout(debounceTimer)
+			// Устанавливаем новый таймер
+			debounceTimer = setTimeout(() => {
+				const center = view.getCenter()
+				const zoom = view.getZoom()
 
-			if (!center || zoom === undefined) return
+				if (!center || zoom === undefined) return
 
-			const [lon, lat] = toLonLat(center)
+				const [lon, lat] = toLonLat(center)
+				const newParams = new URLSearchParams(searchParams.toString())
 
-			const newParams = new URLSearchParams(searchParams.toString())
+				newParams.set('zoom', zoom.toFixed(2))
+				newParams.set('center', `${lon.toFixed(6)},${lat.toFixed(6)}`)
 
-			newParams.set('zoom', zoom.toFixed(2))
-			newParams.set('center', `${lon.toFixed(6)},${lat.toFixed(6)}`)
-
-			router.replace(`${pathname}?${newParams.toString()}`, { scroll: false })
+				router.replace(`${pathname}?${newParams.toString()}`, { scroll: false })
+			}, 300)
 		}
 
 		// Подписка на изменение зума и центра
@@ -136,43 +169,26 @@ export default function MainMap() {
 		]
 
 		return () => {
+			// Очищаем таймер при размонтировании
+			clearTimeout(debounceTimer)
+
+			// Отписываемся от событий
 			listenerKeys.forEach((key) => {
 				view.un('change:resolution', key.listener)
 				view.un('change:center', key.listener)
 			})
 		}
-	}, [])
-
-
-
-	useEffect(() => {
-		let timeoutId
-		if (didLogFiltersRef.current) {
-			timeoutId = setTimeout(() => {
-				didLogFiltersRef.current = false
-				const categoriesParam = searchParams.get('categories')
-				const termsParam = searchParams.get('terms')
-				const authorsParam = searchParams.get('authors')
-
-				categoriesParam &&
-					categoriesParam
-						.split(',')
-						.forEach(param => handleAddCategory(Number(param)))
-				termsParam &&
-					termsParam.split(',').forEach(param => handleAddTerm(Number(param)))
-				authorsParam &&
-					authorsParam
-						.split(',')
-						.forEach(param => handleAddAuthor(Number(param)))
-			}, 300)
-		}
-		return () => clearTimeout(timeoutId)
-	}, [])
+	}, [soilsIsLoading, ecosystemsIsLoading, publicationsIsLoading, router, pathname, searchParams])
 
 	useEffect(() => {
 		layersVisible &&
 			localStorage.setItem('layersVisible', JSON.stringify(layersVisible))
 	}, [layersVisible])
+
+	useEffect(() => {
+		selectedLayer &&
+			localStorage.setItem('layer', JSON.stringify(selectedLayer))
+	}, [selectedLayer])
 
 	useEffect(() => {
 		if (clusterLayer) {
@@ -188,9 +204,10 @@ export default function MainMap() {
 	}, [layersVisible, clusterLayer, soils, ecosystems, publications, features])
 
 	useEffect(() => {
+		if (!mapRef.current) return
 		addListeners()
 		return () => removeListeners()
-	}, [soils, ecosystems, publications])
+	}, [soilsIsLoading, ecosystemsIsLoading, publicationsIsLoading, searchParams, pathname, router])
 
 	useEffect(() => {
 		if (window.innerWidth < 640) {
@@ -207,150 +224,88 @@ export default function MainMap() {
 		}
 	}, [])
 
-	const handleAddCategory = useCallback(
-		newItem => {
-			filtersStore.selectedCategories = filtersStore.selectedCategories.includes(newItem)
-				? filtersStore.selectedCategories.filter(item => item !== newItem)
-				: [...filtersStore.selectedCategories, newItem]
-		},
-		[]
-	)
+	const updateHistory = useCallback(selected => {
+		const _soilIds = selected.filter(({ _type }) => _type === 'soil').map(({ id }) => id)
+		const _ecosIds = selected.filter(({ _type }) => _type === 'ecosystem').map(({ id }) => id)
+		const _publIds = selected.filter(({ _type }) => _type === 'publication').map(({ id }) => id)
 
-	const handleAddTerm = useCallback(
-		newItem => {
-			filtersStore.selectedTerms = filtersStore.selectedTerms.includes(newItem)
-				? filtersStore.selectedTerms.filter(item => item !== newItem)
-				: [...filtersStore.selectedTerms, newItem]
-		},
-		[]
-	)
-
-	const handleAddAuthor = useCallback(
-		newItem => {
-			filtersStore.selectedAuthors = filtersStore.selectedAuthors.includes(newItem)
-				? filtersStore.selectedAuthors.filter(item => item !== newItem)
-				: [...filtersStore.selectedAuthors, newItem]
-		},
-		[]
-	)
-
-	const filterById = useCallback(
-		filteredIds => {
-			const layerSource = clusterLayer.getSource().getSource() // Получаем источник кластера
-			features.forEach(feature => {
-				if (feature.get('p_type')) {
-					const featureId = feature.get('p_Id')
-					const featureType = feature.get('p_type')
-					if (
-						filteredIds.find(
-							obj => obj.id === featureId && obj._type === featureType
-						) &&
-						layersVisible[featureType]
-					) {
-						!layerSource.hasFeature(feature) && layerSource.addFeature(feature)
-					} else {
-						layerSource.removeFeature(feature)
-					}
-				}
-			})
-			if (filterName.length) {
-				setSelectedObjects(
-					objects.filter(item =>
-						filteredIds.find(
-							obj => obj.id === item.id && obj._type === item._type
-						)
-					)
-				)
-			} else {
-				setSelectedObjects([])
-			}
-		},
-		[clusterLayer, features, layersVisible, objects, filterName]
-	)
-
-	useEffect(() => {
-		const _filterName = filterName.toLowerCase().trim()
-		const filteredAllIds = objects
-			.filter(
-				obj =>
-					layersVisible[obj._type] &&
-					(draftIsVisible
-						? true
-						: obj.translations?.find(transl => transl.isEnglish === _isEng)
-							?.isVisible) &&
-					(filterName.length
-						? obj.translations
-							?.find(transl => transl.isEnglish === _isEng)
-							?.name?.toLowerCase()
-							.includes(_filterName) ||
-						obj.translations
-							?.find(transl => transl.isEnglish === _isEng)
-							?.code?.toLowerCase()
-							.includes(_filterName)
-						: true) &&
-					(obj.objectType
-						? selectedCategories.length === 0 ||
-						selectedCategories.includes(obj.objectType)
-						: true) &&
-					(obj.authors
-						? selectedAuthors.length === 0 ||
-						selectedAuthors.some(selectedAuthor =>
-							obj.authors?.some(author => author === selectedAuthor)
-						)
-						: true) &&
-					(obj.terms
-						? selectedTerms.length === 0 ||
-						selectedTerms.some(selectedTerm =>
-							obj.terms?.some(term => term === selectedTerm)
-						)
-						: true)
-			)
-			.map(({ id, _type }) => ({ id, _type }))
-		if (clusterLayer) {
-			filterById(filteredAllIds)
-		}
-	}, [
-		selectedTerms,
-		selectedCategories,
-		selectedAuthors,
-		objects,
-		draftIsVisible,
-		clusterLayer,
-		filterName,
-		layersVisible,
-		filterById,
-		_isEng
-	])
-
-	useEffect(() => {
-		!didLogFiltersRef.current && updateFiltersInHistory()
-	}, [selectedCategories, selectedTerms, selectedAuthors])
-
-	const updateFiltersInHistory = () => {
-		const params = new URLSearchParams(searchParams.toString())
-
-		if (selectedCategories.length > 0) {
-			params.set('categories', selectedCategories.join(','))
+		const newParams = new URLSearchParams(searchParams.toString())
+		console.log(newParams)
+		if (_soilIds.length > 0) {
+			newParams.set('soilIds', _soilIds.join(','))
 		} else {
-			params.delete('categories')
+			newParams.delete('soilIds')
 		}
 
-		if (selectedTerms.length > 0) {
-			params.set('terms', selectedTerms.join(','))
+		if (_ecosIds.length > 0) {
+			newParams.set('ecosIds', _ecosIds.join(','))
 		} else {
-			params.delete('terms')
+			newParams.delete('ecosIds')
 		}
 
-		if (selectedAuthors.length > 0) {
-			params.set('authors', selectedAuthors.join(','))
+		if (_publIds.length > 0) {
+			newParams.set('publIds', _publIds.join(','))
 		} else {
-			params.delete('authors')
+			newParams.delete('publIds')
 		}
+		router.replace(`${pathname}?${newParams.toString()}`, { scroll: false })
+	}, [pathname, router, searchParams])
 
-		router.replace(pathname + '?' + params.toString())
-	}
+	// const filterById = useCallback(
+	// 	filteredIds => {
+	// 		console.log(filteredIds)
+	// 		const layerSource = clusterLayer.getSource().getSource() // Получаем источник кластера
+	// 		features.forEach(feature => {
+	// 			if (feature.get('p_type')) {
+	// 				const featureId = feature.get('p_Id')
+	// 				const featureType = feature.get('p_type')
+	// 				if (
+	// 					filteredIds.find(
+	// 						obj => obj.id === featureId && obj._type === featureType
+	// 					)
+	// 				) {
+	// 					!layerSource.hasFeature(feature) && layerSource.addFeature(feature)
+	// 				} else {
+	// 					layerSource.removeFeature(feature)
+	// 				}
+	// 			}
+	// 		})
+	// 		const filterName = searchParams.get('search')
+	// 		if (filterName?.length) {
+	// 			const _selected = [...soils, ...ecosystems, ...publications].filter(item =>
+	// 				filteredIds.find(
+	// 					obj => obj.id === item.id && obj._type === item._type
+	// 				)
+	// 			)
+	// 			setSelectedObjects(_selected)
+	// 		} else {
+	// 			setSelectedObjects([])
+	// 		}
+	// 	},
+	// 	[clusterLayer, features, soils, ecosystems, publications, searchParams]
+	// )
+
+	// useEffect(() => {
+	// 	if (soilsIsLoading || ecosystemsIsLoading || publicationsIsLoading || !layersVisible) return
+
+	// 	const filteredAllIds = [...soils, ...ecosystems, ...publications]
+	// 		.filter(obj => layersVisible[obj._type])
+	// 		.map(({ id, _type }) => ({ id, _type }))
+	// 	if (clusterLayer) {
+	// 		// filterById(filteredAllIds)
+	// 	}
+	// }, [soils,
+	// 	soilsIsLoading,
+	// 	ecosystems,
+	// 	ecosystemsIsLoading,
+	// 	publications,
+	// 	publicationsIsLoading,
+	// 	clusterLayer,
+	// 	layersVisible
+	// ])
 
 	const init = () => {
+		console.log('init')
 		let startcoords = fromLonLat([85.9075867, 53.1155423])
 		let initialZoom = 3
 
@@ -384,8 +339,8 @@ export default function MainMap() {
 		// Базовый слой карты
 		const baseLayer = new TileLayer()
 
-		baseLayer.setSource(getMapLayers('OSM', locale))
-		setSelectedLayer('OSM')
+		baseLayer.setSource(getMapLayers(selectedLayer, locale))
+		// setSelectedLayer('OSM')
 		mapRef.current = new OLMap({
 			layers: [baseLayer],
 			target: mapElement.current,
@@ -418,72 +373,37 @@ export default function MainMap() {
 		[baseLayer, locale]
 	)
 
-	const typeConfig = [
-		{
-			type: 'soil',
-			fetch: getSoils,
-			setState: setSoils
-		},
-		{
-			type: 'ecosystem',
-			fetch: getEcosystems,
-			setState: setEcosystems
-		},
-		{
-			type: 'publication',
-			fetch: getPublications,
-			setState: setPublications
-		}
-	]
-
-	const fetchData = async () => {
-		const fetchPromises = typeConfig.map(async ({ type, fetch, setState }) => {
-			const result = await fetch()
-			if (result.success && setState) {
-				setState(result.data)
-				const dataWithType = result.data.map(item => ({
-					...item,
-					_type: type
-				}))
-				return dataWithType
-			}
-		})
-
-		const results = await Promise.all(fetchPromises)
-		const combinedResults = results.flat() // Объединяем все массивы в один
-		setObjects(combinedResults)
-		return combinedResults
-	}
-
 	const getLayer = () => {
 		let layerVectorSource = new VectorSource()
 
-		fetchData().then(data => {
-			const newFeatures = []
-			data?.forEach(item => {
-				const coordinates =
-					item._type === 'publication' && item.coordinates
-						? JSON.parse(item.coordinates)
-						: [{ longtitude: item.longtitude, latitude: item.latitude }]
-				// Создаем точки на основе координат
-				coordinates.forEach(coord => {
-					if (coord.longtitude && coord.latitude) {
-						const newPointFeature = new Feature({
-							geometry: new Point(
-								fromLonLat([coord.longtitude, coord.latitude])
-							)
-						})
-						newPointFeature.set('p_Id', item.id)
-						newPointFeature.set('p_type', item._type)
-						newPointFeature.setStyle(getIconStyleByLayerName(item._type))
-						layersVisible?.[item._type] &&
-							layerVectorSource.addFeature(newPointFeature)
-						newFeatures.push(newPointFeature)
-					}
-				})
+		const newFeatures = []
+		const allItems = [...soils, ...ecosystems, ...publications]
+
+		allItems.forEach(item => {
+			const coordinates =
+				item._type === 'publication' && item.coordinates
+					? JSON.parse(item.coordinates)
+					: [{ longtitude: item.longtitude, latitude: item.latitude }]
+			// Создаем точки на основе координат
+			coordinates.forEach(coord => {
+				if (coord.longtitude && coord.latitude) {
+					const newPointFeature = new Feature({
+						geometry: new Point(
+							fromLonLat([coord.longtitude, coord.latitude])
+						)
+					})
+					newPointFeature.set('p_Id', item.id)
+					newPointFeature.set('p_type', item._type)
+					newPointFeature.setStyle(getIconStyleByLayerName(item._type))
+					layersVisible?.[item._type] &&
+						layerVectorSource.addFeature(newPointFeature)
+					newFeatures.push(newPointFeature)
+				}
 			})
-			setFeatures(prevFeatures => [...prevFeatures, ...newFeatures])
 		})
+		// setFeatures(prevFeatures => [...prevFeatures, ...newFeatures])
+		setFeatures(newFeatures)
+
 		const clusterSource = new Cluster({
 			distance: 18, // Расстояние для кластеризации в пикселях
 			minDistance: 18,
@@ -499,6 +419,9 @@ export default function MainMap() {
 	}
 
 	const loadLayers = () => {
+		if (clusterLayer) {
+			mapRef.current.removeLayer(clusterLayer)
+		}
 		mapRef.current.addLayer(getLayer())
 	}
 
@@ -588,7 +511,7 @@ export default function MainMap() {
 				const type = point.get('p_type')
 				const _id = point.get('p_Id')
 
-				const foundObject = objects.find(({ id, _type }) => {
+				const foundObject = [...soils, ...ecosystems, ...publications].find(({ id, _type }) => {
 					if (_type === 'publication') {
 						return (
 							!_objects.some(obj => obj.id === _id) &&
@@ -607,10 +530,11 @@ export default function MainMap() {
 		}
 		if (_objects.length) {
 			setSelectedObjects(_objects)
+			updateHistory(_objects)
 		}
 	}
 
-	const handleMapHover = e => {
+	const handleMapHover = throttle(e => {
 		const features = mapRef.current.getFeaturesAtPixel(e.pixel)
 
 		if (features.length > 0) {
@@ -695,7 +619,7 @@ export default function MainMap() {
 
 			mapRef.current.getTargetElement().style.cursor = 'pointer'
 		} else {
-			handleMapOut()
+			mapRef.current.getTargetElement().style.cursor = 'default'
 			mapRef.current
 				.getLayers()
 				.getArray()[1]
@@ -705,11 +629,7 @@ export default function MainMap() {
 					feature.setStyle(null) // Сброс стиля
 				})
 		}
-	}
-
-	const handleMapOut = () => {
-		mapRef.current.getTargetElement().style.cursor = 'default'
-	}
+	}, 1)
 
 	const addListeners = () => {
 		mapRef.current.on('singleclick', hangleMapClick)
@@ -739,9 +659,9 @@ export default function MainMap() {
 
 	const handlePopupClose = useCallback(() => {
 		setPopupVisible(false)
-		setFilterName('')
 		setSelectedObjects([])
-	}, [])
+		updateHistory([])
+	}, [updateHistory])
 
 	const getUserLocation = e => {
 		e.preventDefault()
@@ -819,17 +739,14 @@ export default function MainMap() {
 
 			<SideBar
 				sidebarOpen={sidebarOpen}
-				filterName={filterName}
+				isLoading={soilsIsLoading || ecosystemsIsLoading || publicationsIsLoading}
 				objects={selectedObjects}
-				setFilterName={setFilterName}
 				setSideBarOpen={setSideBarOpen}
 				popupVisible={popupVisible}
 				popupClose={handlePopupClose}
 				layersVisible={layersVisible}
 				onVisibleChange={handleLayerChange}
 				onLocationHandler={selectLocationHandler}
-				draftIsVisible={draftIsVisible}
-				setDraftIsVisible={setDraftIsVisible}
 			/>
 		</div>
 	)

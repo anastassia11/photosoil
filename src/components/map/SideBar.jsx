@@ -11,7 +11,8 @@ import React, {
 	useCallback,
 	useEffect,
 	useMemo,
-	useRef
+	useRef,
+	useState
 } from 'react'
 import { useSnapshot } from 'valtio'
 
@@ -33,20 +34,18 @@ import useAuthors from '@/hooks/data/useAuthors'
 const SideBar = memo(
 	function SideBar({
 		sidebarOpen,
+		isLoading,
 		setSideBarOpen,
-		filterName,
 		objects,
-		setFilterName,
 		layersVisible,
 		popupVisible,
 		popupClose,
-		onVisibleChange,
-		draftIsVisible,
-		setDraftIsVisible
+		onVisibleChange
 	}) {
-
+		const didLogRef = useRef(true)
 		const { classifications } = useClassifications()
 		const { authors } = useAuthors({ needSort: false })
+		const [draftIsVisible, setDraftIsVisible] = useState(false)
 
 		const { selectedTerms, selectedCategories, selectedAuthors } =
 			useSnapshot(filtersStore)
@@ -54,6 +53,8 @@ const SideBar = memo(
 		const pathname = usePathname()
 		const router = useRouter()
 		const searchParams = useSearchParams()
+
+		const [token, setToken] = useState(null)
 
 		const { locale } = useParams()
 		const { t } = getTranslation(locale)
@@ -72,6 +73,37 @@ const SideBar = memo(
 
 		useEffect(() => {
 			setSideBarOpen(window.innerWidth > 640)
+		}, [])
+
+		useEffect(() => {
+			setToken(JSON.parse(localStorage.getItem('tokenData'))?.token)
+		}, [])
+
+		useEffect(() => {
+			let timeoutId
+			if (didLogRef.current) {
+				timeoutId = setTimeout(() => {
+					const categoriesParam = searchParams.get('categories')
+					const termsParam = searchParams.get('terms')
+					const authorsParam = searchParams.get('authors')
+					const draftIsVisible = searchParams.get('draft')
+
+					if (authorsParam) {
+						filtersStore.selectedAuthors = authorsParam.split(',').map(Number)
+					}
+					if (draftIsVisible) {
+						setDraftIsVisible(draftIsVisible === '1')
+					}
+					if (categoriesParam) {
+						filtersStore.selectedCategories = categoriesParam.split(',').map(Number)
+					}
+					if (termsParam) {
+						filtersStore.selectedTerms = termsParam.split(',').map(Number)
+					}
+					didLogRef.current = false
+				}, 300)
+			}
+			return () => clearTimeout(timeoutId)
 		}, [])
 
 		const handleViewSidebar = () => {
@@ -190,6 +222,18 @@ const SideBar = memo(
 			[authors, updateHistory]
 		)
 
+		const updateDraftIsVisible = () => {
+			const _visible = !draftIsVisible
+			setDraftIsVisible(_visible)
+
+			updateHistory('draft', _visible ? ['1'] : [])
+		}
+
+		const changeFilterName = (value) => {
+			if (value === null) return
+			updateHistory('search', value?.length ? [value] : [])
+		}
+
 		return (
 			<div
 				id='map-sidebar'
@@ -222,10 +266,9 @@ const SideBar = memo(
 
 					{!popupVisible ? (
 						<div className='sm:px-4 pt-2 px-2'>
-							<div className='relative sm:mb-4 mb-3'>
+							<div className='relative'>
 								<SearchInput
-									filterName={filterName}
-									setFilterName={setFilterName}
+									changeFilterName={changeFilterName}
 									placeholder={t('search_code')}
 								/>
 							</div>
@@ -233,7 +276,10 @@ const SideBar = memo(
 					) : (
 						<button
 							className='sideBar pt-4 pb-1 sm:px-5 px-3 self-end text-zinc-400 hover:text-zinc-600 duration-300'
-							onClick={popupClose}
+							onClick={() => {
+								changeFilterName('')
+								popupClose()
+							}}
 						>
 							<svg
 								xmlns='http://www.w3.org/2000/svg'
@@ -251,153 +297,142 @@ const SideBar = memo(
 							</svg>
 						</button>
 					)}
+					{objects.length ? <ul className='flex flex-col sm:pb-4 pb-2 max-h-full overflow-y-auto scroll pt-0'>
+						{objects
+							.sort((a, b) => {
+								return order.indexOf(a._type) - order.indexOf(b._type)
+							})
+							.map(obj => (
+								<li key={obj.id}>
+									<ObjectCard object={obj} />
+								</li>
+							))}
+					</ul> : (searchParams?.get('search') && !isLoading ? <p className='sm:mt-4 mt-3 sm:px-5 px-3 pb-3'>{t('no_objects')}</p>
+						: <div className='flex-1 h-full overflow-y-auto scroll sm:px-5 px-3 flex flex-col sm:space-y-3 space-y-1 w-full pb-3'>
+							<MotionWrapper>
+								{!!token && <div className='pl-0.5 sm:mt-4 mt-3'>
+									<DraftSwitcher
+										draftIsVisible={draftIsVisible}
+										setDraftIsVisible={updateDraftIsVisible}
+										label={t('grafts_visible')}
+										type='all'
+									/>
+								</div>}
 
-					{objects.length ? (
-						<ul className='flex flex-col sm:pb-4 pb-2 max-h-full overflow-y-auto scroll pt-0'>
-							{objects
-								.sort((a, b) => {
-									return order.indexOf(a._type) - order.indexOf(b._type)
-								})
-								.map(obj => (
-									<li key={obj.id}>
-										<ObjectCard object={obj} />
-									</li>
-								))}
-						</ul>
-					) : (
-						<>
-							{filterName.length ? (
-								<p className='sm:mt-4 mt-3 sm:px-5 px-3 pb-3'>
-									{t('no_objects')}
+							</MotionWrapper>
+							<div className='pb-1.5'>
+								<p className='font-medium sm:text-xl text-lg sm:mb-1.5'>
+									{t('map_layers')}
 								</p>
-							) : (
-								<div className='flex-1 h-full overflow-y-auto scroll sm:px-5 px-3 flex flex-col sm:space-y-3 space-y-1 w-full pb-3'>
-									<MotionWrapper className='pl-0.5'>
-										<DraftSwitcher
-											draftIsVisible={draftIsVisible}
-											setDraftIsVisible={setDraftIsVisible}
-											label={t('grafts_visible')}
-											type='all'
-										/>
-									</MotionWrapper>
-									<div className='pb-1.5'>
-										<p className='font-medium sm:text-xl text-lg sm:mb-1.5'>
-											{t('map_layers')}
-										</p>
-										<div
-											x-show='show'
-											x-transition={true}
-											className='sm:space-y-2.5 space-y-1 px-1'
-										>
-											<LayerSwitch
-												title={t('soils')}
-												type='soil'
-												visible={layersVisible?.soil}
-												onVisibleChange={handleVisibleChange}
-											/>
-											<LayerSwitch
-												title={t('ecosystems')}
-												type='ecosystem'
-												visible={layersVisible?.ecosystem}
-												onVisibleChange={handleVisibleChange}
-											/>
-											<LayerSwitch
-												title={t('publications')}
-												type='publication'
-												visible={layersVisible?.publication}
-												onVisibleChange={handleVisibleChange}
-											/>
-										</div>
-									</div>
-
-									<div>
-										<p className='font-medium sm:text-xl text-lg sm:mb-1.5 '>
-											{t('filters')}
-										</p>
-
-										{
-											<ul className='flex flex-col z-10 max-h-full sm:space-y-2.5 space-y-1 px-1'>
-												<li key={'authors'}>
-													<Filter
-														locale={locale}
-														itemId={`author`}
-														name={t('authors')}
-														items={authors}
-														type='authors'
-														isMapFilter={true}
-														selectedItems={authors
-															.map(({ id }) => id)
-															.filter(id => selectedAuthors?.includes(id))}
-														addItem={handleAddAuthor}
-														resetItems={handleResetAuthor}
-														selectAll={handleAllAuthor}
-													/>
-												</li>
-												<li key={'category'}>
-													<Filter
-														locale={locale}
-														name={t('category')}
-														itemId='category'
-														items={CATEGORY_ARRAY}
-														selectedItems={CATEGORY_ARRAY.map(
-															({ id }) => id
-														).filter(id => selectedCategories?.includes(id))}
-														type='category'
-														isMapFilter={true}
-														addItem={handleAddCategory}
-														resetItems={handleResetCategory}
-														selectAll={handleAllCategory}
-													/>
-												</li>
-												{classifications?.map(item => {
-													const isEnglish = locale === 'en'
-													const isTranslationModeValid =
-														item.translationMode === 0 ||
-														(isEnglish
-															? item.translationMode === 1
-															: item.translationMode === 2)
-													if (isTranslationModeValid) {
-														return (
-															<li key={item.id}>
-																<Filter
-																	locale={locale}
-																	itemId={item.id}
-																	type='classif'
-																	isMapFilter={true}
-																	name={isEnglish ? item.nameEng : item.nameRu}
-																	sortByOrder={!item.isAlphabeticallOrder}
-																	items={item.terms}
-																	selectedItems={item.terms
-																		.map(({ id }) => id)
-																		.filter(id => selectedTerms?.includes(id))}
-																	addItem={handleAddTerm}
-																	resetItems={handleResetTerm}
-																	selectAll={() => handleAllTerm(item.terms)}
-																/>
-															</li>
-														)
-													}
-												})}
-											</ul>
-										}
-									</div>
+								<div
+									x-show='show'
+									x-transition={true}
+									className='sm:space-y-2.5 space-y-1'
+								>
+									<LayerSwitch
+										title={t('soils')}
+										type='soil'
+										visible={layersVisible?.soil}
+										onVisibleChange={handleVisibleChange}
+									/>
+									<LayerSwitch
+										title={t('ecosystems')}
+										type='ecosystem'
+										visible={layersVisible?.ecosystem}
+										onVisibleChange={handleVisibleChange}
+									/>
+									<LayerSwitch
+										title={t('publications')}
+										type='publication'
+										visible={layersVisible?.publication}
+										onVisibleChange={handleVisibleChange}
+									/>
 								</div>
-							)}
-						</>
-					)}
+							</div>
+
+							<div>
+								<p className='font-medium sm:text-xl text-lg sm:mb-1.5 '>
+									{t('filters')}
+								</p>
+
+								{
+									<ul className='flex flex-col z-10 max-h-full sm:space-y-2.5 space-y-1'>
+										<li key={'authors'}>
+											<Filter
+												locale={locale}
+												itemId={`author`}
+												name={t('authors')}
+												items={authors}
+												type='authors'
+												isMapFilter={true}
+												selectedItems={authors
+													.map(({ id }) => id)
+													.filter(id => selectedAuthors?.includes(id))}
+												addItem={handleAddAuthor}
+												resetItems={handleResetAuthor}
+												selectAll={handleAllAuthor}
+											/>
+										</li>
+										<li key={'category'}>
+											<Filter
+												locale={locale}
+												name={t('category')}
+												itemId='category'
+												items={CATEGORY_ARRAY}
+												selectedItems={CATEGORY_ARRAY.map(
+													({ id }) => id
+												).filter(id => selectedCategories?.includes(id))}
+												type='category'
+												isMapFilter={true}
+												addItem={handleAddCategory}
+												resetItems={handleResetCategory}
+												selectAll={handleAllCategory}
+											/>
+										</li>
+										{classifications?.map(item => {
+											const isEnglish = locale === 'en'
+											const isTranslationModeValid =
+												item.translationMode === 0 ||
+												(isEnglish
+													? item.translationMode === 1
+													: item.translationMode === 2)
+											if (isTranslationModeValid) {
+												return (
+													<li key={item.id}>
+														<Filter
+															locale={locale}
+															itemId={item.id}
+															type='classif'
+															isMapFilter={true}
+															name={isEnglish ? item.nameEng : item.nameRu}
+															sortByOrder={!item.isAlphabeticallOrder}
+															items={item.terms}
+															selectedItems={item.terms
+																.map(({ id }) => id)
+																.filter(id => selectedTerms?.includes(id))}
+															addItem={handleAddTerm}
+															resetItems={handleResetTerm}
+															selectAll={() => handleAllTerm(item.terms)}
+														/>
+													</li>
+												)
+											}
+										})}
+									</ul>
+								}
+							</div>
+						</div>)}
 				</div>
 			</div>
 		)
 	},
-	(prevProps, nextProps) => {
-		return (
-			prevProps.sidebarOpen === nextProps.sidebarOpen &&
-			prevProps.filterName === nextProps.filterName &&
-			prevProps.objects.map(({ id }) => id).toString() === nextProps.objects.map(({ id }) => id).toString() &&
-			prevProps.layersVisible === nextProps.layersVisible &&
-			prevProps.popupVisible === nextProps.popupVisible &&
-			prevProps.draftIsVisible === nextProps.draftIsVisible
-		)
-	}
+	// (prevProps, nextProps) => {
+	// 	return (
+	// 		prevProps.sidebarOpen === nextProps.sidebarOpen &&
+	// 		prevProps.objects.map(({ id }) => id).toString() === nextProps.objects.map(({ id }) => id).toString() &&
+	// 		prevProps.layersVisible === nextProps.layersVisible &&
+	// 		prevProps.popupVisible === nextProps.popupVisible
+	// 	)
+	// }
 )
 export default SideBar

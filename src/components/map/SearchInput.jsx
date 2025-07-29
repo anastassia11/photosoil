@@ -1,10 +1,60 @@
-const { memo } = require('react')
+import { useSearchParams } from 'next/navigation'
+import { useForm } from 'react-hook-form'
+
+const { memo, useEffect, useRef } = require('react')
 
 const SearchInput = memo(function SearchInput({
-	filterName,
-	setFilterName,
+	changeFilterName,
 	placeholder
 }) {
+	const didLogRef = useRef(true)
+
+	const searchParams = useSearchParams()
+
+	const {
+		register,
+		setValue,
+		watch,
+	} = useForm({
+		mode: 'onChange'
+	})
+
+	const watchedFilterName = watch('filterName')
+
+	useEffect(() => {
+		if (didLogRef.current) return
+		let debounceTimer
+
+		const handler = () => {
+			// Очищаем предыдущий таймер
+			clearTimeout(debounceTimer)
+			// Устанавливаем новый таймер
+			debounceTimer = setTimeout(() => {
+				changeFilterName(watchedFilterName)
+			}, 1000)
+		}
+
+		handler()
+
+		return () => {
+			clearTimeout(debounceTimer)
+		}
+	}, [watchedFilterName])
+
+	useEffect(() => {
+		let timeoutId
+		if (didLogRef.current) {
+			timeoutId = setTimeout(() => {
+				const filterName = searchParams.get('search')
+				if (filterName) {
+					setValue('filterName', filterName)
+				}
+				didLogRef.current = false
+			}, 300)
+		}
+		return () => clearTimeout(timeoutId)
+	}, [searchParams, setValue])
+
 	return (
 		<>
 			<svg
@@ -22,18 +72,19 @@ const SearchInput = memo(function SearchInput({
 				/>
 			</svg>
 			<input
-				value={filterName}
-				onChange={e => {
-					setFilterName(e.target.value)
-				}}
+				{...register('filterName')}
 				type='text'
+				autoComplete="off"
 				placeholder={placeholder}
 				className='w-full h-[40px] px-8 sm:px-10 border-b rounded-none outline-none bg-white focus:border-blue-600'
 			/>
 
 			<button
 				className='sideBar absolute right-1 top-0 bottom-0 w-6 h-6 my-auto text-zinc-400 hover:text-zinc-600 duration-300'
-				onClick={() => setFilterName('')}
+				onClick={() => {
+					setValue('filterName', '')
+					changeFilterName('')
+				}}
 			>
 				<svg
 					xmlns='http://www.w3.org/2000/svg'

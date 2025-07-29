@@ -15,9 +15,9 @@ const LayersPanel = memo(function LayersPanel({
 
 	const layers = [
 		{ key: 'OSM', title: t('OSM') },
-		{ key: 'BingRoud', title: t('BingRoud') },
-		{ key: 'BingSat', title: t('BingSat') },
-		{ key: 'BingHibrid', title: t('BingHibrid') },
+		// { key: 'BingRoud', title: t('BingRoud') },
+		// { key: 'BingSat', title: t('BingSat') },
+		// { key: 'BingHibrid', title: t('BingHibrid') },
 		{ key: 'ArcGis_World_Imagery', title: t('ArcGis_World_Imagery') },
 		{ key: 'ArcGis_World_Topo_Map', title: t('ArcGis_World_Topo_Map') }
 	]

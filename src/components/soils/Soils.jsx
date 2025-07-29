@@ -82,14 +82,16 @@ export default function Soils({ _soils, isAllSoils, isFilters = false, type }) {
 	}, [isFilters, type, pathname])
 
 	useEffect(() => {
-		let timeoutId
 		setFiltersVisible(window.innerWidth > 640 || type === 'ecosystem')
 
 		if (_soils) {
 			setSoils(_soils)
 			setIsLoading(prev => ({ ...prev, items: false }))
 		}
+	}, [_soils, type])
 
+	useEffect(() => {
+		let timeoutId
 		if (didLogRef.current) {
 			timeoutId = setTimeout(() => {
 				const authorsParam = searchParams.get('authors')
@@ -120,7 +122,7 @@ export default function Soils({ _soils, isAllSoils, isFilters = false, type }) {
 			}, 300)
 		}
 		return () => clearTimeout(timeoutId)
-	}, [_soils])
+	}, [isChild, isSoils, searchParams, type])
 
 	const updateHistory = useCallback((key, updatedArray) => {
 		const params = new URLSearchParams(searchParams.toString())
@@ -379,7 +381,9 @@ export default function Soils({ _soils, isAllSoils, isFilters = false, type }) {
 			)}
 
 			<MotionWrapper className='my-4 pl-0.5'>
-				<DraftSwitcher draftIsVisible={draftIsVisible} setDraftIsVisible={updateDraftIsVisible} label={t('grafts_visible')}
+				<DraftSwitcher draftIsVisible={draftIsVisible}
+					setDraftIsVisible={updateDraftIsVisible}
+					label={t('grafts_visible')}
 					type={type} />
 			</MotionWrapper>
 
