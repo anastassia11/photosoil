@@ -58,7 +58,7 @@ export default function AdminLayout({ children }) {
 	}, [alertIsOpen, dispatch])
 
 	return (
-		<div className='flex flex-row min-h-screen overflow-x-hidden pb-10'>
+		<div className='flex flex-row min-h-screen h-full max-h-screen overflow-x-hidden pb-10'>
 			{isChecked ? (
 				isAuth ? (
 					<>
@@ -68,7 +68,7 @@ export default function AdminLayout({ children }) {
 							<Sidebar />
 						</div>
 
-						<div className='min-h-full flex flex-col sm:py-4 py-1 sm:px-8 px-4 lg:w-[calc(100%-290px)] mr-0 ml-auto w-full'>
+						<div className='min-h-full h-full flex flex-col sm:py-4 py-1 sm:px-8 px-4 lg:w-[calc(100%-290px)] mr-0 ml-auto w-full'>
 							<Alert
 								isOpen={alertIsOpen}
 								{...alertProps}

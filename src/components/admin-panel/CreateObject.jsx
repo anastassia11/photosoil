@@ -361,7 +361,7 @@ export default function CreateObject({ title, onCreate, type }) {
 		return (
 			<div
 				className={`aspect-[1/1] relative bg-white rounded-lg border flex flex-row
-        duration-300 cursor-pointer hover:shadow-md ${currentForm === itemId ? ' ring ring-blue-700 ring-opacity-30 w-full' : 'w-[95%]'}  overflow-hidden`}
+        duration-300 cursor-pointer hover:shadow-md ${currentForm === itemId ? 'ring ring-blue-700 ring-opacity-30 w-full' : 'w-[95%]'}  overflow-hidden`}
 				onClick={() => selectCurrentForm(itemId)}
 			>
 				<div className='flex flex-col items-center w-full h-full overflow-hidden'>
@@ -445,7 +445,7 @@ export default function CreateObject({ title, onCreate, type }) {
 	}
 
 	return (
-		<div className='flex flex-col w-full'>
+		<div className='flex flex-col w-full h-full min-h-0'>
 			<h1 className='sm:text-2xl text-xl font-semibold h-[40px] flex items-end'>
 				{title}
 			</h1>
@@ -511,7 +511,7 @@ export default function CreateObject({ title, onCreate, type }) {
 						</div>
 					</>
 				) : (
-					<div className='flex xl:flex-row flex-col'>
+					<div className='flex xl:flex-row flex-col h-full'>
 						<div className='pt-2 flex-1 xl:order-1 order-2 xl:pr-6 xl:border-r'>
 							{currentForm !== null ? (
 								<ObjectForm
@@ -531,7 +531,7 @@ export default function CreateObject({ title, onCreate, type }) {
 
 						<div
 							className={`pt-2 xl:mb-0 flex flex-col xl:items-center w-full xl:w-[250px] max-w-full space-y-2 xl:order-2 order-1 
-                            xl:pl-6 xl:sticky xl:top-0 
+                            xl:pl-6 xl:sticky xl:top-0 xl:self-start
                             xl:max-h-[calc(100vh-40px)] h-[250px] xl:h-fit`}
 						>
 							<p className='font-medium w-full'>

@@ -55,6 +55,52 @@ export default function AuthorPageComponent({ id }) {
 		return regex.test(email)
 	}
 
+	const filteredSoils = useMemo(() => {
+		if (!author?.soilObjects?.length) return null
+
+		const filterName = searchParams.get('soils_search')
+		const draftIsVisible = searchParams.get('soils_draft')
+
+		const data = author.soilObjects.filter(soil => {
+			const translation = soil.translations?.find(
+				transl => transl.isEnglish === (locale === 'en')
+			)
+			const matchesSearch = !filterName || (
+				translation?.name.toLowerCase().includes(filterName.toLowerCase()) ||
+				translation?.code?.toLowerCase().includes(filterName.toLowerCase())
+			)
+			const matchesDraft = (draftIsVisible && draftIsVisible == 1) || translation?.isVisible
+			return matchesSearch
+				&& matchesDraft
+		}).sort((a, b) => {
+			return b.createdDate - a.createdDate
+		})
+		return data
+	}, [author, searchParams, locale])
+
+	const filteredEcosystems = useMemo(() => {
+		if (!author?.ecoSystems?.length) return null
+
+		const filterName = searchParams.get('ecosystems_search')
+		const draftIsVisible = searchParams.get('ecosystems_draft')
+
+		const data = author.ecoSystems.filter(ecosystem => {
+			const translation = ecosystem.translations?.find(
+				transl => transl.isEnglish === (locale === 'en')
+			)
+			const matchesSearch = !filterName || (
+				translation?.name.toLowerCase().includes(filterName.toLowerCase()) ||
+				translation?.code?.toLowerCase().includes(filterName.toLowerCase())
+			)
+			const matchesDraft = (draftIsVisible && draftIsVisible == 1) || translation?.isVisible
+			return matchesSearch
+				&& matchesDraft
+		}).sort((a, b) => {
+			return b.createdDate - a.createdDate
+		})
+		return data
+	}, [author, searchParams, locale])
+
 	return (
 		<div className='flex flex-col'>
 			{!authorIsLoading ? (
@@ -193,7 +239,7 @@ export default function AuthorPageComponent({ id }) {
 							{t('author_soils')}
 						</h3>
 						<Soils
-							_soils={author.soilObjects}
+							_soils={filteredSoils}
 							type='soils'
 							isFilters={false}
 						/>
@@ -206,7 +252,7 @@ export default function AuthorPageComponent({ id }) {
 							{t('author_ecosystems')}
 						</h3>
 						<Soils
-							_soils={author.ecoSystems}
+							_soils={filteredEcosystems}
 							type='ecosystems'
 							isFilters={false}
 						/>

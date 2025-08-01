@@ -92,7 +92,7 @@ export default function SoilObject({ object, children, type }) {
 				translation?.name.toLowerCase().includes(filterName.toLowerCase()) ||
 				translation?.code?.toLowerCase().includes(filterName.toLowerCase())
 			)
-			const matchesDraft = draftIsVisible == draftIsVisible == 1 || translation?.isVisible
+			const matchesDraft = (draftIsVisible && draftIsVisible == 1) || translation?.isVisible
 			return matchesSearch
 				&& matchesDraft
 		}).sort((a, b) => {
@@ -115,7 +115,7 @@ export default function SoilObject({ object, children, type }) {
 				translation?.name.toLowerCase().includes(filterName.toLowerCase()) ||
 				translation?.code?.toLowerCase().includes(filterName.toLowerCase())
 			)
-			const matchesDraft = draftIsVisible == draftIsVisible == 1 || translation?.isVisible
+			const matchesDraft = (draftIsVisible && draftIsVisible == 1) || translation?.isVisible
 			return matchesSearch
 				&& matchesDraft
 		}).sort((a, b) => {
@@ -137,7 +137,7 @@ export default function SoilObject({ object, children, type }) {
 			const matchesSearch = !filterName || (
 				translation?.name.toLowerCase().includes(filterName.toLowerCase())
 			)
-			const matchesDraft = draftIsVisible == draftIsVisible == 1 || translation?.isVisible
+			const matchesDraft = (draftIsVisible && draftIsVisible == 1) || translation?.isVisible
 			return matchesSearch
 				&& matchesDraft
 		}).sort((a, b) => {

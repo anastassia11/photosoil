@@ -45,14 +45,17 @@ export default function NewGallery({ mainPhoto, objectPhoto }) {
 						<Carousel onPageChange={setPage}>
 							{elements?.map(
 								({ id, path, pathResize, titleEng, titleRu, lastUpdated, takenDate }) => {
-									const date = new Date(takenDate * 1000).toLocaleDateString()
+									const date = new Date((takenDate ?? lastUpdated) * 1000).toLocaleDateString()
 									return (
+
 										<figure
 											key={id}
 											className='f-carousel__slide flex flex-col items-center justify-center min-h-full'
+											// Миниатюры полноэкранного режима
 											data-thumb-src={`${BASE_SERVER_URL}${pathResize.length ? pathResize : path}`}
 											data-fancybox='gallery'
 											data-title={locale === 'en' ? titleEng : titleRu}
+											// Фото полноэкранного режима
 											data-src={`${BASE_SERVER_URL}${path}`}
 											data-caption={`<div class='flex flex-col h-full'>
                           <p class="text-base font-medium mb-3">${date}</p>
@@ -60,6 +63,7 @@ export default function NewGallery({ mainPhoto, objectPhoto }) {
                       </div>`}
 										>
 											<div className='h-[100%] w-full overflow-hidden opacity-80 absolute inset-0 z-[-1]'>
+												{/* Фон */}
 												<Image
 													priority
 													src={`${BASE_SERVER_URL}${pathResize.length ? pathResize : path}`}
@@ -73,7 +77,7 @@ export default function NewGallery({ mainPhoto, objectPhoto }) {
 												<div className='flex-1 min-h-0'>
 													<Image
 														priority
-														src={`${BASE_SERVER_URL}${path}`}
+														src={`${BASE_SERVER_URL}${pathResize.length ? pathResize : path}`}
 														width={500}
 														height={500}
 														alt='soil'
