@@ -68,12 +68,12 @@ export default function AdminLayout({ children }) {
 							<Sidebar />
 						</div>
 
-						<div className='min-h-full h-full flex flex-col sm:py-4 py-1 sm:px-8 px-4 lg:w-[calc(100%-290px)] mr-0 ml-auto w-full'>
+						<div className='min-h-full h-full flex flex-col sm:px-8 px-4 lg:w-[calc(100%-290px)] mr-0 ml-auto w-full'>
 							<Alert
 								isOpen={alertIsOpen}
 								{...alertProps}
 							/>
-							<div className='flex flex-row w-full justify-end items-center'>
+							<div className='flex flex-row w-full justify-end items-center sm:pt-4 pt-1'>
 								<Header />
 								<div className='block lg:hidden mini:ml-2'>
 									<button
