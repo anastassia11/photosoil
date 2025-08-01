@@ -44,8 +44,8 @@ export default function NewGallery({ mainPhoto, objectPhoto }) {
 					>
 						<Carousel onPageChange={setPage}>
 							{elements?.map(
-								({ id, path, pathResize, titleEng, titleRu, lastUpdated }) => {
-									const date = new Date(lastUpdated * 1000).toLocaleString()
+								({ id, path, pathResize, titleEng, titleRu, lastUpdated, takenDate }) => {
+									const date = new Date(takenDate * 1000).toLocaleDateString()
 									return (
 										<figure
 											key={id}
