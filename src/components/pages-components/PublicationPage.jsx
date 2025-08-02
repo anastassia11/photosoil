@@ -99,6 +99,11 @@ export default function PublicationPageComponent({ id }) {
 		return data
 	}, [publication, searchParams, locale])
 
+	if (!currentTransl && !publicationIsLoading) return <div className='items-center justify-center flex flex-col p-6 gap-6'>
+		<p className='text-2xl font-medium'>{t('not_found')}</p>
+		<p className='text-zinc-500'>{t('no_object')}</p>
+	</div>
+
 	return (
 		<div className='flex flex-col'>
 			<div className='flex flex-col sm:flex-row mb-2 justify-between sm:items-start'>
