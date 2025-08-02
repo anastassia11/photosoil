@@ -93,7 +93,8 @@ export default function SoilObject({ object, children, type }) {
 				translation?.code?.toLowerCase().includes(filterName.toLowerCase())
 			)
 			const matchesDraft = (draftIsVisible && draftIsVisible == 1) || translation?.isVisible
-			return matchesSearch
+			return translation
+				&& matchesSearch
 				&& matchesDraft
 		}).sort((a, b) => {
 			return b.createdDate - a.createdDate
@@ -116,7 +117,8 @@ export default function SoilObject({ object, children, type }) {
 				translation?.code?.toLowerCase().includes(filterName.toLowerCase())
 			)
 			const matchesDraft = (draftIsVisible && draftIsVisible == 1) || translation?.isVisible
-			return matchesSearch
+			return translation
+				&& matchesSearch
 				&& matchesDraft
 		}).sort((a, b) => {
 			return b.createdDate - a.createdDate
@@ -138,7 +140,8 @@ export default function SoilObject({ object, children, type }) {
 				translation?.name.toLowerCase().includes(filterName.toLowerCase())
 			)
 			const matchesDraft = (draftIsVisible && draftIsVisible == 1) || translation?.isVisible
-			return matchesSearch
+			return translation
+				&& matchesSearch
 				&& matchesDraft
 		}).sort((a, b) => {
 			return b.createdDate - a.createdDate
