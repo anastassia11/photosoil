@@ -191,6 +191,12 @@ export default function MainMap() {
 	}, [selectedLayer])
 
 	useEffect(() => {
+		if (baseLayer && selectedLayer) {
+			baseLayer.setSource(getMapLayers(selectedLayer, locale))
+		}
+	}, [baseLayer, selectedLayer, locale])
+
+	useEffect(() => {
 		if (clusterLayer) {
 			const layerSource = clusterLayer.getSource().getSource() // Получаем источник кластера
 			features.forEach(feature => {
