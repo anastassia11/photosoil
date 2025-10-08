@@ -47,6 +47,7 @@ export default function SoilPageComponent({ id }) {
 		<SoilObject
 			object={soil ?? {}}
 			type='soil'
+			isLoading={soilIsLoading}
 		>
 			{!soilIsLoading && <ul className='flex flex-col space-y-2 '>
 				{SOIL_INFO.map(({ name, title }) => {

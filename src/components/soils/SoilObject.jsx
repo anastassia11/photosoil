@@ -14,7 +14,7 @@ import Soils from './Soils'
 import { getTranslation } from '@/i18n/client'
 import '@/styles/editor.css'
 
-export default function SoilObject({ object, children, type }) {
+export default function SoilObject({ object, children, type, isLoading = false }) {
 	const searchParams = useSearchParams()
 
 	const [mapVisible, setMapVisible] = useState(true)
@@ -149,7 +149,7 @@ export default function SoilObject({ object, children, type }) {
 		return data
 	}, [object, searchParams, locale])
 
-	if (!object.translations?.find(
+	if (!isLoading && !object.translations?.find(
 		({ isEnglish }) => isEnglish === _isEng
 	)) return <div className='items-center justify-center flex flex-col p-6 gap-6'>
 		<p className='text-2xl font-medium'>{t('not_found')}</p>
