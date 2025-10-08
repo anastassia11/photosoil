@@ -246,6 +246,7 @@ export default function Sidebar() {
 			<Link
 				prefetch={false}
 				href={`/${locale}`}
+				onClick={e => handleLinkClick(e, `/${locale}`)}
 				className='hover:cursor-pointer border-b flex flex-row items-center sm:h-[70px] h-[60px] min-h-[60px]'
 			>
 				<Image
