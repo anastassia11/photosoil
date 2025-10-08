@@ -9,6 +9,7 @@ import SoilObject from '@/components/soils/SoilObject'
 import { useConstants } from '@/hooks/useConstants'
 
 import CollapsibleText from '../admin-panel/ui-kit/CollapsibleText'
+import CollapsibleHtml from '../admin-panel/ui-kit/CollapsibleHtml'
 
 import { getTranslation } from '@/i18n/client'
 import useSoil from '@/hooks/data/itemById/useSoil'
@@ -74,18 +75,15 @@ export default function SoilPageComponent({ id }) {
 								) : name === 'soilFeatures' ? (
 									<CollapsibleText
 										text={currentTransl[name]}
-										limit={150}
 									/>
 								) : name === 'comments' ? (
-									<div
+									<CollapsibleHtml
 										className='tiptap'
-										dangerouslySetInnerHTML={{
-											__html: parser?.parseFromString(
-												currentTransl[name] || '',
-												'text/html'
-											).body.innerHTML
-										}}
-									></div>
+										html={parser?.parseFromString(
+											currentTransl[name] || '',
+											'text/html'
+										).body.innerHTML}
+									/>
 								) : (
 									currentTransl[name]
 								)}
