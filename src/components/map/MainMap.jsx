@@ -134,6 +134,7 @@ export default function MainMap() {
 		loadLayers()
 	}, [soils, ecosystems, publications])
 
+
 	useEffect(() => {
 		const map = mapRef.current
 		if (!map) return
@@ -746,7 +747,7 @@ export default function MainMap() {
 			<SideBar
 				sidebarOpen={sidebarOpen}
 				isLoading={soilsIsLoading || ecosystemsIsLoading || publicationsIsLoading}
-				objects={selectedObjects}
+				objects={(searchParams.get('search') && !selectedObjects.length) ? [...(soils || []), ...(ecosystems || []), ...(publications || [])] : selectedObjects}
 				setSideBarOpen={setSideBarOpen}
 				popupVisible={popupVisible}
 				popupClose={handlePopupClose}

@@ -270,6 +270,7 @@ const SideBar = memo(
 								<SearchInput
 									changeFilterName={changeFilterName}
 									placeholder={t('search_code')}
+									variant='line'
 								/>
 							</div>
 						</div>

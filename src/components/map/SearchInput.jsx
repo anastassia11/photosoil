@@ -5,7 +5,9 @@ const { memo, useEffect, useRef } = require('react')
 
 const SearchInput = memo(function SearchInput({
 	changeFilterName,
-	placeholder
+	placeholder,
+	name = 'search',
+	variant = 'rounded'
 }) {
 	const didLogRef = useRef(true)
 
@@ -45,7 +47,7 @@ const SearchInput = memo(function SearchInput({
 		let timeoutId
 		if (didLogRef.current) {
 			timeoutId = setTimeout(() => {
-				const filterName = searchParams.get('search')
+				const filterName = searchParams.get(name)
 				if (filterName) {
 					setValue('filterName', filterName)
 				}
@@ -53,13 +55,13 @@ const SearchInput = memo(function SearchInput({
 			}, 300)
 		}
 		return () => clearTimeout(timeoutId)
-	}, [searchParams, setValue])
+	}, [searchParams, setValue, name])
 
 	return (
 		<>
 			<svg
 				xmlns='http://www.w3.org/2000/svg'
-				className='absolute top-0 bottom-0 w-6 h-6 my-auto text-zinc-400 left-1'
+				className={`absolute top-0 bottom-0 w-6 h-6 my-auto text-zinc-400 ${variant === 'line' ? 'left-1' : 'left-3'}`}
 				fill='none'
 				viewBox='0 0 24 24'
 				stroke='currentColor'
@@ -76,11 +78,13 @@ const SearchInput = memo(function SearchInput({
 				type='text'
 				autoComplete="off"
 				placeholder={placeholder}
-				className='w-full h-[40px] px-8 sm:px-10 border-b rounded-none outline-none bg-white focus:border-blue-600'
+				className={`w-full h-[40px] outline-none bg-white focus:border-blue-600 px-8 sm:px-10
+						${variant === 'line' ? 'rounded-none border-b' : 'rounded-md border'}`}
 			/>
 
 			<button
-				className='sideBar absolute right-1 top-0 bottom-0 w-6 h-6 my-auto text-zinc-400 hover:text-zinc-600 duration-300'
+				className={`sideBar absolute top-0 bottom-0 w-6 h-6 my-auto text-zinc-400 hover:text-zinc-600 duration-300 
+					${variant === 'line' ? 'right-1' : 'right-2'}`}
 				onClick={() => {
 					setValue('filterName', '')
 					changeFilterName('')

@@ -27,6 +27,7 @@ import useAuthors from '@/hooks/data/useAuthors'
 import useClassifications from '@/hooks/data/useClassifications'
 import PerPageSelect from '../PerPageSelect'
 import { recoveryItemsPerPage } from '@/utils/common'
+import SearchInput from '../map/SearchInput'
 
 export default function Soils({ _soils, isAllSoils, isFilters = false, type }) {
 	const { locale } = useParams()
@@ -45,7 +46,6 @@ export default function Soils({ _soils, isAllSoils, isFilters = false, type }) {
 
 	const { authors, authorsIsLoading } = useAuthors({ needSort: false })
 
-	const [filterName, setFilterName] = useState('')
 	const [filtersVisible, setFiltersVisible] = useState(true)
 
 	const [currentItems, setCurrentItems] = useState([])
@@ -96,16 +96,12 @@ export default function Soils({ _soils, isAllSoils, isFilters = false, type }) {
 			timeoutId = setTimeout(() => {
 				const authorsParam = searchParams.get('authors')
 				const draftIsVisible = searchParams.get(isChild ? `${type}_draft` : 'draft')
-				const filterName = searchParams.get(isChild ? `${type}_search` : 'search')
 
 				if (authorsParam) {
 					filtersStore.selectedAuthors = authorsParam.split(',').map(Number)
 				}
 				if (draftIsVisible) {
 					setDraftIsVisible(draftIsVisible === '1')
-				}
-				if (filterName) {
-					setFilterName(filterName)
 				}
 
 				if (isSoils) {
@@ -235,9 +231,8 @@ export default function Soils({ _soils, isAllSoils, isFilters = false, type }) {
 		[authors, updateHistory]
 	)
 
-	const changeFilterName = (e) => {
-		const value = e.target.value
-		setFilterName(value)
+	const changeFilterName = (value) => {
+		if (value === null) return
 		updateHistory(isChild ? `${type}_search` : 'search', value.length ? [value] : [])
 	}
 
@@ -249,29 +244,11 @@ export default function Soils({ _soils, isAllSoils, isFilters = false, type }) {
 		<div className='flex flex-col'>
 			<div className='relative flex flex-row space-x-2 mb-4'>
 				<div className='relative w-full'>
-					<svg
-						xmlns='http://www.w3.org/2000/svg'
-						className='absolute top-0 bottom-0 w-6 h-6 my-auto text-zinc-400 left-3'
-						fill='none'
-						viewBox='0 0 24 24'
-						stroke='currentColor'
-					>
-						<path
-							strokeLinecap='round'
-							strokeLinejoin='round'
-							strokeWidth={2}
-							d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
-						/>
-					</svg>
-					<input
-						value={filterName}
-						onChange={changeFilterName}
-						type='text'
+					<SearchInput
+						name={isChild ? `${type}_search` : 'search'}
+						changeFilterName={changeFilterName}
 						placeholder={`${isSoils || type === 'ecosystems'
-							? t('search_code')
-							: t('search_name')
-							}`}
-						className='w-full py-2 pl-12 pr-4 border rounded-md outline-none bg-white focus:border-blue-600'
+							? t('search_code') : t('search_name')}`}
 					/>
 				</div>
 			</div>

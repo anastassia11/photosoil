@@ -15,6 +15,7 @@ import { getTranslation } from '@/i18n/client'
 import DraftSwitcher from './map/DraftSwitcher'
 import PerPageSelect from './PerPageSelect'
 import { recoveryItemsPerPage } from '@/utils/common'
+import SearchInput from './map/SearchInput'
 
 export default function Publications({ _publications, isChild = false }) {
 	const searchParams = useSearchParams()
@@ -23,7 +24,6 @@ export default function Publications({ _publications, isChild = false }) {
 
 	const didLogRef = useRef(true)
 
-	const [filterName, setFilterName] = useState('')
 	const [publications, setPublications] = useState([])
 	const [currentItems, setCurrentItems] = useState([])
 	const [itemsPerPage, setItemsPerPage] = useState()
@@ -53,13 +53,9 @@ export default function Publications({ _publications, isChild = false }) {
 		if (didLogRef.current) {
 			timeoutId = setTimeout(() => {
 				const draftIsVisible = searchParams.get(isChild ? `publications_draft` : 'draft')
-				const filterName = searchParams.get(isChild ? `publications_search` : 'search')
 
 				if (draftIsVisible) {
 					setDraftIsVisible(draftIsVisible === '1')
-				}
-				if (filterName) {
-					setFilterName(filterName)
 				}
 				didLogRef.current = false
 			}, 300)
@@ -83,9 +79,8 @@ export default function Publications({ _publications, isChild = false }) {
 		updateHistory(isChild ? 'publications_draft' : 'draft', _visible ? ['1'] : [])
 	}
 
-	const changeFilterName = (e) => {
-		const value = e.target.value
-		setFilterName(value)
+	const changeFilterName = (value) => {
+		if (value === null) return
 		updateHistory(isChild ? 'publications_search' : 'search', value.length ? [value] : [])
 	}
 
@@ -97,26 +92,10 @@ export default function Publications({ _publications, isChild = false }) {
 		<div className='flex flex-col'>
 			<div className='relative flex flex-row space-x-2 mb-4'>
 				<div className='relative w-full'>
-					<svg
-						xmlns='http://www.w3.org/2000/svg'
-						className='absolute top-0 bottom-0 w-6 h-6 my-auto text-zinc-400 left-3'
-						fill='none'
-						viewBox='0 0 24 24'
-						stroke='currentColor'
-					>
-						<path
-							strokeLinecap='round'
-							strokeLinejoin='round'
-							strokeWidth={2}
-							d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
-						/>
-					</svg>
-					<input
-						value={filterName}
-						onChange={changeFilterName}
-						type='text'
+					<SearchInput
+						name={isChild ? `publications_search` : 'search'}
+						changeFilterName={changeFilterName}
 						placeholder={t('search_title')}
-						className='w-full py-2 pl-12 pr-4 border rounded-md outline-none bg-white focus:border-blue-600'
 					/>
 				</div>
 			</div>

@@ -14,20 +14,17 @@ import { getTranslation } from '@/i18n/client'
 import useAuthors from '@/hooks/data/useAuthors'
 import PerPageSelect from './PerPageSelect'
 import { recoveryItemsPerPage } from '@/utils/common'
+import SearchInput from './map/SearchInput'
 
 export default function Authors() {
 	const { locale } = useParams()
 	const pathname = usePathname()
 	const router = useRouter()
 
-	const didLogRef = useRef(true)
-
 	const searchParams = useSearchParams()
 
 	const { t } = getTranslation(locale)
 	const { authors, authorsIsLoading } = useAuthors({ needSort: true })
-
-	const [filterName, setFilterName] = useState('')
 
 	const [currentItems, setCurrentItems] = useState([])
 	const [itemsPerPage, setItemsPerPage] = useState()
@@ -38,22 +35,6 @@ export default function Authors() {
 		const value = recoveryItemsPerPage({ key: 'authors', pathname })
 		setItemsPerPage(value)
 	}, [pathname])
-
-	useEffect(() => {
-		let timeoutId
-
-		if (didLogRef.current) {
-			timeoutId = setTimeout(() => {
-				const filterName = searchParams.get('search')
-
-				if (filterName) {
-					setFilterName(filterName)
-				}
-				didLogRef.current = false
-			}, 300)
-		}
-		return () => clearTimeout(timeoutId)
-	}, [])
 
 	const updateHistory = useCallback((key, updatedArray) => {
 		const params = new URLSearchParams(searchParams.toString())
@@ -68,6 +49,11 @@ export default function Authors() {
 
 	const updateCurrPage = (currPage) => {
 		updateHistory('page', currPage ? [currPage] : [])
+	}
+
+	const changeFilterName = (value) => {
+		if (value === null) return
+		updateHistory('search', value.length ? [value] : [])
 	}
 
 	const AuthorCard = ({ photo, dataEng, dataRu, authorType, id }) => {
@@ -129,29 +115,9 @@ export default function Authors() {
 		<div className='flex flex-col'>
 			<div className='relative flex flex-row space-x-2 mb-4'>
 				<div className='relative w-full'>
-					<svg
-						xmlns='http://www.w3.org/2000/svg'
-						className='absolute top-0 bottom-0 w-6 h-6 my-auto text-zinc-400 left-3'
-						fill='none'
-						viewBox='0 0 24 24'
-						stroke='currentColor'
-					>
-						<path
-							strokeLinecap='round'
-							strokeLinejoin='round'
-							strokeWidth={2}
-							d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
-						/>
-					</svg>
-					<input
-						value={filterName}
-						onChange={e => {
-							setFilterName(e.target.value)
-							updateHistory('search', e.target.value.length ? [e.target.value] : [])
-						}}
-						type='text'
+					<SearchInput
+						changeFilterName={changeFilterName}
 						placeholder={t('search_name')}
-						className='w-full py-2 pl-12 pr-4 border rounded-md outline-none bg-white focus:border-blue-600'
 					/>
 				</div>
 			</div>
