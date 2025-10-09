@@ -96,11 +96,34 @@ const SideBar = memo(
 					filtersStore.selectedCategories = categoriesParam.split(',').map(Number)
 				}
 				if (termsParam) {
-					filtersStore.selectedTerms = termsParam.split(',').map(Number)
+					const selectedTerms = termsParam.split(',').map(Number)
+					const isEnglish = locale === 'en'
+
+					// Create map: classificationId -> translationMode
+					const modeMap = Object.fromEntries(classifications.map(c => [c.id, c.translationMode]))
+
+					// Get all terms with their classificationId
+					const allTerms = classifications.flatMap(c => c.terms)
+
+					const validTerms = selectedTerms.filter(termId => {
+						const term = allTerms.find(t => t.id === termId)
+						if (!term) return false
+						const mode = modeMap[term.classificationId]
+						// 0=both, 1=en only, 2=ru only
+						return mode === 0 || (mode === 1 && isEnglish) || (mode === 2 && !isEnglish)
+					})
+
+					filtersStore.selectedTerms = validTerms
+
+					if (validTerms.length !== selectedTerms.length) {
+						const params = new URLSearchParams(searchParams.toString())
+						validTerms.length ? params.set('terms', validTerms.join(',')) : params.delete('terms')
+						router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+					}
 				}
 			}, 300)
 			return () => clearTimeout(timeoutId)
-		}, [locale])
+		}, [locale, classifications, searchParams, pathname, router])
 
 		const handleViewSidebar = () => {
 			setSideBarOpen(!sidebarOpen)
