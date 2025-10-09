@@ -85,35 +85,7 @@ export default function MainMap() {
 
 		const initializeMap = () => {
 			init()
-			// loadLayers()
 		}
-
-		let timeoutId
-
-		timeoutId = setTimeout(() => {
-			const soilIds = searchParams.get('soilIds')?.split(',').map(Number)
-			const ecosIds = searchParams.get('ecosIds')?.split(',').map(Number)
-			const publIds = searchParams.get('publIds')?.split(',').map(Number)
-
-			let _selectedSoils = []
-			let _selectedEcoss = []
-			let _selectedPubls = []
-
-			if (soilIds) {
-				_selectedSoils = soils.filter(({ id }) => soilIds?.includes(id))
-			}
-			if (ecosIds) {
-				_selectedEcoss = ecosystems.filter(({ id }) => ecosIds?.includes(id))
-			}
-			if (publIds) {
-				_selectedPubls = publications.filter(({ id }) => publIds?.includes(id))
-			}
-			setSelectedObjects([..._selectedSoils, ..._selectedEcoss, ..._selectedPubls])
-
-			if (soilIds || ecosIds || publIds) {
-				setPopupVisible(true)
-			}
-		}, 300)
 
 		if (mapElement.current) {
 			if (didLogRef.current) {
@@ -125,15 +97,71 @@ export default function MainMap() {
 		}
 		return () => {
 			document.removeEventListener('DOMContentLoaded', initializeMap)
-			clearTimeout(timeoutId)
 		}
 	}, [soilsIsLoading, ecosystemsIsLoading, publicationsIsLoading])
 
 	useEffect(() => {
 		if (soilsIsLoading || ecosystemsIsLoading || publicationsIsLoading) return
+		let timeoutId
+
+		timeoutId = setTimeout(() => {
+			const soilIds = searchParams.get('soilIds')?.split(',').map(Number)
+			const ecosIds = searchParams.get('ecosIds')?.split(',').map(Number)
+			const publIds = searchParams.get('publIds')?.split(',').map(Number)
+
+			let _selectedSoils = []
+			let _selectedEcoss = []
+			let _selectedPubls = []
+
+			const isEnglish = locale === 'en'
+
+			if (soilIds) {
+				_selectedSoils = soils.filter(({ id }) => soilIds?.includes(id))
+					.filter(obj => obj.translations?.some(t => t.isEnglish === isEnglish))
+			}
+			if (ecosIds) {
+				_selectedEcoss = ecosystems.filter(({ id }) => ecosIds?.includes(id))
+					.filter(obj => obj.translations?.some(t => t.isEnglish === isEnglish))
+			}
+			if (publIds) {
+				_selectedPubls = publications.filter(({ id }) => publIds?.includes(id))
+					.filter(obj => obj.translations?.some(t => t.isEnglish === isEnglish))
+			}
+
+			const allSelected = [..._selectedSoils, ..._selectedEcoss, ..._selectedPubls]
+			setSelectedObjects(allSelected)
+
+			const foundSoilIds = _selectedSoils.map(s => s.id)
+			const foundEcosIds = _selectedEcoss.map(e => e.id)
+			const foundPublIds = _selectedPubls.map(p => p.id)
+
+			const shouldUpdateUrl =
+				(soilIds && JSON.stringify(soilIds.sort()) !== JSON.stringify(foundSoilIds.sort())) ||
+				(ecosIds && JSON.stringify(ecosIds.sort()) !== JSON.stringify(foundEcosIds.sort())) ||
+				(publIds && JSON.stringify(publIds.sort()) !== JSON.stringify(foundPublIds.sort()))
+
+			if (shouldUpdateUrl) {
+				const newParams = new URLSearchParams(searchParams.toString())
+				foundSoilIds.length ? newParams.set('soilIds', foundSoilIds.join(',')) : newParams.delete('soilIds')
+				foundEcosIds.length ? newParams.set('ecosIds', foundEcosIds.join(',')) : newParams.delete('ecosIds')
+				foundPublIds.length ? newParams.set('publIds', foundPublIds.join(',')) : newParams.delete('publIds')
+				router.replace(`${pathname}?${newParams.toString()}`, { scroll: false })
+			}
+
+			if (allSelected.length > 0) {
+				setPopupVisible(true)
+			}
+		}, 300)
+
+		return () => {
+			clearTimeout(timeoutId)
+		}
+	}, [soilsIsLoading, ecosystemsIsLoading, publicationsIsLoading, locale, soils, ecosystems, publications, searchParams, router, pathname])
+
+	useEffect(() => {
+		if (soilsIsLoading || ecosystemsIsLoading || publicationsIsLoading) return
 		loadLayers()
 	}, [soils, ecosystems, publications])
-
 
 	useEffect(() => {
 		const map = mapRef.current
@@ -237,7 +265,6 @@ export default function MainMap() {
 		const _publIds = selected.filter(({ _type }) => _type === 'publication').map(({ id }) => id)
 
 		const newParams = new URLSearchParams(searchParams.toString())
-		console.log(newParams)
 		if (_soilIds.length > 0) {
 			newParams.set('soilIds', _soilIds.join(','))
 		} else {
@@ -258,61 +285,7 @@ export default function MainMap() {
 		router.replace(`${pathname}?${newParams.toString()}`, { scroll: false })
 	}, [pathname, router, searchParams])
 
-	// const filterById = useCallback(
-	// 	filteredIds => {
-	// 		console.log(filteredIds)
-	// 		const layerSource = clusterLayer.getSource().getSource() // Получаем источник кластера
-	// 		features.forEach(feature => {
-	// 			if (feature.get('p_type')) {
-	// 				const featureId = feature.get('p_Id')
-	// 				const featureType = feature.get('p_type')
-	// 				if (
-	// 					filteredIds.find(
-	// 						obj => obj.id === featureId && obj._type === featureType
-	// 					)
-	// 				) {
-	// 					!layerSource.hasFeature(feature) && layerSource.addFeature(feature)
-	// 				} else {
-	// 					layerSource.removeFeature(feature)
-	// 				}
-	// 			}
-	// 		})
-	// 		const filterName = searchParams.get('search')
-	// 		if (filterName?.length) {
-	// 			const _selected = [...soils, ...ecosystems, ...publications].filter(item =>
-	// 				filteredIds.find(
-	// 					obj => obj.id === item.id && obj._type === item._type
-	// 				)
-	// 			)
-	// 			setSelectedObjects(_selected)
-	// 		} else {
-	// 			setSelectedObjects([])
-	// 		}
-	// 	},
-	// 	[clusterLayer, features, soils, ecosystems, publications, searchParams]
-	// )
-
-	// useEffect(() => {
-	// 	if (soilsIsLoading || ecosystemsIsLoading || publicationsIsLoading || !layersVisible) return
-
-	// 	const filteredAllIds = [...soils, ...ecosystems, ...publications]
-	// 		.filter(obj => layersVisible[obj._type])
-	// 		.map(({ id, _type }) => ({ id, _type }))
-	// 	if (clusterLayer) {
-	// 		// filterById(filteredAllIds)
-	// 	}
-	// }, [soils,
-	// 	soilsIsLoading,
-	// 	ecosystems,
-	// 	ecosystemsIsLoading,
-	// 	publications,
-	// 	publicationsIsLoading,
-	// 	clusterLayer,
-	// 	layersVisible
-	// ])
-
 	const init = () => {
-		console.log('init')
 		let startcoords = fromLonLat([85.9075867, 53.1155423])
 		let initialZoom = 3
 

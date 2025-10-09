@@ -31,8 +31,6 @@ export default function SoilObject({ object, children, type, isLoading = false }
 		section.scrollIntoView({ behavior: 'smooth' })
 	}
 
-	useEffect(() => { console.log(object) }, [object])
-
 	useEffect(() => {
 		if (typeof document !== 'undefined') {
 			setParser(new DOMParser())
