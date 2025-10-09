@@ -116,15 +116,21 @@ export default function MainMap() {
 			const isEnglish = locale === 'en'
 
 			if (soilIds) {
-				_selectedSoils = soils.filter(({ id }) => soilIds?.includes(id))
+				_selectedSoils = soilIds
+					.map(id => soils.find(s => s.id === id))
+					.filter(Boolean)
 					.filter(obj => obj.translations?.some(t => t.isEnglish === isEnglish))
 			}
 			if (ecosIds) {
-				_selectedEcoss = ecosystems.filter(({ id }) => ecosIds?.includes(id))
+				_selectedEcoss = ecosIds
+					.map(id => ecosystems.find(e => e.id === id))
+					.filter(Boolean)
 					.filter(obj => obj.translations?.some(t => t.isEnglish === isEnglish))
 			}
 			if (publIds) {
-				_selectedPubls = publications.filter(({ id }) => publIds?.includes(id))
+				_selectedPubls = publIds
+					.map(id => publications.find(p => p.id === id))
+					.filter(Boolean)
 					.filter(obj => obj.translations?.some(t => t.isEnglish === isEnglish))
 			}
 
@@ -136,9 +142,9 @@ export default function MainMap() {
 			const foundPublIds = _selectedPubls.map(p => p.id)
 
 			const shouldUpdateUrl =
-				(soilIds && JSON.stringify(soilIds.sort()) !== JSON.stringify(foundSoilIds.sort())) ||
-				(ecosIds && JSON.stringify(ecosIds.sort()) !== JSON.stringify(foundEcosIds.sort())) ||
-				(publIds && JSON.stringify(publIds.sort()) !== JSON.stringify(foundPublIds.sort()))
+				(soilIds && JSON.stringify([...soilIds].sort()) !== JSON.stringify([...foundSoilIds].sort())) ||
+				(ecosIds && JSON.stringify([...ecosIds].sort()) !== JSON.stringify([...foundEcosIds].sort())) ||
+				(publIds && JSON.stringify([...publIds].sort()) !== JSON.stringify([...foundPublIds].sort()))
 
 			if (shouldUpdateUrl) {
 				const newParams = new URLSearchParams(searchParams.toString())
