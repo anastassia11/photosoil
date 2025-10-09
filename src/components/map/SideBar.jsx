@@ -42,7 +42,6 @@ const SideBar = memo(
 		popupClose,
 		onVisibleChange
 	}) {
-		const didLogRef = useRef(true)
 		const { classifications } = useClassifications()
 		const { authors } = useAuthors({ needSort: false })
 		const [draftIsVisible, setDraftIsVisible] = useState(false)
@@ -81,30 +80,27 @@ const SideBar = memo(
 
 		useEffect(() => {
 			let timeoutId
-			if (didLogRef.current) {
-				timeoutId = setTimeout(() => {
-					const categoriesParam = searchParams.get('categories')
-					const termsParam = searchParams.get('terms')
-					const authorsParam = searchParams.get('authors')
-					const draftIsVisible = searchParams.get('draft')
+			timeoutId = setTimeout(() => {
+				const categoriesParam = searchParams.get('category')
+				const termsParam = searchParams.get('terms')
+				const authorsParam = searchParams.get('authors')
+				const draftIsVisible = searchParams.get('draft')
 
-					if (authorsParam) {
-						filtersStore.selectedAuthors = authorsParam.split(',').map(Number)
-					}
-					if (draftIsVisible) {
-						setDraftIsVisible(draftIsVisible === '1')
-					}
-					if (categoriesParam) {
-						filtersStore.selectedCategories = categoriesParam.split(',').map(Number)
-					}
-					if (termsParam) {
-						filtersStore.selectedTerms = termsParam.split(',').map(Number)
-					}
-					didLogRef.current = false
-				}, 300)
-			}
+				if (authorsParam) {
+					filtersStore.selectedAuthors = authorsParam.split(',').map(Number)
+				}
+				if (draftIsVisible) {
+					setDraftIsVisible(draftIsVisible === '1')
+				}
+				if (categoriesParam) {
+					filtersStore.selectedCategories = categoriesParam.split(',').map(Number)
+				}
+				if (termsParam) {
+					filtersStore.selectedTerms = termsParam.split(',').map(Number)
+				}
+			}, 300)
 			return () => clearTimeout(timeoutId)
-		}, [])
+		}, [locale])
 
 		const handleViewSidebar = () => {
 			setSideBarOpen(!sidebarOpen)

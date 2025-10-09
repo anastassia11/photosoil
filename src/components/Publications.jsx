@@ -22,8 +22,6 @@ export default function Publications({ _publications, isChild = false }) {
 	const pathname = usePathname()
 	const router = useRouter()
 
-	const didLogRef = useRef(true)
-
 	const [publications, setPublications] = useState([])
 	const [currentItems, setCurrentItems] = useState([])
 	const [itemsPerPage, setItemsPerPage] = useState()
@@ -44,24 +42,23 @@ export default function Publications({ _publications, isChild = false }) {
 	}, [isChild, pathname])
 
 	useEffect(() => {
-		let timeoutId
-
 		if (_publications) {
 			setPublications(_publications)
 			setIsLoading(false)
 		}
-		if (didLogRef.current) {
-			timeoutId = setTimeout(() => {
-				const draftIsVisible = searchParams.get(isChild ? `publications_draft` : 'draft')
-
-				if (draftIsVisible) {
-					setDraftIsVisible(draftIsVisible === '1')
-				}
-				didLogRef.current = false
-			}, 300)
-		}
-		return () => clearTimeout(timeoutId)
 	}, [_publications])
+
+	useEffect(() => {
+		let timeoutId
+		timeoutId = setTimeout(() => {
+			const draftIsVisible = searchParams.get(isChild ? `publications_draft` : 'draft')
+
+			if (draftIsVisible) {
+				setDraftIsVisible(draftIsVisible === '1')
+			}
+		}, 300)
+		return () => clearTimeout(timeoutId)
+	}, [locale, isChild])
 
 	const updateHistory = useCallback((key, updatedArray) => {
 		const params = new URLSearchParams(searchParams.toString())

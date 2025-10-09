@@ -31,6 +31,8 @@ export default function SoilObject({ object, children, type, isLoading = false }
 		section.scrollIntoView({ behavior: 'smooth' })
 	}
 
+	useEffect(() => { console.log(object) }, [object])
+
 	useEffect(() => {
 		if (typeof document !== 'undefined') {
 			setParser(new DOMParser())
@@ -149,7 +151,7 @@ export default function SoilObject({ object, children, type, isLoading = false }
 		return data
 	}, [object, searchParams, locale])
 
-	if (!isLoading && !object.translations?.find(
+	if (!isLoading && Object.keys(object).length && !object.translations?.find(
 		({ isEnglish }) => isEnglish === _isEng
 	)) return <div className='items-center justify-center flex flex-col p-6 gap-6'>
 		<p className='text-2xl font-medium'>{t('not_found')}</p>
@@ -292,7 +294,7 @@ export default function SoilObject({ object, children, type, isLoading = false }
 				</div>
 			)}
 
-			{!!object.soilObjects?.length && (
+			{!!object.stats?.soilObjects?.[locale] && (
 				<div id='soilObjects-section'>
 					<h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-4'>
 						{t('connect_soils')}
@@ -303,7 +305,7 @@ export default function SoilObject({ object, children, type, isLoading = false }
 					/>
 				</div>
 			)}
-			{!!object.ecoSystems?.length && (
+			{!!object.stats?.ecoSystems?.[locale] && (
 				<div id='ecosystems-section'>
 					<h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-4'>
 						{t('connect_ecosystems')}
@@ -314,7 +316,7 @@ export default function SoilObject({ object, children, type, isLoading = false }
 					/>
 				</div>
 			)}
-			{!!object.publications?.length && (
+			{!!object.stats?.publications?.[locale] && (
 				<div id='publications-section'>
 					<h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-4'>
 						{t('connect_publ')}

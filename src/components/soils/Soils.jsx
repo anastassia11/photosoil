@@ -33,7 +33,6 @@ export default function Soils({ _soils, isAllSoils, isFilters = false, type }) {
 	const { locale } = useParams()
 	const { t } = getTranslation(locale)
 
-	const didLogRef = useRef(true)
 	const pathname = usePathname()
 	const router = useRouter()
 	const searchParams = useSearchParams()
@@ -92,33 +91,30 @@ export default function Soils({ _soils, isAllSoils, isFilters = false, type }) {
 
 	useEffect(() => {
 		let timeoutId
-		if (didLogRef.current) {
-			timeoutId = setTimeout(() => {
-				const authorsParam = searchParams.get('authors')
-				const draftIsVisible = searchParams.get(isChild ? `${type}_draft` : 'draft')
+		timeoutId = setTimeout(() => {
+			const authorsParam = searchParams.get('authors')
+			const draftIsVisible = searchParams.get(isChild ? `${type}_draft` : 'draft')
 
-				if (authorsParam) {
-					filtersStore.selectedAuthors = authorsParam.split(',').map(Number)
-				}
-				if (draftIsVisible) {
-					setDraftIsVisible(draftIsVisible === '1')
-				}
+			if (authorsParam) {
+				filtersStore.selectedAuthors = authorsParam.split(',').map(Number)
+			}
+			if (draftIsVisible) {
+				setDraftIsVisible(draftIsVisible === '1')
+			}
 
-				if (isSoils) {
-					const categoriesParam = searchParams.get('categories')
-					const termsParam = searchParams.get('terms')
-					if (categoriesParam) {
-						filtersStore.selectedCategories = categoriesParam.split(',').map(Number)
-					}
-					if (termsParam) {
-						filtersStore.selectedTerms = termsParam.split(',').map(Number)
-					}
+			if (isSoils) {
+				const categoriesParam = searchParams.get('category')
+				const termsParam = searchParams.get('terms')
+				if (categoriesParam) {
+					filtersStore.selectedCategories = categoriesParam.split(',').map(Number)
 				}
-				didLogRef.current = false
-			}, 300)
-		}
+				if (termsParam) {
+					filtersStore.selectedTerms = termsParam.split(',').map(Number)
+				}
+			}
+		}, 300)
 		return () => clearTimeout(timeoutId)
-	}, [isChild, isSoils, searchParams, type])
+	}, [locale, isChild, isSoils, searchParams, type])
 
 	const updateHistory = useCallback((key, updatedArray) => {
 		const params = new URLSearchParams(searchParams.toString())
@@ -389,12 +385,6 @@ export default function Soils({ _soils, isAllSoils, isFilters = false, type }) {
 													translations?.find(
 														({ isEnglish }) => isEnglish === (locale === 'en')
 													)?.name
-													// ||
-													// (locale === 'en'
-													// 	? dataEng.name
-													// 	: locale === 'ru'
-													// 		? dataRu.name
-													// 		: '')
 												}
 											/>
 										</MotionWrapper>

@@ -20,6 +20,7 @@ import { recoveryAdminSort, recoveryItemsPerPage } from '@/utils/common'
 import { Checkbox } from '../ui/checkbox'
 import { adminSortsStore } from '@/store/valtioStore/adminSortsStore'
 import { useSnapshot } from 'valtio'
+import SearchInput from '../map/SearchInput'
 
 export default function ObjectsView({
 	objects,
@@ -39,7 +40,6 @@ export default function ObjectsView({
 	const didLogRef = useRef(true)
 	const dispatch = useDispatch()
 
-	const [filterName, setFilterName] = useState('')
 	const [currentLang, setCurrentLang] = useState('any')
 	const [publishStatus, setPublichStatus] = useState('all')
 
@@ -64,7 +64,6 @@ export default function ObjectsView({
 		let timeoutId
 		if (didLogRef.current) {
 			timeoutId = setTimeout(() => {
-				const filterName = searchParams.get('search')
 				const currentLang = searchParams.get('lang')
 				const publishStatus = searchParams.get('publish')
 
@@ -73,9 +72,6 @@ export default function ObjectsView({
 				}
 				if (publishStatus) {
 					setPublichStatus(publishStatus == 1 ? 'publish' : 'not_publish')
-				}
-				if (filterName) {
-					setFilterName(filterName)
 				}
 				didLogRef.current = false
 			}, 300)
@@ -930,9 +926,8 @@ export default function ObjectsView({
 		)
 	}
 
-	const changeFilterName = (e) => {
-		const value = e.target.value
-		setFilterName(value)
+	const changeFilterName = (value) => {
+		if (value === null) return
 		updateHistory({ 'search': value.length ? [value] : [] })
 	}
 
@@ -946,24 +941,8 @@ export default function ObjectsView({
 			className={`flex flex-col w-full  ${visibilityControl ? 'space-y-4' : 'space-y-2'}`}
 		>
 			<div className='w-full relative'>
-				<svg
-					xmlns='http://www.w3.org/2000/svg'
-					className='absolute top-0 bottom-0 w-6 h-6 my-auto text-zinc-400 left-3'
-					fill='none'
-					viewBox='0 0 24 24'
-					stroke='currentColor'
-				>
-					<path
-						strokeLinecap='round'
-						strokeLinejoin='round'
-						strokeWidth={2}
-						d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
-					/>
-				</svg>
-				<input
-					value={filterName}
-					onChange={changeFilterName}
-					type='text'
+				<SearchInput
+					changeFilterName={changeFilterName}
 					placeholder={
 						objectType === 'users'
 							? t('search_email')
@@ -973,7 +952,6 @@ export default function ObjectsView({
 									? t('search_code')
 									: t('search_title')
 					}
-					className='w-full py-2 pl-12 pr-4 border rounded-md outline-none bg-white focus:border-blue-600'
 				/>
 			</div>
 			<div
