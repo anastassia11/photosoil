@@ -67,7 +67,7 @@ export default function SoilPageComponent({ id }) {
 							>
 								{name === 'objectType' ? (
 									<Link
-										href={`/${locale}/soils?categories=${soil.objectType}`}
+										href={`/${locale}/soils?category=${soil.objectType}`}
 										prefetch={false}
 										className='text-blue-600 hover:underline'
 									>

@@ -37,7 +37,6 @@ export default function ObjectsView({
 	const searchParams = useSearchParams()
 	const pathname = usePathname()
 	const router = useRouter()
-	const didLogRef = useRef(true)
 	const dispatch = useDispatch()
 
 	const [currentLang, setCurrentLang] = useState('any')
@@ -61,22 +60,15 @@ export default function ObjectsView({
 	}
 
 	useEffect(() => {
-		let timeoutId
-		if (didLogRef.current) {
-			timeoutId = setTimeout(() => {
-				const currentLang = searchParams.get('lang')
-				const publishStatus = searchParams.get('publish')
+		const currentLang = searchParams.get('lang')
+		const publishStatus = searchParams.get('publish')
 
-				if (currentLang) {
-					setCurrentLang(currentLang)
-				}
-				if (publishStatus) {
-					setPublichStatus(publishStatus == 1 ? 'publish' : 'not_publish')
-				}
-				didLogRef.current = false
-			}, 300)
+		if (currentLang) {
+			setCurrentLang(currentLang)
 		}
-		return () => clearTimeout(timeoutId)
+		if (publishStatus) {
+			setPublichStatus(publishStatus == 1 ? 'publish' : 'not_publish')
+		}
 	}, [])
 
 	useEffect(() => {

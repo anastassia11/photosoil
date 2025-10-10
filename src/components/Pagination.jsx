@@ -48,16 +48,6 @@ export default function Pagination({
 
 		const endOffset = newOffset + itemsPerPage
 		const currentItems = items.slice(newOffset, endOffset)
-
-		// console.log(prevItemsLength, currentItems.length)
-		// Прокрутка только если количество элементов изменилось
-		// if (prevItemsLength && (prevItemsLength !== currentItems.length)) {
-		// 	console.log('scrollIntoView')
-		// 	const element = document.getElementById('pagination')
-		// 	setTimeout(() => {
-		// 		element.scrollIntoView()
-		// 	}, 100)
-		// }
 		setPrevItemsLength(currentItems.length)
 	}
 

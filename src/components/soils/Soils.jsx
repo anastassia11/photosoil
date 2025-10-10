@@ -90,14 +90,17 @@ export default function Soils({ _soils, isAllSoils, isFilters = false, type }) {
 	}, [_soils, type])
 
 	useEffect(() => {
-		let timeoutId
-		timeoutId = setTimeout(() => {
+		if (classificationsIsLoading) return
+
+		// setTimeout помогает с синхронизацией Valtio в production build
+		const timeoutId = setTimeout(() => {
 			const authorsParam = searchParams.get('authors')
 			const draftIsVisible = searchParams.get(isChild ? `${type}_draft` : 'draft')
 
 			if (authorsParam) {
 				filtersStore.selectedAuthors = authorsParam.split(',').map(Number)
 			}
+
 			if (draftIsVisible) {
 				setDraftIsVisible(draftIsVisible === '1')
 			}
@@ -105,10 +108,12 @@ export default function Soils({ _soils, isAllSoils, isFilters = false, type }) {
 			if (isSoils) {
 				const categoriesParam = searchParams.get('category')
 				const termsParam = searchParams.get('terms')
+
 				if (categoriesParam) {
 					filtersStore.selectedCategories = categoriesParam.split(',').map(Number)
 				}
-				if (termsParam) {
+
+				if (termsParam && classifications) {
 					const selectedTerms = termsParam.split(',').map(Number)
 					const isEnglish = locale === 'en'
 
@@ -133,11 +138,14 @@ export default function Soils({ _soils, isAllSoils, isFilters = false, type }) {
 						validTerms.length ? params.set('terms', validTerms.join(',')) : params.delete('terms')
 						router.replace(`${pathname}?${params.toString()}`, { scroll: false })
 					}
+				} else {
+					filtersStore.selectedTerms = []
 				}
 			}
-		}, 300)
+		}, 100) // Уменьшили до 100ms для быстрой работы
+
 		return () => clearTimeout(timeoutId)
-	}, [locale, isChild, isSoils, searchParams, type, classifications])
+	}, [locale, isChild, isSoils, type, classifications, classificationsIsLoading, pathname, router])
 
 	const updateHistory = useCallback((key, updatedArray) => {
 		const params = new URLSearchParams(searchParams.toString())

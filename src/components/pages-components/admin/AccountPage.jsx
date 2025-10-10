@@ -20,7 +20,6 @@ import { Label } from '@/components/ui/label'
 
 export default function AccountPageComponent({ id }) {
 	const dispatch = useDispatch()
-	const didLogRef = useRef(true)
 	const pathname = usePathname()
 	const router = useRouter()
 	const searchParams = useSearchParams()
@@ -52,18 +51,10 @@ export default function AccountPageComponent({ id }) {
 	}, [account.email])
 
 	useEffect(() => {
-		let timeoutId
-		if (didLogRef.current) {
-			timeoutId = setTimeout(() => {
-				const disabledTypes = searchParams.get('disabled')?.split(',')
-				if (disabledTypes) {
-					setSelectedFilters(FILTERS.map(({ name }) => name).filter(el => !disabledTypes.includes(el)))
-				}
-
-				didLogRef.current = false
-			}, 300)
+		const disabledTypes = searchParams.get('disabled')?.split(',')
+		if (disabledTypes) {
+			setSelectedFilters(FILTERS.map(({ name }) => name).filter(el => !disabledTypes.includes(el)))
 		}
-		return () => clearTimeout(timeoutId)
 	}, [])
 
 	const updateHistory = useCallback((key, updatedArray) => {

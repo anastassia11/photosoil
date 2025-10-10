@@ -102,67 +102,60 @@ export default function MainMap() {
 
 	useEffect(() => {
 		if (soilsIsLoading || ecosystemsIsLoading || publicationsIsLoading) return
-		let timeoutId
 
-		timeoutId = setTimeout(() => {
-			const soilIds = searchParams.get('soilIds')?.split(',').map(Number)
-			const ecosIds = searchParams.get('ecosIds')?.split(',').map(Number)
-			const publIds = searchParams.get('publIds')?.split(',').map(Number)
+		const soilIds = searchParams.get('soilIds')?.split(',').map(Number)
+		const ecosIds = searchParams.get('ecosIds')?.split(',').map(Number)
+		const publIds = searchParams.get('publIds')?.split(',').map(Number)
 
-			let _selectedSoils = []
-			let _selectedEcoss = []
-			let _selectedPubls = []
+		let _selectedSoils = []
+		let _selectedEcoss = []
+		let _selectedPubls = []
 
-			const isEnglish = locale === 'en'
+		const isEnglish = locale === 'en'
 
-			if (soilIds) {
-				_selectedSoils = soilIds
-					.map(id => soils.find(s => s.id === id))
-					.filter(Boolean)
-					.filter(obj => obj.translations?.some(t => t.isEnglish === isEnglish))
-			}
-			if (ecosIds) {
-				_selectedEcoss = ecosIds
-					.map(id => ecosystems.find(e => e.id === id))
-					.filter(Boolean)
-					.filter(obj => obj.translations?.some(t => t.isEnglish === isEnglish))
-			}
-			if (publIds) {
-				_selectedPubls = publIds
-					.map(id => publications.find(p => p.id === id))
-					.filter(Boolean)
-					.filter(obj => obj.translations?.some(t => t.isEnglish === isEnglish))
-			}
-
-			const allSelected = [..._selectedSoils, ..._selectedEcoss, ..._selectedPubls]
-			setSelectedObjects(allSelected)
-
-			const foundSoilIds = _selectedSoils.map(s => s.id)
-			const foundEcosIds = _selectedEcoss.map(e => e.id)
-			const foundPublIds = _selectedPubls.map(p => p.id)
-
-			const shouldUpdateUrl =
-				(soilIds && JSON.stringify([...soilIds].sort()) !== JSON.stringify([...foundSoilIds].sort())) ||
-				(ecosIds && JSON.stringify([...ecosIds].sort()) !== JSON.stringify([...foundEcosIds].sort())) ||
-				(publIds && JSON.stringify([...publIds].sort()) !== JSON.stringify([...foundPublIds].sort()))
-
-			if (shouldUpdateUrl) {
-				const newParams = new URLSearchParams(searchParams.toString())
-				foundSoilIds.length ? newParams.set('soilIds', foundSoilIds.join(',')) : newParams.delete('soilIds')
-				foundEcosIds.length ? newParams.set('ecosIds', foundEcosIds.join(',')) : newParams.delete('ecosIds')
-				foundPublIds.length ? newParams.set('publIds', foundPublIds.join(',')) : newParams.delete('publIds')
-				router.replace(`${pathname}?${newParams.toString()}`, { scroll: false })
-			}
-
-			if (allSelected.length > 0) {
-				setPopupVisible(true)
-			}
-		}, 300)
-
-		return () => {
-			clearTimeout(timeoutId)
+		if (soilIds) {
+			_selectedSoils = soilIds
+				.map(id => soils.find(s => s.id === id))
+				.filter(Boolean)
+				.filter(obj => obj.translations?.some(t => t.isEnglish === isEnglish))
 		}
-	}, [soilsIsLoading, ecosystemsIsLoading, publicationsIsLoading, locale, soils, ecosystems, publications, searchParams, router, pathname])
+		if (ecosIds) {
+			_selectedEcoss = ecosIds
+				.map(id => ecosystems.find(e => e.id === id))
+				.filter(Boolean)
+				.filter(obj => obj.translations?.some(t => t.isEnglish === isEnglish))
+		}
+		if (publIds) {
+			_selectedPubls = publIds
+				.map(id => publications.find(p => p.id === id))
+				.filter(Boolean)
+				.filter(obj => obj.translations?.some(t => t.isEnglish === isEnglish))
+		}
+
+		const allSelected = [..._selectedSoils, ..._selectedEcoss, ..._selectedPubls]
+		setSelectedObjects(allSelected)
+
+		const foundSoilIds = _selectedSoils.map(s => s.id)
+		const foundEcosIds = _selectedEcoss.map(e => e.id)
+		const foundPublIds = _selectedPubls.map(p => p.id)
+
+		const shouldUpdateUrl =
+			(soilIds && JSON.stringify([...soilIds].sort()) !== JSON.stringify([...foundSoilIds].sort())) ||
+			(ecosIds && JSON.stringify([...ecosIds].sort()) !== JSON.stringify([...foundEcosIds].sort())) ||
+			(publIds && JSON.stringify([...publIds].sort()) !== JSON.stringify([...foundPublIds].sort()))
+
+		if (shouldUpdateUrl) {
+			const newParams = new URLSearchParams(searchParams.toString())
+			foundSoilIds.length ? newParams.set('soilIds', foundSoilIds.join(',')) : newParams.delete('soilIds')
+			foundEcosIds.length ? newParams.set('ecosIds', foundEcosIds.join(',')) : newParams.delete('ecosIds')
+			foundPublIds.length ? newParams.set('publIds', foundPublIds.join(',')) : newParams.delete('publIds')
+			router.replace(`${pathname}?${newParams.toString()}`, { scroll: false })
+		}
+
+		if (allSelected.length > 0) {
+			setPopupVisible(true)
+		}
+	}, [soilsIsLoading, ecosystemsIsLoading, publicationsIsLoading, locale])
 
 	useEffect(() => {
 		if (soilsIsLoading || ecosystemsIsLoading || publicationsIsLoading) return

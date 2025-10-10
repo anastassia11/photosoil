@@ -42,7 +42,7 @@ const SideBar = memo(
 		popupClose,
 		onVisibleChange
 	}) {
-		const { classifications } = useClassifications()
+		const { classifications, classificationsIsLoading } = useClassifications()
 		const { authors } = useAuthors({ needSort: false })
 		const [draftIsVisible, setDraftIsVisible] = useState(false)
 
@@ -79,8 +79,10 @@ const SideBar = memo(
 		}, [])
 
 		useEffect(() => {
-			let timeoutId
-			timeoutId = setTimeout(() => {
+			if (classificationsIsLoading) return
+
+			// setTimeout помогает с синхронизацией Valtio в production build
+			const timeoutId = setTimeout(() => {
 				const categoriesParam = searchParams.get('category')
 				const termsParam = searchParams.get('terms')
 				const authorsParam = searchParams.get('authors')
@@ -95,10 +97,9 @@ const SideBar = memo(
 				if (categoriesParam) {
 					filtersStore.selectedCategories = categoriesParam.split(',').map(Number)
 				}
-				if (termsParam) {
+				if (termsParam && classifications) {
 					const selectedTerms = termsParam.split(',').map(Number)
 					const isEnglish = locale === 'en'
-
 					// Create map: classificationId -> translationMode
 					const modeMap = Object.fromEntries(classifications.map(c => [c.id, c.translationMode]))
 
@@ -121,9 +122,10 @@ const SideBar = memo(
 						router.replace(`${pathname}?${params.toString()}`, { scroll: false })
 					}
 				}
-			}, 300)
+			}, 100)
+
 			return () => clearTimeout(timeoutId)
-		}, [locale, classifications, searchParams, pathname, router])
+		}, [locale, classifications, classificationsIsLoading, pathname, router])
 
 		const handleViewSidebar = () => {
 			setSideBarOpen(!sidebarOpen)

@@ -54,18 +54,16 @@ export default function NewsPageComponent() {
 	}, [pathname])
 
 	useEffect(() => {
-		let timeoutId
-		timeoutId = setTimeout(() => {
+		const timeoutId = setTimeout(() => {
 			const tagsParam = searchParams.get('tags')
 
 			if (tagsParam) {
 				filtersStore.selectedTags = tagsParam.split(',').map(Number)
 			}
-		}, 300)
-		return () => {
-			clearTimeout(timeoutId)
-		}
-	}, [locale, searchParams])
+		}, 100)
+
+		return () => clearTimeout(timeoutId)
+	}, [locale, pathname, router])
 
 	const updateHistory = useCallback((key, updatedArray) => {
 		const params = new URLSearchParams(searchParams.toString())

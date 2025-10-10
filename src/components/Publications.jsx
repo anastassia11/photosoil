@@ -49,15 +49,11 @@ export default function Publications({ _publications, isChild = false }) {
 	}, [_publications])
 
 	useEffect(() => {
-		let timeoutId
-		timeoutId = setTimeout(() => {
-			const draftIsVisible = searchParams.get(isChild ? `publications_draft` : 'draft')
+		const draftIsVisible = searchParams.get(isChild ? `publications_draft` : 'draft')
 
-			if (draftIsVisible) {
-				setDraftIsVisible(draftIsVisible === '1')
-			}
-		}, 300)
-		return () => clearTimeout(timeoutId)
+		if (draftIsVisible) {
+			setDraftIsVisible(draftIsVisible === '1')
+		}
 	}, [locale, isChild])
 
 	const updateHistory = useCallback((key, updatedArray) => {
