@@ -1,7 +1,7 @@
 import { useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 
-const { memo, useEffect } = require('react')
+const { memo, useEffect, useRef } = require('react')
 
 const SearchInput = memo(function SearchInput({
 	changeFilterName,
@@ -19,17 +19,18 @@ const SearchInput = memo(function SearchInput({
 	} = useForm({
 		mode: 'onChange'
 	})
-
+	const isInitialized = useRef(false)
 	const watchedFilterName = watch('filterName')
 
 	useEffect(() => {
-		const filterName = searchParams.get(name)
-		if (filterName) {
-			setValue('filterName', filterName)
-		}
+		const filterName = searchParams.get(name) || ''
+		setValue('filterName', filterName)
+		isInitialized.current = true
 	}, [setValue, name])
 
 	useEffect(() => {
+		if (!isInitialized.current) return
+
 		let debounceTimer
 
 		const handler = () => {
@@ -37,7 +38,10 @@ const SearchInput = memo(function SearchInput({
 			clearTimeout(debounceTimer)
 			// Устанавливаем новый таймер
 			debounceTimer = setTimeout(() => {
-				changeFilterName(watchedFilterName)
+				const currentFromUrl = searchParams.get(name) || ''
+				if (watchedFilterName !== currentFromUrl) {
+					changeFilterName(watchedFilterName)
+				}
 			}, 1000)
 		}
 
@@ -46,7 +50,7 @@ const SearchInput = memo(function SearchInput({
 		return () => {
 			clearTimeout(debounceTimer)
 		}
-	}, [watchedFilterName])
+	}, [watchedFilterName, name, searchParams])
 
 	return (
 		<>

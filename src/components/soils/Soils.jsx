@@ -138,8 +138,6 @@ export default function Soils({ _soils, isAllSoils, isFilters = false, type }) {
 						validTerms.length ? params.set('terms', validTerms.join(',')) : params.delete('terms')
 						router.replace(`${pathname}?${params.toString()}`, { scroll: false })
 					}
-				} else {
-					filtersStore.selectedTerms = []
 				}
 			}
 		}, 100) // Уменьшили до 100ms для быстрой работы
