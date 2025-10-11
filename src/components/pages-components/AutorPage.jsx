@@ -104,7 +104,7 @@ export default function AuthorPageComponent({ id }) {
 	}, [author, searchParams, locale])
 
 	return (
-		<div className='flex flex-col'>
+		<div className='flex flex-col min-h-full'>
 			{!authorIsLoading ? (
 				<MotionWrapper>
 					<h1 className='sm:text-2xl text-xl font-semibold mb-2 flex justify-between md:flex-row md:items-center flex-col'>
