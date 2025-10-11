@@ -489,7 +489,7 @@ export default function ObjectsView({
 				</div>
 			</td>
 
-			<td className='px-4 py-3 text-sm whitespace-nowrap'>
+			<td className='px-4 py-3 text-sm whitespace-nowrap min-w-[218px]'>
 				{authorType !== undefined && (
 					<div className='flex items-center gap-x-2'>
 						{authorType == '0' ? (
