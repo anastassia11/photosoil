@@ -1,6 +1,12 @@
 .tiptap :first-child {
 	margin-top: 0;
 }
+
+.tiptap span {
+	font-size: inherit !important;
+	font-family: inherit !important;
+}
+
 .tiptap ul,
 .tiptap ol {
 	padding: 0 1rem;
