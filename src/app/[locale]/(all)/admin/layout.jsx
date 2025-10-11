@@ -1,8 +1,8 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { usePathname, useRouter } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import { usePathname, useRouter, useParams } from 'next/navigation'
+import { useEffect, useRef, useState, useMemo, memo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import Breadcrumbs from '@/components/Breadcrumbs'
@@ -19,6 +19,18 @@ const Modal = dynamic(() => import('@/components/admin-panel/ui-kit/Modal'), {
 	ssr: false
 })
 
+// Изолированный wrapper для Sidebar чтобы предотвратить перерисовку
+const SidebarWrapper = memo(function SidebarWrapper({ menuOpen, locale }) {
+	return (
+		<div
+			key="admin-sidebar"
+			className={`lg:block fixed z-50 transition-all duration-300 ${menuOpen ? 'block' : 'lg:opacity-100 opacity-0 lg:left-0 -left-[290px]'}`}
+		>
+			<Sidebar locale={locale} />
+		</div>
+	)
+})
+
 export default function AdminLayout({ children }) {
 	const { isOpen, modalProps } = useSelector(state => state.modal)
 	const { isOpen: alertIsOpen, props: alertProps } = useSelector(
@@ -28,9 +40,12 @@ export default function AdminLayout({ children }) {
 	const dispatch = useDispatch()
 	const router = useRouter()
 	const pathname = usePathname()
+	const params = useParams()
 	const [isAuth, setIsAuth] = useState(false)
 	const [isChecked, setIsChecked] = useState(false)
 	const [menuOpen, setMenuOpen] = useState(false)
+	// Стабилизируем locale чтобы не вызывать лишние ререндеры Sidebar
+	const locale = useMemo(() => params?.locale || 'ru', [params?.locale])
 
 	useEffect(() => {
 		token.current = localStorage.getItem('tokenData')
@@ -41,10 +56,12 @@ export default function AdminLayout({ children }) {
 			setIsAuth(false)
 			setIsChecked(true)
 		} else {
-			setIsAuth(true)
-			setIsChecked(true)
+			// Устанавливаем состояния только если они изменились
+			setIsAuth(prev => prev !== true ? true : prev)
+			setIsChecked(prev => prev !== true ? true : prev)
 		}
-		setMenuOpen(false)
+		// Закрываем меню только если оно открыто
+		setMenuOpen(prev => prev ? false : prev)
 	}, [pathname])
 
 	useEffect(() => {
@@ -62,11 +79,7 @@ export default function AdminLayout({ children }) {
 			{isChecked ? (
 				isAuth ? (
 					<>
-						<div
-							className={`lg:block fixed z-50 duration-300 ${menuOpen ? 'block' : 'lg:opacity-100 opacity-0 lg:left-0 -left-[290px]'}`}
-						>
-							<Sidebar />
-						</div>
+						<SidebarWrapper menuOpen={menuOpen} locale={locale} />
 
 						<div className='min-h-full h-full flex flex-col sm:px-8 px-4 lg:w-[calc(100%-290px)] mr-0 ml-auto w-full'>
 							<Alert

@@ -2,18 +2,17 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useParams, useRouter } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import React, { useEffect, useState, memo, useMemo, useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { setDirty } from '@/store/slices/formSlice'
 
 import { getTranslation } from '@/i18n/client'
 
-export default function Sidebar() {
+function Sidebar({ locale }) {
 	const dispatch = useDispatch()
 	const [role, setRole] = useState(null)
-	const { locale } = useParams()
 	const { t } = getTranslation(locale)
 	const { isDirty } = useSelector(state => state.form)
 	const router = useRouter()
@@ -23,7 +22,7 @@ export default function Sidebar() {
 			setRole(JSON.parse(localStorage.getItem('tokenData')).role)
 	}, [])
 
-	const content = [
+	const content = useMemo(() => [
 		{
 			url: 'objects',
 			title: t('soils'),
@@ -128,9 +127,9 @@ export default function Sidebar() {
 				</svg>
 			)
 		},
-	]
+	], [t])
 
-	const taxonomy = [
+	const taxonomy = useMemo(() => [
 		{
 			url: 'dictionary',
 			title: t('dictionaries'),
@@ -151,9 +150,9 @@ export default function Sidebar() {
 				</svg>
 			)
 		}
-	]
+	], [t])
 
-	const policy = [
+	const policy = useMemo(() => [
 		{
 			url: 'policy',
 			title: t('rules'),
@@ -185,9 +184,9 @@ export default function Sidebar() {
 				</svg>
 			)
 		}
-	]
+	], [t])
 
-	const users = [
+	const users = useMemo(() => [
 		{
 			url: 'users',
 			title: t('users'),
@@ -208,9 +207,9 @@ export default function Sidebar() {
 				</svg>
 			)
 		}
-	]
+	], [t])
 
-	const handleLinkClick = (e, href) => {
+	const handleLinkClick = useCallback((e, href) => {
 		if (isDirty) {
 			e.preventDefault() // Отменяем переход по умолчанию
 			const confirmLeave = window.confirm(t('form_confirm'))
@@ -219,15 +218,16 @@ export default function Sidebar() {
 				router.push(href) // Переход к новому URL
 			}
 		}
-	}
+	}, [isDirty, t, dispatch, router])
 
-	const LinkItem = ({ url, title, svg }) => (
+	const LinkItem = memo(({ url, title, svg }) => (
 		<Link
 			href={`/${locale}/admin/${url}`}
 			prefetch={false}
 			onClick={e => handleLinkClick(e, `/${locale}/admin/${url}`)}
-			className='cursor-pointer flex items-center px-3 py-2 transition-colors duration-300 
-            transform rounded-lg hover:bg-gray-100 hover:text-gray-700'
+			className='cursor-pointer flex items-center px-3 py-2 transition-colors duration-100
+            rounded-lg hover:bg-gray-100 hover:text-gray-700 active:bg-gray-100 active:text-gray-700 
+            focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500'
 		>
 			{svg && <div className='text-zinc-500'>{svg}</div>}
 			<span
@@ -236,7 +236,8 @@ export default function Sidebar() {
 				{title}
 			</span>
 		</Link>
-	)
+	))
+	LinkItem.displayName = 'LinkItem'
 
 	return (
 		<aside
@@ -315,3 +316,5 @@ export default function Sidebar() {
 		</aside>
 	)
 }
+
+export default memo(Sidebar)
