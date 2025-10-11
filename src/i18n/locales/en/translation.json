@@ -176,7 +176,8 @@
 	"no_objects": "There are no objects matching the search results",
 	"no_object": "This object does not exist. It may exist in another locale.",
 	"not_found": "Object not found",
-
+	"new_tag": "New tag",
+	"edit_tag": "Edit tag",
 	"delete_photo": "Photo will be deleted",
 	"in_map": "Object location on the map",
 	"main_photo": "Main photo",

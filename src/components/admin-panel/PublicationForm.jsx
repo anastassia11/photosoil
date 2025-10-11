@@ -18,7 +18,7 @@ import { sendPhoto } from '@/api/photo/send_photo'
 import { getBaseSoils } from '@/api/soil/get_base_soils'
 
 import MapArraySelect from '../map/MapArraySelect'
-import Filter from '../soils/Filter'
+import Filter from '../soils/Filter2'
 
 import DragAndDrop from './ui-kit/DragAndDrop'
 import FileCard from './ui-kit/FileCard'
@@ -53,7 +53,7 @@ export default function PublicationForm({
 		setFocus,
 		formState: { errors, isSubmitting, isDirty }
 	} = useForm({
-		mode: 'onChange',
+		mode: 'onBlur',
 		defaultValues: {
 			type: 1,
 			doi: '',
@@ -478,6 +478,7 @@ export default function PublicationForm({
 											: onChange([...value, newItem])
 									}
 									resetItems={() => onChange([])}
+									selectAll={onChange}
 								/>
 							)}
 						/>
@@ -497,6 +498,7 @@ export default function PublicationForm({
 											: onChange([...value, newItem])
 									}
 									resetItems={() => onChange([])}
+									selectAll={onChange}
 								/>
 							)}
 						/>

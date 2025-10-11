@@ -22,7 +22,7 @@ import { useConstants } from '@/hooks/useConstants'
 
 import LayerSwitch from '../admin-panel/ui-kit/LayerSwitch'
 import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper'
-import Filter from '../soils/Filter'
+import Filter from '../soils/Filter2'
 
 import DraftSwitcher from './DraftSwitcher'
 import ObjectCard from './ObjectCard'
@@ -172,8 +172,8 @@ const SideBar = memo(
 		)
 
 		const handleAllCategory = useCallback(
-			() => {
-				const updatedArray = CATEGORY_ARRAY.map(({ id }) => id)
+			(idsToSelect) => {
+				const updatedArray = idsToSelect || CATEGORY_ARRAY.map(({ id }) => id)
 				filtersStore.selectedCategories = updatedArray
 				updateHistory('category', updatedArray)
 			},
@@ -203,8 +203,16 @@ const SideBar = memo(
 		)
 
 		const handleAllTerm = useCallback(
-			terms => {
-				const updatedArray = [...filtersStore.selectedTerms, ...terms.map(({ id }) => id).filter(id => !filtersStore.selectedTerms?.includes(id))]
+			idsToSelect => {
+				// Проверяем, массив объектов или массив ID
+				const ids = Array.isArray(idsToSelect) && typeof idsToSelect[0] === 'object'
+					? idsToSelect.map(({ id }) => id)  // Старый формат - массив объектов
+					: idsToSelect  // Новый формат - массив ID
+
+				const updatedArray = [
+					...filtersStore.selectedTerms,
+					...ids.filter(id => !filtersStore.selectedTerms?.includes(id))
+				]
 				filtersStore.selectedTerms = updatedArray
 				updateHistory('terms', updatedArray)
 			},
@@ -235,8 +243,8 @@ const SideBar = memo(
 		)
 
 		const handleAllAuthor = useCallback(
-			() => {
-				const updatedArray = authors.map(({ id }) => id)
+			(idsToSelect) => {
+				const updatedArray = idsToSelect || authors.map(({ id }) => id)
 				filtersStore.selectedAuthors = updatedArray
 				updateHistory('authors', updatedArray)
 			},
@@ -434,7 +442,7 @@ const SideBar = memo(
 																.filter(id => selectedTerms?.includes(id))}
 															addItem={handleAddTerm}
 															resetItems={handleResetTerm}
-															selectAll={() => handleAllTerm(item.terms)}
+															selectAll={handleAllTerm}
 														/>
 													</li>
 												)

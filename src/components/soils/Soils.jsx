@@ -19,7 +19,7 @@ import Loader from '../Loader'
 import Pagination from '../Pagination'
 import MotionWrapper from '../admin-panel/ui-kit/MotionWrapper'
 
-import Filter from './Filter'
+import Filter from './Filter2'
 import SoilCard from './SoilCard'
 import { getTranslation } from '@/i18n/client'
 import DraftSwitcher from '../map/DraftSwitcher'
@@ -185,8 +185,8 @@ export default function Soils({ _soils, isAllSoils, isFilters = false, type }) {
 	)
 
 	const handleAllCategory = useCallback(
-		() => {
-			const updatedArray = CATEGORY_ARRAY.map(({ id }) => id)
+		idsToSelect => {
+			const updatedArray = idsToSelect || CATEGORY_ARRAY.map(({ id }) => id)
 			filtersStore.selectedCategories = updatedArray
 			updateHistory('category', updatedArray)
 		},
@@ -216,8 +216,16 @@ export default function Soils({ _soils, isAllSoils, isFilters = false, type }) {
 	)
 
 	const handleAllTerm = useCallback(
-		terms => {
-			const updatedArray = [...filtersStore.selectedTerms, ...terms.map(({ id }) => id).filter(id => !filtersStore.selectedTerms?.includes(id))]
+		idsToSelect => {
+			// Проверяем, массив объектов или массив ID
+			const ids = Array.isArray(idsToSelect) && typeof idsToSelect[0] === 'object'
+				? idsToSelect.map(({ id }) => id)  // Старый формат - массив объектов
+				: idsToSelect  // Новый формат - массив ID
+
+			const updatedArray = [
+				...filtersStore.selectedTerms,
+				...ids.filter(id => !filtersStore.selectedTerms?.includes(id))
+			]
 			filtersStore.selectedTerms = updatedArray
 			updateHistory('terms', updatedArray)
 		},
@@ -248,8 +256,8 @@ export default function Soils({ _soils, isAllSoils, isFilters = false, type }) {
 	)
 
 	const handleAllAuthor = useCallback(
-		() => {
-			const updatedArray = authors.map(({ id }) => id)
+		idsToSelect => {
+			const updatedArray = idsToSelect || authors.map(({ id }) => id)
 			filtersStore.selectedAuthors = updatedArray
 			updateHistory('authors', updatedArray)
 		},
@@ -367,7 +375,7 @@ export default function Soils({ _soils, isAllSoils, isFilters = false, type }) {
 															.filter(id => selectedTerms?.includes(id))}
 														addItem={handleAddTerm}
 														resetItems={handleResetTerm}
-														selectAll={() => handleAllTerm(item.terms)}
+														selectAll={handleAllTerm}
 													/>
 												</MotionWrapper>
 											</li>

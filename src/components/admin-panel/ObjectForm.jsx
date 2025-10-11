@@ -7,6 +7,7 @@ import {
 	useCallback,
 	useEffect,
 	useImperativeHandle,
+	useMemo,
 	useState
 } from 'react'
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
@@ -29,7 +30,6 @@ import { getBasePublications } from '@/api/publication/get_base_publications'
 import { getBaseSoils } from '@/api/soil/get_base_soils'
 
 import MapSelect from '../map/MapSelect'
-import Filter from '../soils/Filter'
 
 import TextEditor from './TextEditor'
 import DragAndDrop from './ui-kit/DragAndDrop'
@@ -41,6 +41,99 @@ import { getTranslation } from '@/i18n/client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { Label } from '../ui/label'
 import { Checkbox } from '../ui/checkbox'
+import Filter from '../soils/Filter2'
+
+// Вынесены наружу для предотвращения пересоздания при каждом рендере
+const Column = memo(({ items, control, locale, isEng }) => (
+	<div className='flex flex-col gap-4'>
+		{items.map(item => (
+			<div key={`classification-${item.id}`}>
+				<Controller
+					control={control}
+					name='soilTerms'
+					render={({ field: { value, onChange } }) => (
+						<Filter
+							locale={locale}
+							name={isEng ? item.nameEng : item.nameRu}
+							items={item.terms}
+							itemId={item.id}
+							selectedItems={item.terms
+								.map(({ id }) => id)
+								.filter(id => value?.includes(id))}
+							type='classif'
+							sortByOrder={!item.isAlphabeticallOrder}
+							addItem={newItem => {
+								value.includes(newItem)
+									? onChange(value.filter(item => item !== newItem))
+									: onChange([...value, newItem])
+							}}
+							resetItems={items =>
+								onChange(value.filter(item => !items.includes(item)))
+							}
+							selectAll={onChange}
+						/>
+					)}
+				/>
+			</div>
+		))}
+	</div>
+))
+
+Column.displayName = 'Column'
+
+const GridComponent = memo(({ classifications, isEng, control, locale }) => {
+	const filteredClassifications = useMemo(() => {
+		return classifications.filter(
+			item =>
+				item.translationMode == 0 ||
+				(isEng ? item.translationMode == 1 : item.translationMode == 2)
+		)
+	}, [classifications, isEng])
+
+	const [firstColumnItems, secondColumnItems] = useMemo(() => {
+		const midPoint = Math.ceil(filteredClassifications.length / 2)
+		return [
+			filteredClassifications.slice(0, midPoint),
+			filteredClassifications.slice(midPoint)
+		]
+	}, [filteredClassifications])
+
+	return (
+		<div className='grid md:grid-cols-2 grid-cols-1 gap-4 w-full mt-1'>
+			<Column items={firstColumnItems} control={control} locale={locale} isEng={isEng} />
+			<Column items={secondColumnItems} control={control} locale={locale} isEng={isEng} />
+		</div>
+	)
+})
+
+GridComponent.displayName = 'GridComponent'
+
+const ItemFilter = memo(({ name, items, title, type, control, locale }) => {
+	return (
+		<Controller
+			control={control}
+			name={name}
+			render={({ field: { value, onChange } }) => (
+				<Filter
+					locale={locale}
+					name={title}
+					items={items}
+					selectedItems={value}
+					type={type}
+					addItem={newItem =>
+						value.includes(newItem)
+							? onChange(value.filter(item => item !== newItem))
+							: onChange([...value, newItem])
+					}
+					resetItems={() => onChange([])}
+					selectAll={onChange}
+				/>
+			)}
+		/>
+	)
+})
+
+ItemFilter.displayName = 'ItemFilter'
 
 function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, onMainPhotoSend, onOtherPhotoSend,
 	onObjectPhotoDelete, onMainPhotoDelete, setBtnDisabled
@@ -76,7 +169,7 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, onMainPhot
 		getValues,
 		setFocus,
 		formState: { errors, isDirty }
-	} = useForm({ mode: 'onChange', defaultValues })
+	} = useForm({ mode: 'onBlur', defaultValues })
 
 	const { fields: translationsFields, append: appendTranslation } =
 		useFieldArray({
@@ -132,7 +225,7 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, onMainPhot
 
 	useEffect(() => {
 		dispatch(setDirty(isDirty))
-	}, [isDirty])
+	}, [isDirty, dispatch])
 
 	useEffect(() => {
 		if (setBtnDisabled) setBtnDisabled(mainPhoto.isLoading || localObjectPhoto?.some((photo) => photo.isLoading))
@@ -367,84 +460,6 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, onMainPhot
 		}
 	}
 
-	const Column = ({ items }) => (
-		<div className='flex flex-col gap-4'>
-			{items.map(item => (
-				<div key={`classification-${item.id}`}>
-					<Controller
-						control={control}
-						name='soilTerms'
-						render={({ field: { value, onChange } }) => (
-							<Filter
-								locale={locale}
-								name={isEng ? item.nameEng : item.nameRu}
-								items={item.terms}
-								itemId={item.id}
-								selectedItems={item.terms
-									.map(({ id }) => id)
-									.filter(id => value?.includes(id))}
-								type='classif'
-								sortByOrder={!item.isAlphabeticallOrder}
-								addItem={newItem => {
-									value.includes(newItem)
-										? onChange(value.filter(item => item !== newItem))
-										: onChange([...value, newItem])
-								}}
-								resetItems={items =>
-									onChange(value.filter(item => !items.includes(item)))
-								}
-								selectAll={() =>
-									onChange([...value, ...item.terms.map(({ id }) => id).filter(id => !value?.includes(id))])
-								}
-							/>
-						)}
-					/>
-				</div>
-			))}
-		</div>
-	)
-
-	const GridComponent = ({ classifications }) => {
-		const _classifications = classifications.filter(
-			item =>
-				item.translationMode == 0 ||
-				(isEng ? item.translationMode == 1 : item.translationMode == 2)
-		)
-		const midPoint = Math.ceil(_classifications.length / 2)
-		const firstColumnItems = _classifications.slice(0, midPoint)
-		const secondColumnItems = _classifications.slice(midPoint)
-
-		return (
-			<div className='grid md:grid-cols-2 grid-cols-1 gap-4 w-full mt-1'>
-				<Column items={firstColumnItems} />
-				<Column items={secondColumnItems} />
-			</div>
-		)
-	}
-
-	const ItemFilter = ({ name, items, title, type }) => {
-		return (
-			<Controller
-				control={control}
-				name={name}
-				render={({ field: { value, onChange } }) => (
-					<Filter
-						locale={locale}
-						name={title}
-						items={items}
-						selectedItems={value}
-						type={type}
-						addItem={newItem =>
-							value.includes(newItem)
-								? onChange(value.filter(item => item !== newItem))
-								: onChange([...value, newItem])
-						}
-						resetItems={() => onChange([])}
-					/>
-				)}
-			/>
-		)
-	}
 
 	return (
 		<form
@@ -555,6 +570,8 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, onMainPhot
 									items={authors}
 									title={t('authors')}
 									type='authors'
+									control={control}
+									locale={locale}
 								/>
 							</li>
 							<div className={`mt-3 flex flex-row items-center space-x-2`}>
@@ -739,7 +756,12 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, onMainPhot
 						{type === 'soil' && (
 							<>
 								<p className='font-medium mt-8'>{t('classifications')}</p>
-								<GridComponent classifications={classifications} />
+								<GridComponent
+									classifications={classifications}
+									isEng={isEng}
+									control={control}
+									locale={locale}
+								/>
 							</>
 						)}
 
@@ -751,6 +773,8 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, onMainPhot
 									type='ecosystem'
 									title={t('ecosystems')}
 									items={ecosystems}
+									control={control}
+									locale={locale}
 								/>
 							)}
 
@@ -760,6 +784,8 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, onMainPhot
 									type='soil'
 									title={t('soils')}
 									items={soils}
+									control={control}
+									locale={locale}
 								/>
 							)}
 							<ItemFilter
@@ -767,6 +793,8 @@ function ObjectForm({ id, oldTwoLang, oldIsEng, pathname, type, item, onMainPhot
 								type='publications'
 								title={t('publications')}
 								items={publications}
+								control={control}
+								locale={locale}
 							/>
 						</div>
 

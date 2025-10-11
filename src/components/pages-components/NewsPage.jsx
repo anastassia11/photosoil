@@ -14,7 +14,7 @@ import { useSnapshot } from 'valtio'
 import Loader from '@/components/Loader'
 import Pagination from '@/components/Pagination'
 import MotionWrapper from '@/components/admin-panel/ui-kit/MotionWrapper'
-import Filter from '@/components/soils/Filter'
+import Filter from '@/components/soils/Filter2'
 
 import { filtersStore } from '@/store/valtioStore/filtersStore'
 
@@ -99,8 +99,8 @@ export default function NewsPageComponent() {
 	)
 
 	const handleAllTag = useCallback(
-		() => {
-			const updatedArray = tags.map(({ id }) => id)
+		idsToSelect => {
+			const updatedArray = idsToSelect || tags.map(({ id }) => id)
 			filtersStore.selectedTags = updatedArray
 			updateHistory('tags', updatedArray)
 		},

@@ -16,7 +16,7 @@ export default function Modal({ isOpen, title, message, buttonText, type }) {
 		<div className='modal'>
 			{isOpen && (
 				<div
-					className='bg-black/30 fixed top-0 left-0 z-50 overflow-y-auto w-screen h-screen'
+					className='bg-black/30 fixed top-0 left-0 z-[60] overflow-y-auto w-screen h-screen'
 					aria-labelledby='modal-title'
 					role='dialog'
 					aria-modal='true'

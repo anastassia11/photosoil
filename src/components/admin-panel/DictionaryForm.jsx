@@ -42,7 +42,7 @@ export default function DictionaryForm({
 		formState: { errors, isSubmitting, isDirty }
 	} = useForm({
 		defaultValues,
-		mode: 'onChange'
+		mode: 'onBlur'
 	})
 	const {
 		fields: termsFields,

@@ -71,7 +71,7 @@ export default function AuthorForm({
 		formState: { errors, isSubmitting, isDirty }
 	} = useForm({
 		defaultValues,
-		mode: 'onChange'
+		mode: 'onBlur'
 	})
 	const {
 		fields: contactFields,

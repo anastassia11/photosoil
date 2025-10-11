@@ -16,8 +16,6 @@ import { deletePhotoById } from '@/api/photo/delete_photo'
 import { sendPhoto } from '@/api/photo/send_photo'
 import { getTags } from '@/api/tags/get_tags'
 
-import Filter from '../soils/Filter'
-
 import TextEditor from './TextEditor'
 import DragAndDrop from './ui-kit/DragAndDrop'
 import FileCard from './ui-kit/FileCard'
@@ -27,6 +25,7 @@ import SubmitBtn from './ui-kit/SubmitBtn'
 import Textarea from './ui-kit/Textarea'
 import { getTranslation } from '@/i18n/client'
 import uuid from 'react-uuid'
+import Filter from '../soils/Filter2'
 
 export default function NewsForm({
 	_news,
@@ -48,7 +47,7 @@ export default function NewsForm({
 		setFocus,
 		formState: { errors, isSubmitting, isDirty }
 	} = useForm({
-		mode: 'onChange',
+		mode: 'onBlur',
 		defaultValues: {
 			translations: [
 				{
@@ -484,7 +483,7 @@ export default function NewsForm({
 											: onChange([...value, newItem])
 									}}
 									resetItems={() => onChange([])}
-									selectAll={() => onChange(tags.map(({ id }) => id))}
+									selectAll={onChange}
 								/>
 							)}
 						/>

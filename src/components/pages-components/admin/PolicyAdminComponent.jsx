@@ -36,7 +36,7 @@ export default function PolicyAdminComponent() {
 		reset,
 		formState: { isSubmitting, isDirty }
 	} = useForm({
-		mode: 'onChange',
+		mode: 'onBlur',
 		defaultValues: {
 			contentRu: '',
 			contentEng: '',

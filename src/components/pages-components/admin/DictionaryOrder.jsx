@@ -43,7 +43,7 @@ export default function DictionaryOrderComponent() {
 		defaultValues: {
 			disconaries: []
 		},
-		mode: 'onChange'
+		mode: 'onBlur'
 	})
 	const { locale } = useParams()
 	const { t } = getTranslation(locale)
