@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { memo, useEffect } from 'react'
+import React, { memo } from 'react'
 
 import { BASE_SERVER_URL } from '@/utils/constants'
 
@@ -18,7 +18,6 @@ const SoilCard = memo(
 			>
 				<div className='h-[100%] w-full overflow-hidden opacity-80'>
 					<Image
-						priority
 						src={`${BASE_SERVER_URL}${photo.pathResize.length ? photo.pathResize : photo.path}`}
 						width={500}
 						height={500}
@@ -29,7 +28,6 @@ const SoilCard = memo(
 
 				<div className='h-[77%] absolute top-0 w-full flex'>
 					<Image
-						priority
 						src={`${BASE_SERVER_URL}${photo.pathResize.length ? photo.pathResize : photo.path}`}
 						width={500}
 						height={500}
