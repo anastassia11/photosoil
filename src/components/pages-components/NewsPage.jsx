@@ -119,7 +119,7 @@ export default function NewsPageComponent() {
 			<Link
 				href={`/${locale}/news/${id}`}
 				prefetch={false}
-				className='bg-white rounded-md hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] transition-all duration-300
+				className='bg-white rounded-md ring ring-transparent hover:ring hover:ring-blue-700 hover:ring-opacity-30 transition-all duration-300
              w-full max-w-full h-full flex flex-col justify-between overflow-hidden'
 			>
 				{!!photo && <Image

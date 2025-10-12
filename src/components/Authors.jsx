@@ -62,7 +62,7 @@ export default function Authors() {
 				href={`/${locale}/authors/${id}`}
 				prefetch={false}
 				className='relative aspect-[2/3] overflow-hidden
-    rounded-md hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] transition-all duration-300 flex flex-col  cursor-pointer'
+    rounded-md ring ring-transparent hover:ring hover:ring-blue-700 hover:ring-opacity-30 transition-all duration-300 flex flex-col  cursor-pointer'
 			>
 				<div className='w-full h-full relative'>
 					{photo && (

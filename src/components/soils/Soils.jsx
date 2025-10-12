@@ -397,7 +397,7 @@ export default function Soils({ _soils, isAllSoils, isFilters = false, type }) {
 					type={type} />
 			</MotionWrapper>
 
-			<ul className='soils-grid my-4'>
+			<ul className='soils-grid py-4 overflow-hidden px-1'>
 				{isLoading?.items ? (
 					Array(8)
 						.fill('')
@@ -411,7 +411,7 @@ export default function Soils({ _soils, isAllSoils, isFilters = false, type }) {
 						{soils.length ? (
 							currentItems.map(
 								({ id, photo, translations, dataRu, dataEng }) => (
-									<li key={id}>
+									<li key={id} className='max-w-full'>
 										<MotionWrapper>
 											<SoilCard
 												locale={locale}

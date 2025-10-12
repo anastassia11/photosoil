@@ -126,7 +126,7 @@ export default function Publications({ _publications, isChild = false }) {
 											href={`/${locale}/publications/${item.id}`}
 											prefetch={false}
 											className='justify-between items-start flex flex-row flex-1 mb-4 sm:px-4 px-2 sm:py-5 py-3 cursor-pointer hover:bg-white
-                                        rounded-md hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] transition-all duration-300'
+                                        rounded-md ring ring-transparent hover:ring hover:ring-blue-700 hover:ring-opacity-30 transition-all duration-300'
 										>
 											<div className='sm:space-y-3 space-y-1'>
 												<div className='flex items-center gap-x-3'>

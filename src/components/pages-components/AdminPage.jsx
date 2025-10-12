@@ -45,7 +45,7 @@ export default function AdminPageComponent() {
 		return <Link
 			href={`/${locale}/news/${id}`}
 			prefetch={false}
-			className='sm:px-8 px-4 py-4 bg-white rounded-md hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] transition-all duration-300
+			className='sm:px-8 px-4 py-4 bg-white rounded-md ring ring-transparent hover:ring hover:ring-blue-700 hover:ring-opacity-30 transition-all duration-300
              w-full h-full flex flex-col justify-between'
 		>
 			<div className='flex flex-col'>
