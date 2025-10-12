@@ -13,7 +13,7 @@ const SoilCard = memo(
 					query: {}
 				}}
 				prefetch={false}
-				className='relative aspect-[2/3] overflow-hidden transition-all
+				className='relative aspect-[2/3] overflow-hidden transition-all max-w-full max-h-full
     rounded-md  hover:ring ring-blue-700 ring-opacity-30 hover:scale-[1.006] flex flex-col  duration-300 cursor-pointer'
 			>
 				<div className='h-[100%] w-full overflow-hidden opacity-80'>

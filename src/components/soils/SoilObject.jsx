@@ -231,7 +231,7 @@ export default function SoilObject({ object, children, type, isLoading = false }
 				<button
 					className={`text-blue-600 w-fit font-semibold text-sm sm:text-base md:border-l-0 pl-2 md:pl-0 border-l-2 md:border-b-2 translate-y-[2px]
                 hover:border-blue-600 md:py-2 py-1.5
-                ${!object.latitude ? 'opacity-50 pointer-events-none ' : ''}`}
+                ${!object.latitude && 'hidden'}`}
 					onClick={() => handleScrollToSection('map-section')}
 				>
 					{t('show_inMap')}
