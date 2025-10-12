@@ -33,10 +33,6 @@ export default function NewsItemPageComponent({ id }) {
 	useEffect(() => {
 		localStorage.getItem('tokenData') &&
 			setTokenData(JSON.parse(localStorage.getItem('tokenData')))
-		document.documentElement.style.setProperty(
-			'--product-view-height',
-			window.innerWidth > 640 ? '600px' : '300px'
-		)
 	}, [])
 
 	useEffect(() => {
@@ -161,7 +157,7 @@ export default function NewsItemPageComponent({ id }) {
 
 				<div
 					id='gallery-section'
-					className='mt-8 self-center w-full'
+					className='mt-8 self-center w-full lg:aspect-[2/1] aspect-[9/16] overflow-hidden'
 				>
 					<NewGallery objectPhoto={news?.objectPhoto} />
 				</div>

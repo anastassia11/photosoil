@@ -21,7 +21,6 @@ export default function NewGallery({ mainPhoto, objectPhoto }) {
 	const { locale } = useParams()
 
 	useEffect(() => {
-		// document.documentElement.style.setProperty('--product-view-height', '280px');
 		if (mainPhoto || objectPhoto) {
 			const _elements = []
 			if (mainPhoto) {

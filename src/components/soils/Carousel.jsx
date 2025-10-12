@@ -54,7 +54,7 @@ export default function Carousel({ onPageChange, children }) {
 	return (
 		<div
 			id='productCarousel'
-			className='f-carousel lg:order-last'
+			className='f-carousel lg:order-last max-w-full overflow-hidden min-h-full'
 			ref={containerRef}
 		>
 			{children}

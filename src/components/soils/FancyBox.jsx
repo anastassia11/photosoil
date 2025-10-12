@@ -127,7 +127,7 @@ export default function FancyBox(props) {
 	return (
 		<div
 			id='productContainer'
-			className={`${props.length > 1 && 'grid gap-2 lg:grid-cols-[106px_minmax(0px,_1fr)]'}`}
+			className={`${props.length > 1 && 'grid gap-2 lg:grid-cols-[106px_minmax(0px,_1fr)] min-h-full'}`}
 			ref={containerRef}
 		>
 			{props.children}

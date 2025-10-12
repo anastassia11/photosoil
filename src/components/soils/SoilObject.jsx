@@ -35,7 +35,6 @@ export default function SoilObject({ object, children, type, isLoading = false }
 		if (typeof document !== 'undefined') {
 			setParser(new DOMParser())
 		}
-		document.documentElement.style.setProperty('--product-view-height', '480px')
 		localStorage.getItem('tokenData') &&
 			setTokenData(JSON.parse(localStorage.getItem('tokenData')))
 	}, [])
@@ -242,10 +241,14 @@ export default function SoilObject({ object, children, type, isLoading = false }
 				<div className='duration-300 md:sticky relative md:top-24 w-full md:min-w-[50%] md:max-w-[50%] lg:max-w-[550px] lg:min-w-[550px] h-fit'>
 					{object.photo ? (
 						<MotionWrapper>
-							<NewGallery
-								mainPhoto={object.photo}
-								objectPhoto={object.objectPhoto}
-							/>
+							<div
+								className='lg:aspect-[55/48] aspect-[9/16] overflow-hidden'
+							>
+								<NewGallery
+									mainPhoto={object.photo}
+									objectPhoto={object.objectPhoto}
+								/>
+							</div>
 							{object.isExternal ? <Info /> : ''}
 						</MotionWrapper>
 					) : (
