@@ -159,7 +159,7 @@ export default function SoilObject({ object, children, type, isLoading = false }
 		<div className='flex flex-col'>
 			<div className='flex flex-col sm:flex-row mb-2 justify-between sm:items-start'>
 				<div className='w-full'>
-					{object.translations ? (
+					{!isLoading ? (
 						<MotionWrapper>
 							<h1 className='sm:text-2xl text-xl font-semibold w-full'>
 								{
@@ -231,7 +231,7 @@ export default function SoilObject({ object, children, type, isLoading = false }
 				<button
 					className={`text-blue-600 w-fit font-semibold text-sm sm:text-base md:border-l-0 pl-2 md:pl-0 border-l-2 md:border-b-2 translate-y-[2px]
                 hover:border-blue-600 md:py-2 py-1.5
-                ${!object.latitude && 'hidden'}`}
+                ${!object.latitude ? 'opacity-50 pointer-events-none ' : ''}`}
 					onClick={() => handleScrollToSection('map-section')}
 				>
 					{t('show_inMap')}
@@ -239,7 +239,7 @@ export default function SoilObject({ object, children, type, isLoading = false }
 			</div>
 			<div className='flex md:flex-row flex-col mt-6 relaltive'>
 				<div className='duration-300 md:sticky relative md:top-24 w-full md:min-w-[50%] md:max-w-[50%] lg:max-w-[550px] lg:min-w-[550px] h-fit'>
-					{object.photo ? (
+					{!isLoading ? (
 						<MotionWrapper>
 							<div
 								className='lg:aspect-[55/48] aspect-[9/16] overflow-hidden'
@@ -252,18 +252,18 @@ export default function SoilObject({ object, children, type, isLoading = false }
 							{object.isExternal ? <Info /> : ''}
 						</MotionWrapper>
 					) : (
-						<div className='opacity-90 absolute top-0 h-full w-full grid gap-2 lg:grid-cols-[106px_minmax(0px,_1fr)]'>
+						<div className='opacity-90 h-full w-full lg:aspect-[55/48] aspect-[9/16] grid grid-rows-[1fr_155px] lg:grid-rows-1 gap-2 lg:grid-cols-[106px_minmax(0px,_1fr)]'>
 							<div className='max-h-full overflow-hidden flex lg:flex-col lg:space-y-2 lg:space-x-0 space-x-2 lg:px-2 lg:order-1 order-2 py-2 lg:py-0'>
-								{Array(5)
+								{Array(6)
 									.fill('')
 									.map((item, idx) => (
 										<Loader
 											key={idx}
-											className='lg:w-full min-w-[90px] min-h-[135px]'
+											className='lg:w-full min-w-[90px] w-[90px] max-w-[90px] min-h-[135px] h-[135px] max-h-[135px]'
 										/>
 									))}
 							</div>
-							<Loader className='w-full h-[480px] lg:order-2 order-1' />
+							<Loader className='w-full h-full lg:order-2 order-1' />
 						</div>
 					)}
 				</div>
@@ -273,7 +273,7 @@ export default function SoilObject({ object, children, type, isLoading = false }
 					</div>
 				)}
 			</div>
-			{!!object.latitude && (
+			{!isLoading && !!object.latitude && (
 				<div id='map-section'>
 					<button
 						className='text-blue-600 w-fit mt-6'
@@ -295,7 +295,7 @@ export default function SoilObject({ object, children, type, isLoading = false }
 				</div>
 			)}
 
-			{!!object.stats?.soilObjects?.[locale] && (
+			{!isLoading && !!object.stats?.soilObjects?.[locale] && (
 				<div id='soilObjects-section'>
 					<h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-4'>
 						{t('connect_soils')}
@@ -306,7 +306,7 @@ export default function SoilObject({ object, children, type, isLoading = false }
 					/>
 				</div>
 			)}
-			{!!object.stats?.ecoSystems?.[locale] && (
+			{!isLoading && !!object.stats?.ecoSystems?.[locale] && (
 				<div id='ecosystems-section'>
 					<h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-4'>
 						{t('connect_ecosystems')}
@@ -317,7 +317,7 @@ export default function SoilObject({ object, children, type, isLoading = false }
 					/>
 				</div>
 			)}
-			{!!object.stats?.publications?.[locale] && (
+			{!isLoading && !!object.stats?.publications?.[locale] && (
 				<div id='publications-section'>
 					<h3 className='sm:text-2xl text-xl font-semibold mt-12 mb-4'>
 						{t('connect_publ')}
