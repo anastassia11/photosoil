@@ -84,7 +84,7 @@ export default function NewGallery({ mainPhoto, objectPhoto }) {
 													/>
 												</div>
 												<div className='p-4 z-10 h-fit backdrop-blur-md bg-black/40 text-white w-full
-                            flex flex-col justify-center'>
+                            flex flex-col justify-center rounded-b-md'>
 													<p className="text-sm font-medium">{date}</p>
 													<p className='text-sm line-clamp-2'>{locale === 'en' ? (titleEng || '') : locale === 'ru' ? (titleRu || '') : ''}</p>
 												</div>
