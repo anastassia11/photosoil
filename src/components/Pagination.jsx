@@ -20,12 +20,33 @@ export default function Pagination({
 	const [prevItemsLength, setPrevItemsLength] = useState()
 
 	useEffect(() => {
-		if (window.innerWidth < 640) {
-			setPageRangeDisplayed(0)
-			setMarginPagesDisplayed(1)
-		} else {
-			setPageRangeDisplayed(2)
-			setMarginPagesDisplayed(2)
+		const updatePaginationSettings = () => {
+			if (window.innerWidth < 640) {
+				// На мобильных: только первая и последняя страницы + текущая
+				setPageRangeDisplayed(0)
+				setMarginPagesDisplayed(1)
+			} else if (window.innerWidth < 768) {
+				// На планшетах: текущая страница + 1 соседняя + первая и последняя
+				setPageRangeDisplayed(1)
+				setMarginPagesDisplayed(1)
+			} else {
+				// На десктопе: текущая страница + 2 соседние + первая и последняя
+				setPageRangeDisplayed(2)
+				setMarginPagesDisplayed(2)
+			}
+		}
+
+		updatePaginationSettings()
+
+		// Обновляем при изменении размера окна
+		const handleResize = () => {
+			updatePaginationSettings()
+		}
+
+		window.addEventListener('resize', handleResize)
+
+		return () => {
+			window.removeEventListener('resize', handleResize)
 		}
 	}, [])
 
