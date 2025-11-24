@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 	images: {
+		domains: ['photosoil.tsu.ru'],
 		remotePatterns: [
 			{
 				protocol: 'https',
