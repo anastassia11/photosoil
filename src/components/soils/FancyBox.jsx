@@ -101,20 +101,9 @@ export default function FancyBox(props) {
 	if (setFancyboxIsActive) {
 		NativeFancybox.defaults.on = {
 			init: () => {
-				// Сохраняем оригинальный URL
-				const originalUrl = window.location.href.split('#')[0]
-
-				// Добавляем запись в историю
-				const newUrl = `${originalUrl}#gallery-1`
-				window.history.pushState({ fancybox: true, source: 'init' }, '', newUrl)
-
 				setFancyboxIsActive(true)
 			},
 			close: () => {
-				// Восстанавливаем оригинальный URL
-				const originalUrl = window.location.href.split('#')[0]
-				window.history.replaceState(null, null, originalUrl)
-
 				setFancyboxIsActive(false)
 			}
 		}
@@ -129,20 +118,8 @@ export default function FancyBox(props) {
 		}
 		NativeFancybox.bind(container, delegate, options)
 
-		// Обработчик для кнопки "назад" в браузере
-		const handlePopState = (event) => {
-			const instance = NativeFancybox.getInstance()
-			if (instance && instance.isVisible) {
-				instance.close()
-			}
-		}
-
-		window.addEventListener('popstate', handlePopState)
-
 		return () => {
-			window.removeEventListener('popstate', handlePopState)
 			NativeFancybox.unbind(container)
-			// NativeFancybox.close()
 		}
 	})
 
