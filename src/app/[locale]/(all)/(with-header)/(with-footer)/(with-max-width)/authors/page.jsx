@@ -12,7 +12,15 @@ export async function generateMetadata({ params: { locale } }) {
 }
 
 export default async function AuthorsPage({ params: { locale } }) {
+	const { t } = await getTranslation(locale, 'seo')
 	return (
-		<AuthorsPageComponent locale={locale} />
+		<>
+			{/* Скрытый текст для SEO */}
+			<div className="sr-only">
+				<h1>{t(`authorsPage-title`)}</h1>
+				<p>{t(`authorsPage-description`)}</p>
+			</div>
+			<AuthorsPageComponent locale={locale} />
+		</>
 	)
 }

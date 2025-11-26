@@ -13,9 +13,16 @@ export async function generateMetadata({ params: { locale } }) {
 	}
 }
 
-export default function HomePage() {
+export default async function HomePage({ params: { locale } }) {
+	const { t } = await getTranslation(locale, 'seo')
 	return (
 		<div className='relative w-screen h-[calc(100vh-64px)]'>
+			{/* Скрытый текст для SEO */}
+			<div className="sr-only">
+				<h1>{t('homePage-title')}</h1>
+				<p>{t('homePage-description')}</p>
+			</div>
+
 			<Suspense>
 				<MainMap />
 			</Suspense>

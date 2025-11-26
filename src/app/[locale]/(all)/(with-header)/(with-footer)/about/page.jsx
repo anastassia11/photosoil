@@ -11,6 +11,16 @@ export async function generateMetadata({ params: { locale } }) {
 	}
 }
 
-export default function AboutPage({ params: { locale } }) {
-	return <AboutPageComponent locale={locale} />
+export default async function AboutPage({ params: { locale } }) {
+	const { t } = await getTranslation(locale, 'seo')
+	return (
+		<>
+			{/* Скрытый текст для SEO */}
+			<div className="sr-only">
+				<h1>{t(`aboutPage-title`)}</h1>
+				<p>{t(`aboutPage-description`)}</p>
+			</div>
+			<AboutPageComponent locale={locale} />
+		</>
+	)
 }

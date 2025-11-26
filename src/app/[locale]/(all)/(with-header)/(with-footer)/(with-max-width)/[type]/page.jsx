@@ -11,11 +11,21 @@ export async function generateMetadata({ params: { locale, type } }) {
 	}
 }
 
-export default function SoilsPage({ params: { locale, type } }) {
+export default async function SoilsPage({ params: { locale, type } }) {
+	const { t } = await getTranslation(locale, 'seo')
 	return (
-		<SoilsPageComponent
-			type={type}
-			locale={locale}
-		/>
+		<>
+			{/* Скрытый текст для SEO */}
+			<div className="sr-only">
+				<h1>{t(`${type}Page-title`)}</h1>
+				<p>{t(`${type}Page-description`)}</p>
+			</div>
+
+			<SoilsPageComponent
+				type={type}
+				locale={locale}
+			/>
+		</>
+
 	)
 }

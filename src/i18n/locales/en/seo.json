@@ -1,40 +1,40 @@
 {
 	"homePage-title": "Home | Visual database of soils and ecosystems PhotoSOIL",
-	"homePage-description": "HomePage-description",
+	"homePage-description": "The PhotoSOIL database is intended as a scientific platform through which researchers can share their soil photographs with others who might benefit from them. Its mission is to promote comparative genetic and geographical research. It seeks to enhance the understanding of soil morphological diversity among soil scientists and naturalists.",
 
 	"aboutPage-title": "About Us | Visual database of soils and ecosystems PhotoSOIL",
 	"aboutPage-description": "The PhotoSOIL database is intended to be a scientific platform for researchers wishing to share their soil photographs with those who may potentially benefit from them.",
 
 	"soilsPage-title": "Search all objects | Visual database of soils and ecosystems PhotoSOIL",
-	"soilsPage-description": "SoilsPage-description",
+	"soilsPage-description": "Search all objects in the PhotoSOIL database: soil profiles, soil dynamics, morphological elements. Filters by classification, author, and category.",
 
 	"profilesPage-title": "Soil profiles | Visual database of soils and ecosystems PhotoSOIL",
-	"profilesPage-description": "profilesPage-description",
+	"profilesPage-description": "Photographs of soil profile sections are posted here. Objects are linked to a map. Brief descriptions of soil formation factors, soil structure features and genesis are provided. Additional photographs of soil morphons are provided if available.",
 
 	"dynamicsPage-title": "Soil dynamics | Visual database of soils and ecosystems PhotoSOIL",
-	"dynamicsPage-description": "The 'Soil dynamics' category contains photographs that clearly demonstrate rapid soil transformations, such as those associated with erosive processes.",
+	"dynamicsPage-description": "This category is intended for posting photographs that clearly demonstrate rapid soil transformations, such as those associated with erosion processes.",
 
 	"morphologicalPage-title": "Soil morphons | Visual database of soils and ecosystems PhotoSOIL",
-	"morphologicalPage-description": "morphologicalPage-description",
+	"morphologicalPage-description": "This category is filled with photographs of various morphons and other structural elements, from very small ones, which are related to the field of micromorphology, to those with dimensions of a few meters. These photographs are linked to a map, accompanied by brief descriptions and assigned to soil classification taxa.",
 
 	"ecosystemsPage-title": "Ecosystems | Visual database of soils and ecosystems PhotoSOIL",
-	"ecosystemsPage-description": "EcosystemsPage-description",
+	"ecosystemsPage-description": "Ecosystem catalog in the PhotoSOIL database. Photographs and descriptions of ecosystems, including their relationships with soils.",
 
 	"publicationsPage-title": "Publications | Visual database of soils and ecosystems PhotoSOIL",
-	"publicationsPage-description": "PublicationsPage-description",
+	"publicationsPage-description": "Scientific publications devoted to the study of soil profiles, soil formation factors, the morphological structure of soils and their classification.",
 
 	"joinPage-title": "Become an author | Visual database of soils and ecosystems PhotoSOIL",
-	"joinPage-description": "JoinPage-description",
+	"joinPage-description": "Submit an application to participate in the PhotoSOIL project as an author. Researchers and soil scientists can join the database to share photographs of soils, soil profiles, and ecosystems.",
 
 	"loginPage-title": "Authorization | Visual database of soils and ecosystems PhotoSOIL",
-	"loginPage-description": "LoginPage-description",
+	"loginPage-description": "Login to the PhotoSOIL system. Login to the personal account for authors and database editors. Access to the administrative panel for managing objects, publications, and project content.",
 
 	"forgot-passwordPage-title": "Reset password | Visual database of soils and ecosystems PhotoSOIL",
-	"forgot-passwordPage-description": "forgot-passwordPage-description",
+	"forgot-password Page-description": "Restoring access to an account in the PhotoSOIL database.",
 
 	"authorsPage-title": "Authors | Visual database of soils and ecosystems PhotoSOIL",
-	"authorsPage-description": "AuthorsPage-description",
+	"authorsPage-description": "A list of PhotoSOIL database authors. Researchers and soil scientists who share soil photographs. Information about the authors, their organizations, and their roles in the project.",
 
 	"newsPage-title": "News | Visual database of soils and ecosystems PhotoSOIL",
-	"newsPage-description": "NewsPage-description"
+	"newsPage-description": "PhotoSOIL news and events and more. Latest information about the project, soil and ecosystem research, and database updates."
 }

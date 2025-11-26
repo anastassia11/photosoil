@@ -1,0 +1,33 @@
+# robots.txt для PhotoSOIL
+
+User-agent: *
+Allow: /
+
+# Запрещаем индексацию админ-панели
+Disallow: /admin
+Disallow: /*/admin
+
+# Запрещаем индексацию служебных путей Next.js
+Disallow: /_next/
+Disallow: /api/
+
+# Запрещаем индексацию страниц авторизации и регистрации
+Disallow: /*/login
+Disallow: /*/join
+Disallow: /*/login/forgot-password
+
+# Разрешаем индексацию публичных страниц
+Allow: /*              # главная страница (для всех локалей)
+Allow: /*/soils
+Allow: /*/profiles
+Allow: /*/dynamics
+Allow: /*/morphological
+Allow: /*/ecosystems
+Allow: /*/authors
+Allow: /*/publications
+Allow: /*/news
+Allow: /*/about
+
+# Указываем расположение sitemap
+Sitemap: https://photosoil.tsu.ru/sitemap.xml
+

@@ -56,6 +56,7 @@ export default function Header({ locale }) {
 
 	return (
 		<header
+			data-nosnippet
 			className={`backdrop-blur-sm w-screen fixed top-0 z-50 transition-all duration-200 
             ease-in-out pl-4 pr-6 2xl:pl-8 2xl:pr-10 border-b shadow-sm h-16  bg-white/90 flex flex-row items-center justify-between`}
 		>

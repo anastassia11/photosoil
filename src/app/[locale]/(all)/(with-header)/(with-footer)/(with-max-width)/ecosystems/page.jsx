@@ -11,9 +11,17 @@ export async function generateMetadata({ params: { locale } }) {
 }
 
 export default async function EcosystemsPage({ params: { locale } }) {
+	const { t } = await getTranslation(locale, 'seo')
 	return (
-		<Suspense>
-			<EcosystemsPageComponent locale={locale} />
-		</Suspense>
+		<>
+			{/* Скрытый текст для SEO */}
+			<div className="sr-only">
+				<h1>{t(`ecosystemsPage-title`)}</h1>
+				<p>{t(`ecosystemsPage-description`)}</p>
+			</div>
+			<Suspense>
+				<EcosystemsPageComponent locale={locale} />
+			</Suspense>
+		</>
 	)
 }

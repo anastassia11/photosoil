@@ -12,8 +12,16 @@ export async function generateMetadata({ params: { locale } }) {
 	}
 }
 
-export default function NewsPage() {
+export default async function NewsPage({ params: { locale } }) {
+	const { t } = await getTranslation(locale, 'seo')
 	return (
-		<NewsPageComponent />
+		<>
+			{/* Скрытый текст для SEO */}
+			<div className="sr-only">
+				<h1>{t(`newsPage-title`)}</h1>
+				<p>{t(`newsPage-description`)}</p>
+			</div>
+			<NewsPageComponent />
+		</>
 	)
 }
