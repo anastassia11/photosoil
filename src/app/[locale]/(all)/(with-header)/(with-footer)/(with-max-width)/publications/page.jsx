@@ -1,12 +1,21 @@
 import PublicationsPageComponent from '@/components/pages-components/PublicationsPage'
 
 import { getTranslation } from '@/i18n'
+import { BASE_URL } from '@/utils/constants'
 
 export async function generateMetadata({ params: { locale } }) {
 	const { t } = await getTranslation(locale, 'seo')
 	return {
 		title: t(`publicationsPage-title`),
-		description: t(`publicationsPage-description`)
+		description: t(`publicationsPage-description`),
+		alternates: {
+			canonical: `${BASE_URL}/${locale}}/publications`,
+			languages: {
+				'ru': `${BASE_URL}/ru/publications`,
+				'en': `${BASE_URL}/en/publications`,
+				'x-default': `${BASE_URL}/ru/publications`
+			}
+		}
 	}
 }
 

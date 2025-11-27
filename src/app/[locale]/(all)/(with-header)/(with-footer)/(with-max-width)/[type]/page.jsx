@@ -1,13 +1,24 @@
 import SoilsPageComponent from '@/components/pages-components/SoilsPage'
 
 import { getTranslation } from '@/i18n'
+import { BASE_URL } from '@/utils/constants'
 import { Suspense } from 'react'
 
 export async function generateMetadata({ params: { locale, type } }) {
 	const { t } = await getTranslation(locale, 'seo')
+	const path = type ? `/${type}` : ''
+
 	return {
 		title: t(`${type}Page-title`),
-		description: t(`${type}Page-description`)
+		description: t(`${type}Page-description`),
+		alternates: {
+			canonical: `${BASE_URL}/${locale}}${path}`,
+			languages: {
+				'ru': `${BASE_URL}/ru}${path}`,
+				'en': `${BASE_URL}/en}${path}`,
+				'x-default': `${BASE_URL}/ru}${path}`
+			}
+		}
 	}
 }
 

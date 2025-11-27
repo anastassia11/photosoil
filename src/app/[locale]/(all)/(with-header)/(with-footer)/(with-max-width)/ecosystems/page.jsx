@@ -1,12 +1,21 @@
 import { getTranslation } from '@/i18n'
 import EcosystemsPageComponent from '@/components/pages-components/EcosystemsPage'
 import { Suspense } from 'react'
+import { BASE_URL } from '@/utils/constants'
 
 export async function generateMetadata({ params: { locale } }) {
 	const { t } = await getTranslation(locale, 'seo')
 	return {
 		title: t(`ecosystemsPage-title`),
-		description: t(`ecosystemsPage-description`)
+		description: t(`ecosystemsPage-description`),
+		alternates: {
+			canonical: `${BASE_URL}/${locale}}/ecosystems`,
+			languages: {
+				'ru': `${BASE_URL}/ru/ecosystems`,
+				'en': `${BASE_URL}/en/ecosystems`,
+				'x-default': `${BASE_URL}/ru/ecosystems`
+			}
+		}
 	}
 }
 
